@@ -3,22 +3,23 @@
         "module": "commonjs",
         "noImplicitAny": false,
         "removeComments": true,
+        "allowJs": true,
         "preserveConstEnums": true,
-        "outDir": "./lib",
+        "outDir": "./build",
         "sourceMap": true,
         "target": "es5",
         "experimentalDecorators": true,
         "downlevelIteration": true,
         "declaration": true,
         "lib": [
-            "ES2015",
+            "ES2015"
         ],
         "types": [
             "node"
         ]
     },
     "include": [
-        "src/**/*"
+        "src/**/*",
     ],
     "exclude": [
         "node_modules",
