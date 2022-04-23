@@ -1,8 +1,9 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
+// Node-only
+
 var warn = function (opts, str) {
     opts.out.write("WARN" + "\t" + str + "\n");
-};
+}
+
 function lintNames(grm, opts) {
     var all = [];
     grm.rules.forEach(function (rule) {
@@ -18,10 +19,9 @@ function lintNames(grm, opts) {
         });
     });
 }
-function lint(grm, opts) {
-    if (!opts.out)
-        opts.out = process.stderr;
+
+export function lint(grm, opts) {
+    if (!opts.out) opts.out = process.stderr;
     lintNames(grm, opts);
 }
-exports.lint = lint;
-//# sourceMappingURL=lint.js.map
+

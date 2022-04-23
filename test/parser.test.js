@@ -2,8 +2,8 @@
 const fs = require('fs');
 const expect = require('expect');
 
-const nearley = require('../lib/nearley');
 const {compile, parse} = require('./_shared');
+const { Parser } = require('../lib/nearley');
 
 function read(filename) {
     return fs.readFileSync(filename, 'utf-8');
@@ -102,7 +102,7 @@ describe('Parser: API', function() {
     it('can save state', function() {
         let first = "say 'hello'";
         let second = " for 2 secs";
-        let p = new nearley.Parser(tosh, { keepHistory: true });
+        let p = new Parser(tosh, { keepHistory: true });
         p.feed(first);
         expect(p.current).toBe(11)
         expect(p.table.length).toBe(12)
@@ -114,7 +114,7 @@ describe('Parser: API', function() {
     it('can rewind', function() {
         let first = "say 'hello'";
         let second = " for 2 secs";
-        let p = new nearley.Parser(tosh, { keepHistory: true });
+        let p = new Parser(tosh, { keepHistory: true });
         p.feed(first);
         expect(p.current).toBe(11)
         expect(p.table.length).toBe(12)
@@ -130,12 +130,12 @@ describe('Parser: API', function() {
     });
 
     it("won't rewind without `keepHistory` option", function() {
-        let p = new nearley.Parser(tosh, {});
+        let p = new Parser(tosh, {});
         expect(() => p.rewind()).toThrow()
     })
 
     it('restores line numbers', function() {
-      let p = new nearley.Parser(testGrammar);
+      let p = new Parser(testGrammar);
       p.feed('abc\n')
       expect(p.save().lexerState.line).toBe(2)
       p.feed('123\n')
@@ -148,7 +148,7 @@ describe('Parser: API', function() {
     });
 
     it('restores column number', function() {
-      let p = new nearley.Parser(testGrammar);
+      let p = new Parser(testGrammar);
       p.feed('foo\nbar')
       var col = p.save();
       expect(col.lexerState.line).toBe(2)

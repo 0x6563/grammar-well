@@ -1,7 +1,7 @@
 
 const fs = require('fs');
+const { Parser } = require('../lib/nearley');
 
-const nearley = require('../lib/nearley');
 const {compile} = require('./_shared');
 
 function read(filename) {
@@ -20,7 +20,7 @@ function makeParser(neFile) {
         if (grammar === null) {
             throw 'grammar error';
         }
-        var p = new nearley.Parser(grammar);
+        var p = new Parser(grammar);
         p.feed(input);
         return p.results;
     }

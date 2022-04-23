@@ -1,16 +1,16 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-function serializeRules(rules, builtinPostprocessors, extraIndent) {
-    if (extraIndent === void 0) { extraIndent = ''; }
+function serializeRules(rules, builtinPostprocessors, extraIndent = '') {
     return '[\n    ' + rules.map(function (rule) {
         return serializeRule(rule, builtinPostprocessors);
     }).join(',\n    ') + '\n' + extraIndent + ']';
 }
+
 function dedentFunc(func) {
     var lines = func.toString().split(/\n/);
+
     if (lines.length === 1) {
         return [lines[0].replace(/^\s+|\s+$/g, '')];
     }
+
     var indent = null;
     var tail = lines.slice(1);
     for (var i = 0; i < tail.length; i++) {
@@ -22,9 +22,11 @@ function dedentFunc(func) {
             }
         }
     }
+
     if (indent === null) {
         return lines;
     }
+
     return lines.map(function dedent(line) {
         if (line.slice(0, indent.length) === indent) {
             return line.slice(indent.length);
@@ -32,40 +34,42 @@ function dedentFunc(func) {
         return line;
     });
 }
-function tabulateString(string, indent, options) {
-    if (options === void 0) { options = {}; }
+
+function tabulateString(string, indent, options: any = {}) {
     var lines;
     if (Array.isArray(string)) {
         lines = string;
-    }
-    else {
+    } else {
         lines = string.toString().split('\n');
     }
+
     var tabulated = lines.map(function addIndent(line, i) {
         var shouldIndent = true;
+
         if (i == 0 && !options.indentFirst) {
             shouldIndent = false;
         }
+
         if (shouldIndent) {
             return indent + line;
-        }
-        else {
+        } else {
             return line;
         }
     }).join('\n');
+
     return tabulated;
 }
+
 function serializeSymbol(s) {
     if (s instanceof RegExp) {
         return s.toString();
-    }
-    else if (s.token) {
+    } else if (s.token) {
         return s.token;
-    }
-    else {
+    } else {
         return JSON.stringify(s);
     }
 }
+
 function serializeRule(rule, builtinPostprocessors) {
     var ret = '{';
     ret += '"name": ' + JSON.stringify(rule.name);
@@ -79,16 +83,20 @@ function serializeRule(rule, builtinPostprocessors) {
     ret += '}';
     return ret;
 }
-exports.generate = function (parser, exportName) {
+
+export const generate: any = function (parser, exportName) {
     if (!parser.config.preprocessor) {
         parser.config.preprocessor = "_default";
     }
-    if (!exports.generate[parser.config.preprocessor]) {
-        throw new Error("No such preprocessor: " + parser.config.preprocessor);
+
+    if (!generate[parser.config.preprocessor]) {
+        throw new Error("No such preprocessor: " + parser.config.preprocessor)
     }
-    return exports.generate[parser.config.preprocessor](parser, exportName);
+
+    return generate[parser.config.preprocessor](parser, exportName);
 };
-exports.generate.js = exports.generate._default = exports.generate.javascript = function (parser, exportName) {
+
+generate.js = generate._default = generate.javascript = function (parser, exportName) {
     var output = "// Generated automatically by nearley, version " + parser.version + "\n";
     output += "// http://github.com/Hardmath123/nearley\n";
     output += "(function () {\n";
@@ -97,7 +105,7 @@ exports.generate.js = exports.generate._default = exports.generate.javascript = 
     output += "var grammar = {\n";
     output += "    Lexer: " + parser.config.lexer + ",\n";
     output += "    ParserRules: " +
-        serializeRules(parser.rules, exports.generate.javascript.builtinPostprocessors)
+        serializeRules(parser.rules, generate.javascript.builtinPostprocessors)
         + "\n";
     output += "  , ParserStart: " + JSON.stringify(parser.start) + "\n";
     output += "}\n";
@@ -110,25 +118,28 @@ exports.generate.js = exports.generate._default = exports.generate.javascript = 
     output += "})();\n";
     return output;
 };
-exports.generate.javascript.builtinPostprocessors = {
+
+generate.javascript.builtinPostprocessors = {
     "joiner": "function joiner(d) {return d.join('');}",
     "arrconcat": "function arrconcat(d) {return [d[0]].concat(d[1]);}",
     "arrpush": "function arrpush(d) {return d[0].concat([d[1]]);}",
     "nuller": "function(d) {return null;}",
     "id": "id"
-};
-exports.generate.module = exports.generate.esmodule = function (parser, exportName) {
+}
+
+generate.module = generate.esmodule = function (parser, exportName) {
     var output = "// Generated automatically by nearley, version " + parser.version + "\n";
     output += "// http://github.com/Hardmath123/nearley\n";
     output += "function id(x) { return x[0]; }\n";
     output += parser.body.join('\n');
     output += "let Lexer = " + parser.config.lexer + ";\n";
-    output += "let ParserRules = " + serializeRules(parser.rules, exports.generate.javascript.builtinPostprocessors) + ";\n";
+    output += "let ParserRules = " + serializeRules(parser.rules, generate.javascript.builtinPostprocessors) + ";\n";
     output += "let ParserStart = " + JSON.stringify(parser.start) + ";\n";
     output += "export default { Lexer, ParserRules, ParserStart };\n";
     return output;
 };
-exports.generate.cs = exports.generate.coffee = exports.generate.coffeescript = function (parser, exportName) {
+
+generate.cs = generate.coffee = generate.coffeescript = function (parser, exportName) {
     var output = "# Generated automatically by nearley, version " + parser.version + "\n";
     output += "# http://github.com/Hardmath123/nearley\n";
     output += "do ->\n";
@@ -137,7 +148,10 @@ exports.generate.cs = exports.generate.coffee = exports.generate.coffeescript = 
     output += "  grammar = {\n";
     output += "    Lexer: " + parser.config.lexer + ",\n";
     output += "    ParserRules: " +
-        tabulateString(serializeRules(parser.rules, exports.generate.coffeescript.builtinPostprocessors), '      ', { indentFirst: false })
+        tabulateString(
+            serializeRules(parser.rules, generate.coffeescript.builtinPostprocessors),
+            '      ',
+            { indentFirst: false })
         + ",\n";
     output += "    ParserStart: " + JSON.stringify(parser.start) + "\n";
     output += "  }\n";
@@ -148,20 +162,22 @@ exports.generate.cs = exports.generate.coffee = exports.generate.coffeescript = 
     output += "    window." + exportName + " = grammar;\n";
     return output;
 };
-exports.generate.coffeescript.builtinPostprocessors = {
+
+generate.coffeescript.builtinPostprocessors = {
     "joiner": "(d) -> d.join('')",
     "arrconcat": "(d) -> [d[0]].concat(d[1])",
     "arrpush": "(d) -> d[0].concat([d[1]])",
     "nuller": "() -> null",
     "id": "id"
 };
-exports.generate.ts = exports.generate.typescript = function (parser, exportName) {
+
+generate.ts = generate.typescript = function (parser, exportName) {
     var output = "// Generated automatically by nearley, version " + parser.version + "\n";
     output += "// http://github.com/Hardmath123/nearley\n";
     output += "// Bypasses TS6133. Allow declared but unused functions.\n";
     output += "// @ts-ignore\n";
     output += "function id(d: any[]): any { return d[0]; }\n";
-    output += parser.customTokens.map(function (token) { return "declare var " + token + ": any;\n"; }).join("");
+    output += parser.customTokens.map(function (token) { return "declare var " + token + ": any;\n" }).join("")
     output += parser.body.join('\n');
     output += "\n";
     output += "interface NearleyToken {\n";
@@ -193,18 +209,21 @@ exports.generate.ts = exports.generate.typescript = function (parser, exportName
     output += "\n";
     output += "const grammar: Grammar = {\n";
     output += "  Lexer: " + parser.config.lexer + ",\n";
-    output += "  ParserRules: " + serializeRules(parser.rules, exports.generate.typescript.builtinPostprocessors, "  ") + ",\n";
+    output += "  ParserRules: " + serializeRules(parser.rules, generate.typescript.builtinPostprocessors, "  ") + ",\n";
     output += "  ParserStart: " + JSON.stringify(parser.start) + ",\n";
     output += "};\n";
     output += "\n";
     output += "export default grammar;\n";
+
     return output;
 };
-exports.generate.typescript.builtinPostprocessors = {
+
+generate.typescript.builtinPostprocessors = {
     "joiner": "(d) => d.join('')",
     "arrconcat": "(d) => [d[0]].concat(d[1])",
     "arrpush": "(d) => d[0].concat([d[1]])",
     "nuller": "() => null",
     "id": "id"
 };
-//# sourceMappingURL=generate.js.map
+
+

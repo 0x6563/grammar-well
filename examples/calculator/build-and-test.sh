@@ -1,2 +1,2 @@
-../../bin/nearleyc.js arithmetic.ne -o grammar.js -e arithmetic
+../../lib/cli.js arithmetic.ne -o grammar.js -e arithmetic
 node calculator.js

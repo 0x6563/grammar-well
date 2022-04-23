@@ -1,8 +1,8 @@
-var nearley = require('../lib/nearley.js');
+var { Parser } = require('../lib/nearley.js');
 var parserGrammar = require('./grammars/parens.js');
 function nspace(n) {
 	var out = "";
-	for (var i=0; i<n; i++) {
+	for (var i = 0; i < n; i++) {
 		out += " ";
 	}
 	return out;
@@ -10,29 +10,29 @@ function nspace(n) {
 
 function profile(n, type) {
 	var test = "";
-	for (var i=0; i<n; i++) {
+	for (var i = 0; i < n; i++) {
 		test += "(";
 	}
 	test += "acowcowcowcowcowcowcowcowcow";
-	for (var i=0; i<n; i++) {
+	for (var i = 0; i < n; i++) {
 		test += ")";
 	}
 	var starttime = process.hrtime();
 	var startmemory = process.memoryUsage().heapUsed;
-	var p = new nearley.Parser(parserGrammar.ParserRules, parserGrammar.ParserStart).feed(test);
+	var p = new Parser(parserGrammar.ParserRules, parserGrammar.ParserStart).feed(test);
 	console.assert(p.results[0]);
 	switch (type) {
-	case "TIME":
-		var tdiff = process.hrtime(starttime)[1];
-		console.log(
-			nspace(Math.round(tdiff/1e9  *80))+"*" // how much of one second
-		);
-		break;
-	case "MEMO":
-		var mdiff = process.memoryUsage().heapUsed - startmemory;
-		console.log(
-			nspace(Math.round(mdiff/1e8  *80)) + "+"
-		);
+		case "TIME":
+			var tdiff = process.hrtime(starttime)[1];
+			console.log(
+				nspace(Math.round(tdiff / 1e9 * 80)) + "*" // how much of one second
+			);
+			break;
+		case "MEMO":
+			var mdiff = process.memoryUsage().heapUsed - startmemory;
+			console.log(
+				nspace(Math.round(mdiff / 1e8 * 80)) + "+"
+			);
 	}
 }
 
@@ -53,8 +53,8 @@ console.log(nspace(40) + "0.50s");
 console.log(nspace(60) + "0.75s");
 console.log(nspace(80) + "1.00s");
 
-for (var i=0; i<5e4; i+=2e3) {
-	if (i%1e4 === 0) {
+for (var i = 0; i < 5e4; i += 2e3) {
+	if (i % 1e4 === 0) {
 		console.log(i);
 	}
 	profile(i, "TIME");
@@ -72,8 +72,8 @@ console.log(nspace(40) + "050MB");
 console.log(nspace(60) + "075MB");
 console.log(nspace(80) + "100MB");
 
-for (var i=0; i<5e4; i+=2e3) {
-	if (i%1e4 === 0) {
+for (var i = 0; i < 5e4; i += 2e3) {
+	if (i % 1e4 === 0) {
 		console.log(i);
 	}
 	profile(i, "MEMO");

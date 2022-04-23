@@ -6,7 +6,6 @@
 const fs = require('fs');
 const expect = require('expect');
 
-const nearley = require('../lib/nearley');
 const shared =  require('./_shared');
 const compile = shared.compile;
 const parse = shared.parse;
