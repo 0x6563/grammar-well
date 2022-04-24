@@ -21,5 +21,5 @@ __exportStar(require("./lib/lint"), exports);
 __exportStar(require("./lib/parser"), exports);
 __exportStar(require("./lib/rule"), exports);
 __exportStar(require("./lib/state"), exports);
-__exportStar(require("./lib/streamlexer"), exports);
+__exportStar(require("./lib/lexer"), exports);
 //# sourceMappingURL=index.js.map

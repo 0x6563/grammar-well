@@ -2,15 +2,15 @@ import { Rule } from "./rule";
 export declare class State {
     rule: Rule;
     dot: number;
-    reference: any;
-    wantedBy: any;
+    reference: number;
+    wantedBy: State[];
     isComplete: boolean;
     data: any;
     left: State;
-    right: StateToken;
-    constructor(rule: Rule, dot: number, reference: any, wantedBy: any);
+    right: State | StateToken;
+    constructor(rule: Rule, dot: number, reference: number, wantedBy: State[]);
     toString(): string;
-    nextState(child: StateToken): State;
+    nextState(child: State | StateToken): State;
     build(): any[];
     finish(): void;
 }

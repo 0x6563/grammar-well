@@ -5,4 +5,4 @@ export * from './lib/lint';
 export * from './lib/parser';
 export * from './lib/rule';
 export * from './lib/state';
-export * from './lib/streamlexer';
+export * from './lib/lexer';

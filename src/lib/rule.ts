@@ -1,17 +1,15 @@
 import { PostProcessor } from "../typings";
 
-export class Rule {
+export class Rule implements RuleConfig {
     static highestId: number = 0;
-    id: number;
+    id: number = ++Rule.highestId;
     constructor(
         public name: string,
         public symbols: (any)[],
         public postprocess: PostProcessor
-    ) {
-        this.id = ++Rule.highestId;
-    }
+    ) { }
 
-    toString(withCursorAt) {
+    toString(withCursorAt?: number) {
         var symbolSequence = (typeof withCursorAt === "undefined")
             ? this.symbols.map(getSymbolShortDisplay).join(' ')
             : (this.symbols.slice(0, withCursorAt).map(getSymbolShortDisplay).join(' ')
@@ -38,4 +36,18 @@ function getSymbolShortDisplay(symbol) {
             throw new Error('Unknown symbol type: ' + symbol);
         }
     }
+}
+
+interface LiteralToken {
+    literal: any;
+}
+interface TokenType {
+    type: string;
+}
+type Token = string | RegExp | LiteralToken | TokenType;
+
+export interface RuleConfig {
+    name: string;
+    symbols: any;
+    postprocess: PostProcessor
 }

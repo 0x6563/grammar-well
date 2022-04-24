@@ -18,4 +18,4 @@ var FileSystemResolver = (function () {
     return FileSystemResolver;
 }());
 exports.FileSystemResolver = FileSystemResolver;
-//# sourceMappingURL=resolver.js.map
+//# sourceMappingURL=import-resolver.js.map

@@ -1,6 +1,7 @@
 import { Grammar } from "./grammar";
 import { State } from "./state";
-import { Dictionary, LexerState } from "../typings";
+import { Dictionary } from "../typings";
+import { LexerState } from "./lexer";
 export declare class Column {
     private grammar;
     private index;
@@ -12,5 +13,5 @@ export declare class Column {
     constructor(grammar: Grammar, index: number);
     process(nextColumn?: any): void;
     predict(exp: string): void;
-    complete(left: State, right: any): void;
+    complete(left: State, right: State): void;
 }

@@ -1,15 +1,16 @@
 import { Grammar } from "./grammar";
 import { Parser } from "./parser";
 import { State } from "./state";
-import { Dictionary, LexerState } from "../typings";
+import { Dictionary } from "../typings";
+import { LexerState } from "./lexer";
 
 
 export class Column {
     lexerState: LexerState;
     states: State[] = [];
-    wants: Dictionary<State[]> = {};// states indexed by the non-terminal they expect
+    wants: Dictionary<State[]> = Object.create(null);// states indexed by the non-terminal they expect
     scannable: State[] = [];// list of states that expect a token
-    completed: Dictionary<State[]> = {};  // states that are nullable
+    completed: Dictionary<State[]> = Object.create(null);  // states that are nullable
 
     constructor(
         private grammar: Grammar,
@@ -18,32 +19,27 @@ export class Column {
 
 
     process(nextColumn?) {
-        let exp: string | RegExp;
-
-        for (var w = 0; w < this.states.length; w++) { // nb. we push() during iteration
-            var state = this.states[w];
-
+        let w = -1;
+        let state: State;
+        while (state = this.states[++w]) { // nb. we push() during iteration
             if (state.isComplete) {
                 state.finish();
                 if (state.data !== Parser.fail) {
-                    // complete
-                    var wantedBy = state.wantedBy;
+                    const { wantedBy } = state;
                     for (var i = wantedBy.length; i--;) { // this line is hot
-                        var left = wantedBy[i];
-                        this.complete(left, state);
+                        this.complete(wantedBy[i], state);
                     }
 
                     // special-case nullables
                     if (state.reference === this.index) {
-                        // make sure future predictors of this rule get completed.
-                        exp = state.rule.name;
-                        (this.completed[exp] = this.completed[exp] || []).push(state);
+                        const { name } = state.rule;
+                        this.completed[name] = this.completed[name] || [];
+                        this.completed[name].push(state);
                     }
                 }
 
             } else {
-                // queue scannable states
-                exp = state.rule.symbols[state.dot];
+                const exp = state.rule.symbols[state.dot];
                 if (typeof exp !== 'string') {
                     this.scannable.push(state);
                     continue;
@@ -53,10 +49,8 @@ export class Column {
                 if (this.wants[exp]) {
                     this.wants[exp].push(state);
 
-                    if (this.completed.hasOwnProperty(exp)) {
-                        var nulls = this.completed[exp];
-                        for (let i = 0; i < nulls.length; i++) {
-                            var right = nulls[i];
+                    if (this.completed[exp]) {
+                        for (const right of this.completed[exp]) {
                             this.complete(state, right);
                         }
                     }
@@ -69,18 +63,16 @@ export class Column {
     }
 
     predict(exp: string) {
-        const rules = this.grammar.byName[exp] || [];
+        if (!this.grammar.byName[exp])
+            return;
 
-        for (let i = 0; i < rules.length; i++) {
-            const r = rules[i];
-            const wantedBy = this.wants[exp];
-            const s = new State(r, 0, this.index, wantedBy);
-            this.states.push(s);
+        for (const rule of this.grammar.byName[exp]) {
+            this.states.push(new State(rule, 0, this.index, this.wants[exp]));
         }
     }
 
-    complete(left: State, right) {
-        var copy = left.nextState(right);
+    complete(left: State, right: State) {
+        const copy = left.nextState(right);
         this.states.push(copy);
     }
 }

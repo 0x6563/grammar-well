@@ -1,23 +1,22 @@
 // Node-only
 
-var warn = function (opts, str) {
+function warn(opts, str) {
     opts.out.write("WARN" + "\t" + str + "\n");
 }
 
 function lintNames(grm, opts) {
-    var all = [];
-    grm.rules.forEach(function (rule) {
-        all.push(rule.name);
-    });
-    grm.rules.forEach(function (rule) {
-        rule.symbols.forEach(function (symbol) {
+    const all = new Set();
+    const { rules } = grm;
+    rules.forEach(r => all.add(r.name));
+    for (const rule of rules) {
+        for (const symbol of rule.symbols) {
             if (!symbol.literal && !symbol.token && symbol.constructor !== RegExp) {
-                if (all.indexOf(symbol) === -1) {
+                if (!all.has(symbol)) {
                     warn(opts, "Undefined symbol `" + symbol + "` used.");
                 }
             }
-        });
-    });
+        }
+    }
 }
 
 export function lint(grm, opts) {

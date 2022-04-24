@@ -6,13 +6,13 @@ export class State {
     isComplete: boolean;
     data: any = [];
     left: State;
-    right: StateToken;
+    right: State | StateToken;
     // a State is a rule at a position from a given starting point in the input stream (reference)
     constructor(
         public rule: Rule,
         public dot: number,
-        public reference,
-        public wantedBy
+        public reference: number,
+        public wantedBy: State[]
     ) {
         this.isComplete = this.dot === rule.symbols.length;
     }
@@ -21,7 +21,7 @@ export class State {
         return "{" + this.rule.toString(this.dot) + "}, from: " + (this.reference || 0);
     }
 
-    nextState(child: StateToken) {
+    nextState(child: State | StateToken) {
         const state = new State(this.rule, this.dot + 1, this.reference, this.wantedBy);
         state.left = this;
         state.right = child;
@@ -50,8 +50,8 @@ export class State {
             this.data = this.rule.postprocess(this.data, this.reference, Parser.fail);
         }
     }
-
 }
+
 interface StateToken {
     data: any,
     token: any,

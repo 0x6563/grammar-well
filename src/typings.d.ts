@@ -5,7 +5,7 @@ export interface Dictionary<T> {
     [key: string]: T;
 }
 
-export interface LexerState {
-    line: number;
-    col: number;
+
+export interface Token {
+
 }

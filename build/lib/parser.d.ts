@@ -1,27 +1,33 @@
 import { Column } from "./column";
 import { Grammar } from "./grammar";
 import { Rule } from "./rule";
-import { StreamLexer } from "./streamlexer";
+import { Lexer } from "./lexer";
+import { State } from "./state";
+interface ParserOptions {
+    keepHistory: boolean;
+    lexer: Lexer;
+}
 export declare class Parser {
-    static fail: {};
+    static fail: symbol;
+    keepHistory: boolean;
     grammar: Grammar;
-    options: any;
-    lexer: StreamLexer;
+    lexer: Lexer;
     lexerState: any;
     table: Column[];
     current: 0;
     results: any;
-    constructor(rules: Rule[], start?: any);
-    constructor(grammar: Grammar, start?: any);
-    feed(chunk: any): this;
+    constructor(grammar: Grammar, options?: ParserOptions);
+    constructor(rules: Rule[], start?: string, options?: ParserOptions);
+    feed(chunk: string): this;
     reportLexerError(lexerError: any): string;
     reportError(token: any): string;
     reportErrorCommon(lexerMessage: any, tokenDisplay: any): string;
     displayStateStack(stateStack: any, lines: any): void;
     getSymbolDisplay(symbol: any): any;
-    buildFirstStateStack(state: any, visited: any): any;
+    buildFirstStateStack(state: State, visited: Set<State>): any;
     save(): Column;
     restore(column: any): void;
     rewind(index: any): void;
     finish(): any[];
 }
+export {};

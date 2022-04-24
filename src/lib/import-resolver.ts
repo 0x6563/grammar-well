@@ -6,9 +6,9 @@ export class FileSystemResolver implements ImportResolver {
     constructor(baseDir: string) {
         const { readFileSync } = require('fs');
         const { resolve, dirname } = require('path');
-        const { promisify } = require('util');
-        this.resolve = resolve;
+        // const { promisify } = require('util');
         // this.readFile = promisify(readFile);
+        this.resolve = resolve;
         this.readFile = readFileSync;
         this.baseDir = baseDir ? dirname(baseDir) : process?.cwd();
     }

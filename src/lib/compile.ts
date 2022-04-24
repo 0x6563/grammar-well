@@ -1,14 +1,42 @@
+
+import { resolve } from "path";
 import { Grammar } from "./grammar";
 import { Parser } from "./parser";
+import { FileSystemResolver, ImportResolver, ImportResolverConstructor } from "./import-resolver";
 import { Rule } from "./rule";
 
-export function Compile(structure, opts) {
+
+interface ProductionRule {
+    body: any;
+    builtin: any;
+    include: any;
+    macro: any;
+    args: any;
+    exprs: any;
+    config: any;
+    value: any;
+    rules: any;
+    name: any;
+}
+interface CompileOptions {
+    alreadycompiled: Set<string>,
+    version: string;
+    nojs: boolean;
+    args: any[]
+    resolver?: ImportResolverConstructor;
+    resolverInstance?: ImportResolver;
+}
+
+export function Compile(structure: ProductionRule[], opts: CompileOptions) {
     const unique = uniquer();
     if (!opts.alreadycompiled) {
-        opts.alreadycompiled = [];
+        opts.alreadycompiled = new Set();
     }
-
-    var result: any = {
+    if (!opts.resolverInstance) {
+        opts.resolverInstance = opts.resolver ? new opts.resolver(opts?.args?.[0]) : new FileSystemResolver(opts?.args?.[0]);
+    }
+    const builtInResolver = new FileSystemResolver(resolve(__dirname, '../grammars/file.ne'));
+    const result: any = {
         rules: [],
         body: [], // @directives list
         customTokens: [], // %tokens
@@ -18,44 +46,26 @@ export function Compile(structure, opts) {
         version: opts.version || 'unknown'
     };
 
-    for (var i = 0; i < structure.length; i++) {
-        var productionRule = structure[i];
+    for (const productionRule of structure) {
         if (productionRule.body) {
             // This isn't a rule, it's an @directive.
             if (!opts.nojs) {
                 result.body.push(productionRule.body);
             }
         } else if (productionRule.include) {
-            // Include file
-            var path;
-            if (!productionRule.builtin) {
-                path = require('path').resolve(
-                    opts.args[0] ? require('path').dirname(opts.args[0]) : process.cwd(),
-                    productionRule.include
-                );
-            } else {
-                path = require('path').resolve(
-                    __dirname,
-                    '../grammars/',
-                    productionRule.include
-                );
-            }
-            if (opts.alreadycompiled.indexOf(path) === -1) {
-                opts.alreadycompiled.push(path);
-                var f = require('fs').readFileSync(path).toString();
-                var parserGrammar = Grammar.fromCompiled(require('./nearley-language-bootstrapped.js'));
-                var parser = new Parser(parserGrammar);
-                parser.feed(f);
-                var c = Compile(parser.results[0], { args: [path], __proto__: opts });
+            const resolver = productionRule.builtin ? builtInResolver : opts.resolverInstance;
+            const path = resolver.path(productionRule.include);
+            if (!opts.alreadycompiled.has(path)) {
+                opts.alreadycompiled.add(path);
+                const parserGrammar = Grammar.fromCompiled(require('./nearley-language-bootstrapped.js'));
+                const parser = new Parser(parserGrammar);
+                parser.feed(resolver.body(path));
+                const c = Compile(parser.results[0], { args: [path], __proto__: opts } as any);
                 result.rules = result.rules.concat(c.rules);
                 result.body = result.body.concat(c.body);
                 result.customTokens = result.customTokens.concat(c.customTokens);
-                Object.keys(c.config).forEach(function (k) {
-                    result.config[k] = c.config[k];
-                });
-                Object.keys(c.macros).forEach(function (k) {
-                    result.macros[k] = c.macros[k];
-                });
+                Object.assign(result.config, c.config);
+                Object.assign(result.macros, c.macros);
             }
         } else if (productionRule.macro) {
             result.macros[productionRule.macro] = {
@@ -67,9 +77,7 @@ export function Compile(structure, opts) {
             result.config[productionRule.config] = productionRule.value
         } else {
             produceRules(productionRule.name, productionRule.rules, {});
-            if (!result.start) {
-                result.start = productionRule.name;
-            }
+            result.start = result.start || productionRule.name;
         }
     }
 
@@ -86,18 +94,14 @@ export function Compile(structure, opts) {
     }
 
     function buildRule(ruleName, rule, env) {
-        var tokens = [];
-        for (var i = 0; i < rule.tokens.length; i++) {
-            var token = buildToken(ruleName, rule.tokens[i], env);
+        const tokens = [];
+        for (let i = 0; i < rule.tokens.length; i++) {
+            const token = buildToken(ruleName, rule.tokens[i], env);
             if (token !== null) {
                 tokens.push(token);
             }
         }
-        return new Rule(
-            ruleName,
-            tokens,
-            rule.postprocess
-        );
+        return new Rule(ruleName, tokens, rule.postprocess);
     }
 
     function buildToken(ruleName, token, env) {
@@ -290,10 +294,9 @@ export function Compile(structure, opts) {
 }
 
 function uniquer() {
-    var uns = {};
-    return unique;
-    function unique(name) {
-        var un = uns[name] = (uns[name] || 0) + 1;
+    const uns = {};
+    return function unique(name) {
+        const un = uns[name] = (uns[name] || 0) + 1;
         return name + '$' + un;
     }
 }

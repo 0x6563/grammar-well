@@ -1,14 +1,33 @@
 "use strict";
+var __values = (this && this.__values) || function(o) {
+    var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
+    if (m) return m.call(o);
+    if (o && typeof o.length === "number") return {
+        next: function () {
+            if (o && i >= o.length) o = void 0;
+            return { value: o && o[i++], done: !o };
+        }
+    };
+    throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Compile = void 0;
+var path_1 = require("path");
 var grammar_1 = require("./grammar");
 var parser_1 = require("./parser");
+var import_resolver_1 = require("./import-resolver");
 var rule_1 = require("./rule");
 function Compile(structure, opts) {
+    var e_1, _a;
+    var _b, _c;
     var unique = uniquer();
     if (!opts.alreadycompiled) {
-        opts.alreadycompiled = [];
+        opts.alreadycompiled = new Set();
     }
+    if (!opts.resolverInstance) {
+        opts.resolverInstance = opts.resolver ? new opts.resolver((_b = opts === null || opts === void 0 ? void 0 : opts.args) === null || _b === void 0 ? void 0 : _b[0]) : new import_resolver_1.FileSystemResolver((_c = opts === null || opts === void 0 ? void 0 : opts.args) === null || _c === void 0 ? void 0 : _c[0]);
+    }
+    var builtInResolver = new import_resolver_1.FileSystemResolver((0, path_1.resolve)(__dirname, '../grammars/file.ne'));
     var result = {
         rules: [],
         body: [],
@@ -18,54 +37,51 @@ function Compile(structure, opts) {
         start: '',
         version: opts.version || 'unknown'
     };
-    for (var i = 0; i < structure.length; i++) {
-        var productionRule = structure[i];
-        if (productionRule.body) {
-            if (!opts.nojs) {
-                result.body.push(productionRule.body);
+    try {
+        for (var structure_1 = __values(structure), structure_1_1 = structure_1.next(); !structure_1_1.done; structure_1_1 = structure_1.next()) {
+            var productionRule = structure_1_1.value;
+            if (productionRule.body) {
+                if (!opts.nojs) {
+                    result.body.push(productionRule.body);
+                }
             }
-        }
-        else if (productionRule.include) {
-            var path;
-            if (!productionRule.builtin) {
-                path = require('path').resolve(opts.args[0] ? require('path').dirname(opts.args[0]) : process.cwd(), productionRule.include);
+            else if (productionRule.include) {
+                var resolver = productionRule.builtin ? builtInResolver : opts.resolverInstance;
+                var path = resolver.path(productionRule.include);
+                if (!opts.alreadycompiled.has(path)) {
+                    opts.alreadycompiled.add(path);
+                    var parserGrammar = grammar_1.Grammar.fromCompiled(require('./nearley-language-bootstrapped.js'));
+                    var parser = new parser_1.Parser(parserGrammar);
+                    parser.feed(resolver.body(path));
+                    var c = Compile(parser.results[0], { args: [path], __proto__: opts });
+                    result.rules = result.rules.concat(c.rules);
+                    result.body = result.body.concat(c.body);
+                    result.customTokens = result.customTokens.concat(c.customTokens);
+                    Object.assign(result.config, c.config);
+                    Object.assign(result.macros, c.macros);
+                }
+            }
+            else if (productionRule.macro) {
+                result.macros[productionRule.macro] = {
+                    'args': productionRule.args,
+                    'exprs': productionRule.exprs
+                };
+            }
+            else if (productionRule.config) {
+                result.config[productionRule.config] = productionRule.value;
             }
             else {
-                path = require('path').resolve(__dirname, '../grammars/', productionRule.include);
-            }
-            if (opts.alreadycompiled.indexOf(path) === -1) {
-                opts.alreadycompiled.push(path);
-                var f = require('fs').readFileSync(path).toString();
-                var parserGrammar = grammar_1.Grammar.fromCompiled(require('./nearley-language-bootstrapped.js'));
-                var parser = new parser_1.Parser(parserGrammar);
-                parser.feed(f);
-                var c = Compile(parser.results[0], { args: [path], __proto__: opts });
-                result.rules = result.rules.concat(c.rules);
-                result.body = result.body.concat(c.body);
-                result.customTokens = result.customTokens.concat(c.customTokens);
-                Object.keys(c.config).forEach(function (k) {
-                    result.config[k] = c.config[k];
-                });
-                Object.keys(c.macros).forEach(function (k) {
-                    result.macros[k] = c.macros[k];
-                });
+                produceRules(productionRule.name, productionRule.rules, {});
+                result.start = result.start || productionRule.name;
             }
         }
-        else if (productionRule.macro) {
-            result.macros[productionRule.macro] = {
-                'args': productionRule.args,
-                'exprs': productionRule.exprs
-            };
+    }
+    catch (e_1_1) { e_1 = { error: e_1_1 }; }
+    finally {
+        try {
+            if (structure_1_1 && !structure_1_1.done && (_a = structure_1.return)) _a.call(structure_1);
         }
-        else if (productionRule.config) {
-            result.config[productionRule.config] = productionRule.value;
-        }
-        else {
-            produceRules(productionRule.name, productionRule.rules, {});
-            if (!result.start) {
-                result.start = productionRule.name;
-            }
-        }
+        finally { if (e_1) throw e_1.error; }
     }
     return result;
     function produceRules(name, rules, env) {
@@ -219,10 +235,9 @@ function Compile(structure, opts) {
 exports.Compile = Compile;
 function uniquer() {
     var uns = {};
-    return unique;
-    function unique(name) {
+    return function unique(name) {
         var un = uns[name] = (uns[name] || 0) + 1;
         return name + '$' + un;
-    }
+    };
 }
 //# sourceMappingURL=compile.js.map
