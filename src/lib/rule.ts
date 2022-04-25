@@ -1,4 +1,4 @@
-import { PostProcessor } from "../typings";
+import { BuiltInPostProcessor, PostProcessor } from "../typings";
 
 export class Rule implements RuleConfig {
     static highestId: number = 0;
@@ -6,7 +6,7 @@ export class Rule implements RuleConfig {
     constructor(
         public name: string,
         public symbols: (any)[],
-        public postprocess: PostProcessor
+        public postprocess: PostProcessor | BuiltInPostProcessor | string
     ) { }
 
     toString(withCursorAt?: number) {
@@ -49,5 +49,5 @@ type Token = string | RegExp | LiteralToken | TokenType;
 export interface RuleConfig {
     name: string;
     symbols: any;
-    postprocess: PostProcessor
+    postprocess: PostProcessor | BuiltInPostProcessor | string;
 }

@@ -18,6 +18,7 @@ var lexer_1 = require("./lexer");
 var Parser = (function () {
     function Parser(a, b, c) {
         this.keepHistory = false;
+        this.current = 0;
         var options;
         if (a instanceof grammar_1.Grammar) {
             this.grammar = a;
@@ -29,32 +30,29 @@ var Parser = (function () {
         }
         this.keepHistory = !!(options === null || options === void 0 ? void 0 : options.keepHistory);
         this.lexer = (options === null || options === void 0 ? void 0 : options.lexer) || this.grammar.lexer || new lexer_1.StreamLexer();
-        this.lexerState = undefined;
         var column = new column_1.Column(this.grammar, 0);
         this.table = [column];
         column.wants[this.grammar.start] = [];
         column.predict(this.grammar.start);
         column.process();
-        this.current = 0;
     }
+    Parser.prototype.next = function () {
+        try {
+            return this.lexer.next();
+        }
+        catch (e) {
+            var nextColumn = new column_1.Column(this.grammar, this.current + 1);
+            this.table.push(nextColumn);
+            var err = new Error(this.reportLexerError(e));
+            err.offset = this.current;
+            err.token = e.token;
+            throw err;
+        }
+    };
     Parser.prototype.feed = function (chunk) {
         this.lexer.reset(chunk, this.lexerState);
         var token, column;
-        while (true) {
-            try {
-                token = this.lexer.next();
-                if (!token) {
-                    break;
-                }
-            }
-            catch (e) {
-                var nextColumn_1 = new column_1.Column(this.grammar, this.current + 1);
-                this.table.push(nextColumn_1);
-                var err = new Error(this.reportLexerError(e));
-                err.offset = this.current;
-                err.token = e.token;
-                throw err;
-            }
+        while (token = this.next()) {
             column = this.table[this.current];
             if (!this.keepHistory) {
                 delete this.table[this.current - 1];
@@ -91,7 +89,6 @@ var Parser = (function () {
             this.lexerState = this.lexer.save();
         }
         this.results = this.finish();
-        return this;
     };
     ;
     Parser.prototype.reportLexerError = function (lexerError) {
@@ -233,8 +230,8 @@ var Parser = (function () {
         var states = this.table[this.table.length - 1].states;
         try {
             for (var states_1 = __values(states), states_1_1 = states_1.next(); !states_1_1.done; states_1_1 = states_1.next()) {
-                var _b = states_1_1.value, rule = _b.rule, dot = _b.dot, reference = _b.reference, data = _b.data;
-                if (rule.name === start && dot === rule.symbols.length && !reference && data !== Parser.fail) {
+                var _b = states_1_1.value, _c = _b.rule, name = _c.name, symbols = _c.symbols, dot = _b.dot, reference = _b.reference, data = _b.data;
+                if (name === start && dot === symbols.length && !reference && data !== Parser.fail) {
                     considerations.push(data);
                 }
             }

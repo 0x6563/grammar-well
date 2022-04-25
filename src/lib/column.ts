@@ -14,14 +14,14 @@ export class Column {
 
     constructor(
         private grammar: Grammar,
-        private index: number
+        public index: number
     ) { }
 
 
     process(nextColumn?) {
-        let w = -1;
+        let w = 0;
         let state: State;
-        while (state = this.states[++w]) { // nb. we push() during iteration
+        while (state = this.states[w++]) { // nb. we push() during iteration
             if (state.isComplete) {
                 state.finish();
                 if (state.data !== Parser.fail) {

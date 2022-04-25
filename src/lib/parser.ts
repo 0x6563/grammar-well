@@ -1,7 +1,7 @@
 import { Column } from "./column";
 import { Grammar } from "./grammar";
 import { Rule } from "./rule";
-import { Lexer, StreamLexer } from "./lexer";
+import { Lexer, LexerState, StreamLexer } from "./lexer";
 import { State } from "./state";
 
 interface ParserOptions {
@@ -12,66 +12,57 @@ interface ParserOptions {
 export class Parser {
     static fail = Symbol();
     keepHistory: boolean = false;
+    current: number = 0;
+
     grammar: Grammar;
     lexer: Lexer;
-    lexerState: any;
+    lexerState: LexerState;
     table: Column[];
-    current: 0;
     results: any;
 
     constructor(grammar: Grammar, options?: ParserOptions)
     constructor(rules: Rule[], start?: string, options?: ParserOptions)
-    constructor(a: Rule[] | Grammar, b?: string | ParserOptions, c?: string | ParserOptions) {
+    constructor(a: Rule[] | Grammar, b?: string | ParserOptions, c?: ParserOptions) {
         let options: ParserOptions;
         if (a instanceof Grammar) {
             this.grammar = a;
             options = b as ParserOptions;
         } else {
             this.grammar = new Grammar(a, b as string);
-            options = c as ParserOptions;
+            options = c;
         }
         this.keepHistory = !!(options?.keepHistory);
 
         this.lexer = options?.lexer || this.grammar.lexer || new StreamLexer();
-        this.lexerState = undefined;
 
         const column = new Column(this.grammar, 0);
         this.table = [column];
 
-        // I could be expecting anything.
         column.wants[this.grammar.start] = [];
         column.predict(this.grammar.start);
-        // TODO what if start rule is nullable?
         column.process();
-        this.current = 0; // token index
     }
 
-    // create a reserved token for indicating a parse fail
+    next() {
+        try {
+            return this.lexer.next();
+        } catch (e) {
+            const nextColumn = new Column(this.grammar, this.current + 1);
+            this.table.push(nextColumn);
+            const err: any = new Error(this.reportLexerError(e));
+            err.offset = this.current;
+            err.token = e.token;
+            throw err;
+        }
+    }
 
     feed(chunk: string) {
         this.lexer.reset(chunk, this.lexerState);
-
         let token, column;
-        while (true) {
-            try {
-                token = this.lexer.next();
-                if (!token) {
-                    break;
-                }
-            } catch (e) {
-                // Create the next column so that the error reporter
-                // can display the correctly predicted states.
-                const nextColumn = new Column(this.grammar, this.current + 1);
-                this.table.push(nextColumn);
-                const err: any = new Error(this.reportLexerError(e));
-                err.offset = this.current;
-                err.token = e.token;
-                throw err;
-            }
-            // We add new states to table[current+1]
+
+        while (token = this.next()) {
             column = this.table[this.current];
 
-            // GC unused states
             if (!this.keepHistory) {
                 delete this.table[this.current - 1];
             }
@@ -117,22 +108,19 @@ export class Parser {
                 throw err;
             }
 
-            // maybe save lexer state
             if (this.keepHistory) {
                 column.lexerState = this.lexer.save()
             }
 
             this.current++;
         }
+
         if (column) {
             this.lexerState = this.lexer.save()
         }
 
         // Incrementally keep track of results
         this.results = this.finish();
-
-        // Allow chaining, for whatever it's worth
-        return this;
     };
 
     reportLexerError(lexerError) {
@@ -261,7 +249,7 @@ export class Parser {
         return column;
     };
 
-    restore(column) {
+    restore(column: Column) {
         const index = column.index;
         this.current = index;
         this.table[index] = column;
@@ -273,7 +261,7 @@ export class Parser {
     };
 
     // nb. deprecated: use save/restore instead!
-    rewind(index) {
+    rewind(index: number) {
         if (!this.keepHistory) {
             throw new Error('set option `keepHistory` to enable rewinding')
         }
@@ -286,8 +274,8 @@ export class Parser {
         const considerations = [];
         const { start } = this.grammar;
         const { states } = this.table[this.table.length - 1];
-        for (const { rule, dot, reference, data } of states) {
-            if (rule.name === start && dot === rule.symbols.length && !reference && data !== Parser.fail) {
+        for (const { rule: { name, symbols }, dot, reference, data } of states) {
+            if (name === start && dot === symbols.length && !reference && data !== Parser.fail) {
                 considerations.push(data);
             }
         }

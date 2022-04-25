@@ -1,7 +1,7 @@
 import { Column } from "./column";
 import { Grammar } from "./grammar";
 import { Rule } from "./rule";
-import { Lexer } from "./lexer";
+import { Lexer, LexerState } from "./lexer";
 import { State } from "./state";
 interface ParserOptions {
     keepHistory: boolean;
@@ -10,15 +10,16 @@ interface ParserOptions {
 export declare class Parser {
     static fail: symbol;
     keepHistory: boolean;
+    current: number;
     grammar: Grammar;
     lexer: Lexer;
-    lexerState: any;
+    lexerState: LexerState;
     table: Column[];
-    current: 0;
     results: any;
     constructor(grammar: Grammar, options?: ParserOptions);
     constructor(rules: Rule[], start?: string, options?: ParserOptions);
-    feed(chunk: string): this;
+    next(): any;
+    feed(chunk: string): void;
     reportLexerError(lexerError: any): string;
     reportError(token: any): string;
     reportErrorCommon(lexerMessage: any, tokenDisplay: any): string;
@@ -26,8 +27,8 @@ export declare class Parser {
     getSymbolDisplay(symbol: any): any;
     buildFirstStateStack(state: State, visited: Set<State>): any;
     save(): Column;
-    restore(column: any): void;
-    rewind(index: any): void;
+    restore(column: Column): void;
+    rewind(index: number): void;
     finish(): any[];
 }
 export {};

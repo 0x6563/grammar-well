@@ -25,9 +25,9 @@ var Column = (function () {
     }
     Column.prototype.process = function (nextColumn) {
         var e_1, _a;
-        var w = -1;
+        var w = 0;
         var state;
-        while (state = this.states[++w]) {
+        while (state = this.states[w++]) {
             if (state.isComplete) {
                 state.finish();
                 if (state.data !== parser_1.Parser.fail) {

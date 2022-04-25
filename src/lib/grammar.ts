@@ -19,7 +19,6 @@ export class Grammar {
         }
     }
 
-    // So we can allow passing (rules, start) directly to Parser for backwards compatibility
     static fromCompiled({ ParserRules, ParserStart, Lexer }: PrecompiledGrammar) {
         const rules: Rule[] = ParserRules.map(r => new Rule(r.name, r.symbols, r.postprocess));
         const grammar = new Grammar(rules, ParserStart);

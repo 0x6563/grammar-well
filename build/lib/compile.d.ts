@@ -1,23 +1,18 @@
 import { ImportResolver, ImportResolverConstructor } from "./import-resolver";
-interface ProductionRule {
-    body: any;
-    builtin: any;
-    include: any;
-    macro: any;
-    args: any;
-    exprs: any;
-    config: any;
-    value: any;
-    rules: any;
-    name: any;
-}
-interface CompileOptions {
-    alreadycompiled: Set<string>;
+import { ConfigDefinition, ExpressionDefinition, IncludeDefinition, JavascriptDefinition, MacroDefinition } from "../typings";
+export declare function Compile(rules: RuleDefinitions, config: CompileOptions): import("./tokenizer").TokenizerState;
+export declare function Compiler(rules: RuleDefinitions, config: CompileOptions, state: CompilerState): import("./tokenizer").TokenizerState;
+export declare type RuleDefinitions = (JavascriptDefinition | IncludeDefinition | MacroDefinition | ConfigDefinition | ExpressionDefinition)[];
+export interface CompileOptions {
     version: string;
-    nojs: boolean;
-    args: any[];
+    noscript: boolean;
+    basedir?: string;
     resolver?: ImportResolverConstructor;
     resolverInstance?: ImportResolver;
 }
-export declare function Compile(structure: ProductionRule[], opts: CompileOptions): any;
+interface CompilerState {
+    alreadycompiled: Set<string>;
+    resolver: ImportResolver;
+    builtinResolver: ImportResolver;
+}
 export {};

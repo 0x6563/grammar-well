@@ -1,4 +1,3 @@
-import { Token } from "../typings";
 export declare class StreamLexer implements Lexer {
     private index;
     private buffer;
@@ -13,8 +12,8 @@ export declare class StreamLexer implements Lexer {
 }
 export interface Lexer {
     reset(chunk?: string, state?: LexerState): void;
-    formatError(token: Token, message?: string): string;
-    next(): Token | undefined;
+    formatError(token: any, message?: string): string;
+    next(): any;
     save(): LexerState;
 }
 export interface LexerState {

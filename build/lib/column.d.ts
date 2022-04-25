@@ -4,7 +4,7 @@ import { Dictionary } from "../typings";
 import { LexerState } from "./lexer";
 export declare class Column {
     private grammar;
-    private index;
+    index: number;
     lexerState: LexerState;
     states: State[];
     wants: Dictionary<State[]>;

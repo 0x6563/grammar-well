@@ -1,3 +1,4 @@
+import { PostProcessor } from "../typings";
 import { Parser } from "./parser";
 import { Rule } from "./rule";
 
@@ -47,7 +48,7 @@ export class State {
 
     finish() {
         if (this.rule.postprocess) {
-            this.data = this.rule.postprocess(this.data, this.reference, Parser.fail);
+            this.data = (this.rule.postprocess as PostProcessor)(this.data, this.reference, Parser.fail);
         }
     }
 }
