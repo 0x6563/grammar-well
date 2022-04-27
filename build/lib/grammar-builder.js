@@ -227,4 +227,4 @@ var GrammarBuilder = (function () {
     return GrammarBuilder;
 }());
 exports.GrammarBuilder = GrammarBuilder;
-//# sourceMappingURL=tokenizer.js.map
+//# sourceMappingURL=grammar-builder.js.map

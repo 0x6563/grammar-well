@@ -3,7 +3,7 @@ import { Grammar } from "./grammar";
 import { Rule } from "./rule";
 import { Lexer, LexerState } from "./lexer";
 import { State } from "./state";
-interface ParserOptions {
+export interface ParserOptions {
     keepHistory: boolean;
     lexer: Lexer;
 }
@@ -31,4 +31,3 @@ export declare class Parser {
     rewind(index: number): void;
     finish(): any[];
 }
-export {};

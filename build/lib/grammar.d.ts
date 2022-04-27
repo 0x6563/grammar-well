@@ -9,9 +9,8 @@ export declare class Grammar {
     constructor(rules: Rule[], start: string);
     static fromCompiled({ ParserRules, ParserStart, Lexer }: PrecompiledGrammar): Grammar;
 }
-interface PrecompiledGrammar {
+export interface PrecompiledGrammar {
     Lexer: Lexer;
     ParserStart: string;
     ParserRules: RuleConfig[];
 }
-export {};

@@ -1,7 +1,9 @@
-import { Dictionary, EBNFModified, Expression, ExpressionToken, LexerToken, MacroCall, SubExpression, TokenLiteral } from "../typings";
+import { Dictionary, EBNFModified, Expression, ExpressionToken, LexerToken, MacroCall, RuleDefinition, RuleDefinitionList, SubExpression, TokenLiteral } from "../typings";
+import { CompilerState } from "./compile";
+import { Interpreter } from "./interpreter";
 import { Rule } from "./rule";
 
-export interface TokenizerState {
+export interface GrammarBuilderState {
     rules: any[],
     body: any[], // @directives list
     customTokens: any[], // %tokens
@@ -11,9 +13,11 @@ export interface TokenizerState {
     version: string;
 }
 
-export class Tokenizer {
+export class GrammarBuilder {
     private names = Object.create(null);
-    state: TokenizerState = {
+    private interpreter = new Interpreter(require('./nearley-language-bootstrapped.js'));
+
+    private state: GrammarBuilderState = {
         rules: [],
         body: [], // @directives list
         customTokens: [], // %tokens
@@ -23,24 +27,59 @@ export class Tokenizer {
         version: 'unknown',
     }
 
-    constructor(private config: { noscript?: boolean; version?: string }) {
+    constructor(private config: { noscript?: boolean; version?: string }, private compilerState: CompilerState) {
         this.state.version = config.version || this.state.version;
     }
 
-    
 
+    import(rules: string | RuleDefinition | RuleDefinitionList) {
+        if (typeof rules == 'string') {
+            const state = this.subGrammar(rules);
+            this.merge(state);
+            this.state.start = this.state.start || state.start;
+            return;
+        }
+        rules = Array.isArray(rules) ? rules : [rules];
+        for (const rule of rules) {
+            if ("body" in rule) {
+                if (!this.config.noscript) {
+                    this.state.body.push(rule.body);
+                }
+            } else if ("include" in rule) {
+                const resolver = rule.builtin ? this.compilerState.builtinResolver : this.compilerState.resolver;
+                const path = resolver.path(rule.include);
+                if (!this.compilerState.alreadycompiled.has(path)) {
+                    this.compilerState.alreadycompiled.add(path);
+                    const state = this.subGrammar(resolver.body(path));
+                    this.merge(state);
+                }
+            } else if ("macro" in rule) {
+                this.state.macros[rule.macro] = { args: rule.args, exprs: rule.exprs };
+            } else if ("config" in rule) {
+                this.state.config[rule.config] = rule.value
+            } else {
+                this.buildRules(rule.name, rule.rules, {});
+                this.state.start = this.state.start || rule.name;
+            }
+        }
+    }
 
-    merge(state: TokenizerState) {
+    export() {
+        return this.state;
+    }
+
+    private subGrammar(grammar: string) {
+        const builder = new GrammarBuilder(this.config, this.compilerState);
+        builder.import(this.interpreter.run(grammar));
+        return builder.export();
+    }
+
+    private merge(state: GrammarBuilderState) {
         this.state.rules = this.state.rules.concat(state.rules);
         this.state.body = this.state.body.concat(state.body);
         this.state.customTokens = this.state.customTokens.concat(state.customTokens);
         Object.assign(this.state.config, state.config);
         Object.assign(this.state.macros, state.macros);
-    }
-
-    feed(name: string, rules: Expression[]) {
-        this.buildRules(name, rules, {});
-        this.state.start = this.state.start || name;
     }
 
     private uuid(name: string) {

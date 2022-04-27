@@ -4,8 +4,8 @@ import { Rule } from "./rule";
 import { Lexer, LexerState, StreamLexer } from "./lexer";
 import { State } from "./state";
 
-interface ParserOptions {
-    keepHistory: boolean;
+export interface ParserOptions {
+    keepHistory?: boolean;
     lexer: Lexer;
 }
 

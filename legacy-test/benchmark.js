@@ -1,31 +1,11 @@
 
-const fs = require('fs');
-const { Parser } = require('../build');
+const { readFileSync } = require('fs');
 
-const {compile} = require('./_shared');
+const { interpreter } = require('./_shared');
 
 function read(filename) {
-    return fs.readFileSync(filename, 'utf-8');
+  return readFileSync(filename, 'utf-8');
 }
-
-function makeParser(neFile) {
-    var grammar;
-    try {
-        grammar = compile(read(neFile));
-    } catch (e) {
-        grammar = null; // oh dear
-    }
-
-    return function parse(input) {
-        if (grammar === null) {
-            throw 'grammar error';
-        }
-        var p = new Parser(grammar);
-        p.feed(input);
-        return p.results;
-    }
-}
-
 
 // Define benchmarks
 
@@ -53,16 +33,16 @@ suite('nearley: parse tosh.ne', () => {
 suite('calculator: parse', () => {
   const exampleFile = 'ln (3 + 2*(8/e - sin(pi/5)))'
 
-  const parse = makeParser('examples/calculator/arithmetic.ne')
-  benchmark('nearley', () => parse(exampleFile))
+  const runner = interpreter(read('examples/calculator/arithmetic.ne'))
+  benchmark('nearley', () => runner.run(exampleFile))
 
 })
 
 suite('json: parse sample1k', () => {
   const jsonFile = read('legacy-test/grammars/sample1k.json')
 
-  const parse = makeParser('examples/json.ne')
-  benchmark('nearley', () => parse(jsonFile))
+  const runner = interpreter(read('examples/json.ne'))
+  benchmark('nearley', () => runner.run(jsonFile))
 
   //benchmark('native JSON 😛', () => JSON.parse(jsonFile))
 
@@ -71,8 +51,8 @@ suite('json: parse sample1k', () => {
 suite('tosh: parse', () => {
   const toshFile = 'set foo to 2 * e^ of ( foo * -0.05 + 0.5) * (1 - e ^ of (foo * -0.05 + 0.5))'
 
-  const parse = makeParser('examples/tosh.ne')
-  benchmark('nearley', () => parse(toshFile))
+  const runner = interpreter(read('examples/tosh.ne'))
+  benchmark('nearley', () => runner.run(toshFile))
 
 })
 

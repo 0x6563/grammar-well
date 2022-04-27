@@ -5,11 +5,11 @@
   "main": "build/index.js",
   "scripts": {
     "build": "tsc",
-    "cli": "ts-node ./src/cli",
+    "cli": "ts-node index.ts",
     "bootstrap": "mocha legacy-test/bootstrap.test.js && bin/nearleyc.js src/grammars/nearley.ne > tmp && mv tmp lib/nearley-language-bootstrapped.js && echo bootstrapped ok",
     "benchmark": "benchr legacy-test/benchmark.js",
     "test": "mocha legacy-test/*.test.js",
-    "profile": "build/cli.js legacy-test/grammars/parens.ne > legacy-test/grammars/parens.js && node legacy-test/profile.js"
+    "profile": "node legacy-test/profile.js"
   },
   "author": "0x6563",
   "license": "MIT",

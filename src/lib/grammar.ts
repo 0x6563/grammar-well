@@ -27,7 +27,7 @@ export class Grammar {
     }
 }
 
-interface PrecompiledGrammar {
+export interface PrecompiledGrammar {
     Lexer: Lexer;
     ParserStart: string;
     ParserRules: RuleConfig[];

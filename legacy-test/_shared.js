@@ -1,8 +1,11 @@
 
-var path = require('path');
+const { Grammar, Parser, Compile, Interpreter } = require('../build');
 
-const { Grammar, Parser, Generate, Compile } = require('../build');
-var parserGrammar = Grammar.fromCompiled(require('../src/lib/nearley-language-bootstrapped'));
+function interpreter(source) {
+    const g = nearleyc(source);
+    var exports = requireFromString(g);
+    return new Interpreter(exports);
+}
 
 function parse(grammar, input) {
     var p = new Parser(grammar);
@@ -11,13 +14,7 @@ function parse(grammar, input) {
 }
 
 function nearleyc(source) {
-    // parse
-    var results = parse(parserGrammar, source);
-
-    // compile
-    var c = Compile(results[0], {});
-    // Generate
-    return Generate(c, 'grammar');
+    return Compile(source, { exportName: 'grammar' });
 }
 
 function compile(source) {
@@ -38,7 +35,7 @@ function requireFromString(source) {
 }
 */
 function requireFromString(source) {
-    var module = {exports: null};
+    var module = { exports: null };
     eval(source)
     return module.exports;
 }
@@ -53,5 +50,6 @@ module.exports = {
     nearleyc: nearleyc,
     evalGrammar: evalGrammar,
     parse: parse,
+    interpreter: interpreter
 };
 

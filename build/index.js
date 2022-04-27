@@ -15,9 +15,10 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 __exportStar(require("./lib/compile"), exports);
-__exportStar(require("./lib/generate"), exports);
 __exportStar(require("./lib/grammar"), exports);
+__exportStar(require("./lib/grammar-builder"), exports);
 __exportStar(require("./lib/lint"), exports);
+__exportStar(require("./lib/interpreter"), exports);
 __exportStar(require("./lib/parser"), exports);
 __exportStar(require("./lib/rule"), exports);
 __exportStar(require("./lib/state"), exports);

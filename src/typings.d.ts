@@ -82,3 +82,6 @@ export interface ProductionRule {
     rules: any;
     name: any;
 }
+
+export type RuleDefinition = (JavascriptDefinition | IncludeDefinition | MacroDefinition | ConfigDefinition | ExpressionDefinition);
+export type RuleDefinitionList = (JavascriptDefinition | IncludeDefinition | MacroDefinition | ConfigDefinition | ExpressionDefinition)[];

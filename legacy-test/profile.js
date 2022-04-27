@@ -1,5 +1,7 @@
-var { Parser } = require('../build');
-var parserGrammar = require('./grammars/parens.js');
+const { readFileSync } = require('fs');
+const { interpreter } = require('./_shared');
+const ip = interpreter(readFileSync('./legacy-test/grammars/parens.ne', 'utf-8'))
+
 function nspace(n) {
 	var out = "";
 	for (var i = 0; i < n; i++) {
@@ -19,8 +21,8 @@ function profile(n, type) {
 	}
 	var starttime = process.hrtime();
 	var startmemory = process.memoryUsage().heapUsed;
-	var p = new Parser(parserGrammar.ParserRules, parserGrammar.ParserStart).feed(test);
-	console.assert(p.results[0]);
+	var p = ip.run(test);
+	console.assert(p);
 	switch (type) {
 		case "TIME":
 			var tdiff = process.hrtime(starttime)[1];
