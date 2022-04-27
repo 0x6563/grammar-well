@@ -1,36 +1,36 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.StreamLexer = void 0;
-var StreamLexer = (function () {
-    function StreamLexer() {
+class StreamLexer {
+    constructor() {
         this.index = 0;
         this.buffer = '';
         this.line = 1;
         this.lastLineBreak = 0;
     }
-    StreamLexer.prototype.reset = function (data, state) {
+    reset(data, state) {
         this.buffer = data;
         this.index = 0;
         this.line = state ? state.line : 1;
         this.lastLineBreak = state ? -state.col : 0;
-    };
-    StreamLexer.prototype.next = function () {
+    }
+    next() {
         if (this.index < this.buffer.length) {
-            var value = this.buffer[this.index++];
+            const value = this.buffer[this.index++];
             if (value === '\n') {
                 this.line++;
                 this.lastLineBreak = this.index;
             }
-            return { value: value };
+            return { value };
         }
-    };
-    StreamLexer.prototype.save = function () {
+    }
+    save() {
         return {
             line: this.line,
             col: this.index - this.lastLineBreak,
         };
-    };
-    StreamLexer.prototype.formatError = function (token, message) {
+    }
+    formatError(token, message) {
         var buffer = this.buffer;
         if (typeof buffer === 'string') {
             var lines = buffer
@@ -57,8 +57,7 @@ var StreamLexer = (function () {
             var s = String(n);
             return Array(length - s.length + 1).join(" ") + s;
         }
-    };
-    return StreamLexer;
-}());
+    }
+}
 exports.StreamLexer = StreamLexer;
 //# sourceMappingURL=lexer.js.map

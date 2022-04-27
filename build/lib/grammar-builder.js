@@ -1,21 +1,10 @@
 "use strict";
-var __values = (this && this.__values) || function(o) {
-    var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
-    if (m) return m.call(o);
-    if (o && typeof o.length === "number") return {
-        next: function () {
-            if (o && i >= o.length) o = void 0;
-            return { value: o && o[i++], done: !o };
-        }
-    };
-    throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GrammarBuilder = void 0;
-var interpreter_1 = require("./interpreter");
-var rule_1 = require("./rule");
-var GrammarBuilder = (function () {
-    function GrammarBuilder(config, compilerState) {
+const interpreter_1 = require("./interpreter");
+const rule_1 = require("./rule");
+class GrammarBuilder {
+    constructor(config, compilerState) {
         this.config = config;
         this.compilerState = compilerState;
         this.names = Object.create(null);
@@ -31,91 +20,80 @@ var GrammarBuilder = (function () {
         };
         this.state.version = config.version || this.state.version;
     }
-    GrammarBuilder.prototype.import = function (rules) {
-        var e_1, _a;
+    import(rules) {
         if (typeof rules == 'string') {
-            var state = this.subGrammar(rules);
+            const state = this.subGrammar(rules);
             this.merge(state);
             this.state.start = this.state.start || state.start;
             return;
         }
         rules = Array.isArray(rules) ? rules : [rules];
-        try {
-            for (var rules_1 = __values(rules), rules_1_1 = rules_1.next(); !rules_1_1.done; rules_1_1 = rules_1.next()) {
-                var rule = rules_1_1.value;
-                if ("body" in rule) {
-                    if (!this.config.noscript) {
-                        this.state.body.push(rule.body);
-                    }
-                }
-                else if ("include" in rule) {
-                    var resolver = rule.builtin ? this.compilerState.builtinResolver : this.compilerState.resolver;
-                    var path = resolver.path(rule.include);
-                    if (!this.compilerState.alreadycompiled.has(path)) {
-                        this.compilerState.alreadycompiled.add(path);
-                        var state = this.subGrammar(resolver.body(path));
-                        this.merge(state);
-                    }
-                }
-                else if ("macro" in rule) {
-                    this.state.macros[rule.macro] = { args: rule.args, exprs: rule.exprs };
-                }
-                else if ("config" in rule) {
-                    this.state.config[rule.config] = rule.value;
-                }
-                else {
-                    this.buildRules(rule.name, rule.rules, {});
-                    this.state.start = this.state.start || rule.name;
+        for (const rule of rules) {
+            if ("body" in rule) {
+                if (!this.config.noscript) {
+                    this.state.body.push(rule.body);
                 }
             }
-        }
-        catch (e_1_1) { e_1 = { error: e_1_1 }; }
-        finally {
-            try {
-                if (rules_1_1 && !rules_1_1.done && (_a = rules_1.return)) _a.call(rules_1);
+            else if ("include" in rule) {
+                const resolver = rule.builtin ? this.compilerState.builtinResolver : this.compilerState.resolver;
+                const path = resolver.path(rule.include);
+                if (!this.compilerState.alreadycompiled.has(path)) {
+                    this.compilerState.alreadycompiled.add(path);
+                    const state = this.subGrammar(resolver.body(path));
+                    this.merge(state);
+                }
             }
-            finally { if (e_1) throw e_1.error; }
+            else if ("macro" in rule) {
+                this.state.macros[rule.macro] = { args: rule.args, exprs: rule.exprs };
+            }
+            else if ("config" in rule) {
+                this.state.config[rule.config] = rule.value;
+            }
+            else {
+                this.buildRules(rule.name, rule.rules, {});
+                this.state.start = this.state.start || rule.name;
+            }
         }
-    };
-    GrammarBuilder.prototype.export = function () {
+    }
+    export() {
         return this.state;
-    };
-    GrammarBuilder.prototype.subGrammar = function (grammar) {
-        var builder = new GrammarBuilder(this.config, this.compilerState);
+    }
+    subGrammar(grammar) {
+        const builder = new GrammarBuilder(this.config, this.compilerState);
         builder.import(this.interpreter.run(grammar));
         return builder.export();
-    };
-    GrammarBuilder.prototype.merge = function (state) {
+    }
+    merge(state) {
         this.state.rules = this.state.rules.concat(state.rules);
         this.state.body = this.state.body.concat(state.body);
         this.state.customTokens = this.state.customTokens.concat(state.customTokens);
         Object.assign(this.state.config, state.config);
         Object.assign(this.state.macros, state.macros);
-    };
-    GrammarBuilder.prototype.uuid = function (name) {
+    }
+    uuid(name) {
         this.names[name] = (this.names[name] || 0) + 1;
         return name + '$' + this.names[name];
-    };
-    GrammarBuilder.prototype.buildRules = function (name, rules, scope) {
-        for (var i = 0; i < rules.length; i++) {
-            var rule = this.buildRule(name, rules[i], scope);
+    }
+    buildRules(name, rules, scope) {
+        for (let i = 0; i < rules.length; i++) {
+            const rule = this.buildRule(name, rules[i], scope);
             if (this.config.noscript) {
                 rule.postprocess = null;
             }
             this.state.rules.push(rule);
         }
-    };
-    GrammarBuilder.prototype.buildRule = function (name, rule, scope) {
-        var tokens = [];
-        for (var i = 0; i < rule.tokens.length; i++) {
-            var token = this.buildToken(name, rule.tokens[i], scope);
+    }
+    buildRule(name, rule, scope) {
+        const tokens = [];
+        for (let i = 0; i < rule.tokens.length; i++) {
+            const token = this.buildToken(name, rule.tokens[i], scope);
             if (token !== null) {
                 tokens.push(token);
             }
         }
         return new rule_1.Rule(name, tokens, rule.postprocess);
-    };
-    GrammarBuilder.prototype.buildToken = function (name, token, scope) {
+    }
+    buildToken(name, token, scope) {
         if (typeof token === 'string') {
             return token === 'null' ? null : token;
         }
@@ -133,11 +111,11 @@ var GrammarBuilder = (function () {
         }
         if ('token' in token) {
             if (this.state.config.lexer) {
-                var name_1 = token.token;
-                if (this.state.customTokens.indexOf(name_1) === -1) {
-                    this.state.customTokens.push(name_1);
+                const name = token.token;
+                if (this.state.customTokens.indexOf(name) === -1) {
+                    this.state.customTokens.push(name);
                 }
-                return { token: "(".concat(this.state.config.lexer, ".has(").concat(JSON.stringify(name_1), ") ? {type: ").concat(JSON.stringify(name_1), "} : ").concat(name_1, ")") };
+                return { token: `(${this.state.config.lexer}.has(${JSON.stringify(name)}) ? {type: ${JSON.stringify(name)}} : ${name})` };
             }
             return token;
         }
@@ -159,25 +137,25 @@ var GrammarBuilder = (function () {
             }
         }
         throw new Error("unrecognized token: " + JSON.stringify(token));
-    };
-    GrammarBuilder.prototype.buildStringToken = function (name, token, scope) {
-        var id = this.uuid(name + "$string");
+    }
+    buildStringToken(name, token, scope) {
+        const id = this.uuid(name + "$string");
         this.buildRules(id, [
             {
-                tokens: token.literal.split("").map(function (literal) { return ({ literal: literal }); }),
+                tokens: token.literal.split("").map((literal) => ({ literal })),
                 postprocess: { builtin: "joiner" }
             }
         ], scope);
         return id;
-    };
-    GrammarBuilder.prototype.buildSubExpressionToken = function (name, token, scope) {
-        var id = this.uuid(name + "$subexpression");
+    }
+    buildSubExpressionToken(name, token, scope) {
+        const id = this.uuid(name + "$subexpression");
         this.buildRules(id, token.subexpression, scope);
         return id;
-    };
-    GrammarBuilder.prototype.buildEBNFToken = function (name, token, scope) {
-        var id = this.uuid(name + "$ebnf");
-        var exprs;
+    }
+    buildEBNFToken(name, token, scope) {
+        const id = this.uuid(name + "$ebnf");
+        let exprs;
         if (token.modifier == ':+') {
             exprs = [{
                     tokens: [token.ebnf],
@@ -205,26 +183,25 @@ var GrammarBuilder = (function () {
         }
         this.buildRules(id, exprs, scope);
         return id;
-    };
-    GrammarBuilder.prototype.buildMacroCallToken = function (name, token, scope) {
-        var id = this.uuid(name + "$macrocall");
-        var macro = this.state.macros[token.macrocall];
+    }
+    buildMacroCallToken(name, token, scope) {
+        const id = this.uuid(name + "$macrocall");
+        const macro = this.state.macros[token.macrocall];
         if (!macro) {
             throw new Error("Unkown macro: " + token.macrocall);
         }
         if (macro.args.length !== token.args.length) {
             throw new Error("Argument count mismatch.");
         }
-        var newscope = { __proto__: scope };
-        for (var i = 0; i < macro.args.length; i++) {
-            var argrulename = this.uuid(name + "$macrocall");
+        const newscope = { __proto__: scope };
+        for (let i = 0; i < macro.args.length; i++) {
+            const argrulename = this.uuid(name + "$macrocall");
             newscope[macro.args[i]] = argrulename;
             this.buildRules(argrulename, [token.args[i]], scope);
         }
         this.buildRules(id, macro.exprs, newscope);
         return id;
-    };
-    return GrammarBuilder;
-}());
+    }
+}
 exports.GrammarBuilder = GrammarBuilder;
 //# sourceMappingURL=grammar-builder.js.map

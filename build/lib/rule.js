@@ -1,25 +1,24 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Rule = void 0;
-var Rule = (function () {
-    function Rule(name, symbols, postprocess) {
+class Rule {
+    constructor(name, symbols, postprocess) {
         this.name = name;
         this.symbols = symbols;
         this.postprocess = postprocess;
         this.id = ++Rule.highestId;
     }
-    Rule.prototype.toString = function (withCursorAt) {
+    toString(withCursorAt) {
         var symbolSequence = (typeof withCursorAt === "undefined")
             ? this.symbols.map(getSymbolShortDisplay).join(' ')
             : (this.symbols.slice(0, withCursorAt).map(getSymbolShortDisplay).join(' ')
                 + " ● "
                 + this.symbols.slice(withCursorAt).map(getSymbolShortDisplay).join(' '));
         return this.name + " → " + symbolSequence;
-    };
-    Rule.highestId = 0;
-    return Rule;
-}());
+    }
+}
 exports.Rule = Rule;
+Rule.highestId = 0;
 function getSymbolShortDisplay(symbol) {
     var type = typeof symbol;
     if (type === "string") {

@@ -1,15 +1,15 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Compiler = exports.Compile = void 0;
-var path_1 = require("path");
-var import_resolver_1 = require("./import-resolver");
-var grammar_builder_1 = require("./grammar-builder");
-var coffeescript_1 = require("../formats/coffeescript");
-var javascript_1 = require("../formats/javascript");
-var typescript_1 = require("../formats/typescript");
-var OutputFormats = {
-    '{}': function (grammar, exportName) { return ({ grammar: grammar, exportName: exportName }); },
-    json: function (grammar, exportName) { return JSON.stringify({ grammar: grammar, exportName: exportName }); },
+const path_1 = require("path");
+const import_resolver_1 = require("./import-resolver");
+const grammar_builder_1 = require("./grammar-builder");
+const coffeescript_1 = require("../formats/coffeescript");
+const javascript_1 = require("../formats/javascript");
+const typescript_1 = require("../formats/typescript");
+const OutputFormats = {
+    '{}': (grammar, exportName) => ({ grammar, exportName }),
+    json: (grammar, exportName) => JSON.stringify({ grammar, exportName }),
     _default: javascript_1.JavascriptOutput,
     js: javascript_1.JavascriptOutput,
     javascript: javascript_1.JavascriptOutput,
@@ -21,16 +21,14 @@ var OutputFormats = {
     ts: typescript_1.TypescriptFormat,
     typescript: typescript_1.TypescriptFormat
 };
-function Compile(rules, config) {
-    if (config === void 0) { config = {}; }
-    var compiler = new Compiler(config);
+function Compile(rules, config = {}) {
+    const compiler = new Compiler(config);
     compiler.import(rules);
     return compiler.export();
 }
 exports.Compile = Compile;
-var Compiler = (function () {
-    function Compiler(config) {
-        if (config === void 0) { config = {}; }
+class Compiler {
+    constructor(config = {}) {
         this.state = {
             alreadycompiled: new Set(),
             resolver: config.resolver ? new config.resolver(config.basedir) : new import_resolver_1.FileSystemResolver(config.basedir),
@@ -38,19 +36,18 @@ var Compiler = (function () {
         };
         this.grammarBuilder = new grammar_builder_1.GrammarBuilder(config, this.state);
     }
-    Compiler.prototype.import = function (val) {
+    import(val) {
         this.grammarBuilder.import(val);
-    };
-    Compiler.prototype.export = function (format, name) {
-        var grammar = this.grammarBuilder.export();
-        var output = format || grammar.config.preprocessor || '_default';
+    }
+    export(format, name) {
+        const grammar = this.grammarBuilder.export();
+        const output = format || grammar.config.preprocessor || '_default';
         if (OutputFormats[output]) {
             return OutputFormats[output](grammar, name);
         }
         throw new Error("No such preprocessor: " + output);
-    };
+    }
     ;
-    return Compiler;
-}());
+}
 exports.Compiler = Compiler;
 //# sourceMappingURL=compile.js.map

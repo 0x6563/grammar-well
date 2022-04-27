@@ -1,8 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.serializeRule = exports.serializeSymbol = exports.tabulateString = exports.dedentFunc = exports.serializeRules = void 0;
-function serializeRules(rules, builtinPostprocessors, extraIndent) {
-    if (extraIndent === void 0) { extraIndent = ''; }
+function serializeRules(rules, builtinPostprocessors, extraIndent = '') {
     return '[\n    ' + rules.map(function (rule) {
         return serializeRule(rule, builtinPostprocessors);
     }).join(',\n    ') + '\n' + extraIndent + ']';
@@ -35,8 +34,7 @@ function dedentFunc(func) {
     });
 }
 exports.dedentFunc = dedentFunc;
-function tabulateString(string, indent, options) {
-    if (options === void 0) { options = {}; }
+function tabulateString(string, indent, options = {}) {
     var lines;
     if (Array.isArray(string)) {
         lines = string;

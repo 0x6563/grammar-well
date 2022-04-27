@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ESMOutput = exports.JavascriptOutput = exports.JavascriptPostProcessors = void 0;
-var util_1 = require("./util");
+const util_1 = require("./util");
 exports.JavascriptPostProcessors = {
     "joiner": "function joiner(d) {return d.join('');}",
     "arrconcat": "function arrconcat(d) {return [d[0]].concat(d[1]);}",
@@ -10,11 +10,35 @@ exports.JavascriptPostProcessors = {
     "id": "id"
 };
 function JavascriptOutput(parser, exportName) {
-    return "// Generated automatically by nearley, version ".concat(parser.version, " \n// http://github.com/Hardmath123/nearley\n(function () {\nfunction id(x) { return x[0]; }\n").concat(parser.body.join('\n'), "\nvar grammar = {\n    Lexer: ").concat(parser.config.lexer, ",\n    ParserRules: ").concat((0, util_1.serializeRules)(parser.rules, exports.JavascriptPostProcessors), "\n  , ParserStart: ").concat(JSON.stringify(parser.start), "\n}\nif (typeof module !== 'undefined'&& typeof module.exports !== 'undefined') {\n   module.exports = grammar;\n} else {\n   window.").concat(exportName, " = grammar;\n}\n})();\n");
+    return `// Generated automatically by nearley, version ${parser.version} 
+// http://github.com/Hardmath123/nearley
+(function () {
+function id(x) { return x[0]; }
+${parser.body.join('\n')}
+var grammar = {
+    Lexer: ${parser.config.lexer},
+    ParserRules: ${(0, util_1.serializeRules)(parser.rules, exports.JavascriptPostProcessors)}
+  , ParserStart: ${JSON.stringify(parser.start)}
+}
+if (typeof module !== 'undefined'&& typeof module.exports !== 'undefined') {
+   module.exports = grammar;
+} else {
+   window.${exportName} = grammar;
+}
+})();
+`;
 }
 exports.JavascriptOutput = JavascriptOutput;
 function ESMOutput(parser, exportName) {
-    return "// Generated automatically by nearley, version ".concat(parser.version, " \n// http://github.com/Hardmath123/nearley\nfunction id(x) { return x[0]; }\n").concat(parser.body.join('\n'), "\nlet Lexer = ").concat(parser.config.lexer, ";\nlet ParserRules = ").concat((0, util_1.serializeRules)(parser.rules, exports.JavascriptPostProcessors), ";\nlet ParserStart = ").concat(JSON.stringify(parser.start), ";\nexport default { Lexer, ParserRules, ParserStart };\n");
+    return `// Generated automatically by nearley, version ${parser.version} 
+// http://github.com/Hardmath123/nearley
+function id(x) { return x[0]; }
+${parser.body.join('\n')}
+let Lexer = ${parser.config.lexer};
+let ParserRules = ${(0, util_1.serializeRules)(parser.rules, exports.JavascriptPostProcessors)};
+let ParserStart = ${JSON.stringify(parser.start)};
+export default { Lexer, ParserRules, ParserStart };
+`;
 }
 exports.ESMOutput = ESMOutput;
 ;

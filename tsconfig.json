@@ -7,7 +7,7 @@
         "preserveConstEnums": true,
         "outDir": "./build",
         "sourceMap": true,
-        "target": "es5",
+        "target": "es6",
         "experimentalDecorators": true,
         "downlevelIteration": true,
         "declaration": true,

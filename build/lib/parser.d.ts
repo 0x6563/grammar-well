@@ -4,7 +4,7 @@ import { Rule } from "./rule";
 import { Lexer, LexerState } from "./lexer";
 import { State } from "./state";
 export interface ParserOptions {
-    keepHistory: boolean;
+    keepHistory?: boolean;
     lexer: Lexer;
 }
 export declare class Parser {

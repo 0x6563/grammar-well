@@ -1,10 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Generate = void 0;
-var coffeescript_1 = require("../formats/coffeescript");
-var javascript_1 = require("../formats/javascript");
-var typescript_1 = require("../formats/typescript");
-var Registry = {
+const coffeescript_1 = require("../formats/coffeescript");
+const javascript_1 = require("../formats/javascript");
+const typescript_1 = require("../formats/typescript");
+const Registry = {
     _default: javascript_1.JavascriptOutput,
     js: javascript_1.JavascriptOutput,
     javascript: javascript_1.JavascriptOutput,

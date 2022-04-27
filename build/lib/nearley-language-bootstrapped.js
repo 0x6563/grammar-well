@@ -1,34 +1,12 @@
-var __values = (this && this.__values) || function(o) {
-    var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
-    if (m) return m.call(o);
-    if (o && typeof o.length === "number") return {
-        next: function () {
-            if (o && i >= o.length) o = void 0;
-            return { value: o && o[i++], done: !o };
-        }
-    };
-    throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
-};
 (function () {
     function id(x) { return x[0]; }
     function getValue(d) {
         return d[0].value;
     }
     function literals(list) {
-        var e_1, _a;
         var rules = {};
-        try {
-            for (var list_1 = __values(list), list_1_1 = list_1.next(); !list_1_1.done; list_1_1 = list_1.next()) {
-                var lit = list_1_1.value;
-                rules[lit] = { match: lit, next: 'main' };
-            }
-        }
-        catch (e_1_1) { e_1 = { error: e_1_1 }; }
-        finally {
-            try {
-                if (list_1_1 && !list_1_1.done && (_a = list_1.return)) _a.call(list_1);
-            }
-            finally { if (e_1) throw e_1.error; }
+        for (var lit of list) {
+            rules[lit] = { match: lit, next: 'main' };
         }
         return rules;
     }
@@ -39,18 +17,18 @@ var __values = (this && this.__values) || function(o) {
         arrow: { match: /[=-]+\>/, next: 'main' },
         js: {
             match: /\{\%(?:[^%]|\%[^}])*\%\}/,
-            value: function (x) { return x.slice(2, -2); },
+            value: x => x.slice(2, -2),
             lineBreaks: true,
         },
         word: { match: /[\w\?\+]+/, next: 'afterWord' },
         string: {
             match: /"(?:[^\\"\n]|\\["\\/bfnrt]|\\u[a-fA-F0-9]{4})*"/,
-            value: function (x) { return JSON.parse(x); },
+            value: x => JSON.parse(x),
             next: 'main',
         },
         btstring: {
             match: /`[^`]*`/,
-            value: function (x) { return x.slice(1, -1); },
+            value: x => x.slice(1, -1),
             next: 'main',
             lineBreaks: true,
         },
@@ -64,7 +42,7 @@ var __values = (this && this.__values) || function(o) {
         main: Object.assign({}, rules, {
             charclass: {
                 match: /\.|\[(?:\\.|[^\\\n])+?\]/,
-                value: function (x) { return new RegExp(x); },
+                value: x => new RegExp(x),
             },
         }),
         afterWord: Object.assign({}, rules, {
@@ -128,8 +106,8 @@ var __values = (this && this.__values) || function(o) {
             { "name": "expr", "symbols": ["expr_member"] },
             { "name": "expr", "symbols": ["expr", "ws", "expr_member"], "postprocess": function (d) { return d[0].concat([d[2]]); } },
             { "name": "word", "symbols": [(lexer.has("word") ? { type: "word" } : word)], "postprocess": getValue },
-            { "name": "string", "symbols": [(lexer.has("string") ? { type: "string" } : string)], "postprocess": function (d) { return ({ literal: d[0].value }); } },
-            { "name": "string", "symbols": [(lexer.has("btstring") ? { type: "btstring" } : btstring)], "postprocess": function (d) { return ({ literal: d[0].value }); } },
+            { "name": "string", "symbols": [(lexer.has("string") ? { type: "string" } : string)], "postprocess": d => ({ literal: d[0].value }) },
+            { "name": "string", "symbols": [(lexer.has("btstring") ? { type: "btstring" } : btstring)], "postprocess": d => ({ literal: d[0].value }) },
             { "name": "charclass", "symbols": [(lexer.has("charclass") ? { type: "charclass" } : charclass)], "postprocess": getValue },
             { "name": "js", "symbols": [(lexer.has("js") ? { type: "js" } : js)], "postprocess": getValue },
             { "name": "_$ebnf$1", "symbols": ["ws"], "postprocess": id },
