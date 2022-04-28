@@ -210,7 +210,7 @@ export class Parser {
             } else if (symbol.test) {
                 return 'token matching ' + String(symbol.test);
             } else {
-                throw new Error('Unknown symbol type: ' + symbol);
+                throw new Error('Unknown symbol type: ' + JSON.stringify(symbol));
             }
         }
     };

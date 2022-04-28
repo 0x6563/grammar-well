@@ -24,7 +24,7 @@ const OutputFormats = {
 function Compile(rules, config = {}) {
     const compiler = new Compiler(config);
     compiler.import(rules);
-    return compiler.export();
+    return compiler.export(config.format);
 }
 exports.Compile = Compile;
 class Compiler {

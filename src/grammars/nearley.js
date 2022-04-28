@@ -1,4 +1,4 @@
-// Generated automatically by nearley, version 2.19.5
+// Generated automatically by nearley, version unknown 
 // http://github.com/Hardmath123/nearley
 (function () {
 function id(x) { return x[0]; }
@@ -72,6 +72,7 @@ function insensitive(sl) {
     return {subexpression: [{tokens: result, postprocess: function(d) {return d.join(""); }}]};
 }
 
+
 var grammar = {
     Lexer: lexer,
     ParserRules: [
@@ -127,6 +128,6 @@ var grammar = {
 if (typeof module !== 'undefined'&& typeof module.exports !== 'undefined') {
    module.exports = grammar;
 } else {
-   window.grammar = grammar;
+   window.undefined = grammar;
 }
 })();

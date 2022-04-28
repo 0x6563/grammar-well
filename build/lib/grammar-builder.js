@@ -3,12 +3,26 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.GrammarBuilder = void 0;
 const interpreter_1 = require("./interpreter");
 const rule_1 = require("./rule");
+const cow = require("../grammars/cow.json");
+const number = require("../grammars/number.json");
+const postprocessor = require("../grammars/postprocessors.json");
+const nearley = require("../grammars/nearley.json");
+const string = require("../grammars/string.json");
+const whitespace = require("../grammars/whitespace.json");
+const BuiltInRegistry = {
+    'cow.ne': cow.grammar,
+    'number.ne': number.grammar,
+    'postprocessor.ne': postprocessor.grammar,
+    'nearley.ne': nearley.grammar,
+    'string.ne': string.grammar,
+    'whitespace.ne': whitespace.grammar,
+};
 class GrammarBuilder {
     constructor(config, compilerState) {
         this.config = config;
         this.compilerState = compilerState;
         this.names = Object.create(null);
-        this.interpreter = new interpreter_1.Interpreter(require('./nearley-language-bootstrapped.js'));
+        this.interpreter = new interpreter_1.Interpreter(require('../grammars/nearley.js'));
         this.state = {
             rules: [],
             body: [],

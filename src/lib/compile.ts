@@ -24,7 +24,7 @@ const OutputFormats = {
 export function Compile(rules: string | RuleDefinition | RuleDefinitionList, config: CompileOptions = {}) {
     const compiler = new Compiler(config);
     compiler.import(rules);
-    return compiler.export();
+    return compiler.export(config.format);
 }
 
 export class Compiler {
@@ -65,6 +65,7 @@ export interface CompileOptions {
     resolver?: ImportResolverConstructor;
     resolverInstance?: ImportResolver;
     exportName?: string;
+    format?: keyof typeof OutputFormats;
 }
 
 export interface CompilerState {

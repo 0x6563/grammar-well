@@ -3,6 +3,23 @@ import { CompilerState } from "./compile";
 import { Interpreter } from "./interpreter";
 import { Rule } from "./rule";
 
+import * as cow from '../grammars/cow.json';
+import * as number from '../grammars/number.json';
+import * as postprocessor from '../grammars/postprocessors.json';
+import * as nearley from '../grammars/nearley.json';
+import * as string from '../grammars/string.json';
+import * as whitespace from '../grammars/whitespace.json';
+
+// TODO Use Prebuilt grammar
+const BuiltInRegistry = {
+    'cow.ne': cow.grammar,
+    'number.ne': number.grammar,
+    'postprocessor.ne': postprocessor.grammar,
+    'nearley.ne': nearley.grammar,
+    'string.ne': string.grammar,
+    'whitespace.ne': whitespace.grammar,
+}
+
 export interface GrammarBuilderState {
     rules: any[],
     body: any[], // @directives list
@@ -15,7 +32,7 @@ export interface GrammarBuilderState {
 
 export class GrammarBuilder {
     private names = Object.create(null);
-    private interpreter = new Interpreter(require('./nearley-language-bootstrapped.js'));
+    private interpreter = new Interpreter(require('../grammars/nearley.js'));
 
     private state: GrammarBuilderState = {
         rules: [],

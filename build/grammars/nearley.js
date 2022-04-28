@@ -124,7 +124,7 @@
         module.exports = grammar;
     }
     else {
-        window.grammar = grammar;
+        window.undefined = grammar;
     }
 })();
-//# sourceMappingURL=nearley-language-bootstrapped.js.map
+//# sourceMappingURL=nearley.js.map

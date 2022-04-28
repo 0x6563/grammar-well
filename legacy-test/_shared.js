@@ -42,7 +42,7 @@ function requireFromString(source) {
 
 function evalGrammar(compiledGrammar) {
     var exports = requireFromString(compiledGrammar);
-    return new Grammar.fromCompiled(exports);
+    return Grammar.fromCompiled(exports);
 }
 
 module.exports = {

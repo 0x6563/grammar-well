@@ -20,7 +20,10 @@ declare const OutputFormats: {
     ts: typeof TypescriptFormat;
     typescript: typeof TypescriptFormat;
 };
-export declare function Compile(rules: string | RuleDefinition | RuleDefinitionList, config?: CompileOptions): string;
+export declare function Compile(rules: string | RuleDefinition | RuleDefinitionList, config?: CompileOptions): string | {
+    grammar: any;
+    exportName: any;
+};
 export declare class Compiler {
     private state;
     private grammarBuilder;
@@ -39,6 +42,7 @@ export interface CompileOptions {
     resolver?: ImportResolverConstructor;
     resolverInstance?: ImportResolver;
     exportName?: string;
+    format?: keyof typeof OutputFormats;
 }
 export interface CompilerState {
     alreadycompiled: Set<string>;
