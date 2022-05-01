@@ -33,7 +33,7 @@ export declare class Compiler {
     import(rule: RuleDefinition): any;
     import(rules: RuleDefinitionList): any;
     import(val: string | RuleDefinition | RuleDefinitionList): any;
-    export<T extends keyof typeof OutputFormats = '_default'>(format?: T, name?: string): ReturnType<typeof OutputFormats[OutputFormat<T>]>;
+    export<T extends keyof typeof OutputFormats = '_default'>(format: T, name?: string): ReturnType<typeof OutputFormats[OutputFormat<T>]>;
 }
 declare type OutputFormat<T> = T extends keyof typeof OutputFormats ? T : "_default";
 export interface CompileOptions {

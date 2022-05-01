@@ -10,7 +10,7 @@ import { JSONFormatter } from "../formats/json";
 const OutputFormats = {
     _default: JavascriptOutput,
     object: (grammar, exportName) => ({ grammar, exportName }),
-    json:JSONFormatter,
+    json: JSONFormatter,
     js: JavascriptOutput,
     javascript: JavascriptOutput,
     module: ESMOutput,
@@ -48,7 +48,7 @@ export class Compiler {
         this.grammarBuilder.import(val);
     }
 
-    export<T extends keyof typeof OutputFormats = '_default'>(format?: T, name?: string): ReturnType<typeof OutputFormats[OutputFormat<T>]> {
+    export<T extends keyof typeof OutputFormats = '_default'>(format: T, name: string = 'grammar'): ReturnType<typeof OutputFormats[OutputFormat<T>]> {
         const grammar = this.grammarBuilder.export();
         const output = format || grammar.config.preprocessor || '_default';
         if (OutputFormats[output]) {

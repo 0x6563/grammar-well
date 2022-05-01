@@ -1,12 +1,19 @@
 import { Column } from "./column";
-import { Grammar } from "./grammar";
 import { Lexer, LexerState, StreamLexer } from "./lexer";
 import { State } from "./state";
-import { Rule, RuleSymbol } from "../typings";
+import { Dictionary, Rule, RuleSymbol } from "../typings";
 
 export interface ParserOptions {
     keepHistory?: boolean;
-    lexer: Lexer;
+    lexer?: Lexer;
+}
+
+
+export interface PrecompiledGrammar {
+    lexer?: Lexer;
+    start: string;
+    rules: Rule[];
+    map?: Dictionary<Rule[]>;
 }
 
 export class Parser {
@@ -14,33 +21,36 @@ export class Parser {
     keepHistory: boolean = false;
     current: number = 0;
 
-    grammar: Grammar;
+    rules: Rule[];
+    start: string;
     lexer: Lexer;
     lexerState: LexerState;
     table: Column[];
     results: any;
     errorService: ParserErrorService;
+    ruleMap: Dictionary<Rule[]> = Object.create(null);
 
-    constructor(grammar: Grammar, options?: ParserOptions)
-    constructor(rules: Rule[], start?: string, options?: ParserOptions)
-    constructor(a: Rule[] | Grammar, b?: string | ParserOptions, c?: ParserOptions) {
-        let options: ParserOptions;
-        if (a instanceof Grammar) {
-            this.grammar = a;
-            options = b as ParserOptions;
-        } else {
-            this.grammar = new Grammar(a, b as string);
-            options = c;
+    constructor({ rules, start, lexer, map }: PrecompiledGrammar, options: ParserOptions = {}) {
+        this.rules = rules;
+        this.start = start || this.rules[0].name;
+        this.lexer = lexer;
+        if (!map) {
+            for (const rule of rules) {
+                if (!this.ruleMap[rule.name])
+                    this.ruleMap[rule.name] = [rule];
+                else
+                    this.ruleMap[rule.name].push(rule);
+            }
         }
         this.keepHistory = !!(options?.keepHistory);
         this.errorService = new ParserErrorService(this);
-        this.lexer = options?.lexer || this.grammar.lexer || new StreamLexer();
+        this.lexer = options?.lexer || this.lexer || new StreamLexer();
 
-        const column = new Column(this.grammar, 0);
+        const column = new Column(this.ruleMap, 0);
         this.table = [column];
 
-        column.wants[this.grammar.start] = [];
-        column.predict(this.grammar.start);
+        column.wants[this.start] = [];
+        column.predict(this.start);
         column.process();
     }
 
@@ -48,7 +58,7 @@ export class Parser {
         try {
             return this.lexer.next();
         } catch (e) {
-            const nextColumn = new Column(this.grammar, this.current + 1);
+            const nextColumn = new Column(this.ruleMap, this.current + 1);
             this.table.push(nextColumn);
             throw this.errorService.lexerError(e);
         }
@@ -66,7 +76,7 @@ export class Parser {
             }
 
             const n = this.current + 1;
-            const nextColumn = new Column(this.grammar, n);
+            const nextColumn = new Column(this.ruleMap, n);
             this.table.push(nextColumn);
 
             // Advance all tokens that expect the symbol
@@ -141,10 +151,9 @@ export class Parser {
 
     finish() {
         const considerations = [];
-        const { start } = this.grammar;
         const { states } = this.table[this.table.length - 1];
         for (const { rule: { name, symbols }, dot, reference, data } of states) {
-            if (name === start && dot === symbols.length && !reference && data !== Parser.fail) {
+            if (name === this.start && dot === symbols.length && !reference && data !== Parser.fail) {
                 considerations.push(data);
             }
         }

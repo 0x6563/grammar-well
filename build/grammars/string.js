@@ -33,7 +33,7 @@
         module.exports = grammar;
     }
     else {
-        window.undefined = grammar;
+        window.grammar = grammar;
     }
 })();
 //# sourceMappingURL=string.js.map

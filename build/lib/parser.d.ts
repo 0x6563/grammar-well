@@ -1,24 +1,30 @@
 import { Column } from "./column";
-import { Grammar } from "./grammar";
 import { Lexer, LexerState } from "./lexer";
 import { State } from "./state";
-import { Rule, RuleSymbol } from "../typings";
+import { Dictionary, Rule, RuleSymbol } from "../typings";
 export interface ParserOptions {
     keepHistory?: boolean;
-    lexer: Lexer;
+    lexer?: Lexer;
+}
+export interface PrecompiledGrammar {
+    lexer?: Lexer;
+    start: string;
+    rules: Rule[];
+    map?: Dictionary<Rule[]>;
 }
 export declare class Parser {
     static fail: symbol;
     keepHistory: boolean;
     current: number;
-    grammar: Grammar;
+    rules: Rule[];
+    start: string;
     lexer: Lexer;
     lexerState: LexerState;
     table: Column[];
     results: any;
     errorService: ParserErrorService;
-    constructor(grammar: Grammar, options?: ParserOptions);
-    constructor(rules: Rule[], start?: string, options?: ParserOptions);
+    ruleMap: Dictionary<Rule[]>;
+    constructor({ rules, start, lexer, map }: PrecompiledGrammar, options?: ParserOptions);
     next(): any;
     feed(chunk: string): void;
     save(): Column;

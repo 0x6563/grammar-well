@@ -9,7 +9,6 @@ import * as nearley from '../grammars/nearley.json';
 import * as string from '../grammars/string.json';
 import * as whitespace from '../grammars/whitespace.json';
 
-// TODO Use Prebuilt grammar
 const BuiltInRegistry = {
     'cow.ne': cow,
     'number.ne': number,

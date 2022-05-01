@@ -1,7 +1,6 @@
-import { Grammar } from "./grammar";
 import { Parser } from "./parser";
 import { State } from "./state";
-import { Dictionary } from "../typings";
+import { Dictionary, Rule } from "../typings";
 import { LexerState } from "./lexer";
 
 
@@ -13,7 +12,7 @@ export class Column {
     completed: Dictionary<State[]> = Object.create(null);  // states that are nullable
 
     constructor(
-        private grammar: Grammar,
+        private ruleMap: Dictionary<Rule[]>,
         public index: number
     ) { }
 
@@ -63,15 +62,15 @@ export class Column {
     }
 
     predict(exp: string) {
-        if (!this.grammar.map[exp])
+        if (!this.ruleMap[exp])
             return;
 
-        for (const rule of this.grammar.map[exp]) {
+        for (const rule of this.ruleMap[exp]) {
             this.states.push(new State(rule, 0, this.index, this.wants[exp]));
         }
     }
 
-    complete(left: State, right: State) {
+    private complete(left: State, right: State) {
         const copy = left.nextState(right);
         this.states.push(copy);
     }

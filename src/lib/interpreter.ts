@@ -1,21 +1,19 @@
-import { Grammar, PrecompiledGrammar } from "./grammar";
-import { Parser, ParserOptions } from "./parser";
+import { Parser, ParserOptions, PrecompiledGrammar } from "./parser";
 
 export class Interpreter {
-    grammar: Grammar;
     parser: Parser;
 
     get results() {
         return this.parser.results
     }
 
-    constructor(grammar: PrecompiledGrammar, private options?: ParserOptions) {
-        this.grammar = Grammar.fromCompiled(grammar);
+    constructor(private grammar: PrecompiledGrammar, private options?: ParserOptions) {
         this.parser = new Parser(this.grammar, options);
     }
 
     feed(source: string) {
         this.parser.feed(source);
+        return this.results;
     }
 
     run(source: string) {

@@ -40,7 +40,7 @@ class Compiler {
     import(val) {
         this.grammarBuilder.import(val);
     }
-    export(format, name) {
+    export(format, name = 'grammar') {
         const grammar = this.grammarBuilder.export();
         const output = format || grammar.config.preprocessor || '_default';
         if (OutputFormats[output]) {

@@ -4,8 +4,8 @@ exports.Column = void 0;
 const parser_1 = require("./parser");
 const state_1 = require("./state");
 class Column {
-    constructor(grammar, index) {
-        this.grammar = grammar;
+    constructor(ruleMap, index) {
+        this.ruleMap = ruleMap;
         this.index = index;
         this.states = [];
         this.wants = Object.create(null);
@@ -52,9 +52,9 @@ class Column {
         }
     }
     predict(exp) {
-        if (!this.grammar.map[exp])
+        if (!this.ruleMap[exp])
             return;
-        for (const rule of this.grammar.map[exp]) {
+        for (const rule of this.ruleMap[exp]) {
             this.states.push(new state_1.State(rule, 0, this.index, this.wants[exp]));
         }
     }

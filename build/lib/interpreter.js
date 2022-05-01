@@ -1,12 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Interpreter = void 0;
-const grammar_1 = require("./grammar");
 const parser_1 = require("./parser");
 class Interpreter {
     constructor(grammar, options) {
+        this.grammar = grammar;
         this.options = options;
-        this.grammar = grammar_1.Grammar.fromCompiled(grammar);
         this.parser = new parser_1.Parser(this.grammar, options);
     }
     get results() {
@@ -14,6 +13,7 @@ class Interpreter {
     }
     feed(source) {
         this.parser.feed(source);
+        return this.results;
     }
     run(source) {
         const parser = new parser_1.Parser(this.grammar, this.options);

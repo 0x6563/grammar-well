@@ -1,11 +1,10 @@
-import { Grammar, PrecompiledGrammar } from "./grammar";
-import { Parser, ParserOptions } from "./parser";
+import { Parser, ParserOptions, PrecompiledGrammar } from "./parser";
 export declare class Interpreter {
+    private grammar;
     private options?;
-    grammar: Grammar;
     parser: Parser;
     get results(): any;
     constructor(grammar: PrecompiledGrammar, options?: ParserOptions);
-    feed(source: string): void;
+    feed(source: string): any;
     run(source: string): any;
 }

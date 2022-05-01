@@ -1,6 +1,6 @@
 import { readdirSync, readFileSync, writeFileSync } from "fs";
 import { resolve } from "path";
-import { Compile } from "./src/lib/compile";
+import { Compile } from "./src/";
 const BaseDir = './src/grammars'
 const files = readdirSync(BaseDir);
 for (const file of files) {

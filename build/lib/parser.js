@@ -2,28 +2,30 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Parser = void 0;
 const column_1 = require("./column");
-const grammar_1 = require("./grammar");
 const lexer_1 = require("./lexer");
 class Parser {
-    constructor(a, b, c) {
+    constructor({ rules, start, lexer, map }, options = {}) {
         this.keepHistory = false;
         this.current = 0;
-        let options;
-        if (a instanceof grammar_1.Grammar) {
-            this.grammar = a;
-            options = b;
-        }
-        else {
-            this.grammar = new grammar_1.Grammar(a, b);
-            options = c;
+        this.ruleMap = Object.create(null);
+        this.rules = rules;
+        this.start = start || this.rules[0].name;
+        this.lexer = lexer;
+        if (!map) {
+            for (const rule of rules) {
+                if (!this.ruleMap[rule.name])
+                    this.ruleMap[rule.name] = [rule];
+                else
+                    this.ruleMap[rule.name].push(rule);
+            }
         }
         this.keepHistory = !!(options === null || options === void 0 ? void 0 : options.keepHistory);
         this.errorService = new ParserErrorService(this);
-        this.lexer = (options === null || options === void 0 ? void 0 : options.lexer) || this.grammar.lexer || new lexer_1.StreamLexer();
-        const column = new column_1.Column(this.grammar, 0);
+        this.lexer = (options === null || options === void 0 ? void 0 : options.lexer) || this.lexer || new lexer_1.StreamLexer();
+        const column = new column_1.Column(this.ruleMap, 0);
         this.table = [column];
-        column.wants[this.grammar.start] = [];
-        column.predict(this.grammar.start);
+        column.wants[this.start] = [];
+        column.predict(this.start);
         column.process();
     }
     next() {
@@ -31,7 +33,7 @@ class Parser {
             return this.lexer.next();
         }
         catch (e) {
-            const nextColumn = new column_1.Column(this.grammar, this.current + 1);
+            const nextColumn = new column_1.Column(this.ruleMap, this.current + 1);
             this.table.push(nextColumn);
             throw this.errorService.lexerError(e);
         }
@@ -45,7 +47,7 @@ class Parser {
                 delete this.table[this.current - 1];
             }
             const n = this.current + 1;
-            const nextColumn = new column_1.Column(this.grammar, n);
+            const nextColumn = new column_1.Column(this.ruleMap, n);
             this.table.push(nextColumn);
             const literal = token.text !== undefined ? token.text : token.value;
             const value = this.lexer.constructor === lexer_1.StreamLexer ? token.value : token;
@@ -93,10 +95,9 @@ class Parser {
     }
     finish() {
         const considerations = [];
-        const { start } = this.grammar;
         const { states } = this.table[this.table.length - 1];
         for (const { rule: { name, symbols }, dot, reference, data } of states) {
-            if (name === start && dot === symbols.length && !reference && data !== Parser.fail) {
+            if (name === this.start && dot === symbols.length && !reference && data !== Parser.fail) {
                 considerations.push(data);
             }
         }

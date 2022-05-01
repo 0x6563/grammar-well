@@ -17,7 +17,7 @@
         module.exports = grammar;
     }
     else {
-        window.undefined = grammar;
+        window.grammar = grammar;
     }
 })();
 //# sourceMappingURL=whitespace.js.map

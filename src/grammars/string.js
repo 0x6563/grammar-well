@@ -37,6 +37,6 @@ var grammar = {
 if (typeof module !== 'undefined'&& typeof module.exports !== 'undefined') {
    module.exports = grammar;
 } else {
-   window.undefined = grammar;
+   window.grammar = grammar;
 }
 })();

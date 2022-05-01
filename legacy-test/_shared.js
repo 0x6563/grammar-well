@@ -1,9 +1,9 @@
 
-const { Grammar, Parser, Compile, Interpreter } = require('../build');
+const { Parser, Compile, Interpreter } = require('../build');
 
 function interpreter(source) {
     const g = nearleyc(source);
-    var exports = requireFromString(g);
+    var exports = evalGrammar(g);
     return new Interpreter(exports);
 }
 
@@ -19,30 +19,13 @@ function nearleyc(source) {
 
 function compile(source) {
     var compiledGrammar = nearleyc(source);
-
-    // eval
     return evalGrammar(compiledGrammar);
 }
 
-/*
-function requireFromString(source) {
-    var filename = '.'
-    var Module = module.constructor;
-    var m = new Module();
-    m.paths = Module._nodeModulePaths(path.dirname(filename))
-    m._compile(source, filename);
-    return m.exports;
-}
-*/
-function requireFromString(source) {
+function evalGrammar(source) {
     var module = { exports: null };
     eval(source)
     return module.exports;
-}
-
-function evalGrammar(compiledGrammar) {
-    var exports = requireFromString(compiledGrammar);
-    return Grammar.fromCompiled(exports);
 }
 
 module.exports = {
