@@ -3,13 +3,14 @@ import { CoffeescriptOutput } from "../formats/coffeescript";
 import { ESMOutput, JavascriptOutput } from "../formats/javascript";
 import { TypescriptFormat } from "../formats/typescript";
 import { RuleDefinition, RuleDefinitionList } from "../typings";
+import { JSONFormatter } from "../formats/json";
 declare const OutputFormats: {
-    '{}': (grammar: any, exportName: any) => {
+    _default: typeof JavascriptOutput;
+    object: (grammar: any, exportName: any) => {
         grammar: any;
         exportName: any;
     };
-    json: (grammar: any, exportName: any) => string;
-    _default: typeof JavascriptOutput;
+    json: typeof JSONFormatter;
     js: typeof JavascriptOutput;
     javascript: typeof JavascriptOutput;
     module: typeof ESMOutput;

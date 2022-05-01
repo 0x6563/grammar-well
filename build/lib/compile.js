@@ -7,10 +7,11 @@ const grammar_builder_1 = require("./grammar-builder");
 const coffeescript_1 = require("../formats/coffeescript");
 const javascript_1 = require("../formats/javascript");
 const typescript_1 = require("../formats/typescript");
+const json_1 = require("../formats/json");
 const OutputFormats = {
-    '{}': (grammar, exportName) => ({ grammar, exportName }),
-    json: (grammar, exportName) => JSON.stringify({ grammar, exportName }),
     _default: javascript_1.JavascriptOutput,
+    object: (grammar, exportName) => ({ grammar, exportName }),
+    json: json_1.JSONFormatter,
     js: javascript_1.JavascriptOutput,
     javascript: javascript_1.JavascriptOutput,
     module: javascript_1.ESMOutput,

@@ -135,7 +135,7 @@ describe('bootstrapped parser', () => {
     const scannerless = interpreter(read("legacy-test/grammars/scannerless-nearley.ne"));
     const current = interpreter(read("src/grammars/nearley.ne"));
 
-    const check = source =>  expect(current.run( source)).toEqual(scannerless.run(source))
+    const check = source =>  expect(current.run(source)).toEqual(scannerless.run(source))
 
     it('parses directives', () => {
         check("@lexer moo")

@@ -1,5 +1,5 @@
-export const Lexer: any;
-export const ParserRules: ({
+export const lexer: any;
+export const rules: ({
     name: string;
     symbols: (string | RegExp)[];
     postprocess: (d: any) => any;
@@ -26,4 +26,4 @@ export const ParserRules: ({
     symbols: (string | RegExp)[];
     postprocess?: undefined;
 })[];
-export const ParserStart: string;
+export const start: string;

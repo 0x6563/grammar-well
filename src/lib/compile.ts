@@ -5,11 +5,12 @@ import { CoffeescriptOutput } from "../formats/coffeescript";
 import { ESMOutput, JavascriptOutput } from "../formats/javascript";
 import { TypescriptFormat } from "../formats/typescript";
 import { RuleDefinition, RuleDefinitionList } from "../typings";
+import { JSONFormatter } from "../formats/json";
 
 const OutputFormats = {
-    '{}': (grammar, exportName) => ({ grammar, exportName }),
-    json: (grammar, exportName) => JSON.stringify({ grammar, exportName }),
     _default: JavascriptOutput,
+    object: (grammar, exportName) => ({ grammar, exportName }),
+    json:JSONFormatter,
     js: JavascriptOutput,
     javascript: JavascriptOutput,
     module: ESMOutput,

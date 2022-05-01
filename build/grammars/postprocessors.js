@@ -15,9 +15,9 @@
         };
     }
     var grammar = {
-        Lexer: undefined,
-        ParserRules: [],
-        ParserStart: ""
+        lexer: undefined,
+        rules: [],
+        start: ""
     };
     if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
         module.exports = grammar;

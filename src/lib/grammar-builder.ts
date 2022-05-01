@@ -1,7 +1,6 @@
-import { Dictionary, EBNFModified, Expression, ExpressionToken, LexerToken, MacroCall, RuleDefinition, RuleDefinitionList, SubExpression, TokenLiteral } from "../typings";
+import { Dictionary, EBNFModified, Expression, ExpressionToken, LexerToken, MacroCall, Rule, RuleDefinition, RuleDefinitionList, SubExpression, TokenLiteral } from "../typings";
 import { CompilerState } from "./compile";
 import { Interpreter } from "./interpreter";
-import { Rule } from "./rule";
 
 import * as cow from '../grammars/cow.json';
 import * as number from '../grammars/number.json';
@@ -12,20 +11,20 @@ import * as whitespace from '../grammars/whitespace.json';
 
 // TODO Use Prebuilt grammar
 const BuiltInRegistry = {
-    'cow.ne': cow.grammar,
-    'number.ne': number.grammar,
-    'postprocessor.ne': postprocessor.grammar,
-    'nearley.ne': nearley.grammar,
-    'string.ne': string.grammar,
-    'whitespace.ne': whitespace.grammar,
+    'cow.ne': cow,
+    'number.ne': number,
+    'postprocessor.ne': postprocessor,
+    'nearley.ne': nearley,
+    'string.ne': string,
+    'whitespace.ne': whitespace,
 }
 
 export interface GrammarBuilderState {
-    rules: any[],
-    body: any[], // @directives list
-    customTokens: any[], // %tokens
-    config: any, // @config value
-    macros: {},
+    rules: Rule[],
+    body: string[], // @directives list
+    customTokens: Set<string>, // %tokens
+    config: Dictionary<string>, // @config value
+    macros: Dictionary<{ args: any, exprs: any }>,
     start: string;
     version: string;
 }
@@ -37,7 +36,7 @@ export class GrammarBuilder {
     private state: GrammarBuilderState = {
         rules: [],
         body: [], // @directives list
-        customTokens: [], // %tokens
+        customTokens: new Set(), // %tokens
         config: {}, // @config value
         macros: {},
         start: '',
@@ -51,24 +50,21 @@ export class GrammarBuilder {
 
     import(rules: string | RuleDefinition | RuleDefinitionList) {
         if (typeof rules == 'string') {
-            const state = this.subGrammar(rules);
-            this.merge(state);
+            const state = this.mergeGrammarString(rules);
             this.state.start = this.state.start || state.start;
             return;
         }
         rules = Array.isArray(rules) ? rules : [rules];
         for (const rule of rules) {
             if ("body" in rule) {
-                if (!this.config.noscript) {
-                    this.state.body.push(rule.body);
-                }
+                if (this.config.noscript)
+                    continue;
+                this.state.body.push(rule.body);
             } else if ("include" in rule) {
-                const resolver = rule.builtin ? this.compilerState.builtinResolver : this.compilerState.resolver;
-                const path = resolver.path(rule.include);
-                if (!this.compilerState.alreadycompiled.has(path)) {
-                    this.compilerState.alreadycompiled.add(path);
-                    const state = this.subGrammar(resolver.body(path));
-                    this.merge(state);
+                if (rule.builtin) {
+                    this.includeBuiltIn(rule.include);
+                } else {
+                    this.includeGrammar(rule.include);
                 }
             } else if ("macro" in rule) {
                 this.state.macros[rule.macro] = { args: rule.args, exprs: rule.exprs };
@@ -85,16 +81,47 @@ export class GrammarBuilder {
         return this.state;
     }
 
-    private subGrammar(grammar: string) {
+    private includeBuiltIn(name: string) {
+        name = name.toLowerCase();
+        if (!this.compilerState.alreadycompiled.has(name)) {
+            this.compilerState.alreadycompiled.add(name);
+            if (!BuiltInRegistry[name])
+                return;
+            const { grammar } = BuiltInRegistry[name];
+            for (const { symbols } of grammar.rules) {
+                for (let i = 0; i < symbols.length; i++) {
+                    const symbol = symbols[i];
+                    if (typeof symbol === 'object' && "regex" in symbol) {
+                        symbols[i] = new RegExp(symbol.regex.source, symbol.regex.flags);
+                    }
+                }
+            }
+            this.merge(BuiltInRegistry[name].grammar);
+        }
+    }
+
+    private includeGrammar(name) {
+        const resolver = this.compilerState.resolver;
+        const path = resolver.path(name);
+        console.log(path);
+        if (!this.compilerState.alreadycompiled.has(path)) {
+            this.compilerState.alreadycompiled.add(path);
+            this.mergeGrammarString(resolver.body(path))
+        }
+    }
+
+    private mergeGrammarString(body: string) {
         const builder = new GrammarBuilder(this.config, this.compilerState);
-        builder.import(this.interpreter.run(grammar));
-        return builder.export();
+        builder.import(this.interpreter.run(body));
+        const state = builder.export();
+        this.merge(state);
+        return state;
     }
 
     private merge(state: GrammarBuilderState) {
-        this.state.rules = this.state.rules.concat(state.rules);
-        this.state.body = this.state.body.concat(state.body);
-        this.state.customTokens = this.state.customTokens.concat(state.customTokens);
+        this.state.rules.push(...state.rules);
+        this.state.body.push(...state.body);
+        state.customTokens.forEach(s => this.state.customTokens.add(s));
         Object.assign(this.state.config, state.config);
         Object.assign(this.state.macros, state.macros);
     }
@@ -114,18 +141,18 @@ export class GrammarBuilder {
         }
     }
 
-    private buildRule(name: string, rule: Expression, scope: Dictionary<string>) {
-        const tokens: (string | RegExp | TokenLiteral | LexerToken)[] = [];
+    private buildRule(name: string, rule: Expression, scope: Dictionary<string>): Rule {
+        const symbols: (string | RegExp | TokenLiteral | LexerToken)[] = [];
         for (let i = 0; i < rule.tokens.length; i++) {
-            const token = this.buildToken(name, rule.tokens[i], scope);
-            if (token !== null) {
-                tokens.push(token);
+            const symbol = this.buildSymbol(name, rule.tokens[i], scope);
+            if (symbol !== null) {
+                symbols.push(symbol);
             }
         }
-        return new Rule(name, tokens, rule.postprocess);
+        return { name, symbols, postprocess: rule.postprocess };
     }
 
-    private buildToken(name: string, token: ExpressionToken, scope: Dictionary<string>): string | RegExp | TokenLiteral | LexerToken | null {
+    private buildSymbol(name: string, token: ExpressionToken, scope: Dictionary<string>): string | RegExp | TokenLiteral | LexerToken | null {
         if (typeof token === 'string') {
             return token === 'null' ? null : token;
         }
@@ -144,9 +171,7 @@ export class GrammarBuilder {
         if ('token' in token) {
             if (this.state.config.lexer) {
                 const name = token.token;
-                if (this.state.customTokens.indexOf(name) === -1) {
-                    this.state.customTokens.push(name);
-                }
+                this.state.customTokens.add(name);
                 return { token: `(${this.state.config.lexer}.has(${JSON.stringify(name)}) ? {type: ${JSON.stringify(name)}} : ${name})` };
             }
             return token;
@@ -162,7 +187,7 @@ export class GrammarBuilder {
         }
         if ('mixin' in token) {
             if (scope[token.mixin]) {
-                return this.buildToken(name, scope[token.mixin], scope);
+                return this.buildSymbol(name, scope[token.mixin], scope);
             } else {
                 throw new Error("Unbound variable: " + token.mixin);
             }
@@ -190,31 +215,21 @@ export class GrammarBuilder {
 
     private buildEBNFToken(name: string, token: EBNFModified, scope: Dictionary<string>) {
         const id = this.uuid(name + "$ebnf");
-        let exprs;
+        let expr1: Expression = { tokens: [] };
+        let expr2: Expression = { tokens: [] };
         if (token.modifier == ':+') {
-            exprs = [{
-                tokens: [token.ebnf],
-            }, {
-                tokens: [id, token.ebnf],
-                postprocess: { builtin: "arrpush" }
-            }];
+            expr1.tokens = [token.ebnf];
+            expr2.tokens = [id, token.ebnf];
+            expr2.postprocess = { builtin: "arrpush" };
         } else if (token.modifier == ':*') {
-            exprs = [{
-                tokens: [],
-            }, {
-                tokens: [id, token.ebnf],
-                postprocess: { builtin: "arrpush" }
-            }]
+            expr2.tokens = [id, token.ebnf];
+            expr2.postprocess = { builtin: "arrpush" };
         } else if (token.modifier == ':?') {
-            exprs = [{
-                tokens: [token.ebnf],
-                postprocess: { builtin: "id" }
-            }, {
-                tokens: [],
-                postprocess: { builtin: "nuller" }
-            }]
+            expr1.tokens = [token.ebnf];
+            expr1.postprocess = { builtin: "id" };
+            expr2.postprocess = { builtin: "nuller" };
         }
-        this.buildRules(id, exprs, scope);
+        this.buildRules(id, [expr1, expr2], scope);
         return id;
     }
 

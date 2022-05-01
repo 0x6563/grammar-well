@@ -18,6 +18,7 @@ class Parser {
             options = c;
         }
         this.keepHistory = !!(options === null || options === void 0 ? void 0 : options.keepHistory);
+        this.errorService = new ParserErrorService(this);
         this.lexer = (options === null || options === void 0 ? void 0 : options.lexer) || this.grammar.lexer || new lexer_1.StreamLexer();
         const column = new column_1.Column(this.grammar, 0);
         this.table = [column];
@@ -32,10 +33,7 @@ class Parser {
         catch (e) {
             const nextColumn = new column_1.Column(this.grammar, this.current + 1);
             this.table.push(nextColumn);
-            const err = new Error(this.reportLexerError(e));
-            err.offset = this.current;
-            err.token = e.token;
-            throw err;
+            throw this.errorService.lexerError(e);
         }
     }
     feed(chunk) {
@@ -55,19 +53,14 @@ class Parser {
             for (let w = scannable.length; w--;) {
                 const state = scannable[w];
                 const expect = state.rule.symbols[state.dot];
-                if (expect.test ? expect.test(value) :
-                    expect.type ? expect.type === token.type
-                        : expect.literal === literal) {
+                if ((expect.test && expect.test(value)) || (expect.type && expect.type === token.type) || (expect === null || expect === void 0 ? void 0 : expect.literal) === literal) {
                     const next = state.nextState({ data: value, token: token, isToken: true, reference: n - 1 });
                     nextColumn.states.push(next);
                 }
             }
             nextColumn.process();
             if (nextColumn.states.length === 0) {
-                const err = new Error(this.reportError(token));
-                err.offset = this.current;
-                err.token = token;
-                throw err;
+                throw this.errorService.tokenError(token);
             }
             if (this.keepHistory) {
                 column.lexerState = this.lexer.save();
@@ -79,13 +72,49 @@ class Parser {
         }
         this.results = this.finish();
     }
-    ;
-    reportLexerError(lexerError) {
+    save() {
+        const column = this.table[this.current];
+        column.lexerState = this.lexerState;
+        return column;
+    }
+    restore(column) {
+        const index = column.index;
+        this.current = index;
+        this.table[index] = column;
+        this.table.splice(index + 1);
+        this.lexerState = column.lexerState;
+        this.results = this.finish();
+    }
+    rewind(index) {
+        if (!this.keepHistory) {
+            throw new Error('set option `keepHistory` to enable rewinding');
+        }
+        this.restore(this.table[index]);
+    }
+    finish() {
+        const considerations = [];
+        const { start } = this.grammar;
+        const { states } = this.table[this.table.length - 1];
+        for (const { rule: { name, symbols }, dot, reference, data } of states) {
+            if (name === start && dot === symbols.length && !reference && data !== Parser.fail) {
+                considerations.push(data);
+            }
+        }
+        return considerations;
+    }
+}
+exports.Parser = Parser;
+Parser.fail = Symbol();
+class ParserErrorService {
+    constructor(parser) {
+        this.parser = parser;
+    }
+    lexerError(lexerError) {
         let tokenDisplay, lexerMessage;
         const token = lexerError.token;
         if (token) {
             tokenDisplay = "input " + JSON.stringify(token.text[0]) + " (lexer error)";
-            lexerMessage = this.lexer.formatError(token, "Syntax error");
+            lexerMessage = this.parser.lexer.formatError(token, "Syntax error");
         }
         else {
             tokenDisplay = "input (lexer error)";
@@ -93,47 +122,20 @@ class Parser {
         }
         return this.reportErrorCommon(lexerMessage, tokenDisplay);
     }
-    ;
-    reportError(token) {
+    tokenError(token) {
         const tokenDisplay = (token.type ? token.type + " token: " : "") + JSON.stringify(token.value !== undefined ? token.value : token);
-        const lexerMessage = this.lexer.formatError(token, "Syntax error");
-        return this.reportErrorCommon(lexerMessage, tokenDisplay);
-    }
-    ;
-    reportErrorCommon(lexerMessage, tokenDisplay) {
-        const lines = [];
-        lines.push(lexerMessage);
-        const lastColumnIndex = this.table.length - 2;
-        const lastColumn = this.table[lastColumnIndex];
-        const expectantStates = lastColumn.states
-            .filter(function (state) {
-            const nextSymbol = state.rule.symbols[state.dot];
-            return nextSymbol && typeof nextSymbol !== "string";
-        });
-        if (expectantStates.length === 0) {
-            lines.push('Unexpected ' + tokenDisplay + '. I did not expect any more input. Here is the state of my parse table:\n');
-            this.displayStateStack(lastColumn.states, lines);
-        }
-        else {
-            lines.push('Unexpected ' + tokenDisplay + '. Instead, I was expecting to see one of the following:\n');
-            const stateStacks = expectantStates.map(state => this.buildFirstStateStack(state, new Set()) || [state]);
-            stateStacks.forEach(function (stateStack) {
-                const state = stateStack[0];
-                const nextSymbol = state.rule.symbols[state.dot];
-                const symbolDisplay = this.getSymbolDisplay(nextSymbol);
-                lines.push('A ' + symbolDisplay + ' based on:');
-                this.displayStateStack(stateStack, lines);
-            }, this);
-        }
-        lines.push("");
-        return lines.join("\n");
+        const lexerMessage = this.parser.lexer.formatError(token, "Syntax error");
+        const error = new Error(this.reportErrorCommon(lexerMessage, tokenDisplay));
+        error.offset = this.parser.current;
+        error.token = token;
+        return error;
     }
     displayStateStack(stateStack, lines) {
         let lastDisplay;
         let sameDisplayCount = 0;
         for (let j = 0; j < stateStack.length; j++) {
             const state = stateStack[j];
-            const display = state.rule.toString(state.dot);
+            const display = this.formatRule(state.rule, state.dot);
             if (display === lastDisplay) {
                 sameDisplayCount++;
             }
@@ -147,7 +149,34 @@ class Parser {
             lastDisplay = display;
         }
     }
-    ;
+    reportErrorCommon(lexerMessage, tokenDisplay) {
+        const lines = [];
+        lines.push(lexerMessage);
+        const lastColumnIndex = this.parser.table.length - 2;
+        const lastColumn = this.parser.table[lastColumnIndex];
+        const expectantStates = lastColumn.states
+            .filter((state) => {
+            const nextSymbol = state.rule.symbols[state.dot];
+            return nextSymbol && typeof nextSymbol !== "string";
+        });
+        if (expectantStates.length === 0) {
+            lines.push('Unexpected ' + tokenDisplay + '. I did not expect any more input. Here is the state of my parse table:\n');
+            this.displayStateStack(lastColumn.states, lines);
+        }
+        else {
+            lines.push('Unexpected ' + tokenDisplay + '. Instead, I was expecting to see one of the following:\n');
+            const stateStacks = expectantStates.map(state => this.buildFirstStateStack(state, new Set()) || [state]);
+            stateStacks.forEach((stateStack) => {
+                const state = stateStack[0];
+                const nextSymbol = state.rule.symbols[state.dot];
+                const symbolDisplay = this.getSymbolDisplay(nextSymbol);
+                lines.push('A ' + symbolDisplay + ' based on:');
+                this.displayStateStack(stateStack, lines);
+            });
+        }
+        lines.push("");
+        return lines.join("\n");
+    }
     getSymbolDisplay(symbol) {
         const type = typeof symbol;
         if (type === "string") {
@@ -171,7 +200,6 @@ class Parser {
             }
         }
     }
-    ;
     buildFirstStateStack(state, visited) {
         if (visited.has(state)) {
             return null;
@@ -188,42 +216,35 @@ class Parser {
         }
         return [state].concat(childResult);
     }
-    ;
-    save() {
-        const column = this.table[this.current];
-        column.lexerState = this.lexerState;
-        return column;
-    }
-    ;
-    restore(column) {
-        const index = column.index;
-        this.current = index;
-        this.table[index] = column;
-        this.table.splice(index + 1);
-        this.lexerState = column.lexerState;
-        this.results = this.finish();
-    }
-    ;
-    rewind(index) {
-        if (!this.keepHistory) {
-            throw new Error('set option `keepHistory` to enable rewinding');
+    formatRule(rule, withCursorAt) {
+        let symbolSequence = rule.symbols.slice(0, withCursorAt).map(this.getSymbolShortDisplay).join(' ');
+        if (typeof withCursorAt !== "undefined") {
+            symbolSequence += " ● " + rule.symbols.slice(withCursorAt).map(this.getSymbolShortDisplay).join(' ');
         }
-        this.restore(this.table[index]);
+        ;
+        return rule.name + " → " + symbolSequence;
     }
-    ;
-    finish() {
-        const considerations = [];
-        const { start } = this.grammar;
-        const { states } = this.table[this.table.length - 1];
-        for (const { rule: { name, symbols }, dot, reference, data } of states) {
-            if (name === start && dot === symbols.length && !reference && data !== Parser.fail) {
-                considerations.push(data);
+    getSymbolShortDisplay(symbol) {
+        if (typeof symbol === 'string') {
+            return symbol;
+        }
+        else {
+            if ("literal" in symbol) {
+                return JSON.stringify(symbol.literal);
+            }
+            else if (symbol instanceof RegExp) {
+                return symbol.toString();
+            }
+            else if ("type" in symbol) {
+                return '%' + symbol.type;
+            }
+            else if ("test" in symbol) {
+                return '<' + String(symbol.test) + '>';
+            }
+            else {
+                throw new Error('Unknown symbol type: ' + symbol);
             }
         }
-        return considerations;
     }
-    ;
 }
-exports.Parser = Parser;
-Parser.fail = Symbol();
 //# sourceMappingURL=parser.js.map

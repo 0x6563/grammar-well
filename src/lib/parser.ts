@@ -1,8 +1,8 @@
 import { Column } from "./column";
 import { Grammar } from "./grammar";
-import { Rule } from "./rule";
 import { Lexer, LexerState, StreamLexer } from "./lexer";
 import { State } from "./state";
+import { Rule, RuleSymbol } from "../typings";
 
 export interface ParserOptions {
     keepHistory?: boolean;
@@ -19,6 +19,7 @@ export class Parser {
     lexerState: LexerState;
     table: Column[];
     results: any;
+    errorService: ParserErrorService;
 
     constructor(grammar: Grammar, options?: ParserOptions)
     constructor(rules: Rule[], start?: string, options?: ParserOptions)
@@ -32,7 +33,7 @@ export class Parser {
             options = c;
         }
         this.keepHistory = !!(options?.keepHistory);
-
+        this.errorService = new ParserErrorService(this);
         this.lexer = options?.lexer || this.grammar.lexer || new StreamLexer();
 
         const column = new Column(this.grammar, 0);
@@ -49,10 +50,7 @@ export class Parser {
         } catch (e) {
             const nextColumn = new Column(this.grammar, this.current + 1);
             this.table.push(nextColumn);
-            const err: any = new Error(this.reportLexerError(e));
-            err.offset = this.current;
-            err.token = e.token;
-            throw err;
+            throw this.errorService.lexerError(e);
         }
     }
 
@@ -78,12 +76,7 @@ export class Parser {
             for (let w = scannable.length; w--;) {
                 const state = scannable[w];
                 const expect: any = state.rule.symbols[state.dot];
-                // Try to consume the token
-                // either regex or literal
-                if ((expect as RegExp).test ? (expect as RegExp).test(value) :
-                    expect.type ? expect.type === token.type
-                        : expect.literal === literal) {
-                    // Add it
+                if ((expect.test && expect.test(value)) || (expect.type && expect.type === token.type) || expect?.literal === literal) {
                     const next = state.nextState({ data: value, token: token, isToken: true, reference: n - 1 });
                     nextColumn.states.push(next);
                 }
@@ -102,10 +95,7 @@ export class Parser {
             // If needed, throw an error:
             if (nextColumn.states.length === 0) {
                 // No states at all! This is not good.
-                const err: any = new Error(this.reportError(token));
-                err.offset = this.current;
-                err.token = token;
-                throw err;
+                throw this.errorService.tokenError(token);
             }
 
             if (this.keepHistory) {
@@ -121,36 +111,101 @@ export class Parser {
 
         // Incrementally keep track of results
         this.results = this.finish();
-    };
+    }
 
-    reportLexerError(lexerError) {
+    save() {
+        const column = this.table[this.current];
+        column.lexerState = this.lexerState;
+        return column;
+    }
+
+    restore(column: Column) {
+        const index = column.index;
+        this.current = index;
+        this.table[index] = column;
+        this.table.splice(index + 1);
+        this.lexerState = column.lexerState;
+
+        // Incrementally keep track of results
+        this.results = this.finish();
+    }
+
+    rewind(index: number) {
+        if (!this.keepHistory) {
+            throw new Error('set option `keepHistory` to enable rewinding')
+        }
+        // nb. recall column (table) indicies fall between token indicies.
+        //        col 0   --   token 0   --   col 1
+        this.restore(this.table[index]);
+    }
+
+    finish() {
+        const considerations = [];
+        const { start } = this.grammar;
+        const { states } = this.table[this.table.length - 1];
+        for (const { rule: { name, symbols }, dot, reference, data } of states) {
+            if (name === start && dot === symbols.length && !reference && data !== Parser.fail) {
+                considerations.push(data);
+            }
+        }
+        return considerations;
+    }
+}
+
+
+class ParserErrorService {
+    constructor(private parser: Parser) { }
+
+    lexerError(lexerError) {
         let tokenDisplay, lexerMessage;
         // Planning to add a token property to moo's thrown error
         // even on erroring tokens to be used in error display below
         const token = lexerError.token;
         if (token) {
             tokenDisplay = "input " + JSON.stringify(token.text[0]) + " (lexer error)";
-            lexerMessage = this.lexer.formatError(token, "Syntax error");
+            lexerMessage = this.parser.lexer.formatError(token, "Syntax error");
         } else {
             tokenDisplay = "input (lexer error)";
             lexerMessage = lexerError.message;
         }
         return this.reportErrorCommon(lexerMessage, tokenDisplay);
-    };
+    }
 
-    reportError(token) {
+    tokenError(token) {
         const tokenDisplay = (token.type ? token.type + " token: " : "") + JSON.stringify(token.value !== undefined ? token.value : token);
-        const lexerMessage = this.lexer.formatError(token, "Syntax error");
-        return this.reportErrorCommon(lexerMessage, tokenDisplay);
-    };
+        const lexerMessage = this.parser.lexer.formatError(token, "Syntax error");
+        const error: any = new Error(this.reportErrorCommon(lexerMessage, tokenDisplay));
+        error.offset = this.parser.current;
+        error.token = token;
+        return error;
+    }
 
-    reportErrorCommon(lexerMessage, tokenDisplay) {
+    private displayStateStack(stateStack, lines) {
+        let lastDisplay;
+        let sameDisplayCount = 0;
+        for (let j = 0; j < stateStack.length; j++) {
+            const state = stateStack[j];
+            const display = this.formatRule(state.rule, state.dot);
+            if (display === lastDisplay) {
+                sameDisplayCount++;
+            } else {
+                if (sameDisplayCount > 0) {
+                    lines.push('    ^ ' + sameDisplayCount + ' more lines identical to this');
+                }
+                sameDisplayCount = 0;
+                lines.push('    ' + display);
+            }
+            lastDisplay = display;
+        }
+    }
+
+    private reportErrorCommon(lexerMessage, tokenDisplay) {
         const lines = [];
         lines.push(lexerMessage);
-        const lastColumnIndex = this.table.length - 2;
-        const lastColumn = this.table[lastColumnIndex];
+        const lastColumnIndex = this.parser.table.length - 2;
+        const lastColumn = this.parser.table[lastColumnIndex];
         const expectantStates = lastColumn.states
-            .filter(function (state) {
+            .filter((state) => {
                 const nextSymbol = state.rule.symbols[state.dot];
                 return nextSymbol && typeof nextSymbol !== "string";
             });
@@ -165,38 +220,19 @@ export class Parser {
             // If there is more than one derivation, we only display the first one.
             const stateStacks = expectantStates.map(state => this.buildFirstStateStack(state, new Set()) || [state]);
             // Display each state that is expecting a terminal symbol next.
-            stateStacks.forEach(function (stateStack) {
+            stateStacks.forEach((stateStack) => {
                 const state = stateStack[0];
                 const nextSymbol = state.rule.symbols[state.dot];
                 const symbolDisplay = this.getSymbolDisplay(nextSymbol);
                 lines.push('A ' + symbolDisplay + ' based on:');
                 this.displayStateStack(stateStack, lines);
-            }, this);
+            });
         }
         lines.push("");
         return lines.join("\n");
     }
 
-    displayStateStack(stateStack, lines) {
-        let lastDisplay;
-        let sameDisplayCount = 0;
-        for (let j = 0; j < stateStack.length; j++) {
-            const state = stateStack[j];
-            const display = state.rule.toString(state.dot);
-            if (display === lastDisplay) {
-                sameDisplayCount++;
-            } else {
-                if (sameDisplayCount > 0) {
-                    lines.push('    ^ ' + sameDisplayCount + ' more lines identical to this');
-                }
-                sameDisplayCount = 0;
-                lines.push('    ' + display);
-            }
-            lastDisplay = display;
-        }
-    };
-
-    getSymbolDisplay(symbol) {
+    private getSymbolDisplay(symbol) {
         const type = typeof symbol;
         if (type === "string") {
             return symbol;
@@ -213,7 +249,8 @@ export class Parser {
                 throw new Error('Unknown symbol type: ' + JSON.stringify(symbol));
             }
         }
-    };
+    }
+
 
     /*
     Builds a the first state stack. You can think of a state stack as the call stack
@@ -241,44 +278,31 @@ export class Parser {
             return null;
         }
         return [state].concat(childResult);
-    };
+    }
 
-    save() {
-        const column = this.table[this.current];
-        column.lexerState = this.lexerState;
-        return column;
-    };
+    formatRule(rule: Rule, withCursorAt?: number) {
+        let symbolSequence = rule.symbols.slice(0, withCursorAt).map(this.getSymbolShortDisplay).join(' ');
+        if (typeof withCursorAt !== "undefined") {
+            symbolSequence += " ● " + rule.symbols.slice(withCursorAt).map(this.getSymbolShortDisplay).join(' ');
+        };
+        return rule.name + " → " + symbolSequence;
+    }
 
-    restore(column: Column) {
-        const index = column.index;
-        this.current = index;
-        this.table[index] = column;
-        this.table.splice(index + 1);
-        this.lexerState = column.lexerState;
-
-        // Incrementally keep track of results
-        this.results = this.finish();
-    };
-
-    // nb. deprecated: use save/restore instead!
-    rewind(index: number) {
-        if (!this.keepHistory) {
-            throw new Error('set option `keepHistory` to enable rewinding')
-        }
-        // nb. recall column (table) indicies fall between token indicies.
-        //        col 0   --   token 0   --   col 1
-        this.restore(this.table[index]);
-    };
-
-    finish() {
-        const considerations = [];
-        const { start } = this.grammar;
-        const { states } = this.table[this.table.length - 1];
-        for (const { rule: { name, symbols }, dot, reference, data } of states) {
-            if (name === start && dot === symbols.length && !reference && data !== Parser.fail) {
-                considerations.push(data);
+    getSymbolShortDisplay(symbol: RuleSymbol) {
+        if (typeof symbol === 'string') {
+            return symbol;
+        } else {
+            if ("literal" in symbol) {
+                return JSON.stringify(symbol.literal);
+            } else if (symbol instanceof RegExp) {
+                return symbol.toString();
+            } else if ("type" in symbol) {
+                return '%' + symbol.type;
+            } else if ("test" in symbol) {
+                return '<' + String(symbol.test) + '>';
+            } else {
+                throw new Error('Unknown symbol type: ' + symbol);
             }
         }
-        return considerations;
-    };
+    }
 }

@@ -4,8 +4,8 @@
 function id(x) { return x[0]; }
 
 var grammar = {
-    Lexer: undefined,
-    ParserRules: [
+    lexer: undefined,
+    rules: [
     {"name": "dqstring$ebnf$1", "symbols": []},
     {"name": "dqstring$ebnf$1", "symbols": ["dqstring$ebnf$1", "dstrchar"], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
     {"name": "dqstring", "symbols": [{"literal":"\""}, "dqstring$ebnf$1", {"literal":"\""}], "postprocess": function(d) {return d[1].join(""); }},
@@ -31,8 +31,8 @@ var grammar = {
             return d.join("");
         }
         }
-]
-  , ParserStart: "dqstring"
+],
+    start: "dqstring"
 }
 if (typeof module !== 'undefined'&& typeof module.exports !== 'undefined') {
    module.exports = grammar;

@@ -1,16 +1,15 @@
-import { Rule, RuleConfig } from "./rule";
 import { Lexer } from "./lexer";
-import { Dictionary } from "../typings";
+import { Dictionary, Rule } from "../typings";
 export declare class Grammar {
     rules: Rule[];
     start: string;
-    byName: Dictionary<Rule[]>;
+    map: Dictionary<Rule[]>;
     lexer: Lexer;
     constructor(rules: Rule[], start: string);
-    static fromCompiled({ ParserRules, ParserStart, Lexer }: PrecompiledGrammar): Grammar;
+    static fromCompiled({ rules, start, lexer }: PrecompiledGrammar): Grammar;
 }
 export interface PrecompiledGrammar {
-    Lexer: Lexer;
-    ParserStart: string;
-    ParserRules: RuleConfig[];
+    lexer?: Lexer;
+    start: string;
+    rules: Rule[];
 }

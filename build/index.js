@@ -20,7 +20,6 @@ __exportStar(require("./lib/grammar-builder"), exports);
 __exportStar(require("./lib/lint"), exports);
 __exportStar(require("./lib/interpreter"), exports);
 __exportStar(require("./lib/parser"), exports);
-__exportStar(require("./lib/rule"), exports);
 __exportStar(require("./lib/state"), exports);
 __exportStar(require("./lib/lexer"), exports);
 //# sourceMappingURL=index.js.map

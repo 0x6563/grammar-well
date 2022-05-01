@@ -64,8 +64,8 @@
         return { subexpression: [{ tokens: result, postprocess: function (d) { return d.join(""); } }] };
     }
     var grammar = {
-        Lexer: lexer,
-        ParserRules: [
+        lexer: lexer,
+        rules: [
             { "name": "final$ebnf$1", "symbols": [(lexer.has("ws") ? { type: "ws" } : ws)], "postprocess": id },
             { "name": "final$ebnf$1", "symbols": [], "postprocess": function (d) { return null; } },
             { "name": "final", "symbols": ["_", "prog", "_", "final$ebnf$1"], "postprocess": function (d) { return d[1]; } },
@@ -118,7 +118,7 @@
             { "name": "ws$ebnf$1", "symbols": [], "postprocess": function (d) { return null; } },
             { "name": "ws", "symbols": ["ws$ebnf$1", (lexer.has("comment") ? { type: "comment" } : comment), "_"] }
         ],
-        ParserStart: "final"
+        start: "final"
     };
     if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
         module.exports = grammar;

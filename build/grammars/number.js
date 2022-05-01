@@ -1,8 +1,8 @@
 (function () {
     function id(x) { return x[0]; }
     var grammar = {
-        Lexer: undefined,
-        ParserRules: [
+        lexer: undefined,
+        rules: [
             { "name": "unsigned_int$ebnf$1", "symbols": [/[0-9]/] },
             { "name": "unsigned_int$ebnf$1", "symbols": ["unsigned_int$ebnf$1", /[0-9]/], "postprocess": function arrpush(d) { return d[0].concat([d[1]]); } },
             { "name": "unsigned_int", "symbols": ["unsigned_int$ebnf$1"], "postprocess": function (d) {
@@ -79,7 +79,7 @@
                 }
             }
         ],
-        ParserStart: "unsigned_int"
+        start: "unsigned_int"
     };
     if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
         module.exports = grammar;

@@ -1,3 +1,3 @@
-export const Lexer: any;
-export const ParserRules: any[];
-export const ParserStart: string;
+export const lexer: any;
+export const rules: any[];
+export const start: string;

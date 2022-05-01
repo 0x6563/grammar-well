@@ -1,1 +1,2 @@
-export declare function TypescriptFormat(parser: any, exportName: any): string;
+import { GrammarBuilderState } from "../lib/grammar-builder";
+export declare function TypescriptFormat(grammar: GrammarBuilderState, exportName: string): string;

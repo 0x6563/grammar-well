@@ -1,6 +1,5 @@
-import { PostProcessor } from "../typings";
+import { PostProcessor, Rule } from "../typings";
 import { Parser } from "./parser";
-import { Rule } from "./rule";
 
 
 export class State {
@@ -16,10 +15,6 @@ export class State {
         public wantedBy: State[]
     ) {
         this.isComplete = this.dot === rule.symbols.length;
-    }
-
-    toString() {
-        return "{" + this.rule.toString(this.dot) + "}, from: " + (this.reference || 0);
     }
 
     nextState(child: State | StateToken) {

@@ -16,9 +16,9 @@ do ->
   id = (d) -> d[0]
 ${tabulateString(dedentFunc(parser.body.join('\n')), '  ')}
   grammar = {
-    Lexer: ${parser.config.lexer},
-    ParserRules: ${tabulateString(serializeRules(parser.rules, CoffeescriptPostProcessors), '      ', { indentFirst: false })},
-    ParserStart: ${JSON.stringify(parser.start)}
+    lexer: ${parser.config.lexer},
+    rules: ${tabulateString(serializeRules(parser.rules, CoffeescriptPostProcessors), '      ', { indentFirst: false })},
+    start: ${JSON.stringify(parser.start)}
   }
   if typeof module != 'undefined' && typeof module.exports != 'undefined'
     module.exports = grammar;

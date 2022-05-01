@@ -16,9 +16,9 @@ function JavascriptOutput(parser, exportName) {
 function id(x) { return x[0]; }
 ${parser.body.join('\n')}
 var grammar = {
-    Lexer: ${parser.config.lexer},
-    ParserRules: ${(0, util_1.serializeRules)(parser.rules, exports.JavascriptPostProcessors)}
-  , ParserStart: ${JSON.stringify(parser.start)}
+    lexer: ${parser.config.lexer},
+    rules: ${(0, util_1.serializeRules)(parser.rules, exports.JavascriptPostProcessors)},
+    start: ${JSON.stringify(parser.start)}
 }
 if (typeof module !== 'undefined'&& typeof module.exports !== 'undefined') {
    module.exports = grammar;
@@ -34,10 +34,11 @@ function ESMOutput(parser, exportName) {
 // http://github.com/Hardmath123/nearley
 function id(x) { return x[0]; }
 ${parser.body.join('\n')}
-let Lexer = ${parser.config.lexer};
-let ParserRules = ${(0, util_1.serializeRules)(parser.rules, exports.JavascriptPostProcessors)};
-let ParserStart = ${JSON.stringify(parser.start)};
-export default { Lexer, ParserRules, ParserStart };
+export default { 
+    lexer: ${parser.config.lexer},
+    rules: ${(0, util_1.serializeRules)(parser.rules, exports.JavascriptPostProcessors)},
+    start: ${JSON.stringify(parser.start)}
+};
 `;
 }
 exports.ESMOutput = ESMOutput;

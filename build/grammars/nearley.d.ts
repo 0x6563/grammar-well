@@ -1,6 +1,5 @@
-declare var lexer: moo.Lexer;
-export { lexer as Lexer };
-export declare const ParserRules: ({
+export var lexer: moo.Lexer;
+export declare const rules: ({
     name: string;
     symbols: any[];
     postprocess: (x: any) => any;
@@ -9,4 +8,4 @@ export declare const ParserRules: ({
     symbols: any[];
     postprocess?: undefined;
 })[];
-export declare const ParserStart: string;
+export declare const start: string;

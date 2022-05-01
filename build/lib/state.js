@@ -11,9 +11,6 @@ class State {
         this.data = [];
         this.isComplete = this.dot === rule.symbols.length;
     }
-    toString() {
-        return "{" + this.rule.toString(this.dot) + "}, from: " + (this.reference || 0);
-    }
     nextState(child) {
         const state = new State(this.rule, this.dot + 1, this.reference, this.wantedBy);
         state.left = this;

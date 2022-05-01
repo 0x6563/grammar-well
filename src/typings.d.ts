@@ -85,3 +85,25 @@ export interface ProductionRule {
 
 export type RuleDefinition = (JavascriptDefinition | IncludeDefinition | MacroDefinition | ConfigDefinition | ExpressionDefinition);
 export type RuleDefinitionList = (JavascriptDefinition | IncludeDefinition | MacroDefinition | ConfigDefinition | ExpressionDefinition)[];
+
+
+export type RuleSymbol = string | RegExp | RuleSymbolToken | RuleSymbolLexerToken | RuleSymbolTest | LexerToken;
+
+interface RuleSymbolToken {
+    literal: any;
+}
+
+interface RuleSymbolLexerToken {
+    type: string;
+    value: string;
+    text: string;
+}
+
+interface RuleSymbolTest {///?????
+    test: string;
+}
+export interface Rule {
+    name: string;
+    symbols: RuleSymbol[];
+    postprocess: PostProcessor | BuiltInPostProcessor | string;
+}

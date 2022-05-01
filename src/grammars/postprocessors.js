@@ -25,11 +25,11 @@ function $(o) {
 }
 
 var grammar = {
-    Lexer: undefined,
-    ParserRules: [
+    lexer: undefined,
+    rules: [
     
-]
-  , ParserStart: ""
+],
+    start: ""
 }
 if (typeof module !== 'undefined'&& typeof module.exports !== 'undefined') {
    module.exports = grammar;

@@ -63,10 +63,10 @@ export class Column {
     }
 
     predict(exp: string) {
-        if (!this.grammar.byName[exp])
+        if (!this.grammar.map[exp])
             return;
 
-        for (const rule of this.grammar.byName[exp]) {
+        for (const rule of this.grammar.map[exp]) {
             this.states.push(new State(rule, 0, this.index, this.wants[exp]));
         }
     }
