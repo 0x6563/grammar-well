@@ -1,5 +1,5 @@
 import { Dictionary, Rule, RuleDefinition, RuleDefinitionList } from "../typings";
-import { CompilerState } from "./compile";
+import { CompilerState } from "./compiler";
 export interface GrammarBuilderState {
     rules: Rule[];
     body: string[];

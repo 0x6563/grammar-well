@@ -1,7 +1,7 @@
-import { Parser } from "./parser";
+import { EarleyParser } from "./parser";
 import { State } from "./state";
-import { Dictionary, Rule } from "../typings";
-import { LexerState } from "./lexer";
+import { Dictionary, Rule } from "../../typings";
+import { LexerState } from "../../lib/lexer";
 
 
 export class Column {
@@ -23,7 +23,7 @@ export class Column {
         while (state = this.states[w++]) { // nb. we push() during iteration
             if (state.isComplete) {
                 state.finish();
-                if (state.data !== Parser.fail) {
+                if (state.data !== EarleyParser.fail) {
                     const { wantedBy } = state;
                     for (var i = wantedBy.length; i--;) { // this line is hot
                         this.complete(wantedBy[i], state);

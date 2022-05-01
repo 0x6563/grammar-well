@@ -1,5 +1,5 @@
 import { Dictionary, EBNFModified, Expression, ExpressionToken, LexerToken, MacroCall, Rule, RuleDefinition, RuleDefinitionList, SubExpression, TokenLiteral } from "../typings";
-import { CompilerState } from "./compile";
+import { CompilerState } from "./compiler";
 import { Interpreter } from "./interpreter";
 
 import * as cow from '../grammars/cow.json';

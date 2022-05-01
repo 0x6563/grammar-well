@@ -1,6 +1,7 @@
-import { Parser } from "./lib/parser";
+import { Lexer } from "./lib/lexer";
+import { EarleyParser } from "./parsers/earley/parser";
 
-export type PostProcessor = (data: any[], location: number, reject: typeof Parser.fail) => any;
+export type PostProcessor = (data: any[], location: number, reject: typeof EarleyParser.fail) => any;
 export type BuiltInPostProcessor = { builtin: string };
 export interface Dictionary<T> {
     [key: string]: T;
@@ -106,4 +107,20 @@ export interface Rule {
     name: string;
     symbols: RuleSymbol[];
     postprocess: PostProcessor | BuiltInPostProcessor | string;
+}
+
+export interface Parser {
+    results: any[];
+    feed(path: string): void;
+}
+
+export interface ParserConstructor {
+    new(grammar: PrecompiledGrammar, options?: any): Parser;
+}
+
+export interface PrecompiledGrammar {
+    lexer?: Lexer;
+    start: string;
+    rules: Rule[];
+    map?: Dictionary<Rule[]>;
 }

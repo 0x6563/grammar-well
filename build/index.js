@@ -14,11 +14,10 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
     for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-__exportStar(require("./lib/compile"), exports);
+__exportStar(require("./lib/compiler"), exports);
 __exportStar(require("./lib/grammar-builder"), exports);
 __exportStar(require("./lib/lint"), exports);
 __exportStar(require("./lib/interpreter"), exports);
-__exportStar(require("./lib/parser"), exports);
-__exportStar(require("./lib/state"), exports);
+__exportStar(require("./parsers/earley/parser"), exports);
 __exportStar(require("./lib/lexer"), exports);
 //# sourceMappingURL=index.js.map
