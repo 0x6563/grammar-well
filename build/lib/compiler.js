@@ -1,7 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Compiler = exports.Compile = void 0;
-const path_1 = require("path");
 const import_resolver_1 = require("./import-resolver");
 const grammar_builder_1 = require("./grammar-builder");
 const coffeescript_1 = require("../formats/coffeescript");
@@ -32,8 +31,7 @@ class Compiler {
     constructor(config = {}) {
         this.state = {
             alreadycompiled: new Set(),
-            resolver: config.resolver ? new config.resolver(config.basedir) : new import_resolver_1.FileSystemResolver(config.basedir),
-            builtinResolver: new import_resolver_1.FileSystemResolver((0, path_1.resolve)(__dirname, '../grammars/file.ne'))
+            resolver: config.resolverInstance ? config.resolverInstance : config.resolver ? new config.resolver(config.basedir) : new import_resolver_1.FileSystemResolver(config.basedir),
         };
         this.grammarBuilder = new grammar_builder_1.GrammarBuilder(config, this.state);
     }

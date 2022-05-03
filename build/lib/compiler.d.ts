@@ -49,6 +49,5 @@ export interface CompileOptions {
 export interface CompilerState {
     alreadycompiled: Set<string>;
     resolver: ImportResolver;
-    builtinResolver: ImportResolver;
 }
 export {};

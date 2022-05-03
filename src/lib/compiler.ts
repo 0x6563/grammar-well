@@ -34,8 +34,7 @@ export class Compiler {
     constructor(config: CompileOptions = {}) {
         this.state = {
             alreadycompiled: new Set(),
-            resolver: config.resolver ? new config.resolver(config.basedir) : new FileSystemResolver(config.basedir),
-            builtinResolver: new FileSystemResolver(resolve(__dirname, '../grammars/file.ne'))
+            resolver: config.resolverInstance ? config.resolverInstance : config.resolver ? new config.resolver(config.basedir) : new FileSystemResolver(config.basedir),
         }
         this.grammarBuilder = new GrammarBuilder(config, this.state);
     }
@@ -74,5 +73,4 @@ export interface CompileOptions {
 export interface CompilerState {
     alreadycompiled: Set<string>;
     resolver: ImportResolver;
-    builtinResolver: ImportResolver;
 }
