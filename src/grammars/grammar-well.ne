@@ -18,6 +18,11 @@ var rules = Object.assign({
     comment: /\#.*/,
     arrow: {match: /[=-]+\>/, next: 'main'},
     js: {
+        match: /\{\%(?:[^%]|\%[^}])*\%\}/,
+        value: x => x.slice(2, -2),
+        lineBreaks: true,
+    },
+    js2: {
         match: /\$\{(?:.*)\}/,
         value: x => x.slice(2, -1),
         lineBreaks: true,
@@ -94,7 +99,8 @@ wordlist -> word
             | wordlist _ "," _ word {% function(d) { return d[0].concat([d[4]]); } %}
 
 completeexpression -> expr  {% function(d) { return {tokens: d[0]}; } %}
-                    | expr _ js  {% function(d) { return {tokens: d[0], transform: d[2]}; } %}
+                    | expr _ js  {% function(d) { return {tokens: d[0], postprocess: d[2]}; } %}
+                    | expr _ js2  {% function(d) { return {tokens: d[0], transform: d[2]}; } %}
 
 expr_member ->
       word {% id %}
@@ -119,6 +125,7 @@ string -> %string {% d => ({literal: d[0].value}) %}
 charclass -> %charclass  {% getValue %}
 
 js -> %js  {% getValue %}
+js2 -> %js2  {% getValue %}
 
 _ -> ws:?
 ws -> %ws

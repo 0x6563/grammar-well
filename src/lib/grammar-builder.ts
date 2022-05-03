@@ -31,7 +31,7 @@ export interface GrammarBuilderState {
 export class GrammarBuilder {
     private names = Object.create(null);
     private neInterpreter = new Interpreter(require('../grammars/nearley.js'));
-    private grmrInterpreter = new Interpreter(require('../grammars/nearley.js'));
+    private grmrInterpreter = new Interpreter(require('../grammars/grammar-well.js'));
 
     private state: GrammarBuilderState = {
         rules: [],

@@ -22,7 +22,7 @@ class GrammarBuilder {
         this.compilerState = compilerState;
         this.names = Object.create(null);
         this.neInterpreter = new interpreter_1.Interpreter(require('../grammars/nearley.js'));
-        this.grmrInterpreter = new interpreter_1.Interpreter(require('../grammars/nearley.js'));
+        this.grmrInterpreter = new interpreter_1.Interpreter(require('../grammars/grammar-well.js'));
         this.state = {
             rules: [],
             body: [],
