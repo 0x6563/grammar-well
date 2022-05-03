@@ -9,7 +9,7 @@ export interface ParserOptions {
 }
 
 
-export class EarleyParser implements Parser {
+export class NearleyParser implements Parser {
     static fail = Symbol();
     keepHistory: boolean = false;
     current: number = 0;
@@ -146,7 +146,7 @@ export class EarleyParser implements Parser {
         const considerations = [];
         const { states } = this.table[this.table.length - 1];
         for (const { rule: { name, symbols }, dot, reference, data } of states) {
-            if (name === this.start && dot === symbols.length && !reference && data !== EarleyParser.fail) {
+            if (name === this.start && dot === symbols.length && !reference && data !== NearleyParser.fail) {
                 considerations.push(data);
             }
         }

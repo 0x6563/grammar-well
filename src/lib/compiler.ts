@@ -24,7 +24,7 @@ const OutputFormats = {
 
 export function Compile(rules: string | RuleDefinition | RuleDefinitionList, config: CompileOptions = {}) {
     const compiler = new Compiler(config);
-    compiler.import(rules);
+    compiler.import(rules, config.language);
     return compiler.export(config.format);
 }
 
@@ -40,12 +40,13 @@ export class Compiler {
         this.grammarBuilder = new GrammarBuilder(config, this.state);
     }
 
-    import(source: string)
+
     import(rule: RuleDefinition)
     import(rules: RuleDefinitionList)
-    import(val: string | RuleDefinition | RuleDefinitionList)
-    import(val: string | RuleDefinition | RuleDefinitionList) {
-        this.grammarBuilder.import(val);
+    import(source: string, language: 'nearley' | 'grammar-well')
+    import(source: string | RuleDefinition | RuleDefinitionList, language?: 'nearley' | 'grammar-well')
+    import(val: string | RuleDefinition | RuleDefinitionList, language?: 'nearley' | 'grammar-well') {
+        this.grammarBuilder.import(val as any, language);
     }
 
     export<T extends keyof typeof OutputFormats = '_default'>(format: T, name: string = 'grammar'): ReturnType<typeof OutputFormats[OutputFormat<T>]> {
@@ -67,6 +68,7 @@ export interface CompileOptions {
     resolverInstance?: ImportResolver;
     exportName?: string;
     format?: keyof typeof OutputFormats;
+    language?: 'nearley' | 'grammar-well';
 }
 
 export interface CompilerState {

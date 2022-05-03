@@ -25,7 +25,7 @@ export class Column {
                 state.finish();
                 if (state.data !== EarleyParser.fail) {
                     const { wantedBy } = state;
-                    for (var i = wantedBy.length; i--;) { // this line is hot
+                    for (let i = wantedBy.length; i--;) { // this line is hot
                         this.complete(wantedBy[i], state);
                     }
 
@@ -36,7 +36,6 @@ export class Column {
                         this.completed[name].push(state);
                     }
                 }
-
             } else {
                 const exp = state.rule.symbols[state.dot];
                 if (typeof exp !== 'string') {

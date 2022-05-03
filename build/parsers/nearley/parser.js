@@ -1,10 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.EarleyParser = void 0;
+exports.NearleyParser = void 0;
 const column_1 = require("./column");
 const lexer_1 = require("../../lib/lexer");
 const error_reporting_1 = require("./error-reporting");
-class EarleyParser {
+class NearleyParser {
     constructor({ rules, start, lexer, map }, options = {}) {
         this.keepHistory = false;
         this.current = 0;
@@ -98,13 +98,13 @@ class EarleyParser {
         const considerations = [];
         const { states } = this.table[this.table.length - 1];
         for (const { rule: { name, symbols }, dot, reference, data } of states) {
-            if (name === this.start && dot === symbols.length && !reference && data !== EarleyParser.fail) {
+            if (name === this.start && dot === symbols.length && !reference && data !== NearleyParser.fail) {
                 considerations.push(data);
             }
         }
         return considerations;
     }
 }
-exports.EarleyParser = EarleyParser;
-EarleyParser.fail = Symbol();
+exports.NearleyParser = NearleyParser;
+NearleyParser.fail = Symbol();
 //# sourceMappingURL=parser.js.map

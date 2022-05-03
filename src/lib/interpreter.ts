@@ -1,7 +1,9 @@
 import { Parser, ParserConstructor, PrecompiledGrammar } from "../typings";
+import { NearleyParser } from "../parsers/nearley/parser";
 import { EarleyParser } from "../parsers/earley/parser";
 
 const ParserRegistry = {
+    'nearley': NearleyParser,
     'earley': EarleyParser
 }
 
@@ -13,19 +15,19 @@ export class Interpreter {
         return this.parser.results
     }
 
-    constructor(private grammar: PrecompiledGrammar, private options: InterpreterOptions = { parser: 'earley' }) {
+    constructor(private grammar: PrecompiledGrammar, private options: InterpreterOptions = { parser: 'nearley' }) {
         this.parserClass = ParserRegistry[options.parser];
         this.parser = new this.parserClass(this.grammar, options);
     }
 
-    feed(source: string) {
-        this.parser.feed(source);
+    feed(input: string) {
+        this.parser.feed(input);
         return this.results;
     }
 
-    run(source: string) {
+    run(input: string) {
         const parser = new this.parserClass(this.grammar, this.options);
-        parser.feed(source);
+        parser.feed(input);
         return parser.results[0];
     }
 }

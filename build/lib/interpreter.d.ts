@@ -1,6 +1,8 @@
 import { Parser, ParserConstructor, PrecompiledGrammar } from "../typings";
+import { NearleyParser } from "../parsers/nearley/parser";
 import { EarleyParser } from "../parsers/earley/parser";
 declare const ParserRegistry: {
+    nearley: typeof NearleyParser;
     earley: typeof EarleyParser;
 };
 export declare class Interpreter {
@@ -10,8 +12,8 @@ export declare class Interpreter {
     parser: Parser;
     get results(): any[];
     constructor(grammar: PrecompiledGrammar, options?: InterpreterOptions);
-    feed(source: string): any[];
-    run(source: string): any;
+    feed(input: string): any[];
+    run(input: string): any;
 }
 interface InterpreterOptions {
     parser: keyof typeof ParserRegistry;

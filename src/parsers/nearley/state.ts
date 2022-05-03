@@ -1,5 +1,5 @@
-import { Rule } from "../../typings";
-import { EarleyParser } from "./parser";
+import { NearleyPostProcessor, Rule } from "../../typings";
+import { NearleyParser } from "./parser";
 
 
 export class State {
@@ -48,10 +48,10 @@ export class State {
                 reference: this.reference,
                 dot: this.dot,
                 name: this.rule.name,
-                reject: EarleyParser.fail
+                reject: NearleyParser.fail
             });
         } else if (this.rule.postprocess) {
-            this.data = this.rule.postprocess(this.data, this.reference, EarleyParser.fail);
+            this.data = this.rule.postprocess(this.data, this.reference, NearleyParser.fail);
         }
     }
 }

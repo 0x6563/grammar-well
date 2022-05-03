@@ -18,7 +18,7 @@ class Column {
         while (state = this.states[w++]) {
             if (state.isComplete) {
                 state.finish();
-                if (state.data !== parser_1.EarleyParser.fail) {
+                if (state.data !== parser_1.NearleyParser.fail) {
                     const { wantedBy } = state;
                     for (let i = wantedBy.length; i--;) {
                         this.complete(wantedBy[i], state);

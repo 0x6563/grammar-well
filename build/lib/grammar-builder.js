@@ -21,7 +21,8 @@ class GrammarBuilder {
         this.config = config;
         this.compilerState = compilerState;
         this.names = Object.create(null);
-        this.interpreter = new interpreter_1.Interpreter(require('../grammars/nearley.js'));
+        this.neInterpreter = new interpreter_1.Interpreter(require('../grammars/nearley.js'));
+        this.grmrInterpreter = new interpreter_1.Interpreter(require('../grammars/nearley.js'));
         this.state = {
             rules: [],
             body: [],
@@ -33,9 +34,9 @@ class GrammarBuilder {
         };
         this.state.version = config.version || this.state.version;
     }
-    import(rules) {
+    import(rules, language = 'grammar-well') {
         if (typeof rules == 'string') {
-            const state = this.mergeGrammarString(rules);
+            const state = this.mergeGrammarString(rules, language);
             this.state.start = this.state.start || state.start;
             return;
         }
@@ -90,15 +91,19 @@ class GrammarBuilder {
     includeGrammar(name) {
         const resolver = this.compilerState.resolver;
         const path = resolver.path(name);
-        console.log(path);
         if (!this.compilerState.alreadycompiled.has(path)) {
             this.compilerState.alreadycompiled.add(path);
-            this.mergeGrammarString(resolver.body(path));
+            this.mergeGrammarString(resolver.body(path), path.slice(-3) === '.ne' ? 'nearley' : 'grammar-well');
         }
     }
-    mergeGrammarString(body) {
+    mergeGrammarString(body, language = 'grammar-well') {
         const builder = new GrammarBuilder(this.config, this.compilerState);
-        builder.import(this.interpreter.run(body));
+        if (language == 'nearley') {
+            builder.import(this.neInterpreter.run(body));
+        }
+        else {
+            builder.import(this.grmrInterpreter.run(body));
+        }
         const state = builder.export();
         this.merge(state);
         return state;
@@ -119,6 +124,7 @@ class GrammarBuilder {
             const rule = this.buildRule(name, rules[i], scope);
             if (this.config.noscript) {
                 rule.postprocess = null;
+                rule.transform = null;
             }
             this.state.rules.push(rule);
         }
@@ -131,7 +137,7 @@ class GrammarBuilder {
                 symbols.push(symbol);
             }
         }
-        return { name, symbols, postprocess: rule.postprocess };
+        return { name, symbols, postprocess: rule.postprocess, transform: rule.transform };
     }
     buildSymbol(name, token, scope) {
         if (typeof token === 'string') {

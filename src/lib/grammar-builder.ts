@@ -1,4 +1,4 @@
-import { Dictionary, EBNFModified, Expression, ExpressionToken, LexerToken, MacroCall, Rule, RuleDefinition, RuleDefinitionList, SubExpression, TokenLiteral } from "../typings";
+import { Dictionary, EBNFModified, Expression, ExpressionToken, GrammarBuilderRule, LexerToken, MacroCall, RuleDefinition, RuleDefinitionList, SubExpression, TokenLiteral } from "../typings";
 import { CompilerState } from "./compiler";
 import { Interpreter } from "./interpreter";
 
@@ -19,7 +19,7 @@ const BuiltInRegistry = {
 }
 
 export interface GrammarBuilderState {
-    rules: Rule[],
+    rules: GrammarBuilderRule[],
     body: string[], // @directives list
     customTokens: Set<string>, // %tokens
     config: Dictionary<string>, // @config value
@@ -30,7 +30,8 @@ export interface GrammarBuilderState {
 
 export class GrammarBuilder {
     private names = Object.create(null);
-    private interpreter = new Interpreter(require('../grammars/nearley.js'));
+    private neInterpreter = new Interpreter(require('../grammars/nearley.js'));
+    private grmrInterpreter = new Interpreter(require('../grammars/nearley.js'));
 
     private state: GrammarBuilderState = {
         rules: [],
@@ -47,9 +48,13 @@ export class GrammarBuilder {
     }
 
 
-    import(rules: string | RuleDefinition | RuleDefinitionList) {
+    import(source: string, language: 'nearley' | 'grammar-well')
+    import(rule: RuleDefinition)
+    import(rules: RuleDefinitionList)
+    import(rules: string | RuleDefinition | RuleDefinitionList, language?: 'nearley' | 'grammar-well')
+    import(rules: string | RuleDefinition | RuleDefinitionList, language: 'nearley' | 'grammar-well' = 'grammar-well') {
         if (typeof rules == 'string') {
-            const state = this.mergeGrammarString(rules);
+            const state = this.mergeGrammarString(rules, language);
             this.state.start = this.state.start || state.start;
             return;
         }
@@ -102,16 +107,19 @@ export class GrammarBuilder {
     private includeGrammar(name) {
         const resolver = this.compilerState.resolver;
         const path = resolver.path(name);
-        console.log(path);
         if (!this.compilerState.alreadycompiled.has(path)) {
             this.compilerState.alreadycompiled.add(path);
-            this.mergeGrammarString(resolver.body(path))
+            this.mergeGrammarString(resolver.body(path), path.slice(-3) === '.ne' ? 'nearley' : 'grammar-well')
         }
     }
 
-    private mergeGrammarString(body: string) {
+    private mergeGrammarString(body: string, language: 'nearley' | 'grammar-well' = 'grammar-well') {
         const builder = new GrammarBuilder(this.config, this.compilerState);
-        builder.import(this.interpreter.run(body));
+        if (language == 'nearley') {
+            builder.import(this.neInterpreter.run(body));
+        } else {
+            builder.import(this.grmrInterpreter.run(body));
+        }
         const state = builder.export();
         this.merge(state);
         return state;
@@ -135,12 +143,13 @@ export class GrammarBuilder {
             const rule = this.buildRule(name, rules[i], scope);
             if (this.config.noscript) {
                 rule.postprocess = null;
+                rule.transform = null;
             }
             this.state.rules.push(rule);
         }
     }
 
-    private buildRule(name: string, rule: Expression, scope: Dictionary<string>): Rule {
+    private buildRule(name: string, rule: Expression, scope: Dictionary<string>): GrammarBuilderRule {
         const symbols: (string | RegExp | TokenLiteral | LexerToken)[] = [];
         for (let i = 0; i < rule.tokens.length; i++) {
             const symbol = this.buildSymbol(name, rule.tokens[i], scope);
@@ -148,7 +157,7 @@ export class GrammarBuilder {
                 symbols.push(symbol);
             }
         }
-        return { name, symbols, postprocess: rule.postprocess };
+        return { name, symbols, postprocess: rule.postprocess, transform: rule.transform };
     }
 
     private buildSymbol(name: string, token: ExpressionToken, scope: Dictionary<string>): string | RegExp | TokenLiteral | LexerToken | null {

@@ -29,10 +29,10 @@ export declare class Compiler {
     private state;
     private grammarBuilder;
     constructor(config?: CompileOptions);
-    import(source: string): any;
     import(rule: RuleDefinition): any;
     import(rules: RuleDefinitionList): any;
-    import(val: string | RuleDefinition | RuleDefinitionList): any;
+    import(source: string, language: 'nearley' | 'grammar-well'): any;
+    import(source: string | RuleDefinition | RuleDefinitionList, language?: 'nearley' | 'grammar-well'): any;
     export<T extends keyof typeof OutputFormats = '_default'>(format: T, name?: string): ReturnType<typeof OutputFormats[OutputFormat<T>]>;
 }
 declare type OutputFormat<T> = T extends keyof typeof OutputFormats ? T : "_default";
@@ -44,6 +44,7 @@ export interface CompileOptions {
     resolverInstance?: ImportResolver;
     exportName?: string;
     format?: keyof typeof OutputFormats;
+    language?: 'nearley' | 'grammar-well';
 }
 export interface CompilerState {
     alreadycompiled: Set<string>;

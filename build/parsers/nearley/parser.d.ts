@@ -6,7 +6,7 @@ export interface ParserOptions {
     keepHistory?: boolean;
     lexer?: Lexer;
 }
-export declare class EarleyParser implements Parser {
+export declare class NearleyParser implements Parser {
     static fail: symbol;
     keepHistory: boolean;
     current: number;

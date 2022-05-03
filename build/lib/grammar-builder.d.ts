@@ -1,7 +1,7 @@
-import { Dictionary, Rule, RuleDefinition, RuleDefinitionList } from "../typings";
+import { Dictionary, GrammarBuilderRule, RuleDefinition, RuleDefinitionList } from "../typings";
 import { CompilerState } from "./compiler";
 export interface GrammarBuilderState {
-    rules: Rule[];
+    rules: GrammarBuilderRule[];
     body: string[];
     customTokens: Set<string>;
     config: Dictionary<string>;
@@ -16,13 +16,17 @@ export declare class GrammarBuilder {
     private config;
     private compilerState;
     private names;
-    private interpreter;
+    private neInterpreter;
+    private grmrInterpreter;
     private state;
     constructor(config: {
         noscript?: boolean;
         version?: string;
     }, compilerState: CompilerState);
-    import(rules: string | RuleDefinition | RuleDefinitionList): void;
+    import(source: string, language: 'nearley' | 'grammar-well'): any;
+    import(rule: RuleDefinition): any;
+    import(rules: RuleDefinitionList): any;
+    import(rules: string | RuleDefinition | RuleDefinitionList, language?: 'nearley' | 'grammar-well'): any;
     export(): GrammarBuilderState;
     private includeBuiltIn;
     private includeGrammar;

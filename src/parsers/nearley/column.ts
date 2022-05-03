@@ -1,67 +1,76 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.Column = void 0;
-const parser_1 = require("./parser");
-const state_1 = require("./state");
-class Column {
-    constructor(ruleMap, index) {
-        this.ruleMap = ruleMap;
-        this.index = index;
-        this.states = [];
-        this.wants = Object.create(null);
-        this.scannable = [];
-        this.completed = Object.create(null);
-    }
-    process(nextColumn) {
+import { NearleyParser } from "./parser";
+import { State } from "./state";
+import { Dictionary, Rule } from "../../typings";
+import { LexerState } from "../../lib/lexer";
+
+
+export class Column {
+    lexerState: LexerState;
+    states: State[] = [];
+    wants: Dictionary<State[]> = Object.create(null);// states indexed by the non-terminal they expect
+    scannable: State[] = [];// list of states that expect a token
+    completed: Dictionary<State[]> = Object.create(null);  // states that are nullable
+
+    constructor(
+        private ruleMap: Dictionary<Rule[]>,
+        public index: number
+    ) { }
+
+
+    process(nextColumn?) {
         let w = 0;
-        let state;
-        while (state = this.states[w++]) {
+        let state: State;
+        while (state = this.states[w++]) { // nb. we push() during iteration
             if (state.isComplete) {
                 state.finish();
-                if (state.data !== parser_1.EarleyParser.fail) {
+                if (state.data !== NearleyParser.fail) {
                     const { wantedBy } = state;
-                    for (let i = wantedBy.length; i--;) {
+                    for (let i = wantedBy.length; i--;) { // this line is hot
                         this.complete(wantedBy[i], state);
                     }
+
+                    // special-case nullables
                     if (state.reference === this.index) {
                         const { name } = state.rule;
                         this.completed[name] = this.completed[name] || [];
                         this.completed[name].push(state);
                     }
                 }
-            }
-            else {
+            } else {
                 const exp = state.rule.symbols[state.dot];
                 if (typeof exp !== 'string') {
                     this.scannable.push(state);
                     continue;
                 }
+
+                // predict
                 if (this.wants[exp]) {
                     this.wants[exp].push(state);
+
                     if (this.completed[exp]) {
                         for (const right of this.completed[exp]) {
                             this.complete(state, right);
                         }
                     }
-                }
-                else {
+                } else {
                     this.wants[exp] = [state];
                     this.predict(exp);
                 }
             }
         }
     }
-    predict(exp) {
+
+    predict(exp: string) {
         if (!this.ruleMap[exp])
             return;
+
         for (const rule of this.ruleMap[exp]) {
-            this.states.push(new state_1.State(rule, 0, this.index, this.wants[exp]));
+            this.states.push(new State(rule, 0, this.index, this.wants[exp]));
         }
     }
-    complete(left, right) {
+
+    private complete(left: State, right: State) {
         const copy = left.nextState(right);
         this.states.push(copy);
     }
 }
-exports.Column = Column;
-//# sourceMappingURL=column.js.map

@@ -38,11 +38,11 @@ class State {
                 reference: this.reference,
                 dot: this.dot,
                 name: this.rule.name,
-                reject: parser_1.EarleyParser.fail
+                reject: parser_1.NearleyParser.fail
             });
         }
         else if (this.rule.postprocess) {
-            this.data = this.rule.postprocess(this.data, this.reference, parser_1.EarleyParser.fail);
+            this.data = this.rule.postprocess(this.data, this.reference, parser_1.NearleyParser.fail);
         }
     }
 }

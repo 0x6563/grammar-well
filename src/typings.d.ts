@@ -1,7 +1,16 @@
 import { Lexer } from "./lib/lexer";
-import { EarleyParser } from "./parsers/earley/parser";
 
-export type PostProcessor = (data: any[], location: number, reject: typeof EarleyParser.fail) => any;
+export type NearleyPostProcessor = (data: any[], location: number, reject: Symbol) => any;
+export type PostTransform = (payload: PostTransformPayload) => any;
+
+interface PostTransformPayload {
+    data: any[];
+    reference: number;
+    dot: number;
+    name: string;
+    reject: Symbol;
+}
+
 export type BuiltInPostProcessor = { builtin: string };
 export interface Dictionary<T> {
     [key: string]: T;
@@ -44,7 +53,8 @@ export interface ExpressionDefinition {
 }
 export interface Expression {
     tokens: ExpressionToken[];
-    postprocess?: PostProcessor | BuiltInPostProcessor
+    postprocess?: string | BuiltInPostProcessor;
+    transform?: string;
 }
 export type ExpressionToken = string | MixIn | MacroCall | SubExpression | LexerToken | EBNFModified | TokenLiteral;
 
@@ -103,10 +113,19 @@ interface RuleSymbolLexerToken {
 interface RuleSymbolTest {///?????
     test: string;
 }
+
+export interface GrammarBuilderRule {
+    name: string;
+    symbols: RuleSymbol[];
+    postprocess?: BuiltInPostProcessor | string;
+    transform?: BuiltInPostProcessor | string;
+}
+
 export interface Rule {
     name: string;
     symbols: RuleSymbol[];
-    postprocess: PostProcessor | BuiltInPostProcessor | string;
+    postprocess?: NearleyPostProcessor;
+    transform?: PostTransform;
 }
 
 export interface Parser {

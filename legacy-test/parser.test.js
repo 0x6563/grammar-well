@@ -3,7 +3,7 @@ const fs = require('fs');
 const expect = require('expect');
 
 const { compile, parse } = require('./_shared');
-const { EarleyParser: Parser } = require('../build');
+const { NearleyParser: Parser } = require('../build');
 
 function read(filename) {
     return fs.readFileSync(filename, 'utf-8');

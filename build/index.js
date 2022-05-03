@@ -18,6 +18,6 @@ __exportStar(require("./lib/compiler"), exports);
 __exportStar(require("./lib/grammar-builder"), exports);
 __exportStar(require("./lib/lint"), exports);
 __exportStar(require("./lib/interpreter"), exports);
-__exportStar(require("./parsers/earley/parser"), exports);
+__exportStar(require("./parsers/nearley/parser"), exports);
 __exportStar(require("./lib/lexer"), exports);
 //# sourceMappingURL=index.js.map

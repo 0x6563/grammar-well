@@ -24,7 +24,7 @@ const OutputFormats = {
 };
 function Compile(rules, config = {}) {
     const compiler = new Compiler(config);
-    compiler.import(rules);
+    compiler.import(rules, config.language);
     return compiler.export(config.format);
 }
 exports.Compile = Compile;
@@ -37,8 +37,8 @@ class Compiler {
         };
         this.grammarBuilder = new grammar_builder_1.GrammarBuilder(config, this.state);
     }
-    import(val) {
-        this.grammarBuilder.import(val);
+    import(val, language) {
+        this.grammarBuilder.import(val, language);
     }
     export(format, name = 'grammar') {
         const grammar = this.grammarBuilder.export();
