@@ -7,6 +7,11 @@ const ParserRegistry = {
     'earley': EarleyParser
 }
 
+export function Interpret(grammar: PrecompiledGrammar, input: string, options?: InterpreterOptions) {
+    const i = new Interpreter(grammar, options);
+    return i.run(input);
+}
+
 export class Interpreter {
     parserClass: ParserConstructor;
     parser: Parser;

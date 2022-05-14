@@ -1,12 +1,17 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Interpreter = void 0;
+exports.Interpreter = exports.Interpret = void 0;
 const parser_1 = require("../parsers/nearley/parser");
 const parser_2 = require("../parsers/earley/parser");
 const ParserRegistry = {
     'nearley': parser_1.NearleyParser,
     'earley': parser_2.EarleyParser
 };
+function Interpret(grammar, input, options) {
+    const i = new Interpreter(grammar, options);
+    return i.run(input);
+}
+exports.Interpret = Interpret;
 class Interpreter {
     constructor(grammar, options = { parser: 'nearley' }) {
         this.grammar = grammar;

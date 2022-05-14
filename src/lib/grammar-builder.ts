@@ -27,6 +27,9 @@ export interface GrammarBuilderState {
     start: string;
     version: string;
 }
+export interface SerializedGrammarBuilderState extends Omit<GrammarBuilderState, 'customTokens'> {
+    customTokens: string[];
+}
 
 export class GrammarBuilder {
     private names = Object.create(null);

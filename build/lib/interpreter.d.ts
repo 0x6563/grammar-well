@@ -5,6 +5,7 @@ declare const ParserRegistry: {
     nearley: typeof NearleyParser;
     earley: typeof EarleyParser;
 };
+export declare function Interpret(grammar: PrecompiledGrammar, input: string, options?: InterpreterOptions): any;
 export declare class Interpreter {
     private grammar;
     private options;
