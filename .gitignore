@@ -11,3 +11,4 @@ test/grammars/whitespace.js
 *.bat
 npm-debug.log
 sandbox/
+.nyc_output

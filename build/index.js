@@ -19,5 +19,6 @@ __exportStar(require("./lib/grammar-builder"), exports);
 __exportStar(require("./lib/lint"), exports);
 __exportStar(require("./lib/interpreter"), exports);
 __exportStar(require("./parsers/nearley/parser"), exports);
-__exportStar(require("./lib/lexer"), exports);
+__exportStar(require("./lexers/basic-lexer"), exports);
+__exportStar(require("./lexers/legacy-adapter"), exports);
 //# sourceMappingURL=index.js.map

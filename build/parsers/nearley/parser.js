@@ -2,8 +2,9 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.NearleyParser = void 0;
 const column_1 = require("./column");
-const lexer_1 = require("../../lib/lexer");
 const error_reporting_1 = require("./error-reporting");
+const legacy_adapter_1 = require("../../lexers/legacy-adapter");
+const basic_lexer_1 = require("../../lexers/basic-lexer");
 class NearleyParser {
     constructor({ rules, start, lexer, map }, options = {}) {
         this.keepHistory = false;
@@ -22,7 +23,9 @@ class NearleyParser {
         }
         this.keepHistory = !!(options === null || options === void 0 ? void 0 : options.keepHistory);
         this.errorService = new error_reporting_1.ParserErrorService(this);
-        this.lexer = (options === null || options === void 0 ? void 0 : options.lexer) || this.lexer || new lexer_1.StreamLexer();
+        this.lexer = (options === null || options === void 0 ? void 0 : options.lexer) || this.lexer || new basic_lexer_1.BasicLexer();
+        if (!this.lexer.restore)
+            this.lexer = new legacy_adapter_1.LegacyLexerAdapter(this.lexer);
         const column = new column_1.Column(this.ruleMap, 0);
         this.table = [column];
         column.wants[this.start] = [];
@@ -40,7 +43,7 @@ class NearleyParser {
         }
     }
     feed(chunk) {
-        this.lexer.reset(chunk, this.lexerState);
+        this.lexer.feed(chunk);
         let token, column;
         while (token = this.next()) {
             column = this.table[this.current];
@@ -51,7 +54,7 @@ class NearleyParser {
             const nextColumn = new column_1.Column(this.ruleMap, n);
             this.table.push(nextColumn);
             const literal = token.text !== undefined ? token.text : token.value;
-            const data = this.lexer.constructor === lexer_1.StreamLexer ? token.value : token;
+            const data = this.lexer.constructor === basic_lexer_1.BasicLexer ? token.value : token;
             const { scannable } = column;
             for (let w = scannable.length; w--;) {
                 const state = scannable[w];
@@ -66,12 +69,12 @@ class NearleyParser {
                 throw this.errorService.tokenError(token);
             }
             if (this.keepHistory) {
-                column.lexerState = this.lexer.save();
+                column.lexerState = this.lexer.state;
             }
             this.current++;
         }
         if (column) {
-            this.lexerState = this.lexer.save();
+            this.lexerState = this.lexer.state;
         }
         this.results = this.finish();
     }
@@ -86,6 +89,7 @@ class NearleyParser {
         this.table[index] = column;
         this.table.splice(index + 1);
         this.lexerState = column.lexerState;
+        this.lexer.restore(column.lexerState);
         this.results = this.finish();
     }
     rewind(index) {

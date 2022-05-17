@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ParserErrorService = void 0;
+const log_1 = require("../../lib/log");
 class ParserErrorService {
     constructor(parser) {
         this.parser = parser;
@@ -10,7 +11,7 @@ class ParserErrorService {
         const token = lexerError.token;
         if (token) {
             tokenDisplay = "input " + JSON.stringify(token.text[0]) + " (lexer error)";
-            lexerMessage = this.parser.lexer.formatError(token, "Syntax error");
+            lexerMessage = log_1.Log.LexerTokenError(this.parser.lexer);
         }
         else {
             tokenDisplay = "input (lexer error)";
@@ -20,7 +21,7 @@ class ParserErrorService {
     }
     tokenError(token) {
         const tokenDisplay = (token.type ? token.type + " token: " : "") + JSON.stringify(token.value !== undefined ? token.value : token);
-        const lexerMessage = this.parser.lexer.formatError(token, "Syntax error");
+        const lexerMessage = log_1.Log.LexerTokenError(this.parser.lexer);
         const error = new Error(this.reportErrorCommon(lexerMessage, tokenDisplay));
         error.offset = this.parser.current;
         error.token = token;

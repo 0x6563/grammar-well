@@ -1,11 +1,10 @@
-import { resolve } from "path";
 import { FileSystemResolver, ImportResolver, ImportResolverConstructor } from "./import-resolver";
 import { GrammarBuilder } from "./grammar-builder";
-import { CoffeescriptOutput } from "../formats/coffeescript";
-import { ESMOutput, JavascriptOutput } from "../formats/javascript";
-import { TypescriptFormat } from "../formats/typescript";
+import { CoffeescriptOutput } from "../outputs/coffeescript";
+import { ESMOutput, JavascriptOutput } from "../outputs/javascript";
+import { TypescriptFormat } from "../outputs/typescript";
 import { RuleDefinition, RuleDefinitionList } from "../typings";
-import { JSONFormatter } from "../formats/json";
+import { JSONFormatter } from "../outputs/json";
 
 const OutputFormats = {
     _default: JavascriptOutput,

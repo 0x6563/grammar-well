@@ -1,9 +1,9 @@
 import { ImportResolver, ImportResolverConstructor } from "./import-resolver";
-import { CoffeescriptOutput } from "../formats/coffeescript";
-import { ESMOutput, JavascriptOutput } from "../formats/javascript";
-import { TypescriptFormat } from "../formats/typescript";
+import { CoffeescriptOutput } from "../outputs/coffeescript";
+import { ESMOutput, JavascriptOutput } from "../outputs/javascript";
+import { TypescriptFormat } from "../outputs/typescript";
 import { RuleDefinition, RuleDefinitionList } from "../typings";
-import { JSONFormatter } from "../formats/json";
+import { JSONFormatter } from "../outputs/json";
 declare const OutputFormats: {
     _default: typeof JavascriptOutput;
     object: (grammar: any, exportName: any) => {

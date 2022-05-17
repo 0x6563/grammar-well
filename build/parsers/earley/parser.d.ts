@@ -1,6 +1,5 @@
 import { Column } from "./column";
-import { Lexer, LexerState } from "../../lib/lexer";
-import { Dictionary, Parser, PrecompiledGrammar, Rule } from "../../typings";
+import { Lexer, LexerState, Dictionary, Parser, PrecompiledGrammar, Rule } from "../../typings";
 import { ParserErrorService } from "./error-reporting";
 export interface ParserOptions {
     keepHistory?: boolean;

@@ -1,5 +1,3 @@
-import { Lexer } from "./lib/lexer";
-
 export type NearleyPostProcessor = (data: any[], location: number, reject: Symbol) => any;
 export type PostTransform = (payload: PostTransformPayload) => any;
 
@@ -110,7 +108,7 @@ interface RuleSymbolLexerToken {
     text: string;
 }
 
-interface RuleSymbolTest {///?????
+interface RuleSymbolTest {///????? Regex?
     test: string;
 }
 
@@ -142,4 +140,34 @@ export interface PrecompiledGrammar {
     start: string;
     rules: Rule[];
     map?: Dictionary<Rule[]>;
+}
+
+
+
+export interface Lexer {
+    readonly line?: number;
+    readonly index: number;
+    readonly column?: number;
+    readonly current: any;
+    readonly state: LexerState;
+
+    feed(chunk: string, flush?: boolean): void;
+    reset(chunk?: string): void;
+    restore(state: LexerState): void;
+    next(): any;
+    previous(): any;
+    peek(offset: number): any;
+}
+
+export interface LexerState {
+    index: number;
+    indexOffset: number;
+    line?: number;
+    lineOffset?: number;
+    column?: number;
+}
+
+export interface LexerHistory {
+    token: any;
+    state: LexerState;
 }

@@ -1,22 +1,23 @@
 # nearley grammar
 @{%
+
 function getValue(d) {
-    return d[0].value
+    return d[0].value;
 }
 
 function literals(list) {
-    var rules = {}
-    for (var lit of list) {
-        rules[lit] = {match: lit, next: 'main'}
+    const rules = {}
+    for (let lit of list) {
+        rules[lit] = { match: lit, next: 'main' }
     }
-    return rules
+    return rules;
 }
 
-var moo = require('moo')
-var rules = Object.assign({
-    ws: {match: /\s+/, lineBreaks: true, next: 'main'},
+const moo = require('moo');
+const rules = Object.assign({
+    ws: { match: /\s+/, lineBreaks: true, next: 'main' },
     comment: /\#.*/,
-    arrow: {match: /[=-]+\>/, next: 'main'},
+    arrow: { match: /[=-]+\>/, next: 'main' },
     js: {
         match: /\{\%(?:[^%]|\%[^}])*\%\}/,
         value: x => x.slice(2, -2),
@@ -27,7 +28,7 @@ var rules = Object.assign({
         value: x => x.slice(2, -1),
         lineBreaks: true,
     },
-    word: {match: /[\w\?\+]+/, next: 'afterWord'},
+    word: { match: /[\w\?\+]+/, next: 'afterWord' },
     string: {
         match: /"(?:[^\\"\n]|\\["\\/bfnrt]|\\u[a-fA-F0-9]{4})*"/,
         value: x => JSON.parse(x),
@@ -44,9 +45,9 @@ var rules = Object.assign({
     ":?", ":*", ":+",
     "@include", "@builtin", "@",
     "]",
-]))
+]));
 
-var lexer = moo.states({
+const lexer = moo.states({
     main: Object.assign({}, rules, {
         charclass: {
             match: /\.|\[(?:\\.|[^\\\n])+?\]/,
@@ -55,26 +56,24 @@ var lexer = moo.states({
     }),
     // Both macro arguments and charclasses are both enclosed in [ ].
     // We disambiguate based on whether the previous token was a `word`.
-    afterWord: Object.assign({}, rules, {
-        "[": {match: "[", next: 'main'},
-    }),
-})
+    afterWord: Object.assign({}, rules, literals(['['])),
+});
 
-function insensitive(sl) {
-    var s = sl.literal;
-    var result = [];
-    for (var i=0; i<s.length; i++) {
-        var c = s.charAt(i);
+function insensitive({ literal }) {
+    const tokens = [];
+    for (let i = 0; i < literal.length; i++) {
+        const c = literal.charAt(i);
         if (c.toUpperCase() !== c || c.toLowerCase() !== c) {
-            result.push(new RegExp("[" + c.toLowerCase() + c.toUpperCase() + "]"));
-            } else {
-            result.push({literal: c});
+            tokens.push(new RegExp("[" + c.toLowerCase() + c.toUpperCase() + "]"));
+        } else {
+            tokens.push({ literal: c });
         }
     }
-    return {subexpression: [{tokens: result, postprocess: function(d) {return d.join(""); }}]};
+    return { subexpression: [{ tokens, postprocess: d => d.join('') }] };
 }
 
 %}
+
 @lexer lexer
 
 final -> _ prog _ %ws:?  {% function(d) { return d[1]; } %}

@@ -1,7 +1,6 @@
 import { EarleyParser } from "./parser";
 import { State } from "./state";
-import { Dictionary, Rule } from "../../typings";
-import { LexerState } from "../../lib/lexer";
+import { Dictionary, Rule, LexerState } from "../../typings";
 
 
 export class Column {

@@ -1,7 +1,8 @@
 import { Column } from "./column";
-import { Lexer, LexerState, StreamLexer } from "../../lib/lexer";
-import { Dictionary, Parser, PrecompiledGrammar, Rule } from "../../typings";
+import { Dictionary, Lexer, LexerState, Parser, PrecompiledGrammar, Rule } from "../../typings";
 import { ParserErrorService } from "./error-reporting";
+import { LegacyLexerAdapter } from "../../lexers/legacy-adapter";
+import { BasicLexer } from "../../lexers/basic-lexer";
 
 export interface ParserOptions {
     keepHistory?: boolean;
@@ -37,8 +38,9 @@ export class NearleyParser implements Parser {
         }
         this.keepHistory = !!(options?.keepHistory);
         this.errorService = new ParserErrorService(this);
-        this.lexer = options?.lexer || this.lexer || new StreamLexer();
-
+        this.lexer = options?.lexer || this.lexer || new BasicLexer();
+        if (!this.lexer.restore)
+            this.lexer = new LegacyLexerAdapter(this.lexer as any);
         const column = new Column(this.ruleMap, 0);
         this.table = [column];
 
@@ -58,7 +60,7 @@ export class NearleyParser implements Parser {
     }
 
     feed(chunk: string) {
-        this.lexer.reset(chunk, this.lexerState);
+        this.lexer.feed(chunk);
         let token, column;
 
         while (token = this.next()) {
@@ -74,7 +76,7 @@ export class NearleyParser implements Parser {
 
             // Advance all tokens that expect the symbol
             const literal = token.text !== undefined ? token.text : token.value;
-            const data = this.lexer.constructor === StreamLexer ? token.value : token;
+            const data = this.lexer.constructor === BasicLexer ? token.value : token;
             const { scannable } = column;
             for (let w = scannable.length; w--;) {
                 const state = scannable[w];
@@ -102,14 +104,14 @@ export class NearleyParser implements Parser {
             }
 
             if (this.keepHistory) {
-                column.lexerState = this.lexer.save()
+                column.lexerState = this.lexer.state;
             }
 
             this.current++;
         }
 
         if (column) {
-            this.lexerState = this.lexer.save()
+            this.lexerState = this.lexer.state;
         }
 
         // Incrementally keep track of results
@@ -129,6 +131,7 @@ export class NearleyParser implements Parser {
         this.table.splice(index + 1);
         this.lexerState = column.lexerState;
 
+        this.lexer.restore(column.lexerState);
         // Incrementally keep track of results
         this.results = this.finish();
     }

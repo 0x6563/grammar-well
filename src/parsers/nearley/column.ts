@@ -1,7 +1,6 @@
 import { NearleyParser } from "./parser";
 import { State } from "./state";
-import { Dictionary, Rule } from "../../typings";
-import { LexerState } from "../../lib/lexer";
+import { Dictionary, LexerState, Rule } from "../../typings";
 
 
 export class Column {

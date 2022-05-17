@@ -108,7 +108,7 @@ describe('Parser: API', function () {
         expect(p.table.length).toBe(12)
         var col = p.save();
         expect(col.index).toBe(11)
-        expect(col.lexerState.col).toBe(first.length)
+        expect(col.lexerState.column).toBe(first.length - 1)
     });
 
     it('can rewind', function () {
@@ -136,31 +136,37 @@ describe('Parser: API', function () {
 
     it('restores line numbers', function () {
         let p = new Parser(testGrammar);
-        p.feed('abc\n')
-        expect(p.save().lexerState.line).toBe(2)
+        p.feed('abc\n');
+        let save;
+        save = p.save();
+        expect(save.lexerState.line + save.lexerState.lineOffset).toBe(1)
         p.feed('123\n')
-        var col = p.save();
-        expect(col.lexerState.line).toBe(3)
+        save = p.save();
+        expect(save.lexerState.line + save.lexerState.lineOffset).toBe(2)
         p.feed('q')
-        p.restore(col);
-        expect(p.lexer.line).toBe(3)
+        p.restore(save);
+        expect(p.lexer.line).toBe(2)
         p.feed('z')
     });
 
     it('restores column number', function () {
         let p = new Parser(testGrammar);
-        p.feed('foo\nbar')
+        p.feed('foo\nbar') // foo\nbar
         var col = p.save();
-        expect(col.lexerState.line).toBe(2)
-        expect(col.lexerState.col).toBe(3)
-        p.feed('123');
-        expect(p.lexerState.col).toBe(6)
+
+        expect(col.lexerState.line).toBe(1)
+        expect(col.lexerState.column).toBe(2)
+
+        p.feed('123'); // foo\nbar123
+
+        expect(p.lexerState.column).toBe(5)
 
         p.restore(col);
-        expect(p.lexerState.line).toBe(2)
-        expect(p.lexerState.col).toBe(3)
-        p.feed('456')
-        expect(p.lexerState.col).toBe(6)
+        expect(p.lexerState.line).toBe(1)
+        expect(p.lexerState.column).toBe(2)
+        p.feed('456')  // foo\nbar123456
+
+        expect(p.lexer.state.column).toBe(8)
     });
 
     // TODO: moo save/restore

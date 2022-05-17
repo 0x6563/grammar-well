@@ -3,10 +3,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Compiler = exports.Compile = void 0;
 const import_resolver_1 = require("./import-resolver");
 const grammar_builder_1 = require("./grammar-builder");
-const coffeescript_1 = require("../formats/coffeescript");
-const javascript_1 = require("../formats/javascript");
-const typescript_1 = require("../formats/typescript");
-const json_1 = require("../formats/json");
+const coffeescript_1 = require("../outputs/coffeescript");
+const javascript_1 = require("../outputs/javascript");
+const typescript_1 = require("../outputs/typescript");
+const json_1 = require("../outputs/json");
 const OutputFormats = {
     _default: javascript_1.JavascriptOutput,
     object: (grammar, exportName) => ({ grammar, exportName }),

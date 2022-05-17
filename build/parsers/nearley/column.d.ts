@@ -1,6 +1,5 @@
 import { State } from "./state";
-import { Dictionary, Rule } from "../../typings";
-import { LexerState } from "../../lib/lexer";
+import { Dictionary, LexerState, Rule } from "../../typings";
 export declare class Column {
     private ruleMap;
     index: number;

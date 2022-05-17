@@ -27,3 +27,11 @@ expression -> number "+" number ${ function ({data, reference, dot, name , rejec
 ```
 
 Check out the [Live Editor](https://0x6563.github.io/grammar-well-editor/)
+
+
+## Benchmarks
+|                      | Grammar Well                           | Nearley                                |
+| -------------------- | -------------------------------------- | -------------------------------------- |
+| calculator: parse    | 13,542.01  ops/sec  ±3.80%  (79 runs)  | 15,069.82  ops/sec  ±3.78%  (80 runs)  |
+| json: parse sample1k |    122.33  ops/sec  ±3.46%  (74 runs)  |    148.07  ops/sec  ±4.49%  (68 runs)  |
+| tosh: parse          |  2,448.34  ops/sec  ±3.49%  (78 runs)  |  2,761.46  ops/sec  ±3.73%  (77 runs)  |

@@ -16,7 +16,8 @@
             "ES2015"
         ],
         "types": [
-            "node"
+            "node",
+            "mocha"
         ]
     },
     "include": [

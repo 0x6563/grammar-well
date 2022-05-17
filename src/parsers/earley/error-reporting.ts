@@ -1,3 +1,4 @@
+import { Log } from "../../lib/log";
 import { Rule, RuleSymbol } from "../../typings";
 import { EarleyParser } from "./parser";
 import { State } from "./state";
@@ -12,7 +13,7 @@ export class ParserErrorService {
         const token = lexerError.token;
         if (token) {
             tokenDisplay = "input " + JSON.stringify(token.text[0]) + " (lexer error)";
-            lexerMessage = this.parser.lexer.formatError(token, "Syntax error");
+            lexerMessage = Log.LexerTokenError(this.parser.lexer);
         } else {
             tokenDisplay = "input (lexer error)";
             lexerMessage = lexerError.message;
@@ -22,7 +23,7 @@ export class ParserErrorService {
 
     tokenError(token) {
         const tokenDisplay = (token.type ? token.type + " token: " : "") + JSON.stringify(token.value !== undefined ? token.value : token);
-        const lexerMessage = this.parser.lexer.formatError(token, "Syntax error");
+        const lexerMessage = Log.LexerTokenError(this.parser.lexer);
         const error: any = new Error(this.reportErrorCommon(lexerMessage, tokenDisplay));
         error.offset = this.parser.current;
         error.token = token;
