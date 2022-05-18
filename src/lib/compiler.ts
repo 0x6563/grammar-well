@@ -21,9 +21,9 @@ const OutputFormats = {
     typescript: TypescriptFormat
 }
 
-export function Compile(rules: string | RuleDefinition | RuleDefinitionList, config: CompileOptions = {}) {
+export async function Compile(rules: string | RuleDefinition | RuleDefinitionList, config: CompileOptions = {}) {
     const compiler = new Compiler(config);
-    compiler.import(rules, config.language);
+    await compiler.import(rules, config.language);
     return compiler.export(config.format);
 }
 
@@ -39,12 +39,12 @@ export class Compiler {
     }
 
 
-    import(rule: RuleDefinition)
-    import(rules: RuleDefinitionList)
-    import(source: string, language: 'nearley' | 'grammar-well')
-    import(source: string | RuleDefinition | RuleDefinitionList, language?: 'nearley' | 'grammar-well')
-    import(val: string | RuleDefinition | RuleDefinitionList, language?: 'nearley' | 'grammar-well') {
-        this.grammarBuilder.import(val as any, language);
+    import(rule: RuleDefinition): Promise<void>
+    import(rules: RuleDefinitionList): Promise<void>
+    import(source: string, language: 'nearley' | 'grammar-well'): Promise<void>
+    import(source: string | RuleDefinition | RuleDefinitionList, language?: 'nearley' | 'grammar-well'): Promise<void>
+    import(val: string | RuleDefinition | RuleDefinitionList, language?: 'nearley' | 'grammar-well'): Promise<void> {
+        return this.grammarBuilder.import(val as any, language);
     }
 
     export<T extends keyof typeof OutputFormats = '_default'>(format: T, name: string = 'grammar'): ReturnType<typeof OutputFormats[OutputFormat<T>]> {

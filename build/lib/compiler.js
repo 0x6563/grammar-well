@@ -1,4 +1,13 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Compiler = exports.Compile = void 0;
 const import_resolver_1 = require("./import-resolver");
@@ -22,9 +31,11 @@ const OutputFormats = {
     typescript: typescript_1.TypescriptFormat
 };
 function Compile(rules, config = {}) {
-    const compiler = new Compiler(config);
-    compiler.import(rules, config.language);
-    return compiler.export(config.format);
+    return __awaiter(this, void 0, void 0, function* () {
+        const compiler = new Compiler(config);
+        yield compiler.import(rules, config.language);
+        return compiler.export(config.format);
+    });
 }
 exports.Compile = Compile;
 class Compiler {
@@ -36,7 +47,7 @@ class Compiler {
         this.grammarBuilder = new grammar_builder_1.GrammarBuilder(config, this.state);
     }
     import(val, language) {
-        this.grammarBuilder.import(val, language);
+        return this.grammarBuilder.import(val, language);
     }
     export(format, name = 'grammar') {
         const grammar = this.grammarBuilder.export();

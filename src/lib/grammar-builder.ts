@@ -52,13 +52,13 @@ export class GrammarBuilder {
     }
 
 
-    import(source: string, language: 'nearley' | 'grammar-well')
-    import(rule: RuleDefinition)
-    import(rules: RuleDefinitionList)
-    import(rules: string | RuleDefinition | RuleDefinitionList, language?: 'nearley' | 'grammar-well')
-    import(rules: string | RuleDefinition | RuleDefinitionList, language: 'nearley' | 'grammar-well' = 'grammar-well') {
+    async import(source: string, language: 'nearley' | 'grammar-well'): Promise<void>
+    async import(rule: RuleDefinition): Promise<void>
+    async import(rules: RuleDefinitionList): Promise<void>
+    async import(rules: string | RuleDefinition | RuleDefinitionList, language?: 'nearley' | 'grammar-well'): Promise<void>
+    async import(rules: string | RuleDefinition | RuleDefinitionList, language: 'nearley' | 'grammar-well' = 'grammar-well'): Promise<void> {
         if (typeof rules == 'string') {
-            const state = this.mergeGrammarString(rules, language);
+            const state = await this.mergeGrammarString(rules, language);
             this.state.start = this.state.start || state.start;
             return;
         }
@@ -72,7 +72,7 @@ export class GrammarBuilder {
                 if (rule.builtin) {
                     this.includeBuiltIn(rule.include);
                 } else {
-                    this.includeGrammar(rule.include);
+                    await this.includeGrammar(rule.include);
                 }
             } else if ("macro" in rule) {
                 this.state.macros[rule.macro] = { args: rule.args, exprs: rule.exprs };
@@ -108,21 +108,21 @@ export class GrammarBuilder {
         }
     }
 
-    private includeGrammar(name) {
+    private async includeGrammar(name) {
         const resolver = this.compilerState.resolver;
         const path = resolver.path(name);
         if (!this.compilerState.alreadycompiled.has(path)) {
             this.compilerState.alreadycompiled.add(path);
-            this.mergeGrammarString(resolver.body(path), path.slice(-3) === '.ne' ? 'nearley' : 'grammar-well')
+            await this.mergeGrammarString(await resolver.body(path), path.slice(-3) === '.ne' ? 'nearley' : 'grammar-well')
         }
     }
 
-    private mergeGrammarString(body: string, language: 'nearley' | 'grammar-well' = 'grammar-well') {
+    private async mergeGrammarString(body: string, language: 'nearley' | 'grammar-well' = 'grammar-well') {
         const builder = new GrammarBuilder(this.config, this.compilerState);
         if (language == 'nearley') {
-            builder.import(this.neInterpreter.run(body));
+            await builder.import(this.neInterpreter.run(body));
         } else {
-            builder.import(this.grmrInterpreter.run(body));
+            await builder.import(this.grmrInterpreter.run(body));
         }
         const state = builder.export();
         this.merge(state);

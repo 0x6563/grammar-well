@@ -1,4 +1,13 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GrammarBuilder = void 0;
 const interpreter_1 = require("./interpreter");
@@ -35,37 +44,39 @@ class GrammarBuilder {
         this.state.version = config.version || this.state.version;
     }
     import(rules, language = 'grammar-well') {
-        if (typeof rules == 'string') {
-            const state = this.mergeGrammarString(rules, language);
-            this.state.start = this.state.start || state.start;
-            return;
-        }
-        rules = Array.isArray(rules) ? rules : [rules];
-        for (const rule of rules) {
-            if ("body" in rule) {
-                if (this.config.noscript)
-                    continue;
-                this.state.body.push(rule.body);
+        return __awaiter(this, void 0, void 0, function* () {
+            if (typeof rules == 'string') {
+                const state = yield this.mergeGrammarString(rules, language);
+                this.state.start = this.state.start || state.start;
+                return;
             }
-            else if ("include" in rule) {
-                if (rule.builtin) {
-                    this.includeBuiltIn(rule.include);
+            rules = Array.isArray(rules) ? rules : [rules];
+            for (const rule of rules) {
+                if ("body" in rule) {
+                    if (this.config.noscript)
+                        continue;
+                    this.state.body.push(rule.body);
+                }
+                else if ("include" in rule) {
+                    if (rule.builtin) {
+                        this.includeBuiltIn(rule.include);
+                    }
+                    else {
+                        yield this.includeGrammar(rule.include);
+                    }
+                }
+                else if ("macro" in rule) {
+                    this.state.macros[rule.macro] = { args: rule.args, exprs: rule.exprs };
+                }
+                else if ("config" in rule) {
+                    this.state.config[rule.config] = rule.value;
                 }
                 else {
-                    this.includeGrammar(rule.include);
+                    this.buildRules(rule.name, rule.rules, {});
+                    this.state.start = this.state.start || rule.name;
                 }
             }
-            else if ("macro" in rule) {
-                this.state.macros[rule.macro] = { args: rule.args, exprs: rule.exprs };
-            }
-            else if ("config" in rule) {
-                this.state.config[rule.config] = rule.value;
-            }
-            else {
-                this.buildRules(rule.name, rule.rules, {});
-                this.state.start = this.state.start || rule.name;
-            }
-        }
+        });
     }
     export() {
         return this.state;
@@ -89,24 +100,28 @@ class GrammarBuilder {
         }
     }
     includeGrammar(name) {
-        const resolver = this.compilerState.resolver;
-        const path = resolver.path(name);
-        if (!this.compilerState.alreadycompiled.has(path)) {
-            this.compilerState.alreadycompiled.add(path);
-            this.mergeGrammarString(resolver.body(path), path.slice(-3) === '.ne' ? 'nearley' : 'grammar-well');
-        }
+        return __awaiter(this, void 0, void 0, function* () {
+            const resolver = this.compilerState.resolver;
+            const path = resolver.path(name);
+            if (!this.compilerState.alreadycompiled.has(path)) {
+                this.compilerState.alreadycompiled.add(path);
+                yield this.mergeGrammarString(yield resolver.body(path), path.slice(-3) === '.ne' ? 'nearley' : 'grammar-well');
+            }
+        });
     }
     mergeGrammarString(body, language = 'grammar-well') {
-        const builder = new GrammarBuilder(this.config, this.compilerState);
-        if (language == 'nearley') {
-            builder.import(this.neInterpreter.run(body));
-        }
-        else {
-            builder.import(this.grmrInterpreter.run(body));
-        }
-        const state = builder.export();
-        this.merge(state);
-        return state;
+        return __awaiter(this, void 0, void 0, function* () {
+            const builder = new GrammarBuilder(this.config, this.compilerState);
+            if (language == 'nearley') {
+                yield builder.import(this.neInterpreter.run(body));
+            }
+            else {
+                yield builder.import(this.grmrInterpreter.run(body));
+            }
+            const state = builder.export();
+            this.merge(state);
+            return state;
+        });
     }
     merge(state) {
         this.state.rules.push(...state.rules);

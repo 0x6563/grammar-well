@@ -1,15 +1,17 @@
+/// <reference types="typescript/lib/lib.webworker" />
+
+
 export class FileSystemResolver implements ImportResolver {
     private baseDir: string;
-    private readFile: (path: string, type: string) => string;
+    private readFile: (path: string, type: string) => Promise<string>;
     private resolve: (path: string, ...paths: string[]) => string;
 
     constructor(baseDir: string) {
-        const { readFileSync } = require('fs');
+        const { readFile } = require('fs');
         const { resolve, dirname } = require('path');
-        // const { promisify } = require('util');
-        // this.readFile = promisify(readFile);
+        const { promisify } = require('util');
+        this.readFile = promisify(readFile);
         this.resolve = resolve;
-        this.readFile = readFileSync;
         this.baseDir = baseDir ? dirname(baseDir) : process?.cwd();
     }
 
@@ -22,13 +24,24 @@ export class FileSystemResolver implements ImportResolver {
     }
 }
 
+export class BrowserImportResolver implements ImportResolver {
+    constructor(private baseURL: string) { }
+
+    path(path: string) {
+        return (new URL(path, this.baseURL)).href;
+    }
+
+    async body(path: string) {
+        return (await fetch(path)).text();
+    }
+}
 
 export interface ImportResolver {
     path(path: string): string;
-    body(path: string): string;
+    body(path: string): Promise<string>;
 }
 
 
 export interface ImportResolverConstructor {
-    new(baseDir: string): ImportResolver;
+    new(basePath: string): ImportResolver;
 }

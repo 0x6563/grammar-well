@@ -26,10 +26,10 @@ export declare class GrammarBuilder {
         noscript?: boolean;
         version?: string;
     }, compilerState: CompilerState);
-    import(source: string, language: 'nearley' | 'grammar-well'): any;
-    import(rule: RuleDefinition): any;
-    import(rules: RuleDefinitionList): any;
-    import(rules: string | RuleDefinition | RuleDefinitionList, language?: 'nearley' | 'grammar-well'): any;
+    import(source: string, language: 'nearley' | 'grammar-well'): Promise<void>;
+    import(rule: RuleDefinition): Promise<void>;
+    import(rules: RuleDefinitionList): Promise<void>;
+    import(rules: string | RuleDefinition | RuleDefinitionList, language?: 'nearley' | 'grammar-well'): Promise<void>;
     export(): GrammarBuilderState;
     private includeBuiltIn;
     private includeGrammar;
