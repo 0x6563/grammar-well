@@ -1,6 +1,8 @@
 # Grammar Well
 A cross-platform grammar compiler and interpreter. That aims to facilitate a simple way to create and evaluate custom grammars on the front-end and back-end. Formerly a TypeScript port of [Nearley](https://github.com/kach/nearley).
 
+Check out the [Live Editor](https://0x6563.github.io/grammar-well-editor/)
+
 ## QuickStart
 
 The easiest way to generate a compiled js file is to use the `Compile` function.
@@ -8,7 +10,7 @@ The easiest way to generate a compiled js file is to use the `Compile` function.
 import { Compile } from 'grammar-well';
 import { writeFileSync } from 'fs';
 const config = {}; 
-const js = Compile(grammarString, config);
+const js = await Compile(grammarString, config);
 writeFileSync('./precompiledGrammar.js', js);
 ```
 
@@ -25,9 +27,6 @@ Example
 ```
 expression -> number "+" number ${ function ({data, reference, dot, name , reject}) { return data[0] + data[2]; } }
 ```
-
-Check out the [Live Editor](https://0x6563.github.io/grammar-well-editor/)
-
 
 ## Benchmarks
 |                      | Grammar Well                           | Nearley                                |

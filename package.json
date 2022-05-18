@@ -6,11 +6,9 @@
   "scripts": {
     "build": "tsc",
     "cli": "ts-node index.ts",
-    "bootstrap": "mocha legacy-test/bootstrap.test.js && bin/nearleyc.js src/grammars/nearley.ne > tmp && mv tmp lib/nearley-language-bootstrapped.js && echo bootstrapped ok",
-    "benchmark": "benchr legacy-test/benchmark.js",
+    "benchmark": "node tests/performance/benchmark.js",
     "test": "nyc mocha tests/**/*.spec.ts",
-    "test:legacy": "mocha legacy-test/*.test.js",
-    "profile": "node legacy-test/profile.js"
+    "profile": "node tests/performance/profile.js"
   },
   "author": "0x6563",
   "license": "MIT",
@@ -19,6 +17,7 @@
     "url": "https://github.com/0x6563/grammar-well.git"
   },
   "dependencies": {
+    "benny": "^3.7.1",
     "moo": "^0.5.1"
   },
   "devDependencies": {
@@ -28,11 +27,11 @@
     "@types/node": "^17.0.25",
     "babel-cli": "^6.18.0",
     "babel-preset-env": "^1.6.0",
-    "benchr": "^4.3.0",
     "chai": "^4.3.6",
     "coffee-script": "^1.12.7",
     "expect": "^27.5.1",
     "mocha": "^9.2.2",
+    "nearley": "^2.20.1",
     "nyc": "^15.1.0",
     "ts-node": "^10.7.0",
     "typescript": "^4.6.3",
