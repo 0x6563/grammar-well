@@ -96,10 +96,14 @@ export type RuleDefinition = (JavascriptDefinition | IncludeDefinition | MacroDe
 export type RuleDefinitionList = (JavascriptDefinition | IncludeDefinition | MacroDefinition | ConfigDefinition | ExpressionDefinition)[];
 
 
-export type RuleSymbol = string | RegExp | RuleSymbolToken | RuleSymbolLexerToken | RuleSymbolTest | LexerToken;
+export type RuleSymbol = string | RegExp | RuleSymbolToken | RuleSymbolLexerToken | LexerToken | RuleSymbolTestable;
 
 interface RuleSymbolToken {
     literal: any;
+}
+
+interface RuleSymbolTestable {
+    test: (data: any) => boolean;
 }
 
 interface RuleSymbolLexerToken {
@@ -108,9 +112,6 @@ interface RuleSymbolLexerToken {
     text: string;
 }
 
-interface RuleSymbolTest {///????? Regex?
-    test: string;
-}
 
 export interface GrammarBuilderRule {
     name: string;
@@ -126,13 +127,13 @@ export interface Rule {
     transform?: PostTransform;
 }
 
-export interface Parser {
+export interface ParserAlgorithm {
     results: any[];
     feed(path: string): void;
 }
 
 export interface ParserConstructor {
-    new(grammar: PrecompiledGrammar, options?: any): Parser;
+    new(grammar: PrecompiledGrammar, options?: any): ParserAlgorithm;
 }
 
 export interface PrecompiledGrammar {
@@ -146,12 +147,13 @@ export interface PrecompiledGrammar {
 
 export interface Lexer {
     readonly line?: number;
-    readonly index: number;
     readonly column?: number;
+    readonly index: number;
     readonly current: any;
     readonly state: LexerState;
 
     feed(chunk: string, flush?: boolean): void;
+    flush(): void;
     reset(chunk?: string): void;
     restore(state: LexerState): void;
     next(): any;

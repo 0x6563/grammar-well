@@ -16,7 +16,8 @@ writeFileSync('./precompiledGrammar.js', js);
 
 To run input using your compiled js:
 ```TypeScript
-    const result = Interpret(require('./precompiledGrammar.js'), input);
+    import { Parse } from 'grammar-well';
+    const result = Parse(require('./precompiledGrammar.js'), input);
 ```
 
 ## Grammar Syntax

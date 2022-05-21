@@ -1,6 +1,6 @@
 
 const { readFileSync } = require('fs');
-const { Compile, Interpreter } = require('../../build');
+const { Compile, Parser } = require('../../build');
 const { join } = require('path');
 
 function GetFile(path) {
@@ -23,7 +23,7 @@ function GetValue(test, prefix) {
 
 async function GrammarWellRunner(source) {
     const compiled = await Compile(source, { exportName: 'grammar' });
-    const interpreter = new Interpreter(Evalr(compiled));
+    const interpreter = new Parser(Evalr(compiled));
     return (input) => interpreter.run(input);
 }
 
