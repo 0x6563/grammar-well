@@ -1,10 +1,11 @@
 import { EarleyParser } from "./parser";
 import { State } from "./state";
-import { Dictionary, Rule, LexerState } from "../../../typings";
+import { Dictionary, LexerState, Rule } from "../../../typings";
 
 
 export class Column {
     lexerState: LexerState;
+    data: any;
     states: State[] = [];
     wants: Dictionary<State[]> = Object.create(null);// states indexed by the non-terminal they expect
     scannable: State[] = [];// list of states that expect a token
@@ -16,7 +17,7 @@ export class Column {
     ) { }
 
 
-    process(nextColumn?) {
+    process() {
         let w = 0;
         let state: State;
         while (state = this.states[w++]) { // nb. we push() during iteration

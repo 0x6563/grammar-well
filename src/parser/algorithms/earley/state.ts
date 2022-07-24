@@ -34,10 +34,9 @@ export class State {
         const children = [];
         let node: State = this;
         do {
-            children.push(node.right.data);
+            children[node.dot - 1] = node.right.data;
             node = node.left;
         } while (node.left);
-        children.reverse();
         return children;
     }
 

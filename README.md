@@ -30,8 +30,10 @@ expression -> number "+" number ${ function ({data, reference, dot, name , rejec
 ```
 
 ## Benchmarks
-|                      | Grammar Well                           | Nearley                                |
-| -------------------- | -------------------------------------- | -------------------------------------- |
-| calculator: parse    | 13,542.01  ops/sec  ±3.80%  (79 runs)  | 15,069.82  ops/sec  ±3.78%  (80 runs)  |
-| json: parse sample1k |    122.33  ops/sec  ±3.46%  (74 runs)  |    148.07  ops/sec  ±4.49%  (68 runs)  |
-| tosh: parse          |  2,448.34  ops/sec  ±3.49%  (78 runs)  |  2,761.46  ops/sec  ±3.73%  (77 runs)  |
+|            |            Nearley |       Grammar Well |            Results |
+|------------|--------------------|--------------------|--------------------|
+| Calculator | 14078 (±2.06 x 91) | 12715 (±2.09 x 89) |            -10.17% |
+|       Tosh |  2393 (±2.96 x 89) |  2233 (±2.81 x 87) |             -6.92% |
+|       JSON |   111 (±2.99 x 73) |    80 (±4.76 x 61) |            -32.46% |
+|        Lua |  1629 (±3.06 x 89) |  1638 (±2.63 x 88) |             +0.55% |
+|        CSV |   423 (±2.47 x 86) |   434 (±2.72 x 86) |             +2.57% |

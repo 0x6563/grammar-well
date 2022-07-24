@@ -1,4 +1,4 @@
-export const lexer: moo.Lexer;
+export const lexer: any;
 export declare const rules: ({
     name: string;
     symbols: any[];

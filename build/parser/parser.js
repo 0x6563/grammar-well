@@ -17,7 +17,7 @@ class Parser {
         this.grammar = grammar;
         this.options = options;
         this.parserClass = ParserRegistry[options.algorithm];
-        this.parser = new this.parserClass(this.grammar, options);
+        this.parser = new this.parserClass(this.grammar, options.parserOptions);
     }
     get results() {
         return this.parser.results;
@@ -27,7 +27,7 @@ class Parser {
         return this.results;
     }
     run(input) {
-        const parser = new this.parserClass(this.grammar, this.options);
+        const parser = new this.parserClass(this.grammar, this.options.parserOptions);
         parser.feed(input);
         return parser.results[0];
     }

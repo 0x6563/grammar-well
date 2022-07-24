@@ -22,7 +22,7 @@ export class Parser {
 
     constructor(private grammar: PrecompiledGrammar, private options: ParserOptions = { algorithm: 'nearley' }) {
         this.parserClass = ParserRegistry[options.algorithm];
-        this.parser = new this.parserClass(this.grammar, options);
+        this.parser = new this.parserClass(this.grammar, options.parserOptions);
     }
 
     feed(input: string) {
@@ -31,7 +31,7 @@ export class Parser {
     }
 
     run(input: string) {
-        const parser = new this.parserClass(this.grammar, this.options);
+        const parser = new this.parserClass(this.grammar, this.options.parserOptions);
         parser.feed(input);
         return parser.results[0];
     }
@@ -39,5 +39,5 @@ export class Parser {
 
 interface ParserOptions {
     algorithm: keyof typeof ParserRegistry,
-    parserOptions?: any
+    parserOptions?: any;
 }

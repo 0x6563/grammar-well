@@ -1,4 +1,3 @@
-import * as moo from 'moo';
 import { Lexer, LexerState } from '../typings';
 export declare class LegacyLexerAdapter implements Lexer {
     private lexer;
@@ -12,7 +11,7 @@ export declare class LegacyLexerAdapter implements Lexer {
     get column(): number;
     private get active();
     get state(): LexerState;
-    constructor(lexer: moo.Lexer);
+    constructor(lexer: LegacyLexer);
     reset(buffer: string): void;
     restore(state: LexerState): void;
     feed(buffer: string, flush?: boolean): void;
@@ -21,4 +20,33 @@ export declare class LegacyLexerAdapter implements Lexer {
     next(): any;
     peek(offset: number): any;
     private lexerNext;
+}
+export interface LegacyLexer {
+    formatError(token: LegacyToken, message?: string): string;
+    has(tokenType: string): boolean;
+    next(): LegacyToken | undefined;
+    reset(chunk?: string, state?: {
+        line: number;
+        col: number;
+        state: string;
+    }): this;
+    save(): {
+        line: number;
+        col: number;
+        state: string;
+    };
+    pushState(state: string): void;
+    popState(): void;
+    setState(state: string): void;
+    [Symbol.iterator](): Iterator<LegacyToken>;
+}
+export interface LegacyToken {
+    toString(): string;
+    type?: string | undefined;
+    value: string;
+    offset: number;
+    text: string;
+    lineBreaks: number;
+    line: number;
+    col: number;
 }

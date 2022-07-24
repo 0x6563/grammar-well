@@ -12,7 +12,7 @@ class Column {
         this.scannable = [];
         this.completed = Object.create(null);
     }
-    process(nextColumn) {
+    process() {
         let w = 0;
         let state;
         while (state = this.states[w++]) {

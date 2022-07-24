@@ -50,17 +50,18 @@ class EarleyParser {
             if (!this.keepHistory) {
                 delete this.table[this.current - 1];
             }
-            const n = this.current + 1;
-            const nextColumn = new column_1.Column(this.ruleMap, n);
+            this.current++;
+            const nextColumn = new column_1.Column(this.ruleMap, this.current);
             this.table.push(nextColumn);
             const literal = token.text !== undefined ? token.text : token.value;
             const data = this.lexer.constructor === basic_lexer_1.BasicLexer ? token.value : token;
+            nextColumn.data = literal;
             const { scannable } = column;
             for (let w = scannable.length; w--;) {
                 const state = scannable[w];
                 const expect = state.rule.symbols[state.dot];
                 if ((expect.test && expect.test(data)) || (expect.type && expect.type === token.type) || (expect === null || expect === void 0 ? void 0 : expect.literal) === literal) {
-                    const next = state.nextState({ data, token, isToken: true, reference: n - 1 });
+                    const next = state.nextState({ data, token, isToken: true, reference: this.current - 1 });
                     nextColumn.states.push(next);
                 }
             }
@@ -71,7 +72,6 @@ class EarleyParser {
             if (this.keepHistory) {
                 column.lexerState = this.lexer.state;
             }
-            this.current++;
         }
         if (column) {
             this.lexerState = this.lexer.state;

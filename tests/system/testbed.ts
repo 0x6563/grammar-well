@@ -58,7 +58,7 @@ export async function BuildTest(grammar, input) {
 
 export async function GrammarWellRunner(source) {
     const compiled = await Compile(source, { exportName: 'grammar' });
-    const parser = new Parser(Evalr(compiled));
+    const parser = new Parser(Evalr(compiled), { algorithm: 'earley' });
     return (input) => parser.run(input);
 }
 

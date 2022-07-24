@@ -4,8 +4,9 @@
   "description": "Simple, fast, powerful parser toolkit for JavaScript.",
   "main": "build/index.js",
   "scripts": {
-    "build": "tsc",
-    "cli": "ts-node index.ts",
+    "prebuild": "tsc --build --clean",
+    "build": "tsc --build",
+    "cli": "ts-node index.ts --trace-warnings",
     "benchmark": "node tests/performance/benchmark.js",
     "test": "nyc mocha tests/**/*.spec.ts",
     "profile": "node tests/performance/profile.js"
@@ -16,17 +17,13 @@
     "type": "git",
     "url": "https://github.com/0x6563/grammar-well.git"
   },
-  "dependencies": {
-    "benny": "^3.7.1",
-    "moo": "^0.5.1"
-  },
   "devDependencies": {
     "@types/chai": "^4.3.1",
     "@types/mocha": "^9.1.1",
-    "@types/moo": "^0.5.5",
     "@types/node": "^17.0.25",
     "babel-cli": "^6.18.0",
     "babel-preset-env": "^1.6.0",
+    "benny": "^3.7.1",
     "chai": "^4.3.6",
     "coffee-script": "^1.12.7",
     "expect": "^27.5.1",
@@ -45,5 +42,8 @@
     "compile",
     "grammar",
     "language"
-  ]
+  ],
+  "optionalDependencies": {
+    "moo": "^0.5.1"
+  }
 }

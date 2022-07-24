@@ -14,7 +14,6 @@ export class EarleyParser implements ParserAlgorithm {
     static fail = Symbol();
     keepHistory: boolean = false;
     current: number = 0;
-
     rules: Rule[];
     start: string;
     lexer: Lexer;
@@ -70,30 +69,24 @@ export class EarleyParser implements ParserAlgorithm {
                 delete this.table[this.current - 1];
             }
 
-            const n = this.current + 1;
-            const nextColumn = new Column(this.ruleMap, n);
+            this.current++;
+
+            const nextColumn = new Column(this.ruleMap, this.current);
             this.table.push(nextColumn);
 
             // Advance all tokens that expect the symbol
             const literal = token.text !== undefined ? token.text : token.value;
             const data = this.lexer.constructor === BasicLexer ? token.value : token;
+            nextColumn.data = literal;
             const { scannable } = column;
             for (let w = scannable.length; w--;) {
                 const state = scannable[w];
                 const expect: any = state.rule.symbols[state.dot];
                 if ((expect.test && expect.test(data)) || (expect.type && expect.type === token.type) || expect?.literal === literal) {
-                    const next = state.nextState({ data, token, isToken: true, reference: n - 1 });
+                    const next = state.nextState({ data, token, isToken: true, reference: this.current - 1 });
                     nextColumn.states.push(next);
                 }
             }
-
-            // Next, for each of the rules, we either
-            // (a) complete it, and try to see if the reference row expected that
-            //     rule
-            // (b) predict the next nonterminal it expects by adding that
-            //     nonterminal's start state
-            // To prevent duplication, we also keep track of rules we have already
-            // added
 
             nextColumn.process();
 
@@ -107,7 +100,6 @@ export class EarleyParser implements ParserAlgorithm {
                 column.lexerState = this.lexer.state;
             }
 
-            this.current++;
         }
 
         if (column) {
