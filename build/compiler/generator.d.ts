@@ -2,6 +2,7 @@ import { Dictionary, GrammarBuilderRule, RuleDefinition, RuleDefinitionList } fr
 import { CompilerState } from "./compiler";
 export interface GeneratorState {
     rules: GrammarBuilderRule[];
+    head: string[];
     body: string[];
     customTokens: Set<string>;
     config: Dictionary<string>;

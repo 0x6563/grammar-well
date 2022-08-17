@@ -23,7 +23,7 @@ function GetValue(test, prefix) {
 
 async function GrammarWellRunner(source) {
     const compiled = await Compile(source, { exportName: 'grammar' });
-    const interpreter = new Parser(Evalr(compiled), { algorithm: 'earley' });
+    const interpreter = new Parser(Evalr(compiled)(), { algorithm: 'earley' });
     return (input) => interpreter.run(input);
 }
 

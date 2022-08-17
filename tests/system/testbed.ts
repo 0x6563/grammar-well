@@ -44,21 +44,19 @@ export function GetFile(path: string) {
     return readFileSync(join(__dirname, path), 'utf8')
 }
 
-export async function Build(grammar) {
+export async function Build(grammar): Promise<any> {
     const compiled = await Compile(grammar, { exportName: 'grammar' }) as string;
-    const module = { exports: null };
-    eval(compiled)
-    return module.exports;
+    return Evalr(compiled);
 }
 
 export async function BuildTest(grammar, input) {
-    return Parse(await Build(grammar), input);
+    return Parse((await Build(grammar))(), input);
 }
 
 
 export async function GrammarWellRunner(source) {
     const compiled = await Compile(source, { exportName: 'grammar' });
-    const parser = new Parser(Evalr(compiled), { algorithm: 'earley' });
+    const parser = new Parser(Evalr(compiled)(), { algorithm: 'earley' });
     return (input) => parser.run(input);
 }
 
@@ -82,8 +80,8 @@ export function NearleyRunner(source) {
     return (input) => Parse(grammar, input)[0];
 }
 
-function Evalr(source) {
+function Evalr(source): any {
     const module = { exports: null };
-    eval(source)
+    eval(source);
     return module.exports;
 }

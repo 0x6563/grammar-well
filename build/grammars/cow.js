@@ -1,6 +1,6 @@
-(function () {
+function Grammar() {
     function id(x) { return x[0]; }
-    var grammar = {
+    return {
         lexer: undefined,
         rules: [
             { "name": "cow$string$1", "symbols": [{ "literal": "M" }, { "literal": "O" }], "postprocess": function joiner(d) { return d.join(''); } },
@@ -10,11 +10,11 @@
         ],
         start: "cow"
     };
-    if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
-        module.exports = grammar;
-    }
-    else {
-        window.grammar = grammar;
-    }
-})();
+}
+if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
+    module.exports = Grammar;
+}
+else {
+    window.grammar = Grammar;
+}
 //# sourceMappingURL=cow.js.map

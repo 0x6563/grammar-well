@@ -1,4 +1,4 @@
-(function () {
+function Grammar() {
     function id(x) { return x[0]; }
     function nth(n) {
         return function (d) {
@@ -14,16 +14,16 @@
             return ret;
         };
     }
-    var grammar = {
+    return {
         lexer: undefined,
         rules: [],
         start: ""
     };
-    if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
-        module.exports = grammar;
-    }
-    else {
-        window.grammar = grammar;
-    }
-})();
+}
+if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
+    module.exports = Grammar;
+}
+else {
+    window.grammar = Grammar;
+}
 //# sourceMappingURL=postprocessors.js.map

@@ -1,6 +1,6 @@
-(function () {
+function Grammar() {
     function id(x) { return x[0]; }
-    var grammar = {
+    return {
         lexer: undefined,
         rules: [
             { "name": "dqstring$ebnf$1", "symbols": [] },
@@ -29,11 +29,11 @@
         ],
         start: "dqstring"
     };
-    if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
-        module.exports = grammar;
-    }
-    else {
-        window.grammar = grammar;
-    }
-})();
+}
+if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
+    module.exports = Grammar;
+}
+else {
+    window.grammar = Grammar;
+}
 //# sourceMappingURL=string.js.map

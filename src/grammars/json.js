@@ -1,8 +1,11 @@
-// Generated automatically by nearley, version unknown 
-// http://github.com/Hardmath123/nearley
-(function () {
-function id(x) { return x[0]; }
+// Generated automatically by Grammar-Well, version unknown 
+// https://github.com/0x6563/grammar-well
 
+
+
+function Grammar(){
+    function id(x) { return x[0]; }
+    
 
 const moo = require('moo')
 
@@ -51,9 +54,9 @@ function extractArray(d) {
 }
 
 
-var grammar = {
-    lexer: lexer,
-    rules: [
+    return {
+        lexer: lexer,
+        rules: [
     {"name": "json$subexpression$1", "symbols": ["object"]},
     {"name": "json$subexpression$1", "symbols": ["array"]},
     {"name": "json", "symbols": ["_", "json$subexpression$1", "_"], "postprocess": function(d) { return d[1][0]; }},
@@ -81,11 +84,12 @@ var grammar = {
     {"name": "_", "symbols": []},
     {"name": "_", "symbols": [(lexer.has("space") ? {type: "space"} : space)], "postprocess": function(d) { return null; }}
 ],
-    start: "json"
+        start: "json"
+    }
 }
+
 if (typeof module !== 'undefined'&& typeof module.exports !== 'undefined') {
-   module.exports = grammar;
+   module.exports = Grammar;
 } else {
-   window.grammar = grammar;
+   window.grammar = Grammar;
 }
-})();

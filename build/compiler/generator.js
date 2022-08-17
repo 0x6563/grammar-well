@@ -30,10 +30,11 @@ class Generator {
         this.config = config;
         this.compilerState = compilerState;
         this.names = Object.create(null);
-        this.neParser = new parser_1.Parser(require('../grammars/nearley.js'));
-        this.gwParser = new parser_1.Parser(require('../grammars/grammar-well.js'));
+        this.neParser = new parser_1.Parser(require('../grammars/nearley.js')());
+        this.gwParser = new parser_1.Parser(require('../grammars/grammar-well.js')(), { algorithm: 'earley' });
         this.state = {
             rules: [],
+            head: [],
             body: [],
             customTokens: new Set(),
             config: {},
@@ -52,7 +53,12 @@ class Generator {
             }
             rules = Array.isArray(rules) ? rules : [rules];
             for (const rule of rules) {
-                if ("body" in rule) {
+                if ("head" in rule) {
+                    if (this.config.noscript)
+                        continue;
+                    this.state.head.push(rule.head);
+                }
+                else if ("body" in rule) {
                     if (this.config.noscript)
                         continue;
                     this.state.body.push(rule.body);
@@ -125,6 +131,7 @@ class Generator {
     }
     merge(state) {
         this.state.rules.push(...state.rules);
+        this.state.head.push(...state.head);
         this.state.body.push(...state.body);
         state.customTokens.forEach(s => this.state.customTokens.add(s));
         Object.assign(this.state.config, state.config);

@@ -1,6 +1,6 @@
-(function () {
+function Grammar() {
     function id(x) { return x[0]; }
-    var grammar = {
+    return {
         lexer: undefined,
         rules: [
             { "name": "_$ebnf$1", "symbols": [] },
@@ -13,11 +13,11 @@
         ],
         start: "_"
     };
-    if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
-        module.exports = grammar;
-    }
-    else {
-        window.grammar = grammar;
-    }
-})();
+}
+if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
+    module.exports = Grammar;
+}
+else {
+    window.grammar = Grammar;
+}
 //# sourceMappingURL=whitespace.js.map

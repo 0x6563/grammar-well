@@ -1,4 +1,4 @@
-(function () {
+function Grammar() {
     function id(x) { return x[0]; }
     function getValue(d) {
         return d[0].value;
@@ -63,7 +63,7 @@
         }
         return { subexpression: [{ tokens: result, postprocess: function (d) { return d.join(""); } }] };
     }
-    var grammar = {
+    return {
         lexer: lexer,
         rules: [
             { "name": "final$ebnf$1", "symbols": [(lexer.has("ws") ? { type: "ws" } : ws)], "postprocess": id },
@@ -120,11 +120,11 @@
         ],
         start: "final"
     };
-    if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
-        module.exports = grammar;
-    }
-    else {
-        window.grammar = grammar;
-    }
-})();
+}
+if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
+    module.exports = Grammar;
+}
+else {
+    window.grammar = Grammar;
+}
 //# sourceMappingURL=nearley.js.map

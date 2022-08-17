@@ -20,6 +20,7 @@ const BuiltInRegistry = {
 
 export interface GeneratorState {
     rules: GrammarBuilderRule[],
+    head: string[], // @directives list
     body: string[], // @directives list
     customTokens: Set<string>, // %tokens
     config: Dictionary<string>, // @config value
@@ -34,11 +35,12 @@ export interface SerializedGeneratorState extends Omit<GeneratorState, 'customTo
 
 export class Generator {
     private names = Object.create(null);
-    private neParser = new Parser(require('../grammars/nearley.js'));
-    private gwParser = new Parser(require('../grammars/grammar-well.js'));
+    private neParser = new Parser(require('../grammars/nearley.js')());
+    private gwParser = new Parser(require('../grammars/grammar-well.js')(), { algorithm: 'earley' });
 
     private state: GeneratorState = {
         rules: [],
+        head: [], // @directives list
         body: [], // @directives list
         customTokens: new Set(), // %tokens
         config: {}, // @config value
@@ -64,7 +66,11 @@ export class Generator {
         }
         rules = Array.isArray(rules) ? rules : [rules];
         for (const rule of rules) {
-            if ("body" in rule) {
+            if ("head" in rule) {
+                if (this.config.noscript)
+                    continue;
+                this.state.head.push(rule.head);
+            } else if ("body" in rule) {
                 if (this.config.noscript)
                     continue;
                 this.state.body.push(rule.body);
@@ -131,6 +137,7 @@ export class Generator {
 
     private merge(state: GeneratorState) {
         this.state.rules.push(...state.rules);
+        this.state.head.push(...state.head);
         this.state.body.push(...state.body);
         state.customTokens.forEach(s => this.state.customTokens.add(s));
         Object.assign(this.state.config, state.config);

@@ -6,7 +6,8 @@
   "scripts": {
     "prebuild": "tsc --build --clean",
     "build": "tsc --build",
-    "cli": "ts-node index.ts --trace-warnings",
+    "bootstrap": "ts-node bootstrap.ts",
+    "testing": "ts-node testing.ts",
     "benchmark": "node tests/performance/benchmark.js",
     "test": "nyc mocha tests/**/*.spec.ts",
     "profile": "node tests/performance/profile.js"

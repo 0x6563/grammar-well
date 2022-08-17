@@ -1,6 +1,6 @@
-(function () {
+function Grammar() {
     function id(x) { return x[0]; }
-    var grammar = {
+    return {
         lexer: undefined,
         rules: [
             { "name": "unsigned_int$ebnf$1", "symbols": [/[0-9]/] },
@@ -81,11 +81,11 @@
         ],
         start: "unsigned_int"
     };
-    if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
-        module.exports = grammar;
-    }
-    else {
-        window.grammar = grammar;
-    }
-})();
+}
+if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
+    module.exports = Grammar;
+}
+else {
+    window.grammar = Grammar;
+}
 //# sourceMappingURL=number.js.map

@@ -1,4 +1,4 @@
-(function () {
+function Grammar() {
     function id(x) { return x[0]; }
     function getValue(d) {
         return d[0].value;
@@ -40,7 +40,7 @@
     }, literals([
         ",", "|", "$", "%", "(", ")",
         ":?", ":*", ":+",
-        "@include", "@builtin", "@",
+        "@include", "@builtin", "@head", "@body", "@",
         "]",
     ]));
     const lexer = moo.states({
@@ -65,7 +65,7 @@
         }
         return { subexpression: [{ tokens, postprocess: d => d.join('') }] };
     }
-    var grammar = {
+    return {
         lexer: lexer,
         rules: [
             { "name": "final$ebnf$1", "symbols": [(lexer.has("ws") ? { type: "ws" } : ws)], "postprocess": id },
@@ -76,9 +76,11 @@
             { "name": "prod", "symbols": ["word", "_", (lexer.has("arrow") ? { type: "arrow" } : arrow), "_", "expression+"], "postprocess": function (d) { return { name: d[0], rules: d[4] }; } },
             { "name": "prod", "symbols": ["word", { "literal": "[" }, "_", "wordlist", "_", { "literal": "]" }, "_", (lexer.has("arrow") ? { type: "arrow" } : arrow), "_", "expression+"], "postprocess": function (d) { return { macro: d[0], args: d[3], exprs: d[9] }; } },
             { "name": "prod", "symbols": [{ "literal": "@" }, "_", "js"], "postprocess": function (d) { return { body: d[2] }; } },
-            { "name": "prod", "symbols": [{ "literal": "@" }, "word", "ws", "word"], "postprocess": function (d) { return { config: d[1], value: d[3] }; } },
+            { "name": "prod", "symbols": [{ "literal": "@body" }, "_", "js"], "postprocess": function (d) { return { body: d[2] }; } },
+            { "name": "prod", "symbols": [{ "literal": "@head" }, "_", "js"], "postprocess": function (d) { return { head: d[2] }; } },
             { "name": "prod", "symbols": [{ "literal": "@include" }, "_", "string"], "postprocess": function (d) { return { include: d[2].literal, builtin: false }; } },
             { "name": "prod", "symbols": [{ "literal": "@builtin" }, "_", "string"], "postprocess": function (d) { return { include: d[2].literal, builtin: true }; } },
+            { "name": "prod", "symbols": [{ "literal": "@" }, "word", "ws", "word"], "postprocess": function (d) { return { config: d[1], value: d[3] }; } },
             { "name": "expression+", "symbols": ["completeexpression"] },
             { "name": "expression+", "symbols": ["expression+", "_", { "literal": "|" }, "_", "completeexpression"], "postprocess": function (d) { return d[0].concat([d[4]]); } },
             { "name": "expressionlist", "symbols": ["completeexpression"] },
@@ -124,11 +126,11 @@
         ],
         start: "final"
     };
-    if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
-        module.exports = grammar;
-    }
-    else {
-        window.grammar = grammar;
-    }
-})();
+}
+if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
+    module.exports = Grammar;
+}
+else {
+    window.grammar = Grammar;
+}
 //# sourceMappingURL=grammar-well.js.map

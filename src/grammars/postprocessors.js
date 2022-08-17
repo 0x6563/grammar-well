@@ -1,8 +1,11 @@
-// Generated automatically by nearley, version unknown 
-// http://github.com/Hardmath123/nearley
-(function () {
-function id(x) { return x[0]; }
+// Generated automatically by Grammar-Well, version unknown 
+// https://github.com/0x6563/grammar-well
 
+
+
+function Grammar(){
+    function id(x) { return x[0]; }
+    
 // Bypasses TS6133. Allow declared but unused functions.
 // @ts-ignore
 function nth(n) {
@@ -24,16 +27,17 @@ function $(o) {
     };
 }
 
-var grammar = {
-    lexer: undefined,
-    rules: [
+    return {
+        lexer: undefined,
+        rules: [
     
 ],
-    start: ""
+        start: ""
+    }
 }
+
 if (typeof module !== 'undefined'&& typeof module.exports !== 'undefined') {
-   module.exports = grammar;
+   module.exports = Grammar;
 } else {
-   window.grammar = grammar;
+   window.grammar = Grammar;
 }
-})();

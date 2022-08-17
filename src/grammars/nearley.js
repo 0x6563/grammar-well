@@ -1,8 +1,11 @@
-// Generated automatically by nearley, version unknown 
-// http://github.com/Hardmath123/nearley
-(function () {
-function id(x) { return x[0]; }
+// Generated automatically by Grammar-Well, version unknown 
+// https://github.com/0x6563/grammar-well
 
+
+
+function Grammar(){
+    function id(x) { return x[0]; }
+    
 function getValue(d) {
     return d[0].value
 }
@@ -73,9 +76,9 @@ function insensitive(sl) {
 }
 
 
-var grammar = {
-    lexer: lexer,
-    rules: [
+    return {
+        lexer: lexer,
+        rules: [
     {"name": "final$ebnf$1", "symbols": [(lexer.has("ws") ? {type: "ws"} : ws)], "postprocess": id},
     {"name": "final$ebnf$1", "symbols": [], "postprocess": function(d) {return null;}},
     {"name": "final", "symbols": ["_", "prog", "_", "final$ebnf$1"], "postprocess": function(d) { return d[1]; }},
@@ -123,11 +126,12 @@ var grammar = {
     {"name": "ws$ebnf$1", "symbols": [], "postprocess": function(d) {return null;}},
     {"name": "ws", "symbols": ["ws$ebnf$1", (lexer.has("comment") ? {type: "comment"} : comment), "_"]}
 ],
-    start: "final"
+        start: "final"
+    }
 }
+
 if (typeof module !== 'undefined'&& typeof module.exports !== 'undefined') {
-   module.exports = grammar;
+   module.exports = Grammar;
 } else {
-   window.grammar = grammar;
+   window.grammar = Grammar;
 }
-})();

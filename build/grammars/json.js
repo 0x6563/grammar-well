@@ -1,4 +1,4 @@
-(function () {
+function Grammar() {
     function id(x) { return x[0]; }
     const moo = require('moo');
     let lexer = moo.compile({
@@ -35,7 +35,7 @@
         }
         return output;
     }
-    var grammar = {
+    return {
         lexer: lexer,
         rules: [
             { "name": "json$subexpression$1", "symbols": ["object"] },
@@ -67,11 +67,11 @@
         ],
         start: "json"
     };
-    if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
-        module.exports = grammar;
-    }
-    else {
-        window.grammar = grammar;
-    }
-})();
+}
+if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
+    module.exports = Grammar;
+}
+else {
+    window.grammar = Grammar;
+}
 //# sourceMappingURL=json.js.map

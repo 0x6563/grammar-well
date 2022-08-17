@@ -1,6 +1,11 @@
 # nearley grammar
-@{%
+@head {%
+// Head
+%}
 
+
+@body {%
+// Body
 function getValue(d) {
     return d[0].value;
 }
@@ -43,7 +48,7 @@ const rules = Object.assign({
 }, literals([
     ",", "|", "$", "%", "(", ")",
     ":?", ":*", ":+",
-    "@include", "@builtin", "@",
+    "@include", "@builtin", "@head", "@body", "@",
     "]",
 ]));
 
@@ -83,10 +88,12 @@ prog -> prod  {% function(d) { return [d[0]]; } %}
 
 prod -> word _ %arrow _ expression+  {% function(d) { return {name: d[0], rules: d[4]}; } %}
       | word "[" _ wordlist _ "]" _ %arrow _ expression+ {% function(d) {return {macro: d[0], args: d[3], exprs: d[9]}} %}
-      | "@" _ js  {% function(d) { return {body: d[2]}; } %}
-      | "@" word ws word  {% function(d) { return {config: d[1], value: d[3]}; } %}
+      | "@" _ js {% function(d) { return {body: d[2]}; } %}
+      | "@body" _ js {% function(d) { return {body: d[2]}; } %}
+      | "@head" _ js {% function(d) { return {head: d[2]}; } %}
       | "@include"  _ string {% function(d) {return {include: d[2].literal, builtin: false}} %}
       | "@builtin"  _ string {% function(d) {return {include: d[2].literal, builtin: true }} %}
+      | "@" word ws word  {% function(d) { return {config: d[1], value: d[3]}; } %}
 
 expression+ -> completeexpression
              | expression+ _ "|" _ completeexpression  {% function(d) { return d[0].concat([d[4]]); } %}

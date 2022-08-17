@@ -1,11 +1,14 @@
-// Generated automatically by nearley, version unknown 
-// http://github.com/Hardmath123/nearley
-(function () {
-function id(x) { return x[0]; }
+// Generated automatically by Grammar-Well, version unknown 
+// https://github.com/0x6563/grammar-well
 
-var grammar = {
-    lexer: undefined,
-    rules: [
+
+
+function Grammar(){
+    function id(x) { return x[0]; }
+    
+    return {
+        lexer: undefined,
+        rules: [
     {"name": "dqstring$ebnf$1", "symbols": []},
     {"name": "dqstring$ebnf$1", "symbols": ["dqstring$ebnf$1", "dstrchar"], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
     {"name": "dqstring", "symbols": [{"literal":"\""}, "dqstring$ebnf$1", {"literal":"\""}], "postprocess": function(d) {return d[1].join(""); }},
@@ -32,11 +35,12 @@ var grammar = {
         }
         }
 ],
-    start: "dqstring"
+        start: "dqstring"
+    }
 }
+
 if (typeof module !== 'undefined'&& typeof module.exports !== 'undefined') {
-   module.exports = grammar;
+   module.exports = Grammar;
 } else {
-   window.grammar = grammar;
+   window.grammar = Grammar;
 }
-})();

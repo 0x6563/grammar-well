@@ -1,13 +1,16 @@
-export let lexer: any;
-export declare const rules: ({
-    name: string;
-    symbols: (string | {
-        literal: string;
+export = Grammar;
+declare function Grammar(): {
+    lexer: any;
+    rules: ({
+        name: string;
+        symbols: (string | {
+            literal: string;
+        })[];
+        postprocess?: undefined;
+    } | {
+        name: string;
+        symbols: any[];
+        postprocess: (d: any) => any;
     })[];
-    postprocess?: undefined;
-} | {
-    name: string;
-    symbols: any[];
-    postprocess: (d: any) => any;
-})[];
-export declare const start: string;
+    start: string;
+};

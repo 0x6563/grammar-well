@@ -1,3 +1,6 @@
-export const lexer: any;
-export const rules: any[];
-export const start: string;
+export = Grammar;
+declare function Grammar(): {
+    lexer: any;
+    rules: any[];
+    start: string;
+};

@@ -19,9 +19,11 @@ export interface MacroDefinition {
     args: string[];
     exprs: Expression[];
 }
-export interface JavascriptDefinition {
+export declare type JavascriptDefinition = {
     body: string;
-}
+} | {
+    head: string;
+};
 export interface ConfigDefinition {
     config: string;
     value: string;
@@ -109,7 +111,9 @@ export interface PrecompiledGrammar {
     lexer?: Lexer;
     start: string;
     rules: Rule[];
-    map?: Dictionary<Rule[]>;
+    map?: {
+        [key: string]: Rule[];
+    };
 }
 export interface Lexer {
     readonly line?: number;
