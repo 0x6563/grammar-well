@@ -69,7 +69,7 @@ function insensitive({ literal }) {
             tokens.push({ literal: c });
         }
     }
-    return { subexpression: [{ tokens, postprocess: d => d.join('') }] };
+    return { subexpression: [{ tokens, postprocess: ({data}) => data.join('') }] };
 }
 
 %}
@@ -100,13 +100,13 @@ wordlist -> word
             | wordlist _ "," _ word {% function({data}) { return data[0].concat([data[4]]); } %}
 
 completeexpression -> expr  {% function({data}) { return {tokens: data[0]}; } %}
-                    | expr _ js  {% function({data}) { return {tokens: data[0], transform: data[2]}; } %}
+                    | expr _ js  {% function({data}) { return {tokens: data[0], postprocess: data[2]}; } %}
 
 expr_member ->
       word {% ({data}) => data[0] %}
     | "$" word {% function({data}) {return {mixin: data[1]}} %}
     | word "[" _ expressionlist _ "]" {% function({data}) {return {macrocall: data[0], args: data[3]}} %}
-    | string "i":? {% function({data}) { if (data[1]) {return insensitive(data[0]); } else {return data[0]; } } %}
+    | string "i":? {% function({data}) { return data[1] ? insensitive(data[0]) : data[0]; } %}
     | "%" word {% function({data}) {return {token: data[1]}} %}
     | charclass {% ({data}) => data[0] %}
     | "(" _ expression+ _ ")" {% function({data}) {return {'subexpression': data[2]} ;} %}

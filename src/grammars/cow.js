@@ -4,7 +4,7 @@
 
 
 function Grammar(){
-    function id(x) { return x[0]; }
+    function id(x) { return x.data[0]; }
     
     return {
         lexer: undefined,
@@ -18,8 +18,4 @@ function Grammar(){
     }
 }
 
-if (typeof module !== 'undefined'&& typeof module.exports !== 'undefined') {
-   module.exports = Grammar;
-} else {
-   window.grammar = Grammar;
-}
+export default Grammar;

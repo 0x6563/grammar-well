@@ -1,6 +1,6 @@
-export type PostTransform = (payload: PostTransformPayload) => any;
+export type PostProcessor = (payload: PostProcessorPayload) => any;
 
-interface PostTransformPayload {
+interface PostProcessorPayload {
     data: any[];
     reference: number;
     dot: number;
@@ -13,7 +13,6 @@ export type BuiltInPostProcessor = { builtin: string };
 export interface Dictionary<T> {
     [key: string]: T;
 }
-
 
 export type PostProcessorResult = ExpressionDefinition
     | IncludeDefinition
@@ -52,7 +51,6 @@ export interface ExpressionDefinition {
 export interface Expression {
     tokens: ExpressionToken[];
     postprocess?: string | BuiltInPostProcessor;
-    transform?: string;
 }
 export type ExpressionToken = string | MixIn | MacroCall | SubExpression | LexerToken | EBNFModified | TokenLiteral;
 
@@ -117,13 +115,12 @@ export interface GrammarBuilderRule {
     name: string;
     symbols: RuleSymbol[];
     postprocess?: BuiltInPostProcessor | string;
-    transform?: BuiltInPostProcessor | string;
 }
 
 export interface Rule {
     name: string;
     symbols: RuleSymbol[];
-    transform?: PostTransform;
+    postprocess?: PostProcessor;
 }
 
 export interface ParserAlgorithm {

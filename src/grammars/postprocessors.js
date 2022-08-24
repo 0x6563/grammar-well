@@ -4,7 +4,7 @@
 
 
 function Grammar(){
-    function id(x) { return x[0]; }
+    function id(x) { return x.data[0]; }
     
 // Bypasses TS6133. Allow declared but unused functions.
 // @ts-ignore
@@ -36,8 +36,4 @@ function $(o) {
     }
 }
 
-if (typeof module !== 'undefined'&& typeof module.exports !== 'undefined') {
-   module.exports = Grammar;
-} else {
-   window.grammar = Grammar;
-}
+export default Grammar;

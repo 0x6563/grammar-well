@@ -87,7 +87,7 @@ function Grammar(): PrecompiledGrammar {
     
     // Bypasses TS6133. Allow declared but unused functions.
     // @ts-ignore
-    function id(d: any[]): any { return d[0]; }
+    function id(d: any): any { return d.data[0]; }
     ${Array.from(grammar.customTokens).map(function (token) { return "declare var " + token + ": any;\n" }).join("")}
     ${grammar.body.join('\n')}
     return {

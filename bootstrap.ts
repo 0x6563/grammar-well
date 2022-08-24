@@ -6,10 +6,10 @@ const BaseDir = './src/grammars';
 (async () => {
     const files = readdirSync(BaseDir);
     for (const file of files) {
-        console.log(file)
+        console.log(fullpath(file))
         if (/\.ne$/.test(file)) {
             const json = await Compile(read(file), { format: 'json' });
-            const js = await Compile(read(file), { exportName: 'grammar' });
+            const js = await Compile(read(file), { exportName: 'grammar', format: 'esmodule' });
             write(file.replace(/.ne$/, '.json'), json);
             write(file.replace(/.ne$/, '.js'), js);
         }

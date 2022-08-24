@@ -33,7 +33,7 @@ function Compile(parser) {
 ${parser.head.join('\n')}
 
 function Grammar(){
-    function id(x) { return x[0]; }
+    function id(x) { return x.data[0]; }
     ${parser.body.join('\n')}
     return {
         lexer: ${parser.config.lexer},

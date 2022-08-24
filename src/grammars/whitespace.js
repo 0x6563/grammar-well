@@ -4,25 +4,21 @@
 
 
 function Grammar(){
-    function id(x) { return x[0]; }
+    function id(x) { return x.data[0]; }
     
     return {
         lexer: undefined,
         rules: [
     {"name": "_$ebnf$1", "symbols": []},
     {"name": "_$ebnf$1", "symbols": ["_$ebnf$1", "wschar"], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
-    {"name": "_", "symbols": ["_$ebnf$1"], "postprocess": function(d) {return null;}},
+    {"name": "_", "symbols": ["_$ebnf$1"]},
     {"name": "__$ebnf$1", "symbols": ["wschar"]},
     {"name": "__$ebnf$1", "symbols": ["__$ebnf$1", "wschar"], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
-    {"name": "__", "symbols": ["__$ebnf$1"], "postprocess": function(d) {return null;}},
-    {"name": "wschar", "symbols": [/[ \t\n\v\f]/], "postprocess": id}
+    {"name": "__", "symbols": ["__$ebnf$1"]},
+    {"name": "wschar", "symbols": [/[ \t\n\v\f]/]}
 ],
         start: "_"
     }
 }
 
-if (typeof module !== 'undefined'&& typeof module.exports !== 'undefined') {
-   module.exports = Grammar;
-} else {
-   window.grammar = Grammar;
-}
+export default Grammar;

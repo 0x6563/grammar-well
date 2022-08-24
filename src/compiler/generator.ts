@@ -7,6 +7,7 @@ import * as number from '../grammars/number.json';
 import * as postprocessor from '../grammars/postprocessors.json';
 import * as string from '../grammars/string.json';
 import * as whitespace from '../grammars/whitespace.json';
+import Grammar from '../grammars/grammar-well.js';
 
 const BuiltInRegistry = {
     'cow.ne': cow,
@@ -33,7 +34,7 @@ export interface SerializedGeneratorState extends Omit<GeneratorState, 'customTo
 
 export class Generator {
     private names = Object.create(null);
-    private parser = new Parser(require('../grammars/grammar-well.js')(), { algorithm: 'earley' });
+    private parser = new Parser(Grammar(), { algorithm: 'earley' });
 
     private state: GeneratorState = {
         rules: [],
@@ -146,7 +147,6 @@ export class Generator {
             const rule = this.buildRule(name, rules[i], scope);
             if (this.config.noscript) {
                 rule.postprocess = null;
-                rule.transform = null;
             }
             this.state.rules.push(rule);
         }
@@ -160,7 +160,7 @@ export class Generator {
                 symbols.push(symbol);
             }
         }
-        return { name, symbols, postprocess: rule.postprocess, transform: rule.transform };
+        return { name, symbols, postprocess: rule.postprocess };
     }
 
     private buildSymbol(name: string, token: ExpressionToken, scope: Dictionary<string>): string | RegExp | TokenLiteral | LexerToken | null {
