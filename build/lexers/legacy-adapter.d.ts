@@ -23,20 +23,19 @@ export declare class LegacyLexerAdapter implements Lexer {
 }
 export interface LegacyLexer {
     formatError(token: LegacyToken, message?: string): string;
-    has(tokenType: string): boolean;
     next(): LegacyToken | undefined;
     reset(chunk?: string, state?: {
         line: number;
         col: number;
         state: string;
-    }): this;
+    }): void;
     save(): {
         line: number;
         col: number;
         state: string;
     };
-    pushState(state: string): void;
-    popState(): void;
+    push(state: string): void;
+    pop(): void;
     setState(state: string): void;
     [Symbol.iterator](): Iterator<LegacyToken>;
 }

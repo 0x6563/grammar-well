@@ -14,14 +14,12 @@ const parser_1 = require("../parser/parser");
 const cow = require("../grammars/cow.json");
 const number = require("../grammars/number.json");
 const postprocessor = require("../grammars/postprocessors.json");
-const nearley = require("../grammars/nearley.json");
 const string = require("../grammars/string.json");
 const whitespace = require("../grammars/whitespace.json");
 const BuiltInRegistry = {
     'cow.ne': cow,
     'number.ne': number,
     'postprocessor.ne': postprocessor,
-    'nearley.ne': nearley,
     'string.ne': string,
     'whitespace.ne': whitespace,
 };
@@ -30,8 +28,7 @@ class Generator {
         this.config = config;
         this.compilerState = compilerState;
         this.names = Object.create(null);
-        this.neParser = new parser_1.Parser(require('../grammars/nearley.js')());
-        this.gwParser = new parser_1.Parser(require('../grammars/grammar-well.js')(), { algorithm: 'earley' });
+        this.parser = new parser_1.Parser(require('../grammars/grammar-well.js')(), { algorithm: 'earley' });
         this.state = {
             rules: [],
             head: [],
@@ -44,10 +41,10 @@ class Generator {
         };
         this.state.version = config.version || this.state.version;
     }
-    import(rules, language = 'grammar-well') {
+    import(rules) {
         return __awaiter(this, void 0, void 0, function* () {
             if (typeof rules == 'string') {
-                const state = yield this.mergeGrammarString(rules, language);
+                const state = yield this.mergeGrammarString(rules);
                 this.state.start = this.state.start || state.start;
                 return;
             }
@@ -111,19 +108,14 @@ class Generator {
             const path = resolver.path(name);
             if (!this.compilerState.alreadycompiled.has(path)) {
                 this.compilerState.alreadycompiled.add(path);
-                yield this.mergeGrammarString(yield resolver.body(path), path.slice(-3) === '.ne' ? 'nearley' : 'grammar-well');
+                yield this.mergeGrammarString(yield resolver.body(path));
             }
         });
     }
-    mergeGrammarString(body, language = 'grammar-well') {
+    mergeGrammarString(body) {
         return __awaiter(this, void 0, void 0, function* () {
             const builder = new Generator(this.config, this.compilerState);
-            if (language == 'nearley') {
-                yield builder.import(this.neParser.run(body));
-            }
-            else {
-                yield builder.import(this.gwParser.run(body));
-            }
+            yield builder.import(this.parser.run(body));
             const state = builder.export();
             this.merge(state);
             return state;

@@ -24,11 +24,8 @@ interface PrecompiledGrammar {
 interface Rule {
     name: string;
     symbols: RuleSymbol[];
-    postprocess?: NearleyPostProcessor;
     transform?: PostTransform;
 }
-
-type NearleyPostProcessor = (data: any[], location: number, reject: Symbol) => any;
 
 type PostTransform = (payload: PostTransformPayload) => any;
 
@@ -59,7 +56,6 @@ interface RuleSymbolLexerToken {
     value: string;
     text: string;
 }
-
 
 interface Lexer {
     readonly line?: number;

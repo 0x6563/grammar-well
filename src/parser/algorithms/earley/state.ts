@@ -49,8 +49,6 @@ export class State {
                 name: this.rule.name,
                 reject: EarleyParser.fail
             });
-        } else if (this.rule.postprocess) {
-            this.data = this.rule.postprocess(this.data, this.reference, EarleyParser.fail);
         }
     }
 }

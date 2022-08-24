@@ -1,4 +1,4 @@
-import { NearleyPostProcessor, Rule } from "../../../typings";
+import { Rule } from "../../../typings";
 import { NearleyParser } from "./parser";
 
 
@@ -50,8 +50,6 @@ export class State {
                 name: this.rule.name,
                 reject: NearleyParser.fail
             });
-        } else if (this.rule.postprocess) {
-            this.data = this.rule.postprocess(this.data, this.reference, NearleyParser.fail);
         }
     }
 }

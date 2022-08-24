@@ -5,7 +5,6 @@ import { Parser } from "../parser/parser";
 import * as cow from '../grammars/cow.json';
 import * as number from '../grammars/number.json';
 import * as postprocessor from '../grammars/postprocessors.json';
-import * as nearley from '../grammars/nearley.json';
 import * as string from '../grammars/string.json';
 import * as whitespace from '../grammars/whitespace.json';
 
@@ -13,7 +12,6 @@ const BuiltInRegistry = {
     'cow.ne': cow,
     'number.ne': number,
     'postprocessor.ne': postprocessor,
-    'nearley.ne': nearley,
     'string.ne': string,
     'whitespace.ne': whitespace,
 }
@@ -35,8 +33,7 @@ export interface SerializedGeneratorState extends Omit<GeneratorState, 'customTo
 
 export class Generator {
     private names = Object.create(null);
-    private neParser = new Parser(require('../grammars/nearley.js')());
-    private gwParser = new Parser(require('../grammars/grammar-well.js')(), { algorithm: 'earley' });
+    private parser = new Parser(require('../grammars/grammar-well.js')(), { algorithm: 'earley' });
 
     private state: GeneratorState = {
         rules: [],
@@ -54,13 +51,12 @@ export class Generator {
     }
 
 
-    async import(source: string, language: 'nearley' | 'grammar-well'): Promise<void>
+    async import(source: string): Promise<void>
     async import(rule: RuleDefinition): Promise<void>
     async import(rules: RuleDefinitionList): Promise<void>
-    async import(rules: string | RuleDefinition | RuleDefinitionList, language?: 'nearley' | 'grammar-well'): Promise<void>
-    async import(rules: string | RuleDefinition | RuleDefinitionList, language: 'nearley' | 'grammar-well' = 'grammar-well'): Promise<void> {
+    async import(rules: string | RuleDefinition | RuleDefinitionList): Promise<void> {
         if (typeof rules == 'string') {
-            const state = await this.mergeGrammarString(rules, language);
+            const state = await this.mergeGrammarString(rules);
             this.state.start = this.state.start || state.start;
             return;
         }
@@ -119,17 +115,13 @@ export class Generator {
         const path = resolver.path(name);
         if (!this.compilerState.alreadycompiled.has(path)) {
             this.compilerState.alreadycompiled.add(path);
-            await this.mergeGrammarString(await resolver.body(path), path.slice(-3) === '.ne' ? 'nearley' : 'grammar-well')
+            await this.mergeGrammarString(await resolver.body(path))
         }
     }
 
-    private async mergeGrammarString(body: string, language: 'nearley' | 'grammar-well' = 'grammar-well') {
+    private async mergeGrammarString(body: string) {
         const builder = new Generator(this.config, this.compilerState);
-        if (language == 'nearley') {
-            await builder.import(this.neParser.run(body));
-        } else {
-            await builder.import(this.gwParser.run(body));
-        }
+        await builder.import(this.parser.run(body));
         const state = builder.export();
         this.merge(state);
         return state;

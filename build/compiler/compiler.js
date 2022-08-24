@@ -12,7 +12,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Compiler = exports.Compile = void 0;
 const import_resolver_1 = require("./import-resolver");
 const generator_1 = require("./generator");
-const coffeescript_1 = require("./outputs/coffeescript");
 const javascript_1 = require("./outputs/javascript");
 const typescript_1 = require("./outputs/typescript");
 const json_1 = require("./outputs/json");
@@ -24,16 +23,13 @@ const OutputFormats = {
     javascript: javascript_1.JavascriptOutput,
     module: javascript_1.ESMOutput,
     esmodule: javascript_1.ESMOutput,
-    cs: coffeescript_1.CoffeescriptOutput,
-    coffee: coffeescript_1.CoffeescriptOutput,
-    coffeescript: coffeescript_1.CoffeescriptOutput,
     ts: typescript_1.TypescriptFormat,
     typescript: typescript_1.TypescriptFormat
 };
 function Compile(rules, config = {}) {
     return __awaiter(this, void 0, void 0, function* () {
         const compiler = new Compiler(config);
-        yield compiler.import(rules, config.language);
+        yield compiler.import(rules);
         return compiler.export(config.format);
     });
 }
@@ -46,8 +42,8 @@ class Compiler {
         };
         this.grammarBuilder = new generator_1.Generator(config, this.state);
     }
-    import(val, language) {
-        return this.grammarBuilder.import(val, language);
+    import(val) {
+        return this.grammarBuilder.import(val);
     }
     export(format, name = 'grammar') {
         const grammar = this.grammarBuilder.export();

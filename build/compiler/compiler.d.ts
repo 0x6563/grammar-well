@@ -1,5 +1,4 @@
 import { ImportResolver, ImportResolverConstructor } from "./import-resolver";
-import { CoffeescriptOutput } from "./outputs/coffeescript";
 import { ESMOutput, JavascriptOutput } from "./outputs/javascript";
 import { TypescriptFormat } from "./outputs/typescript";
 import { RuleDefinition, RuleDefinitionList } from "../typings";
@@ -15,9 +14,6 @@ declare const OutputFormats: {
     javascript: typeof JavascriptOutput;
     module: typeof ESMOutput;
     esmodule: typeof ESMOutput;
-    cs: typeof CoffeescriptOutput;
-    coffee: typeof CoffeescriptOutput;
-    coffeescript: typeof CoffeescriptOutput;
     ts: typeof TypescriptFormat;
     typescript: typeof TypescriptFormat;
 };
@@ -31,8 +27,8 @@ export declare class Compiler {
     constructor(config?: CompileOptions);
     import(rule: RuleDefinition): Promise<void>;
     import(rules: RuleDefinitionList): Promise<void>;
-    import(source: string, language: 'nearley' | 'grammar-well'): Promise<void>;
-    import(source: string | RuleDefinition | RuleDefinitionList, language?: 'nearley' | 'grammar-well'): Promise<void>;
+    import(source: string): Promise<void>;
+    import(source: string | RuleDefinition | RuleDefinitionList): Promise<void>;
     export<T extends keyof typeof OutputFormats = '_default'>(format: T, name?: string): ReturnType<typeof OutputFormats[OutputFormat<T>]>;
 }
 declare type OutputFormat<T> = T extends keyof typeof OutputFormats ? T : "_default";
@@ -44,7 +40,6 @@ export interface CompileOptions {
     resolverInstance?: ImportResolver;
     exportName?: string;
     format?: keyof typeof OutputFormats;
-    language?: 'nearley' | 'grammar-well';
 }
 export interface CompilerState {
     alreadycompiled: Set<string>;

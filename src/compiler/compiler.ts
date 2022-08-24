@@ -1,6 +1,5 @@
 import { FileSystemResolver, ImportResolver, ImportResolverConstructor } from "./import-resolver";
 import { Generator } from "./generator";
-import { CoffeescriptOutput } from "./outputs/coffeescript";
 import { ESMOutput, JavascriptOutput } from "./outputs/javascript";
 import { TypescriptFormat } from "./outputs/typescript";
 import { RuleDefinition, RuleDefinitionList } from "../typings";
@@ -14,16 +13,13 @@ const OutputFormats = {
     javascript: JavascriptOutput,
     module: ESMOutput,
     esmodule: ESMOutput,
-    cs: CoffeescriptOutput,
-    coffee: CoffeescriptOutput,
-    coffeescript: CoffeescriptOutput,
     ts: TypescriptFormat,
     typescript: TypescriptFormat
 }
 
 export async function Compile(rules: string | RuleDefinition | RuleDefinitionList, config: CompileOptions = {}) {
     const compiler = new Compiler(config);
-    await compiler.import(rules, config.language);
+    await compiler.import(rules);
     return compiler.export(config.format);
 }
 
@@ -41,10 +37,10 @@ export class Compiler {
 
     import(rule: RuleDefinition): Promise<void>
     import(rules: RuleDefinitionList): Promise<void>
-    import(source: string, language: 'nearley' | 'grammar-well'): Promise<void>
-    import(source: string | RuleDefinition | RuleDefinitionList, language?: 'nearley' | 'grammar-well'): Promise<void>
-    import(val: string | RuleDefinition | RuleDefinitionList, language?: 'nearley' | 'grammar-well'): Promise<void> {
-        return this.grammarBuilder.import(val as any, language);
+    import(source: string): Promise<void>
+    import(source: string | RuleDefinition | RuleDefinitionList): Promise<void>
+    import(val: string | RuleDefinition | RuleDefinitionList): Promise<void> {
+        return this.grammarBuilder.import(val as any);
     }
 
     export<T extends keyof typeof OutputFormats = '_default'>(format: T, name: string = 'grammar'): ReturnType<typeof OutputFormats[OutputFormat<T>]> {
@@ -66,7 +62,6 @@ export interface CompileOptions {
     resolverInstance?: ImportResolver;
     exportName?: string;
     format?: keyof typeof OutputFormats;
-    language?: 'nearley' | 'grammar-well';
 }
 
 export interface CompilerState {

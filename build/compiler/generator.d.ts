@@ -20,17 +20,15 @@ export declare class Generator {
     private config;
     private compilerState;
     private names;
-    private neParser;
-    private gwParser;
+    private parser;
     private state;
     constructor(config: {
         noscript?: boolean;
         version?: string;
     }, compilerState: CompilerState);
-    import(source: string, language: 'nearley' | 'grammar-well'): Promise<void>;
+    import(source: string): Promise<void>;
     import(rule: RuleDefinition): Promise<void>;
     import(rules: RuleDefinitionList): Promise<void>;
-    import(rules: string | RuleDefinition | RuleDefinitionList, language?: 'nearley' | 'grammar-well'): Promise<void>;
     export(): GeneratorState;
     private includeBuiltIn;
     private includeGrammar;

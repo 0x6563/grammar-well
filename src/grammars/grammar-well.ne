@@ -6,8 +6,8 @@
 
 @body {%
 // Body
-function getValue(d) {
-    return d[0].value;
+function getValue({ data }) {
+    return data[0].value;
 }
 
 function literals(list) {
@@ -27,12 +27,7 @@ const rules = Object.assign({
         match: /\{\%(?:[^%]|\%[^}])*\%\}/,
         value: x => x.slice(2, -2),
         lineBreaks: true,
-    },
-    js2: {
-        match: /\$\{(?:.*)\}/,
-        value: x => x.slice(2, -1),
-        lineBreaks: true,
-    },
+    }, 
     word: { match: /[\w\?\+]+/, next: 'afterWord' },
     string: {
         match: /"(?:[^\\"\n]|\\["\\/bfnrt]|\\u[a-fA-F0-9]{4})*"/,
@@ -81,59 +76,58 @@ function insensitive({ literal }) {
 
 @lexer lexer
 
-final -> _ prog _ %ws:?  {% function(d) { return d[1]; } %}
+final -> _ prog _ %ws:?  {% function({data}) { return data[1]; } %}
 
-prog -> prod  {% function(d) { return [d[0]]; } %}
-      | prod ws prog  {% function(d) { return [d[0]].concat(d[2]); } %}
+prog -> prod  {% function({data}) { return [data[0]]; } %}
+      | prod ws prog  {% function({data}) { return [data[0]].concat(data[2]); } %}
 
-prod -> word _ %arrow _ expression+  {% function(d) { return {name: d[0], rules: d[4]}; } %}
-      | word "[" _ wordlist _ "]" _ %arrow _ expression+ {% function(d) {return {macro: d[0], args: d[3], exprs: d[9]}} %}
-      | "@" _ js {% function(d) { return {body: d[2]}; } %}
-      | "@body" _ js {% function(d) { return {body: d[2]}; } %}
-      | "@head" _ js {% function(d) { return {head: d[2]}; } %}
-      | "@include"  _ string {% function(d) {return {include: d[2].literal, builtin: false}} %}
-      | "@builtin"  _ string {% function(d) {return {include: d[2].literal, builtin: true }} %}
-      | "@" word ws word  {% function(d) { return {config: d[1], value: d[3]}; } %}
+prod -> word _ %arrow _ expression+  {% function({data}) { return {name: data[0], rules: data[4]}; } %}
+      | word "[" _ wordlist _ "]" _ %arrow _ expression+ {% function({data}) {return {macro: data[0], args: data[3], exprs: data[9]}} %}
+      | "@" _ js {% function({data}) { return {body: data[2]}; } %}
+      | "@body" _ js {% function({data}) { return {body: data[2]}; } %}
+      | "@head" _ js {% function({data}) { return {head: data[2]}; } %}
+      | "@include"  _ string {% function({data}) {return {include: data[2].literal, builtin: false}} %}
+      | "@builtin"  _ string {% function({data}) {return {include: data[2].literal, builtin: true }} %}
+      | "@" word ws word  {% function({data}) { return {config: data[1], value: data[3]}; } %}
 
 expression+ -> completeexpression
-             | expression+ _ "|" _ completeexpression  {% function(d) { return d[0].concat([d[4]]); } %}
+             | expression+ _ "|" _ completeexpression  {% function({data}) { return data[0].concat([data[4]]); } %}
 
 expressionlist -> completeexpression
-             | expressionlist _ "," _ completeexpression {% function(d) { return d[0].concat([d[4]]); } %}
+             | expressionlist _ "," _ completeexpression {% function({data}) { return data[0].concat([data[4]]); } %}
 
 wordlist -> word
-            | wordlist _ "," _ word {% function(d) { return d[0].concat([d[4]]); } %}
+            | wordlist _ "," _ word {% function({data}) { return data[0].concat([data[4]]); } %}
 
-completeexpression -> expr  {% function(d) { return {tokens: d[0]}; } %}
-                    | expr _ js  {% function(d) { return {tokens: d[0], postprocess: d[2]}; } %}
-                    | expr _ js2  {% function(d) { return {tokens: d[0], transform: d[2]}; } %}
+completeexpression -> expr  {% function({data}) { return {tokens: data[0]}; } %}
+                    | expr _ js  {% function({data}) { return {tokens: data[0], transform: data[2]}; } %}
 
 expr_member ->
-      word {% id %}
-    | "$" word {% function(d) {return {mixin: d[1]}} %}
-    | word "[" _ expressionlist _ "]" {% function(d) {return {macrocall: d[0], args: d[3]}} %}
-    | string "i":? {% function(d) { if (d[1]) {return insensitive(d[0]); } else {return d[0]; } } %}
-    | "%" word {% function(d) {return {token: d[1]}} %}
-    | charclass {% id %}
-    | "(" _ expression+ _ ")" {% function(d) {return {'subexpression': d[2]} ;} %}
-    | expr_member _ ebnf_modifier {% function(d) {return {'ebnf': d[0], 'modifier': d[2]}; } %}
+      word {% ({data}) => data[0] %}
+    | "$" word {% function({data}) {return {mixin: data[1]}} %}
+    | word "[" _ expressionlist _ "]" {% function({data}) {return {macrocall: data[0], args: data[3]}} %}
+    | string "i":? {% function({data}) { if (data[1]) {return insensitive(data[0]); } else {return data[0]; } } %}
+    | "%" word {% function({data}) {return {token: data[1]}} %}
+    | charclass {% ({data}) => data[0] %}
+    | "(" _ expression+ _ ")" {% function({data}) {return {'subexpression': data[2]} ;} %}
+    | expr_member _ ebnf_modifier {% function({data}) {return {'ebnf': data[0], 'modifier': data[2]}; } %}
 
 ebnf_modifier -> ":+" {% getValue %} | ":*" {% getValue %} | ":?" {% getValue %}
 
 expr -> expr_member
-      | expr ws expr_member  {% function(d){ return d[0].concat([d[2]]); } %}
+      | expr ws expr_member  {% function({data}){ return data[0].concat([data[2]]); } %}
 
 word -> %word {% getValue %}
 
-string -> %string {% d => ({literal: d[0].value}) %}
-        | %btstring {% d => ({literal: d[0].value}) %}
+string -> %string {% ({data}) => ({literal: data[0].value}) %}
+        | %btstring {% ({data}) => ({literal: data[0].value}) %}
 
 charclass -> %charclass  {% getValue %}
 
 js -> %js  {% getValue %}
-js2 -> %js2  {% getValue %}
 
 _ -> ws:?
+
 ws -> %ws
       | %ws:? %comment _
 

@@ -40,9 +40,6 @@ class State {
                 reject: parser_1.EarleyParser.fail
             });
         }
-        else if (this.rule.postprocess) {
-            this.data = this.rule.postprocess(this.data, this.reference, parser_1.EarleyParser.fail);
-        }
     }
 }
 exports.State = State;

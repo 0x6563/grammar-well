@@ -1,4 +1,3 @@
-export type NearleyPostProcessor = (data: any[], location: number, reject: Symbol) => any;
 export type PostTransform = (payload: PostTransformPayload) => any;
 
 interface PostTransformPayload {
@@ -124,7 +123,6 @@ export interface GrammarBuilderRule {
 export interface Rule {
     name: string;
     symbols: RuleSymbol[];
-    postprocess?: NearleyPostProcessor;
     transform?: PostTransform;
 }
 
