@@ -1,51 +1,51 @@
 unsigned_int -> [0-9]:+ {%
-    function(d) {
-        return parseInt(d[0].join(""));
+    function({data}) {
+        return parseInt(data[0].join(""));
     }
 %}
 
 int -> ("-"|"+"):? [0-9]:+ {%
-    function(d) {
-        if (d[0]) {
-            return parseInt(d[0][0]+d[1].join(""));
+    function({data}) {
+        if (data[0]) {
+            return parseInt(data[0][0]+data[1].join(""));
         } else {
-            return parseInt(d[1].join(""));
+            return parseInt(data[1].join(""));
         }
     }
 %}
 
 unsigned_decimal -> [0-9]:+ ("." [0-9]:+):? {%
-    function(d) {
+    function({data}) {
         return parseFloat(
-            d[0].join("") +
-            (d[1] ? "."+d[1][1].join("") : "")
+            data[0].join("") +
+            (data[1] ? "."+data[1][1].join("") : "")
         );
     }
 %}
 
 decimal -> "-":? [0-9]:+ ("." [0-9]:+):? {%
-    function(d) {
+    function({data}) {
         return parseFloat(
-            (d[0] || "") +
-            d[1].join("") +
-            (d[2] ? "."+d[2][1].join("") : "")
+            (data[0] || "") +
+            data[1].join("") +
+            (data[2] ? "."+data[2][1].join("") : "")
         );
     }
 %}
 
 percentage -> decimal "%" {%
-    function(d) {
-        return d[0]/100;
+    function({data}) {
+        return data[0]/100;
     }
 %}
 
 jsonfloat -> "-":? [0-9]:+ ("." [0-9]:+):? ([eE] [+-]:? [0-9]:+):? {%
-    function(d) {
+    function({data}) {
         return parseFloat(
-            (d[0] || "") +
-            d[1].join("") +
-            (d[2] ? "."+d[2][1].join("") : "") +
-            (d[3] ? "e" + (d[3][1] || "+") + d[3][2].join("") : "")
+            (data[0] || "") +
+            data[1].join("") +
+            (data[2] ? "."+data[2][1].join("") : "") +
+            (data[3] ? "e" + (data[3][1] || "+") + data[3][2].join("") : "")
         );
     }
 %}

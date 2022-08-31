@@ -1,95 +1,201 @@
-import { readdirSync, readFileSync, writeFileSync } from "fs";
-import { resolve } from "path";
-import { Compile, Parse, Parser } from "./src/";
-import { Message } from "./src/utility/message";
-const BaseDir = './src/grammars';
-(async () => {
-    const files = readdirSync(BaseDir);
-    for (const file of files) {
-        console.log(file)
-        if (/\.ne$/.test(file)) {
-            const json = await Compile(readFileSync(filename(file), 'utf-8'), { format: 'json' });
-            const js = await Compile(readFileSync(filename(file), 'utf-8'), { exportName: 'grammar' });
-            writeFileSync(filename(file.replace(/.ne$/, '.json')), json as any, 'utf8');
-            writeFileSync(filename(file.replace(/.ne$/, '.js')), js as any, 'utf8');
-        }
+import { readFileSync, writeFileSync } from "fs";
+import { CompileStates } from "./src/lexers/stateful-lexer";
+const States = [
+    {
+        name: "start",
+        rules: [
+            { import: ["string", "js_pre", "ws", "comment"] },
+            { when: /lexer(?![a-zA-Z\d_])/, type: "K_LEXER", goto: "lexer_pre" },
+            { when: /grammar(?![a-zA-Z\d_])/, type: "K_GRAMMAR", goto: "grammar_pre" },
+            { when: /config(?![a-zA-Z\d_])/, type: "K_CONFIG", goto: "config_pre" },
+            { import: ["k_config", "k_import", "k_head", "k_body", "kv"] },
+        ]
+    },
+    {
+        name: "config_pre",
+        rules: [
+            { import: ["ws"] },
+            { when: "{{", type: "L_TEMPLATEL", set: "config" }
+        ],
+
+    }, {
+        name: "config",
+        rules: [
+            { import: ["comment", "kv"] },
+            { when: "}}", type: "L_TEMPLATER", pop: 1 }
+        ]
+    },
+    {
+        name: "grammar_pre",
+        rules: [
+            { import: ["ws"] },
+            { when: "{{", type: "L_TEMPLATEL", set: "grammar" }
+        ],
+
+    }, {
+        name: "grammar",
+        rules: [
+            { import: ["comment", "js_pre", "js_templatepre", "ws", "regex", "charclass", "l_ebnf_0", "l_ebnf_1n", "l_ebnf_0n", "kv", "l_colon", "l_comma", "l_pipe", "l_parenl", "l_parenr", "l_arrow", "l_dsign", "l_dash",] },
+            { when: "}}", type: "L_TEMPLATER", pop: 1 }
+        ]
+    },
+    {
+        name: "lexer_pre",
+        rules: [
+            { import: ["ws"] },
+            { when: "{{", type: "L_TEMPLATEL", set: "lexer" }
+        ],
+
+    }, {
+        name: "lexer",
+        rules: [
+            { import: ["ws", "kv", "regex", "l_comma", "l_arrow", "l_dash", "comment", "js_pre"] },
+            { when: "}}", type: "L_TEMPLATER", pop: 1 }
+        ]
+    },
+    {
+        name: "js_pre",
+        rules: [{ when: "${", type: "L_JSL", goto: "js_wrap" }]
+    }, {
+        name: "js_wrap",
+        default: "T_JSBODY",
+        unmatched: "T_JSBODY",
+        rules: [
+            { import: ["jsignore"] },
+            { when: "{", goto: "js", type: "T_JSBODY" },
+            { when: "}", type: "L_JSR", pop: 1 },
+        ]
+    },
+    {
+        name: "js",
+        unmatched: "T_JSBODY",
+        default: "T_JSBODY",
+        rules: [
+            { import: ["jsignore"] },
+            { when: "{", goto: "js", type: "T_JSBODY" },
+            { when: "}", pop: 1, type: "T_JSBODY" }
+        ]
+    },
+    {
+        name: "js_templatepre",
+        rules: [{ when: "{{", type: "L_TEMPLATEL", goto: "js_templatewrap" }]
+    }, {
+        name: "js_templatewrap",
+        unmatched: "T_JSBODY",
+        default: "T_JSBODY",
+        rules: [
+            { import: ["jsignore"] },
+            { when: "{", goto: "js", type: "T_JSBODY" },
+            { when: "}}", type: "L_TEMPLATER", pop: 1 },
+        ]
+    },
+    { name: "kv", rules: [{ import: ["string", "ws", "word", "l_colon", "integer"] }] },
+    {
+        name: "jsignore",
+        rules: [
+            { when: /"(?:[^"\\]|\\.)*"/, type: "T_JSBODY" },
+            { when: /'(?:[^'\\]|\\.)*'/, type: "T_JSBODY" },
+            { when: /`(?:[^`\\]|\\.)*`/, type: "T_JSBODY" },
+            { when: /\/(?:[^\/\\]|\\.)+\/[gmiyu]*/, type: "T_JSBODY" },
+            { when: /\/\/[\n]*/, type: "T_JSBODY" },
+            { when: /\/\*.*\*\//, type: "T_JSBODY" }
+        ]
+    },
+
+    { name: "string", rules: [{ when: /"(?:[^"\\]|\\.)*"/, type: "T_STRING" }] },
+    { name: "string2", rules: [{ when: /'(?:[^'\\]|\\.)*'/, type: "T_STRING" }] },
+    { name: "string3", rules: [{ when: /`(?:[^`\\]|\\.)*`/, type: "T_STRING" }] },
+    { name: "charclass", rules: [{ when: /\[(?:[^\]\\]|\\.)+\]/, type: "T_CHARCLASS" }] },
+    { name: "regex", rules: [{ when: /\/(?:[^\/\\]|\\.)+\/[gmiyu]*/, type: "T_REGEX" }] },
+    { name: "integer", rules: [{ when: /\d+/, type: "integer" }] },
+    { name: "word", rules: [{ when: /[a-zA-Z_][a-zA-Z_\d]*/, type: "T_WORD" }] },
+    { name: "ws", rules: [{ when: /\s+/, type: "T_WS" }] },
+    { name: "k_all", rules: [{ when: /all(?![a-zA-Z\d_])/, type: "K_ALL" }] },
+    { name: "k_tag", rules: [{ when: /tag(?![a-zA-Z\d_])/, type: "K_TAG" }] },
+    { name: "k_type", rules: [{ when: /type(?![a-zA-Z\d_])/, type: "K_TYPE" }] },
+    { name: "k_when", rules: [{ when: /when(?![a-zA-Z\d_])/, type: "K_WHEN" }] },
+    { name: "k_pop", rules: [{ when: /pop(?![a-zA-Z\d_])/, type: "K_POP" }] },
+    { name: "k_inset", rules: [{ when: /inset(?![a-zA-Z\d_])/, type: "K_INSET" }] },
+    { name: "k_set", rules: [{ when: /set(?![a-zA-Z\d_])/, type: "K_SET" }] },
+    { name: "k_goto", rules: [{ when: /goto(?![a-zA-Z\d_])/, type: "K_GOTO" }] },
+    { name: "k_config", rules: [{ when: /config(?![a-zA-Z\d_])/, type: "K_CONFIG" }] },
+    { name: "k_lexer", rules: [{ when: /lexer(?![a-zA-Z\d_])/, type: "K_LEXER" }] },
+    { name: "k_grammar", rules: [{ when: /grammar(?![a-zA-Z\d_])/, type: "K_GRAMMAR" }] },
+    { name: "k_import", rules: [{ when: /import(?![a-zA-Z\d_])/, type: "K_IMPORT" }] },
+    { name: "k_body", rules: [{ when: /body(?![a-zA-Z\d_])/, type: "K_BODY" }] },
+    { name: "k_head", rules: [{ when: /head(?![a-zA-Z\d_])/, type: "K_HEAD" }] },
+
+    { name: "l_colon", rules: [{ when: ":", type: "L_COLON" }] },
+    { name: "l_ebnf_0", rules: [{ when: ":?", type: "L_EBNF_0" }] },
+    { name: "l_ebnf_1n", rules: [{ when: ":+", type: "L_EBNF_1N" }] },
+    { name: "l_ebnf_0n", rules: [{ when: ":*", type: "L_EBNF_0N" }] },
+    { name: "l_comma", rules: [{ when: ",", type: "L_COMMA" }] },
+    { name: "l_pipe", rules: [{ when: "|", type: "L_PIPE" }] },
+    { name: "l_parenl", rules: [{ when: "(", type: "L_PARENL" }] },
+    { name: "l_parenr", rules: [{ when: ")", type: "L_PARENR" }] },
+    { name: "l_templatel", rules: [{ when: "{{", type: "L_TEMPLATEL" }] },
+    { name: "l_templater", rules: [{ when: "}}", type: "L_TEMPLATER" }] },
+    { name: "l_arrow", rules: [{ when: "->", type: "L_ARROW" }] },
+    { name: "l_dsign", rules: [{ when: "$", type: "L_DSIGN" }] },
+    { name: "l_dash", rules: [{ when: "-", type: "L_DASH" }] },
+    { name: "comment", rules: [{ when: /\/\/[\n]*/, type: "T_COMMENT" }] },
+    { name: "commentmulti", rules: [{ when: /\/\*.*\*\//, type: "T_COMMENT" }] }
+]
+let file = '';
+for (const state of States) {
+    WriteLine(`${state.name} ->`);
+    if (state.default) {
+        WriteLine(`\tdefault: "${state.default}"`)
     }
-    const n = new Parser(require('./src/grammars/json.js'), { algorithm: 'earley', parserOptions: { keepHistory: true } });
-    n.parser.feed('{"":[],    "1":3 }');
-    const { table, start } = (n.parser as any);
-    console.log(`Results: ${n.parser.results.length}`);
-    const stateMap = new Map();
-    const ruleMap = new Map();
-    const charts = [];
-    let ruleId = 0;
-    let stateId = 0;
-    for (let i = 0; i < table.length; i++) {
-        const chart = [];
-        const { states, data } = table[i];
-        console.log(`Chart ${i} ${data}`)
-        charts.push({ data, states: chart });
-        for (let ii = 0; ii < states.length; ii++) {
-            const state = states[ii];
-            const { rule, dot, reference, isComplete, left, wantedBy } = state;
-            const { symbols, name } = rule;
-
-            if (!ruleMap.has(rule)) {
-                ruleMap.set(rule, ruleId++);
-            }
-
-            if (!stateMap.has(state)) {
-                stateMap.set(state, stateId++);
-            }
-
-            chart.push(stateId);
-            console.log(BuildString([
-                ii.toString().padEnd(4, ' '),
-                (name === start ? 'Start' : '').padEnd(7, ' '),
-                (isComplete ? 'Complete' : '').padEnd(10, ' '),
-                `dot: ${(dot.toString().padEnd(3, ' '))}`,
-                `from: ${reference.toString().padEnd(4, ' ')}`,
-                `id: ${stateId.toString().padEnd(4, ' ')}`,
-                `left: ${(stateMap.get(left) || '').toString().padEnd(4, ' ')}`,
-                `wantedBy: ${(wantedBy.map(v => stateMap.get(v)).join(', ')).toString().padEnd(12, ' ')}`,
-                `${name}  →  ${SymbolString(symbols, dot)}`
-            ]))
-        }
-
+    if (state.unmatched) {
+        WriteLine(`\tunmatched: "${state.unmatched}"`)
     }
-    const rules = [];
-    const states = [];
-    for (const [rule, id] of ruleMap) {
-        const { symbols, name } = rule;
-        rules[id] = {
-            name,
-            symbols: symbols.map(v => Message.GetSymbolDisplay(v, true))
+    for (const rule of state.rules) {
+        let s = '\t-';
+        if ("import" in rule) {
+            s += ` import: ${Print(rule.import)}`;
         }
-    }
-
-    for (const [state, id] of stateMap) {
-        const { rule, dot, reference, isComplete, left, wantedBy } = state;
-
-        states[id] = {
-            left: stateMap.get(left),
-            wantedBy: wantedBy.map(v => stateMap.get(v)),
-            reference,
-            ruleId: ruleMap.get(rule),
-            dot
+        if ("when" in rule) {
+            s += ` when: ${Print(rule.when)}`;
         }
+        if ("type" in rule) {
+            s += ` type: ${Print(rule.type)}`;
+        }
+        if ("pop" in rule) {
+            s += ` pop: ${Print(rule.pop)}`;
+        }
+        if ("goto" in rule) {
+            s += ` goto: ${rule.goto}`;
+        }
+        WriteLine(s);
     }
-    writeFileSync('test.json', JSON.stringify({ start, charts, states, rules }), 'utf-8');
+}
+writeFileSync('./out.txt', file);
 
-})();
 
-function BuildString(strings: string[]) {
-    return strings.join('; ');
+// const lexer = CompileStates(States, "start");
+// const s = readFileSync('./src/grammars/grammar-well.gwell', 'utf-8')
+// lexer.feed(s)
+// let next = lexer.next();
+// while (next) {
+//     console.log({ type: next.type, value: next.value });
+//     next = lexer.next();
+// }
+function WriteLine(s) {
+    file += s + '\n';
 }
 
-function SymbolString(symbols: any[], dot: number) {
-    const r = symbols.map(v => Message.GetSymbolDisplay(v, true));
-    r.splice(dot || 0, 0, ' ● ');
-    return r.join(' ');
-}
-function filename(file: string) {
-    return resolve(BaseDir, file)
+function Print(val) {
+    if (val instanceof RegExp) {
+        return `/${val.source}/`;
+    }
+    if (typeof val == 'string') {
+        return JSON.stringify(val);
+    }
+    if (typeof val == 'number') {
+        return val;
+    }
+    if (Array.isArray(val)) {
+        return val.join(', ');
+    }
 }

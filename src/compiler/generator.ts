@@ -1,8 +1,7 @@
-import { Dictionary, EBNFModified, Expression, ExpressionToken, GrammarBuilderRule, LexerToken, MacroCall, RuleDefinition, RuleDefinitionList, SubExpression, TokenLiteral } from "../typings";
+import { Dictionary, EBNFModified, Expression, ExpressionToken, GrammarBuilderRule, LexerTokenMatch, MacroCall, RuleDefinition, RuleDefinitionList, SubExpression, TokenLiteral } from "../typings";
 import { CompilerState } from "./compiler";
 import { Parser } from "../parser/parser";
 
-import * as cow from '../grammars/cow.json';
 import * as number from '../grammars/number.json';
 import * as postprocessor from '../grammars/postprocessors.json';
 import * as string from '../grammars/string.json';
@@ -10,7 +9,6 @@ import * as whitespace from '../grammars/whitespace.json';
 import Grammar from '../grammars/grammar-well.js';
 
 const BuiltInRegistry = {
-    'cow.ne': cow,
     'number.ne': number,
     'postprocessor.ne': postprocessor,
     'string.ne': string,
@@ -82,6 +80,7 @@ export class Generator {
             } else if ("config" in rule) {
                 this.state.config[rule.config] = rule.value
             } else {
+                console.log(rule);
                 this.buildRules(rule.name, rule.rules, {});
                 this.state.start = this.state.start || rule.name;
             }
@@ -153,7 +152,8 @@ export class Generator {
     }
 
     private buildRule(name: string, rule: Expression, scope: Dictionary<string>): GrammarBuilderRule {
-        const symbols: (string | RegExp | TokenLiteral | LexerToken)[] = [];
+        const symbols: (string | RegExp | TokenLiteral | LexerTokenMatch)[] = [];
+        console.log(rule.tokens);
         for (let i = 0; i < rule.tokens.length; i++) {
             const symbol = this.buildSymbol(name, rule.tokens[i], scope);
             if (symbol !== null) {
@@ -163,7 +163,8 @@ export class Generator {
         return { name, symbols, postprocess: rule.postprocess };
     }
 
-    private buildSymbol(name: string, token: ExpressionToken, scope: Dictionary<string>): string | RegExp | TokenLiteral | LexerToken | null {
+    private buildSymbol(name: string, token: ExpressionToken, scope: Dictionary<string>): string | RegExp | TokenLiteral | LexerTokenMatch | null {
+        console.log(token);
         if (typeof token === 'string') {
             return token === 'null' ? null : token;
         }

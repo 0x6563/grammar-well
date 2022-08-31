@@ -74,9 +74,7 @@ export function serializeRule(rule, builtinPostprocessors) {
     var ret = '{';
     ret += '"name": ' + JSON.stringify(rule.name);
     ret += ', "symbols": [' + rule.symbols.map(serializeSymbol).join(', ') + ']';
-    if (rule.transform) {
-        ret += ', "transform": ' + tabulateString(dedentFunc(rule.transform), '        ', { indentFirst: false });
-    } else if (rule.postprocess) {
+    if (rule.postprocess) {
         if (rule.postprocess.builtin) {
             rule.postprocess = builtinPostprocessors[rule.postprocess.builtin];
         }

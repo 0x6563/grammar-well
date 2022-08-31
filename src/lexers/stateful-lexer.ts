@@ -1,288 +1,173 @@
-import { LegacyLexerAdapter } from "./legacy-adapter";
+import { TokenQueue } from "./token-queue";
 
-const DefaultErrorRule = TransformRule('error', { lineBreaks: true, shouldThrow: true });
+class StatefulLexer {
+    private startState: string;
+    private states: { [key: string]: CompiledStateDefinition };
+    private buffer: string;
+    private stack: string[];
+    private index: number;
+    private line: number;
+    private column: number;
+    private prefetched?: RegExpExecArray;
+    private current: string;
+    private unmatched: MatchRule;
+    private rules: MatchRule[];
+    private regexp: RegExp;
 
-function isRegExp(o: any) { return o?.toString() === '[object RegExp]' }
-function isObject(o: any) { return o && typeof o === 'object' && !isRegExp(o) && !Array.isArray(o) }
-
-function RegexEscape(s: string) {
-    return s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')
-}
-function RegexGroups(s: string) {
-    return (new RegExp('|' + s)).exec('').length - 1
-}
-
-function RegexCapture(source: string) {
-    return '(' + source + ')'
-}
-function RegexUnion(regexps: string[]) {
-    if (!regexps.length)
-        return '(?!)';
-    const source = regexps.map((s) => `(?:${s})`).join('|');
-    return `(?:${source})`;
-}
-
-function regexpOrLiteral(obj: string | RegExp) {
-    if (typeof obj === 'string') {
-        return `(?:${RegexEscape(obj)})`;
+    constructor(states: { [key: string]: CompiledStateDefinition }, startState: string) {
+        this.startState = startState;
+        this.states = states;
+        this.buffer = '';
+        this.stack = [];
+        this.feed();
     }
-    if (isRegExp(obj)) {
-        // TODO: consider /u support
-        if (obj.ignoreCase)
-            throw new Error('RegExp /i flag not allowed')
-        if (obj.global)
-            throw new Error('RegExp /g flag is implied')
-        if (obj.sticky)
-            throw new Error('RegExp /y flag is implied')
-        if (obj.multiline)
-            throw new Error('RegExp /m flag is implied')
-        return obj.source
-    }
-    throw new Error('Not a pattern: ' + obj)
-}
 
-function LastNLines(string: string, numLines: number) {
-    let position = string.length;
-    while (numLines > 0 && --position >= 0) {
-        if (string[position] == '\n') {
-            numLines--;
+    feed(data?: string, state?: ReturnType<StatefulLexer['state']>) {
+        this.buffer = data || '';
+        this.index = 0;
+        this.line = state ? state.line : 1;
+        this.column = state ? state.column : 1;
+        this.prefetched = state?.prefetched;
+        this.set(state ? state.state : this.startState);
+        this.stack = state && state.stack ? state.stack.slice() : [];
+    }
+
+    state() {
+        return {
+            line: this.line,
+            column: this.column,
+            state: this.current,
+            stack: this.stack.slice(),
+            prefetched: this.prefetched,
         }
     }
-    return string.substring(position + 1).split("\n");
-}
 
-function ConvertObjectToRules(obj): LexerRule[] {
-    const result: LexerRule[] = [];
-    for (const key in obj) {
-        const rules = [].concat(obj[key]);
-        if (key === 'include') {
-            rules.forEach(rule => result.push({ include: rule }));
+    next() {
+        const next = this.matchNext();
+        if (!next) {
+            return
+        }
+        const { rule, text, index } = next;
+        if (!rule) {
+            throw new Error('No Matching Rule');
+        }
+        const token = this.createToken(rule, text, index)
+        this.processRule(rule);
+        return token;
+    }
+
+    [Symbol.iterator]() {
+        return new LexerIterator(this)
+    }
+
+    flush() {
+
+    }
+
+    private set(current: string) {
+        if (!current || this.current === current)
+            return
+        const info = this.states[current];
+        this.current = current;
+        this.rules = info.rules;
+        this.unmatched = info.unmatched;
+        this.regexp = info.regexp;
+    }
+
+    private pop() {
+        this.set(this.stack.pop());
+    }
+
+    private goto(state: string) {
+        this.stack.push(this.current)
+        this.set(state)
+    }
+
+    private matchNext() {
+        if (this.index === this.buffer.length) {
+            return;
+        }
+
+        const { index, buffer } = this;
+        let text;
+        let rule;
+        let match;
+
+        this.regexp.lastIndex = index;
+        if (this.prefetched) {
+            match = this.prefetched;
+            this.prefetched = null;
         } else {
-            let match = [];
-            for (const rule of rules) {
-                if (isObject(rule)) {
-                    if (match.length)
-                        result.push(TransformRule(key, match))
-                    result.push(TransformRule(key, rule))
-                    match = []
-                } else {
-                    match.push(rule)
-                }
-            }
-            if (match.length)
-                result.push(TransformRule(key, match))
+            match = this.regexp.exec(buffer)
         }
-    }
-    return result;
-}
-
-function ConvertArrayToRules(array): LexerRule[] {
-    const result: LexerRule[] = [];
-    for (const obj of array) {
-        if (obj.include) {
-            const includes = [].concat(obj.include);
-            includes.forEach(include => result.push({ include }));
-        } else if (obj.type) {
-            result.push(TransformRule(obj.type, obj))
+        if (match == null) {
+            rule = this.unmatched;
+            text = buffer.slice(index, buffer.length);
+        } else if (match.index !== index) {
+            rule = this.unmatched;
+            text = buffer.slice(index, match.index)
+            this.prefetched = match;
         } else {
-            throw new Error('Rule has no type: ' + JSON.stringify(obj))
+            rule = this.getGroup(match)
+            text = match[0]
         }
-    }
-    return result;
-}
 
-function TransformRule(type: string, ref: LexerRule | string | RegExp | ((RegExp | string)[])): LexerRule {
-    const obj: LexerRule = isObject(ref) ? { match: (ref as RegExp[]) } as LexerRule : ref as LexerRule;
-
-    const options: LexerRule = {
-        defaultType: type,
-        lineBreaks: !!obj.error || !!obj.fallback,
-        pop: false,
-        next: null,
-        push: null,
-        error: false,
-        fallback: false,
-        value: null,
-        type: null,
-        shouldThrow: false,
+        return { index, rule, text }
     }
 
-    Object.assign(options, obj);
+    private createToken(rule: MatchRule, text: string, offset: number) {
+        const token = {
+            type: rule.type,
+            value: text,
+            text: text,
+            offset: offset,
+            line: this.line,
+            column: this.column,
+            state: this.current
+        }
 
-    // type transform cannot be a string
-    if (typeof options.type === 'string' && type !== options.type) {
-        throw new Error("Type transform cannot be a string (type '" + options.type + "' for token '" + type + "')")
-    }
-
-    // convert to array
-    const { match } = options;
-    options.match = Array.isArray(match) ? match : match ? [match] : []
-    options.match.sort((a, b) => {
-        const isARegex = isRegExp(a);
-        const isBRegex = isRegExp(b);
-        if (isARegex && isBRegex)
-            return 0;
-        if (isARegex)
-            return 1;
-        if (isBRegex)
-            return -1;
-        return (b as string).length - (a as string).length
-    })
-    return options;
-}
-
-function CompileRules(rules: LexerRule[], hasStates?: boolean) {
-    const fast = Object.create(null)
-    const groups = [];
-    const parts = [];
-
-    let errorRule = null
-    let unicodeFlag = null
-    let fastAllowed = rules.findIndex((v) => v.fallback) < 0;
-
-    for (const options of rules) {
-        if (options.error || options.fallback) {
-            // errorRule can only be set once
-            if (errorRule) {
-                if (!options.fallback === !errorRule.fallback)
-                    throw new Error("Multiple " + (options.fallback ? "fallback" : "error") + " rules not allowed (for token '" + options.defaultType + "')")
-                throw new Error("fallback and error are mutually exclusive (for token '" + options.defaultType + "')")
+        for (let i = 0; i < text.length; i++) {
+            this.index++;
+            this.column++;
+            if (text[i] == '\n') {
+                this.line++;
+                this.column = 1;
             }
-            errorRule = options
         }
+        return token;
+    }
 
-        const matches = options.match.slice();
-
-        if (fastAllowed) {
-            while (matches.length && typeof matches[0] === 'string' && matches[0].length === 1) {
-                const word = matches.shift() as string;
-                fast[word.charCodeAt(0)] = options
+    private processRule(rule: MatchRule) {
+        if (rule.pop) {
+            let i = rule.pop === 'all' ? this.stack.length : rule.pop;
+            while (i-- > 0) {
+                this.pop();
             }
         }
 
-        if (options.pop || options.push || options.next) {
-            if (!hasStates) {
-                throw new Error("State-switching options are not allowed in stateless lexers (for token '" + options.defaultType + "')")
-            }
-            if (options.fallback) {
-                throw new Error("State-switching options are not allowed on fallback tokens (for token '" + options.defaultType + "')")
-            }
+        if (rule.set) {
+            this.set(rule.set);
+        }
+        if (rule.goto) {
+            this.goto(rule.goto);
         }
 
-        if (matches.length === 0) {
-            continue
-        }
-        fastAllowed = false
-
-        groups.push(options)
-
-        for (const match of matches) {
-            if (!isRegExp(match)) {
-                continue;
-            }
-            const obj = match as RegExp;
-            if (unicodeFlag === null) {
-                unicodeFlag = obj.unicode
-            } else if (unicodeFlag !== obj.unicode && options.fallback === false) {
-                throw new Error('If one rule is /u then all must be')
+        if (rule.inset) {
+            let i = rule.inset;
+            while (--i >= 0) {
+                this.goto(this.current);
             }
         }
-
-        // convert to RegExp
-        const pat = RegexUnion(matches.map(regexpOrLiteral))
-
-        // validate
-        const regexp = new RegExp(pat)
-        if (regexp.test("")) {
-            throw new Error("RegExp matches empty string: " + regexp)
-        }
-        const groupCount = RegexGroups(pat)
-        if (groupCount > 0) {
-            throw new Error("RegExp has capture groups: " + regexp + "\nUse (?: … ) instead")
-        }
-
-        // try and detect rules matching newlines
-        if (!options.lineBreaks && regexp.test('\n')) {
-            throw new Error('Rule should declare lineBreaks: ' + regexp)
-        }
-
-        // store regex
-        parts.push(RegexCapture(pat))
     }
 
-    let flags = !(errorRule && errorRule.fallback) ? 'ym' : 'gm'
-
-    if (unicodeFlag === true)
-        flags += "u"
-    const regexp = new RegExp(RegexUnion(parts), flags)
-    return {
-        regexp,
-        groups,
-        fast,
-        error: errorRule || DefaultErrorRule
-    }
-}
-
-function CheckStateGroup(g, name: string, map: { [key: string]: never }) {
-    const state = g && (g.push || g.next);
-    if (state && !map[state]) {
-        throw new Error("Missing state '" + state + "' (in token '" + g.defaultType + "' of state '" + name + "')")
-    }
-    if (g && g.pop && +g.pop !== 1) {
-        throw new Error("pop must be 1 (in token '" + g.defaultType + "' of state '" + name + "')")
-    }
-}
-export function CompileStates(states, start): LegacyLexerAdapter {
-    const ruleMap: { [key: string]: LexerRule[] } = Object.create(null)
-
-    for (const key in states) {
-        start = start || key;
-        ruleMap[key] = Array.isArray(states[key]) ? ConvertArrayToRules(states[key]) : ConvertObjectToRules(states[key]);
-    }
-
-    for (const key in states) {
-        const rules = ruleMap[key]
-        const included = new Set(rules);
-        const includedState = new Set();
-        for (let j = 0; j < rules.length; j++) {
-            const rule = rules[j]
-            if (!rule.include)
-                continue;
-            const splice: [number, number, ...LexerRule[]] = [j, 1]
-            if (rule.include !== key && !includedState.has(rule.include)) {
-                includedState.add(rule.include);
-                const newRules = ruleMap[rule.include];
-                if (!newRules) {
-                    throw new Error("Cannot include nonexistent state '" + rule.include + "' (in state '" + key + "')")
-                }
-                for (const newRule of newRules) {
-                    if (included.has(newRule))
-                        continue;
-                    splice.push(newRule);
-                    included.add(newRule);
-                }
+    private getGroup(match): MatchRule {
+        for (let i = 0; i < this.rules.length; i++) {
+            if (match[i + 1] !== undefined) {
+                return this.rules[i];
             }
-            rules.splice.apply(rules, splice)
-            j--
         }
+        throw new Error('Cannot find token type for matched text')
     }
-
-    const map = Object.create(null);
-    for (const key in states) {
-        map[key] = CompileRules(ruleMap[key], true)
-    }
-
-    for (const key in states) {
-        const state = map[key];
-        for (const group of state.groups) {
-            CheckStateGroup(group, key, map);
-        }
-        for (const f in state.fast) {
-            CheckStateGroup(state.fast[f], key, map);
-        }
-    }
-
-    return new LegacyLexerAdapter(new StatefulLexer(map, start));
 }
 
 class LexerIterator {
@@ -298,241 +183,213 @@ class LexerIterator {
     }
 }
 
-interface LexerRule {
-    defaultType?: string;
-    type?: string | ((s: string) => string);
-    value?: string | ((s: string) => string);
-    push?: string;
-    pop?: boolean;
-    next?: string;
-    shouldThrow?: boolean;
-    lineBreaks?: boolean;
-    match?: (string | RegExp)[];
-    error?: boolean;
-    fallback?: boolean;
-    include?: string;
+class RegexLib {
+
+    static IsRegex(o: any) {
+        return o instanceof RegExp
+    }
+    static Escape(s: string) {
+        return s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')
+    }
+
+    static HasGroups(s: string) {
+        return (new RegExp('|' + s)).exec('').length > 1
+    }
+
+    static Capture(source: string) {
+        return '(' + source + ')'
+    }
+
+    static Join(regexps: string[]) {
+        if (!regexps.length)
+            return '(?!)';
+        const source = regexps.map((s) => `(?:${s})`).join('|');
+        return `(?:${source})`;
+    }
+
+    static Source(search: string | RegExp) {
+        if (typeof search === 'string') {
+            return `(?:${RegexLib.Escape(search)})`;
+        }
+        if (RegexLib.IsRegex(search)) {
+            return search.source;
+        }
+        throw new Error('Not a pattern: ' + search)
+    }
+
 }
 
-class StatefulLexer {
-    startState: string;
-    states: { [key: string]: { groups: LexerRule[], error: { error: boolean }, regexp: RegExp, fast: { [key: string]: LexerRule } } };
-    buffer: string;
-    stack: string[];
-    index: number;
-    line: number;
-    col: number;
-    queuedText: string;
-    state: string;
-    error: { error: boolean };
-    groups: LexerRule[];
-    fast: LexerRule;
-    queuedGroup: LexerRule;
-    regexp: RegExp;
+function CompileRegExp(state: ResolvedStateDefinition): RegExp {
+    const rules = [];
+    const subexpressions = [];
 
-    constructor(states: { [key: string]: { groups: LexerRule[], error: { error: boolean }, regexp: RegExp, fast: { [key: string]: LexerRule } } }, state: string) {
-        this.startState = state;
-        this.states = states;
-        this.buffer = '';
-        this.stack = [];
-        this.reset();
-    }
-
-    reset(data?: string, info?: { line: number, col: number, queuedText: string, state: string, stack: string[] }) {
-        this.buffer = data || '';
-        this.index = 0;
-        this.line = info ? info.line : 1;
-        this.col = info ? info.col : 1;
-        this.queuedText = info ? info.queuedText : "";
-        this.setState(info ? info.state : this.startState);
-        this.stack = info && info.stack ? info.stack.slice() : [];
-    }
-
-    save() {
-        return {
-            line: this.line,
-            col: this.col,
-            state: this.state,
-            stack: this.stack.slice(),
-            queuedText: this.queuedText,
-        }
-    }
-
-    setState(state: string) {
-        if (!state || this.state === state)
-            return
-        const info = this.states[state];
-        this.state = state;
-        this.groups = info.groups;
-        this.error = info.error;
-        this.regexp = info.regexp;
-        this.fast = info.fast;
-    }
-
-    pop() {
-        this.setState(this.stack.pop());
-    }
-
-    push(state: string) {
-        this.stack.push(this.state)
-        this.setState(state)
-    }
-    next() {
-        const index = this.index
-
-        // If a fallback token matched, we don't need to re-run the RegExp
-        if (this.queuedGroup) {
-            const token = this.token(this.queuedGroup, this.queuedText, index)
-            this.queuedGroup = null
-            this.queuedText = ""
-            return token
-        }
-
-        const buffer = this.buffer
-        if (index === buffer.length) {
-            return // EOF
-        }
-
-        // Fast matching for single characters
-        let group = this.fast[buffer.charCodeAt(index)]
-        if (group) {
-            return this.token(group, buffer.charAt(index), index)
-        }
-
-        // Execute RegExp
-        const re = this.regexp
-        re.lastIndex = index
-        const match = re.exec(buffer)
-
-
-        // Error tokens match the remaining buffer
-        const error = this.error
-        if (match == null) {
-            return this.token(error, buffer.slice(index, buffer.length), index)
-        }
-
-        group = this.getGroup(match)
-        const text = match[0]
-
-        if ('fallback' in error && match.index !== index) {
-            this.queuedGroup = group
-            this.queuedText = text
-
-            // Fallback tokens contain the unmatched portion of the buffer
-            return this.token(error, buffer.slice(index, match.index), index)
-        }
-
-        return this.token(group, text, index)
-    }
-
-    formatError(token, message) {
-        if (token == null) {
-            // An undefined token indicates EOF
-            const text = this.buffer.slice(this.index)
-            token = {
-                text: text,
-                offset: this.index,
-                lineBreaks: text.indexOf('\n') === -1 ? 0 : 1,
-                line: this.line,
-                col: this.col,
+    let isUnicode = null;
+    let isCI = null;
+    for (const options of state.rules) {
+        if (RegexLib.IsRegex(options.when)) {
+            const when = options.when as RegExp;
+            if (isUnicode === null) {
+                isUnicode = when.unicode
+            } else if (isUnicode !== when.unicode && !state.unmatched) {
+                throw new Error(`Inconsistent Regex Flag /u in state: ${state.name}`);
+            }
+            if (isCI === null) {
+                isCI = when.ignoreCase
+            } else if (isCI !== when.ignoreCase) {
+                throw new Error(`Inconsistent Regex Flag /i in state: ${state.name}`);
+            }
+        } else {
+            if (isCI == null) {
+                isCI = false;
+            } else if (isCI != false) {
+                throw new Error(`Inconsistent Regex Flag /i in state: ${state.name}`);
             }
         }
 
-        const numLinesAround = 2
-        const firstDisplayedLine = Math.max(token.line - numLinesAround, 1)
-        const lastDisplayedLine = token.line + numLinesAround
-        const lastLineDigits = String(lastDisplayedLine).length
-        const displayedLines = LastNLines(
-            this.buffer,
-            (this.line - token.line) + numLinesAround + 1
-        )
-            .slice(0, 5)
-        const errorLines = []
-        errorLines.push(message + " at line " + token.line + " col " + token.col + ":")
-        errorLines.push("")
-        for (let i = 0; i < displayedLines.length; i++) {
-            const line = displayedLines[i]
-            const lineNo = firstDisplayedLine + i
-            errorLines.push(lineNo.toString().padStart(lastLineDigits, ' ') + "  " + line);
-            if (lineNo === token.line) {
-                errorLines.push("".padStart(lastLineDigits + token.col + 1, " ") + "^")
+        rules.push(options);
+        const pat = RegexLib.Source(options.when);
+        const regexp = new RegExp(pat)
+        if (regexp.test("")) {
+            throw new Error("RegExp matches empty string: " + regexp)
+        }
+
+        if (RegexLib.HasGroups(pat)) {
+            throw new Error("RegExp has capture groups: " + regexp + "\nUse (?: … ) instead")
+        }
+
+        subexpressions.push(RegexLib.Capture(pat))
+    }
+
+    let flags = !state.unmatched ? 'ym' : 'gm';
+    if (isUnicode === true)
+        flags += "u"
+    if (isCI === true)
+        flags += "i"
+    return new RegExp(RegexLib.Join(subexpressions), flags);
+}
+
+export function NormalizeStates(states: StateDefinition[], start: string) {
+
+    const statemap: { [key: string]: StateDefinition } = Object.create(null);
+    const resolved = new Set<string>();
+    const resolving = new Set<string>();
+    const chain = new Set<string>();
+
+    start = start || states[0].name;
+
+    for (const state of states) {
+        statemap[state.name] = state;
+    }
+
+    ResolveRuleImports(start, statemap, resolved, resolving, chain);
+    for (const key in statemap) {
+        if (!resolved.has(key)) {
+            delete statemap[key];
+        }
+    }
+    return statemap;
+}
+
+export function CompileStates(states: StateDefinition[], start: string): TokenQueue {
+    const statemap = NormalizeStates(states, start);
+
+    const map = Object.create(null);
+    for (const key in statemap) {
+        map[key] = {
+            regexp: CompileRegExp(statemap[key] as ResolvedStateDefinition),
+            rules: statemap[key].rules,
+            unmatched: statemap[key].unmatched ? { type: statemap[key].unmatched } as MatchRule : null
+        };
+    }
+
+    return new TokenQueue(new StatefulLexer(map, start));
+}
+
+function ResolveRuleImports(name: string, states: { [key: string]: StateDefinition }, resolved: Set<string>, resolving: Set<string>, chain: Set<string>) {
+    if (chain.has(name))
+        throw new Error(`Can not resolve circular import of ${name}`);
+    if (!states[name])
+        throw new Error(`Can not import unknown state ${name}`);
+    if (resolved.has(name) || resolving.has(name))
+        return;
+    const state = states[name];
+    const rules = new UniqueRules();
+    chain.add(name);
+    resolving.add(name);
+    for (let i = 0; i < state.rules.length; i++) {
+        const rule = state.rules[i];
+        if ("import" in rule) {
+            for (const ref of rule.import) {
+                ResolveRuleImports(ref, states, resolved, resolving, chain);
+                rules.push(...states[ref].rules as MatchRule[]);
+            }
+        } else {
+            rules.push(rule);
+            if ("set" in rule && !resolving.has(rule.set)) {
+                ResolveRuleImports(rule.set, states, resolved, resolving, new Set());
+            }
+            if ("goto" in rule && !resolving.has(rule.goto)) {
+                ResolveRuleImports(rule.goto, states, resolved, resolving, new Set());
             }
         }
-        return errorLines.join("\n")
     }
+    state.rules = rules.rules;
+    chain.delete(name);
+    resolved.add(name);
+}
 
-    clone() {
-        return new StatefulLexer(this.states, this.state)
-    }
+class UniqueRules {
+    private regexps = new Set<string>();
+    private strings = new Set<string>();
+    rules: MatchRule[] = [];
 
-    [Symbol.iterator]() {
-        return new LexerIterator(this)
-    }
-
-
-    private token(group: LexerRule, text, offset) {
-        // count line breaks
-        let lineBreaks = 0
-        let nl = 0;
-        if (group.lineBreaks) {
-            const matchNL = /\n/g
-            nl = 1
-            if (text === '\n') {
-                lineBreaks = 1
+    push(...rules: MatchRule[]) {
+        for (const rule of rules) {
+            if (RegexLib.IsRegex(rule.when)) {
+                if (!this.regexps.has((rule.when as RegExp).source)) {
+                    this.rules.push(rule);
+                }
             } else {
-                while (matchNL.exec(text)) {
-                    lineBreaks++;
-                    nl = matchNL.lastIndex
+                if (!this.strings.has(rule.when as string)) {
+                    this.rules.push(rule);
                 }
             }
         }
-
-        const token = {
-            type: (typeof group.type === 'function' && group.type(text)) || group.defaultType,
-            value: typeof group.value === 'function' ? group.value(text) : text,
-            text: text,
-            toString() {
-                return this.value;
-            },
-            offset: offset,
-            lineBreaks: lineBreaks,
-            line: this.line,
-            col: this.col,
-        }
-        // nb. adding more props to token object will make V8 sad!
-
-        const size = text.length
-        this.index += size
-        this.line += lineBreaks
-        if (lineBreaks !== 0) {
-            this.col = size - nl + 1
-        } else {
-            this.col += size
-        }
-
-        // throw, if no rule with {error: true}
-        if (group.shouldThrow) {
-            const err = new Error(this.formatError(token, "invalid syntax"))
-            throw err;
-        }
-
-        if (group.pop)
-            this.pop()
-        else if (group.push)
-            this.push(group.push)
-        else if (group.next)
-            this.setState(group.next)
-
-        return token;
     }
 
-    private getGroup(match): LexerRule {
-        const groupCount = this.groups.length
-        for (let i = 0; i < groupCount; i++) {
-            if (match[i + 1] !== undefined) {
-                return this.groups[i]
-            }
-        }
-        throw new Error('Cannot find token type for matched text')
-    }
 }
 
+interface StateDefinition {
+    name: string;
+    unmatched?: string;
+    default?: string;
+    rules: (ImportRule | MatchRule)[];
+}
+interface ImportRule {
+    import: string[]
+}
+interface MatchRule {
+    when: string | RegExp
+    type?: string;
+    pop?: number | 'all';
+    inset?: number;
+    goto?: string;
+    set?: string;
+}
+
+interface ResolvedStateDefinition {
+    name: string;
+    unmatched?: string;
+    rules: MatchRule[];
+}
+
+interface CompiledStateDefinition {
+    rules: MatchRule[];
+    regexp: RegExp;
+    unmatched?: MatchRule;
+}
+
+interface LexerConfig {
+    config: {}
+    states: StateDefinition[]
+}

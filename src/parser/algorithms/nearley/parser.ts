@@ -1,8 +1,8 @@
 import { Column } from "./column";
 import { Dictionary, Lexer, LexerState, ParserAlgorithm, PrecompiledGrammar, Rule } from "../../../typings";
 import { ParserErrorService } from "./error-reporting";
-import { LegacyLexerAdapter } from "../../../lexers/legacy-adapter";
 import { BasicLexer } from "../../../lexers/basic-lexer";
+import { TokenQueue } from "../../../lexers/token-queue";
 
 export interface ParserOptions {
     keepHistory?: boolean;
@@ -17,7 +17,7 @@ export class NearleyParser implements ParserAlgorithm {
 
     rules: Rule[];
     start: string;
-    lexer: Lexer;
+    lexer: TokenQueue;
     lexerState: LexerState;
     table: Column[];
     results: any;
@@ -27,7 +27,6 @@ export class NearleyParser implements ParserAlgorithm {
     constructor({ rules, start, lexer, map }: PrecompiledGrammar, options: ParserOptions = {}) {
         this.rules = rules;
         this.start = start || this.rules[0].name;
-        this.lexer = lexer;
         if (!map) {
             for (const rule of rules) {
                 if (!this.ruleMap[rule.name])
@@ -38,9 +37,8 @@ export class NearleyParser implements ParserAlgorithm {
         }
         this.keepHistory = !!(options?.keepHistory);
         this.errorService = new ParserErrorService(this);
-        this.lexer = options?.lexer || this.lexer || new BasicLexer();
-        if (!this.lexer.restore)
-            this.lexer = new LegacyLexerAdapter(this.lexer as any);
+        this.lexer = new TokenQueue(options?.lexer || lexer || new BasicLexer());
+
         const column = new Column(this.ruleMap, 0);
         this.table = [column];
 

@@ -82,7 +82,7 @@ function convertToken(token) {
     };
 }
 
-function convertTokenId(data) {
+function convertTokenId({data}) {
     return convertToken(data[0]);
 }
 
@@ -95,23 +95,23 @@ input -> top_level_statements {% id %}
 top_level_statements
     ->  top_level_statement
         {%
-            d => [d[0]]
+            ({data}) => [data[0]]
         %}
     |  top_level_statement _ "\n" _ top_level_statements
         {%
-            d => [
-                d[0],
-                ...d[4]
+            ({data}) => [
+                data[0],
+                ...data[4]
             ]
         %}
     # below 2 sub-rules handle blank lines
     |  _ "\n" top_level_statements
         {%
-            d => d[2]
+            ({data}) => data[2]
         %}
     |  _
         {%
-            d => []
+            ({data}) => []
         %}
 
 top_level_statement
@@ -122,44 +122,44 @@ top_level_statement
 fun_definition
     -> "fun" __ identifier _ "(" _ parameter_list _ ")" _ code_block
         {%
-            d => ({
+            ({data}) => ({
                 type: "fun_definition",
-                name: d[2],
-                parameters: d[6],
-                body: d[10],
-                start: tokenStart(d[0]),
-                end: d[10].end
+                name: data[2],
+                parameters: data[6],
+                body: data[10],
+                start: tokenStart(data[0]),
+                end: data[10].end
             })
         %}
 
 proc_definition
     -> "proc" __ identifier _ "(" _ parameter_list _ ")" _ code_block
         {%
-            d => ({
+            ({data}) => ({
                 type: "proc_definition",
-                name: d[2],
-                parameters: d[6],
-                body: d[10],
-                start: tokenStart(d[0]),
-                end: d[10].end
+                name: data[2],
+                parameters: data[6],
+                body: data[10],
+                start: tokenStart(data[0]),
+                end: data[10].end
             })
         %}
 
 parameter_list
     -> null        {% () => [] %}
-    | identifier   {% d => [d[0]] %}
+    | identifier   {% ({data}) => [data[0]] %}
     | identifier _ "," _ parameter_list
         {%
-            d => [d[0], ...d[4]]
+            ({data}) => [data[0], ...data[4]]
         %}
 
 code_block -> "[" executable_statements "]"
     {%
-        (d) => ({
+        ({data}) => ({
             type: "code_block",
-            statements: d[1],
-            start: tokenStart(d[0]),
-            end: tokenEnd(d[2])
+            statements: data[1],
+            start: tokenStart(data[0]),
+            end: tokenEnd(data[2])
         })
     %}
 
@@ -167,12 +167,12 @@ executable_statements
     -> _
         {% () => [] %}
     |  _ "\n" executable_statements
-        {% (d) => d[2] %}
+        {% ({data}) => data[2] %}
     |  _ executable_statement _
-        {% d => [d[1]] %}
+        {% ({data}) => [data[1]] %}
     |  _ executable_statement _ "\n" executable_statements
         {%
-            d => [d[1], ...d[4]]
+            ({data}) => [data[1], ...data[4]]
         %}
 
 executable_statement
@@ -188,23 +188,23 @@ executable_statement
 return_statement
    -> "return" __ expression
        {%
-           d => ({
+           ({data}) => ({
                type: "return_statement",
-               value: d[2],
-               start: tokenStart(d[0]),
-               end: d[2].end
+               value: data[2],
+               start: tokenStart(data[0]),
+               end: data[2].end
            })
        %}
 
 var_assignment
     -> identifier _ "=" _ expression
         {%
-            d => ({
+            ({data}) => ({
                 type: "var_assignment",
-                var_name: d[0],
-                value: d[4],
-                start: d[0].start,
-                end: d[4].end
+                var_name: data[0],
+                value: data[4],
+                start: data[0].start,
+                end: data[4].end
             })
         %}
 
@@ -213,107 +213,107 @@ call_statement -> call_expression  {% id %}
 call_expression
     -> identifier _ "(" argument_list ")"
         {%
-            d => ({
+            ({data}) => ({
                 type: "call_expression",
-                fun_name: d[0],
-                arguments: d[3],
-                start: d[0].start,
-                end: tokenEnd(d[4])
+                fun_name: data[0],
+                arguments: data[3],
+                start: data[0].start,
+                end: tokenEnd(data[4])
             })
         %}
 
 indexed_access
     -> unary_expression _ "[" _ expression _ "]"
         {%
-            d => ({
+            ({data}) => ({
                 type: "indexed_access",
-                subject: d[0],
-                index: d[4],
-                start: d[0].start,
-                end: tokenEnd(d[6])
+                subject: data[0],
+                index: data[4],
+                start: data[0].start,
+                end: tokenEnd(data[6])
             })
         %}
 
 indexed_assignment
     -> unary_expression _ "[" _ expression _ "]" _ "=" _ expression
         {%
-            d => ({
+            ({data}) => ({
                 type: "indexed_assignment",
-                subject: d[0],
-                index: d[4],
-                value: d[10],
-                start: d[0].start,
-                end: d[10].end
+                subject: data[0],
+                index: data[4],
+                value: data[10],
+                start: data[0].start,
+                end: data[10].end
             })
         %}
 
 while_loop
     -> "while" __ expression __ code_block
         {%
-            d => ({
+            ({data}) => ({
                 type: "while_loop",
-                condition: d[2],
-                body: d[4],
-                start: tokenStart(d[0]),
-                end: d[4].end
+                condition: data[2],
+                body: data[4],
+                start: tokenStart(data[0]),
+                end: data[4].end
             })
         %}
 
 if_statement
     -> "if" __ expression __ code_block
         {%
-            d => ({
+            ({data}) => ({
                 type: "if_statement",
-                condition: d[2],
-                consequent: d[4],
-                start: tokenStart(d[0]),
-                end: d[4].end
+                condition: data[2],
+                consequent: data[4],
+                start: tokenStart(data[0]),
+                end: data[4].end
             })
         %}
     |  "if" __ expression _ code_block _
        "else" __ code_block
         {%
-            d => ({
+            ({data}) => ({
                 type: "if_statement",
-                condition: d[2],
-                consequent: d[4],
-                alternate: d[8],
-                start: tokenStart(d[0]),
-                end: d[8].end
+                condition: data[2],
+                consequent: data[4],
+                alternate: data[8],
+                start: tokenStart(data[0]),
+                end: data[8].end
             })
         %}
     |  "if" __ expression _ code_block _
        "else" __ if_statement
        {%
-            d => ({
+            ({data}) => ({
                 type: "if_statement",
-                condition: d[2],
-                consequent: d[4],
-                alternate: d[8],
-                start: tokenStart(d[0]),
-                end: d[8].end
+                condition: data[2],
+                consequent: data[4],
+                alternate: data[8],
+                start: tokenStart(data[0]),
+                end: data[8].end
             })
        %}
 
 for_loop
     -> "for" __ identifier __ "in" __ expression _ code_block
         {%
-            d => ({
+            ({data}) => ({
                 type: "for_loop",
-                loop_variable: d[2],
-                iterable: d[6],
-                body: d[8],
-                start: tokenStart(d[0]),
-                end: d[8].end
+                loop_variable: data[2],
+                iterable: data[6],
+                body: data[8],
+                start: tokenStart(data[0]),
+                end: data[8].end
             })
         %}
 
 argument_list
     -> null {% () => [] %}
-    |  _ expression _  {% d => [d[1]] %}
+    |  _ expression _  {% ({data}) => [data[1]] %}
     |  _ expression _ "," argument_list
         {%
-            d => [d[1], ...d[4]]
+            ({data}) => [data[1], ...data[4]]
         %}
 
 expression -> boolean_expression         {% id %}
@@ -322,13 +322,13 @@ boolean_expression
     -> comparison_expression     {% id %}
     |  comparison_expression _ boolean_operator _ boolean_expression
         {%
-            d => ({
+            ({data}) => ({
                 type: "binary_operation",
-                operator: convertToken(d[2]),
-                left: d[0],
-                right: d[4],
-                start: d[0].start,
-                end: d[4].end
+                operator: convertToken(data[2]),
+                left: data[0],
+                right: data[4],
+                start: data[0].start,
+                end: data[4].end
             })
         %}
 
@@ -340,13 +340,13 @@ comparison_expression
     -> additive_expression    {% id %}
     |  additive_expression _ comparison_operator _ comparison_expression
         {%
-            d => ({
+            ({data}) => ({
                 type: "binary_operation",
-                operator: d[2],
-                left: d[0],
-                right: d[4],
-                start: d[0].start,
-                end: d[4].end
+                operator: data[2],
+                left: data[0],
+                right: data[4],
+                start: data[0].start,
+                end: data[4].end
             })
         %}
 
@@ -361,13 +361,13 @@ additive_expression
     -> multiplicative_expression    {% id %}
     |  multiplicative_expression _ [+-] _ additive_expression
         {%
-            d => ({
+            ({data}) => ({
                 type: "binary_operation",
-                operator: convertToken(d[2]),
-                left: d[0],
-                right: d[4],
-                start: d[0].start,
-                end: d[4].end
+                operator: convertToken(data[2]),
+                left: data[0],
+                right: data[4],
+                start: data[0].start,
+                end: data[4].end
             })
         %}
 
@@ -375,13 +375,13 @@ multiplicative_expression
     -> unary_expression     {% id %}
     |  unary_expression _ [*/%] _ multiplicative_expression
         {%
-            d => ({
+            ({data}) => ({
                 type: "binary_operation",
-                operator: convertToken(d[2]),
-                left: d[0],
-                right: d[4],
-                start: d[0].start,
-                end: d[4].end
+                operator: convertToken(data[2]),
+                left: data[0],
+                right: data[4],
+                start: data[0].start,
+                end: data[4].end
             })
         %}
 
@@ -389,11 +389,11 @@ unary_expression
     -> number               {% id %}
     |  identifier
         {%
-            d => ({
+            ({data}) => ({
                 type: "var_reference",
-                var_name: d[0],
-                start: d[0].start,
-                end: d[0].end
+                var_name: data[0],
+                start: data[0].start,
+                end: data[0].end
             })
         %}
     |  call_expression      {% id %}
@@ -411,11 +411,11 @@ unary_expression
 list_literal
     -> "[" list_items "]"
         {%
-            d => ({
+            ({data}) => ({
                 type: "list_literal",
-                items: d[1],
-                start: tokenStart(d[0]),
-                end: tokenEnd(d[2])
+                items: data[1],
+                start: tokenStart(data[0]),
+                end: tokenEnd(data[2])
             })
         %}
 
@@ -423,23 +423,23 @@ list_items
     -> null
         {% () => [] %}
     |  _ml expression _ml
-        {% d => [d[1]] %}
+        {% ({data}) => [data[1]] %}
     |  _ml expression _ml "," list_items
         {%
-            d => [
-                d[1],
-                ...d[4]
+            ({data}) => [
+                data[1],
+                ...data[4]
             ]
         %}
 
 dictionary_literal
     -> "{" dictionary_entries "}"
         {%
-            d => ({
+            ({data}) => ({
                 type: "dictionary_literal",
-                entries: d[1],
-                start: tokenStart(d[0]),
-                end: tokenEnd(d[2])
+                entries: data[1],
+                start: tokenStart(data[0]),
+                end: tokenEnd(data[2])
             })
         %}
 
@@ -447,48 +447,48 @@ dictionary_entries
     -> null  {% () => [] %}
     |  _ml dictionary_entry _ml
         {%
-            d => [d[1]]
+            ({data}) => [data[1]]
         %}
     |  _ml dictionary_entry _ml "," dictionary_entries
         {%
-            d => [d[1], ...d[4]]
+            ({data}) => [data[1], ...data[4]]
         %}
 
 dictionary_entry
     -> identifier _ml ":" _ml expression
         {%
-            d => [d[0], d[4]]
+            ({data}) => [data[0], data[4]]
         %}
 
 boolean_literal
     -> "true"
         {%
-            d => ({
+            ({data}) => ({
                 type: "boolean_literal",
                 value: true,
-                start: tokenStart(d[0]),
-                end: tokenEnd(d[0])
+                start: tokenStart(data[0]),
+                end: tokenEnd(data[0])
             })
         %}
     |  "false"
         {%
-            d => ({
+            ({data}) => ({
                 type: "boolean_literal",
                 value: false,
-                start: tokenStart(d[0]),
-                end: tokenEnd(d[0])
+                start: tokenStart(data[0]),
+                end: tokenEnd(data[0])
             })
         %}
 
 fun_expression
     -> "fun" _ "(" _ parameter_list _ ")" _ code_block
         {%
-            d => ({
+            ({data}) => ({
                 type: "fun_expression",
-                parameters: d[4],
-                body: d[8],
-                start: tokenStart(d[0]),
-                end: d[8].end
+                parameters: data[4],
+                body: data[8],
+                start: tokenStart(data[0]),
+                end: data[8].end
             })
         %}
 

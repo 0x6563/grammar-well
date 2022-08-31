@@ -1,10 +1,10 @@
 import { serializeRules } from "./util";
 
 export const JavascriptPostProcessors = {
-    "joiner": "function joiner(d) {return d.join('');}",
-    "arrconcat": "function arrconcat(d) {return [d[0]].concat(d[1]);}",
-    "arrpush": "function arrpush(d) {return d[0].concat([d[1]]);}",
-    "nuller": "function(d) {return null;}",
+    "joiner": "function joiner({data}) {return data.join('');}",
+    "arrconcat": "function arrconcat({data}) {return [data[0]].concat(data[1]);}",
+    "arrpush": "function arrpush({data}) {return data[0].concat([data[1]]);}",
+    "nuller": "function({data}) {return null;}",
     "id": "id"
 }
 

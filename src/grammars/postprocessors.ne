@@ -6,8 +6,8 @@
 // Bypasses TS6133. Allow declared but unused functions.
 // @ts-ignore
 function nth(n) {
-    return function(d) {
-        return d[n];
+    return function(({data})) {
+        return data[n];
     };
 }
 %}
@@ -17,10 +17,10 @@ function nth(n) {
 // Bypasses TS6133. Allow declared but unused functions.
 // @ts-ignore
 function $(o) {
-    return function(d) {
+    return function({data}) {
         var ret = {};
         Object.keys(o).forEach(function(k) {
-            ret[k] = d[o[k]];
+            ret[k] = data[o[k]];
         });
         return ret;
     };
@@ -30,7 +30,7 @@ function $(o) {
 # A separated list of elements.
 
 delimited[el, delim] -> $el ($delim $el {% nth(1) %}):* {%
-    function(d) {
-        return [d[0]].concat(d[1]);
+    function({data}) {
+        return [data[0]].concat(data[1]);
     }
 %}

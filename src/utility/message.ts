@@ -1,13 +1,14 @@
-import { Lexer, RuleSymbol } from "../typings";
+import { TokenQueue } from "../lexers/token-queue";
+import { RuleSymbol } from "../typings";
 
 export class Message {
 
-    static LexerTokenError(lexer: Lexer) {
+    static LexerTokenError(lexer: TokenQueue) {
         let i = 0;
         let token;
         let string = lexer.peek(i).value;
         let lines = 0;
-        const { line, column, index } = lexer.state;
+        const { line, column, offset } = lexer;
 
         while (token = lexer.peek(--i)) {
             if (token.value == '\n') {
@@ -25,7 +26,7 @@ export class Message {
         string += '\n' + '^'.padStart(pad - 1);
         if (typeof column != 'undefined' && typeof line != 'undefined')
             return `Syntax error at line ${line + 1} col ${column + 1}:\n\n${string}\n`;
-        return `Syntax error at index ${index}:\n\n${string}\n`;
+        return `Syntax error at index ${offset}:\n\n${string}\n`;
     }
 
     static GetSymbolDisplay(symbol: RuleSymbol, short?: boolean, error?: boolean) {

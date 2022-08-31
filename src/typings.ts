@@ -22,7 +22,7 @@ export type PostProcessorResult = ExpressionDefinition
 
     | TokenLiteral
     | SubExpression
-    | LexerToken
+    | LexerTokenMatch
     | EBNFModified
     | MixIn
     | null;
@@ -52,13 +52,13 @@ export interface Expression {
     tokens: ExpressionToken[];
     postprocess?: string | BuiltInPostProcessor;
 }
-export type ExpressionToken = string | MixIn | MacroCall | SubExpression | LexerToken | EBNFModified | TokenLiteral;
+export type ExpressionToken = string | MixIn | MacroCall | SubExpression | LexerTokenMatch | EBNFModified | TokenLiteral;
 
 export interface MacroCall {
     macrocall: string;
     args: ExpressionToken[];
 }
-export interface LexerToken {
+export interface LexerTokenMatch {
     token: string;
 }
 export interface MixIn {
@@ -94,7 +94,7 @@ export type RuleDefinition = (JavascriptDefinition | IncludeDefinition | MacroDe
 export type RuleDefinitionList = (JavascriptDefinition | IncludeDefinition | MacroDefinition | ConfigDefinition | ExpressionDefinition)[];
 
 
-export type RuleSymbol = string | RegExp | RuleSymbolToken | RuleSymbolLexerToken | LexerToken | RuleSymbolTestable;
+export type RuleSymbol = string | RegExp | RuleSymbolToken | RuleSymbolLexerToken | LexerTokenMatch | RuleSymbolTestable;
 
 interface RuleSymbolToken {
     literal: any;
@@ -139,33 +139,29 @@ export interface PrecompiledGrammar {
     map?: { [key: string]: Rule[] };
 }
 
-
+export interface LexerState {
+    historyIndex: number;
+    offset: number;
+}
 
 export interface Lexer {
-    readonly line?: number;
-    readonly column?: number;
-    readonly index: number;
-    readonly current: any;
-    readonly state: LexerState;
-
-    feed(chunk: string, flush?: boolean): void;
-    flush(): void;
-    reset(chunk?: string): void;
-    restore(state: LexerState): void;
-    next(): any;
-    previous(): any;
-    peek(offset: number): any;
+    next(): LexerToken | undefined;
+    feed(chunk?: string, state?: ReturnType<Lexer['state']>): void;
+    state(): any;
+    flush?(): void;
 }
 
-export interface LexerState {
+export interface LexerToken {
+    type?: string | undefined;
+    value: string;
+    offset: number;
+    line: number;
+    column: number;
+}
+
+export interface LexerStatus {
     index: number;
-    indexOffset: number;
-    line?: number;
-    lineOffset?: number;
-    column?: number;
-}
-
-export interface LexerHistory {
-    token: any;
-    state: LexerState;
+    line: number;
+    column: number;
+    state: string;
 }

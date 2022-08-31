@@ -2,9 +2,9 @@ import { GeneratorState } from "../generator";
 import { serializeRules } from "./util";
 
 const TypescriptPostProcessors = {
-    "joiner": "(d) => d.join('')",
-    "arrconcat": "(d) => [d[0]].concat(d[1])",
-    "arrpush": "(d) => d[0].concat([d[1]])",
+    "joiner": "({data}) => data.join('')",
+    "arrconcat": "({data}) => [data[0]].concat(data[1])",
+    "arrpush": "({data}) => data[0].concat([data[1]])",
     "nuller": "() => null",
     "id": "id"
 };

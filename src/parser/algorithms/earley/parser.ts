@@ -1,7 +1,7 @@
 import { Column } from "./column";
 import { Dictionary, Lexer, LexerState, ParserAlgorithm, PrecompiledGrammar, Rule } from "../../../typings";
 import { ParserErrorService } from "./error-reporting";
-import { LegacyLexerAdapter } from "../../../lexers/legacy-adapter";
+import { TokenQueue } from "../../../lexers/token-queue";
 import { BasicLexer } from "../../../lexers/basic-lexer";
 
 export interface ParserOptions {
@@ -16,7 +16,7 @@ export class EarleyParser implements ParserAlgorithm {
     current: number = 0;
     rules: Rule[];
     start: string;
-    lexer: Lexer;
+    lexer: TokenQueue;
     lexerState: LexerState;
     table: Column[];
     results: any;
@@ -26,7 +26,6 @@ export class EarleyParser implements ParserAlgorithm {
     constructor({ rules, start, lexer, map }: PrecompiledGrammar, options: ParserOptions = {}) {
         this.rules = rules;
         this.start = start || this.rules[0].name;
-        this.lexer = lexer;
         if (!map) {
             for (const rule of rules) {
                 if (!this.ruleMap[rule.name])
@@ -37,9 +36,7 @@ export class EarleyParser implements ParserAlgorithm {
         }
         this.keepHistory = !!(options?.keepHistory);
         this.errorService = new ParserErrorService(this);
-        this.lexer = options?.lexer || this.lexer || new BasicLexer();
-        if (!this.lexer.restore)
-            this.lexer = new LegacyLexerAdapter(this.lexer as any);
+        this.lexer = new TokenQueue(options?.lexer || lexer || new BasicLexer());
         const column = new Column(this.ruleMap, 0);
         this.table = [column];
 
@@ -60,9 +57,10 @@ export class EarleyParser implements ParserAlgorithm {
 
     feed(chunk: string) {
         this.lexer.feed(chunk);
-        let token, column;
+        let column;
+        let token = this.next();
 
-        while (token = this.next()) {
+        while (token != undefined) {
             column = this.table[this.current];
 
             if (!this.keepHistory) {
@@ -75,8 +73,8 @@ export class EarleyParser implements ParserAlgorithm {
             this.table.push(nextColumn);
 
             // Advance all tokens that expect the symbol
-            const literal = token.text !== undefined ? token.text : token.value;
-            const data = this.lexer.constructor === BasicLexer ? token.value : token;
+            const literal = token.value;
+            const data = token.value;
             nextColumn.data = literal;
             const { scannable } = column;
             for (let w = scannable.length; w--;) {
@@ -99,8 +97,10 @@ export class EarleyParser implements ParserAlgorithm {
             if (this.keepHistory) {
                 column.lexerState = this.lexer.state;
             }
-
+            token = this.next();
+            console.log(token);
         }
+
 
         if (column) {
             this.lexerState = this.lexer.state;
@@ -117,6 +117,7 @@ export class EarleyParser implements ParserAlgorithm {
     }
 
     restore(column: Column) {
+        console.log('restore', column)
         const index = column.index;
         this.current = index;
         this.table[index] = column;
