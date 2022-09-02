@@ -1,7 +1,7 @@
 grammar {{
-    dqstring -> "\"" dstrchar:* "\"" {{ $1.join("") }}
-    sqstring -> "'" sstrchar:* "'" {{ $1.join("") }}
-    btstring -> "`" [^`]:* "`" {{ $1.join("") }}
+    dqstring -> "\"" dstrchar* "\"" {{ $1.join("") }}
+    sqstring -> "'" sstrchar* "'" {{ $1.join("") }}
+    btstring -> "`" [^`]* "`" {{ $1.join("") }}
 
     dstrchar -> [^\\"\n] {{ $0 }}
         | "\\" strescape {{ JSON.parse("\""+data.join("")+"\"") }}

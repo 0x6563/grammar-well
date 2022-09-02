@@ -5,6 +5,7 @@ import * as number from '../grammars/number.json';
 import * as string from '../grammars/string.json';
 import * as whitespace from '../grammars/whitespace.json';
 import Language from '../grammars/gwell';
+import { writeFileSync } from "fs";
 
 const BuiltInRegistry = {
     number,
@@ -42,6 +43,7 @@ export class Generator {
             return;
         }
         directives = Array.isArray(directives) ? directives : [directives];
+        writeFileSync('./out.json', JSON.stringify(directives, null, 2))
         for (const directive of directives) {
             if ("head" in directive) {
                 if (this.config.noscript)
@@ -218,14 +220,14 @@ export class Generator {
         const id = this.uuid(name + "$ebnf");
         let expr1: Expression = { tokens: [] };
         let expr2: Expression = { tokens: [] };
-        if (token.modifier == ':+') {
+        if (token.modifier == '+') {
             expr1.tokens = [token.ebnf];
             expr2.tokens = [id, token.ebnf];
             expr2.postprocess = { builtin: "arrpush" };
-        } else if (token.modifier == ':*') {
+        } else if (token.modifier == '*') {
             expr2.tokens = [id, token.ebnf];
             expr2.postprocess = { builtin: "arrpush" };
-        } else if (token.modifier == ':?') {
+        } else if (token.modifier == '?') {
             expr1.tokens = [token.ebnf];
             expr1.postprocess = { builtin: "id" };
             expr2.postprocess = { builtin: "nuller" };

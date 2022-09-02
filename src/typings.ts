@@ -66,7 +66,7 @@ export interface LexerTokenMatch {
 }
 export interface EBNFModified {
     ebnf: ExpressionToken;
-    modifier: ":+" | ":*" | ":?";
+    modifier: "+" | "*" | "?";
 }
 
 export interface TokenLiteral {

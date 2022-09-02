@@ -48,7 +48,7 @@ grammar_pre ->
 	- import: ws
 	- when: "{{" type: "L_TEMPLATEL" set: grammar
 grammar ->
-	- import: comment, js_pre, js_templatepre, ws, regex, charclass, l_ebnf_0, l_ebnf_1n, l_ebnf_0n, kv, l_colon, l_comma, l_pipe, l_parenl, l_parenr, l_arrow, l_dsign, l_dash
+	- import: comment, js_pre, js_templatepre, ws, regex, charclass, l_ebnf_01, l_ebnf_1n, l_ebnf_0n, kv, l_colon, l_comma, l_pipe, l_parenl, l_parenr, l_arrow, l_dsign, l_dash
 	- when: "}}" type: "L_TEMPLATER" pop: 1
 lexer_pre ->
 	- import: ws
@@ -105,12 +105,12 @@ ws ->
 	- when: /\s+/ type: "T_WS"
 l_colon ->
 	- when: ":" type: "L_COLON"
-l_ebnf_0 ->
-	- when: ":?" type: "L_EBNF_0"
+l_ebnf_01 ->
+	- when: "?" type: "L_EBNF_01"
 l_ebnf_1n ->
-	- when: ":+" type: "L_EBNF_1N"
+	- when: "+" type: "L_EBNF_1N"
 l_ebnf_0n ->
-	- when: ":*" type: "L_EBNF_0N"
+	- when: "*" type: "L_EBNF_0N"
 l_comma ->
 	- when: "," type: "L_COMMA"
 l_pipe ->
@@ -246,7 +246,7 @@ grammar{{
 
     expr_member ->
         T_WORD {{ $0 }}
-        | T_STRING "i":? {{ $1 ? Insensitive($0) : { literal: $0 } }}
+        | T_STRING "i"? {{ $1 ? Insensitive($0) : { literal: $0 } }}
         | L_DSIGN T_WORD {{ ({ token: $1}) }}
         | L_DSIGN T_STRING {{ ({ token: $1}) }}
         | T_CHARCLASS {{ { regex: $0 } }}
@@ -254,7 +254,7 @@ grammar{{
         | expr_member _ ebnf_modifier {{ ({ 'ebnf': $0, 'modifier': $2 }) }}
 
     ebnf_modifier ->
-        L_EBNF_0 {{ $0[0].value }}
+        L_EBNF_01 {{ $0[0].value }}
         | L_EBNF_1N {{ $0[0].value }}
         | L_EBNF_0N {{ $0[0].value }}
 
@@ -274,10 +274,10 @@ grammar{{
         | T_STRING _ L_COMMA _ string_list  {{ [$0].concat($4) }}
 
     _ ->
-        T_WS:? {{ null }}
+        T_WS? {{ null }}
 
     L_COLON -> $L_COLON
-    L_EBNF_0 -> $L_EBNF_0
+    L_EBNF_01 -> $L_EBNF_01
     L_EBNF_1N -> $L_EBNF_1N
     L_EBNF_0N -> $L_EBNF_0N
     L_COMMA -> $L_COMMA
@@ -306,11 +306,11 @@ grammar{{
     K_BODY -> "body"
     K_HEAD -> "head"
 
-    T_JS -> $L_JSL $T_JSBODY:* $L_JSR  {{ $1.map(v=>v.value).join('') }}
-    T_GRAMMAR_TEMPLATE -> $L_TEMPLATEL _ $T_JSBODY:* _ $L_TEMPLATER {{ $2.map(v=>v.value).join('') }}
+    T_JS -> $L_JSL $T_JSBODY* $L_JSR  {{ $1.map(v=>v.value).join('') }}
+    T_GRAMMAR_TEMPLATE -> $L_TEMPLATEL _ $T_JSBODY* _ $L_TEMPLATER {{ $2.map(v=>v.value).join('') }}
     T_STRING -> $T_STRING {{ JSON.parse($0.value) }}
     T_WORD -> $T_WORD {{ $0.value }}
-    T_REGEX -> $T_REGEX [gmiuy]:* {{ ({ regex: $0.value.slice(1,-1), flags: $1.join('') }) }}
+    T_REGEX -> $T_REGEX [gmiuy]* {{ ({ regex: $0.value.slice(1,-1), flags: $1.join('') }) }}
     T_COMMENT -> $T_COMMENT
     T_CHARCLASS -> $T_CHARCLASS  {{ $0.value }}
     T_INTEGER -> $T_INTEGER  {{ $0.value }}

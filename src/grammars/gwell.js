@@ -101,7 +101,7 @@ function GWLanguage(){
                 { name: "expr_member", symbols: ["T_CHARCLASS"], postprocess: ({data}) => { return  { regex: data[0] } ; }},
                 { name: "expr_member", symbols: ["L_PARENL", "_", "expression_ext", "_", "L_PARENR"], postprocess: ({data}) => { return  ({ 'subexpression': data[2] }) ; }},
                 { name: "expr_member", symbols: ["expr_member", "_", "ebnf_modifier"], postprocess: ({data}) => { return  ({ 'ebnf': data[0], 'modifier': data[2] }) ; }},
-                { name: "ebnf_modifier", symbols: ["L_EBNF_0"], postprocess: ({data}) => { return  data[0][0].value ; }},
+                { name: "ebnf_modifier", symbols: ["L_EBNF_01"], postprocess: ({data}) => { return  data[0][0].value ; }},
                 { name: "ebnf_modifier", symbols: ["L_EBNF_1N"], postprocess: ({data}) => { return  data[0][0].value ; }},
                 { name: "ebnf_modifier", symbols: ["L_EBNF_0N"], postprocess: ({data}) => { return  data[0][0].value ; }},
                 { name: "expr", symbols: ["expr_member"]},
@@ -118,7 +118,7 @@ function GWLanguage(){
                 { name: "_$ebnf$1", symbols: [], postprocess: () => null},
                 { name: "_", symbols: ["_$ebnf$1"], postprocess: ({data}) => { return  null ; }},
                 { name: "L_COLON", symbols: [{ type: "L_COLON"}]},
-                { name: "L_EBNF_0", symbols: [{ type: "L_EBNF_0"}]},
+                { name: "L_EBNF_01", symbols: [{ type: "L_EBNF_01"}]},
                 { name: "L_EBNF_1N", symbols: [{ type: "L_EBNF_1N"}]},
                 { name: "L_EBNF_0N", symbols: [{ type: "L_EBNF_0N"}]},
                 { name: "L_COMMA", symbols: [{ type: "L_COMMA"}]},
@@ -198,7 +198,7 @@ function GWLanguage(){
                 {
                     name: "grammar",
                     rules: [
-                        { import: ["comment","js_pre","js_templatepre","ws","regex","charclass","l_ebnf_0","l_ebnf_1n","l_ebnf_0n","kv","l_colon","l_comma","l_pipe","l_parenl","l_parenr","l_arrow","l_dsign","l_dash"] },
+                        { import: ["comment","js_pre","js_templatepre","ws","regex","charclass","l_ebnf_01","l_ebnf_1n","l_ebnf_0n","kv","l_colon","l_comma","l_pipe","l_parenl","l_parenr","l_arrow","l_dsign","l_dash"] },
                         { when: "}}", type: "L_TEMPLATER", pop: 1 }
                     ]
                 },
@@ -330,21 +330,21 @@ function GWLanguage(){
                     ]
                 },
                 {
-                    name: "l_ebnf_0",
+                    name: "l_ebnf_01",
                     rules: [
-                        { when: ":?", type: "L_EBNF_0" }
+                        { when: "?", type: "L_EBNF_01" }
                     ]
                 },
                 {
                     name: "l_ebnf_1n",
                     rules: [
-                        { when: ":+", type: "L_EBNF_1N" }
+                        { when: "+", type: "L_EBNF_1N" }
                     ]
                 },
                 {
                     name: "l_ebnf_0n",
                     rules: [
-                        { when: ":*", type: "L_EBNF_0N" }
+                        { when: "*", type: "L_EBNF_0N" }
                     ]
                 },
                 {
