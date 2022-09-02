@@ -1,47 +1,72 @@
-import { GeneratorState } from "../generator";
-import { serializeRules } from "./util";
+import { GeneratorState } from "../../typings";
+import { SerializeState } from "./util";
 
-const TypescriptPostProcessors = {
-    "joiner": "({data}) => data.join('')",
-    "arrconcat": "({data}) => [data[0]].concat(data[1])",
-    "arrpush": "({data}) => data[0].concat([data[1]])",
-    "nuller": "() => null",
-    "id": "id"
-};
 
-export function TypescriptFormat(grammar: GeneratorState, exportName: string) {
-    return `// Generated automatically by Grammar-Well, version ${grammar.version} 
+export function TypescriptFormat(state: GeneratorState, exportName: string) {
+    return `// Generated automatically by Grammar-Well, version ${state.version} 
 // https://github.com/0x6563/grammar-well
 
-interface PrecompiledGrammar {
-    lexer?: Lexer;
-    start: string;
-    rules: Rule[];
-    map?: { [key: string]: Rule[] };
+interface LanguageDefinition {
+    lexer?: Lexer | LexerConfig;
+    grammar: {
+        start: string;
+        rules: GrammarRule[];
+    }
 }
 
-
-interface Rule {
-    name: string;
-    symbols: RuleSymbol[];
-    transform?: PostTransform;
+interface Lexer {
+    next(): LexerToken | undefined;
+    feed(chunk?: string, state?: ReturnType<Lexer['state']>): void;
+    state(): any;
+    flush?(): void;
 }
 
-type PostTransform = (payload: PostTransformPayload) => any;
-
-type RuleSymbol = string | RegExp | RuleSymbolToken | RuleSymbolLexerToken | LexerToken | RuleSymbolTestable;
-
-interface PostTransformPayload {
-    data: any[];
-    reference: number;
-    dot: number;
-    name: string;
-    reject: Symbol;
+interface LexerConfig {
+    start?: string
+    states: LexerStateDefinition[];
 }
 
 interface LexerToken {
-    token: string;
+    type?: string;
+    value: string;
+    offset: number;
+    line: number;
+    column: number;
 }
+
+interface LexerStatus {
+    index: number;
+    line: number;
+    column: number;
+    state: string;
+}
+
+interface LexerStateDefinition {
+    name: string;
+    unmatched?: string;
+    default?: string;
+    rules: (LexerStateImportRule | LexerStateMatchRule)[];
+}
+
+interface LexerStateImportRule {
+    import: string[]
+}
+
+interface LexerStateMatchRule {
+    when: string | RegExp
+    type?: string;
+    pop?: number | 'all';
+    inset?: number;
+    goto?: string;
+    set?: string;
+}
+
+interface GrammarRule {
+    name: string;
+    symbols: RuleSymbol[];
+    postprocess?: PostProcessor;
+}
+type RuleSymbol = string | RegExp | RuleSymbolToken | RuleSymbolLexerToken | LexerTokenMatch | RuleSymbolTestable;
 
 interface RuleSymbolToken {
     literal: any;
@@ -53,51 +78,30 @@ interface RuleSymbolTestable {
 
 interface RuleSymbolLexerToken {
     type: string;
-    value: string;
-    text: string;
 }
 
-interface Lexer {
-    readonly line?: number;
-    readonly column?: number;
-    readonly index: number;
-    readonly current: any;
-    readonly state: LexerState;
-
-    feed(chunk: string, flush?: boolean): void;
-    flush(): void;
-    reset(chunk?: string): void;
-    restore(state: LexerState): void;
-    next(): any;
-    previous(): any;
-    peek(offset: number): any;
+interface LexerTokenMatch {
+    token: string;
 }
 
-interface LexerState {
-    index: number;
-    indexOffset: number;
-    line?: number;
-    lineOffset?: number;
-    column?: number;
+type PostProcessor = (payload: PostProcessorPayload) => any;
+
+interface PostProcessorPayload {
+    data: any[];
+    reference: number;
+    dot: number;
+    name: string;
+    reject: Symbol;
 }
 
-${grammar.head.join('\n')}
+${state.head.join('\n')}
 
-function Grammar(): PrecompiledGrammar {
-    
-    // Bypasses TS6133. Allow declared but unused functions.
-    // @ts-ignore
-    function id(d: any): any { return d.data[0]; }
-    ${Array.from(grammar.customTokens).map(function (token) { return "declare var " + token + ": any;\n" }).join("")}
-    ${grammar.body.join('\n')}
-    return {
-        lexer: ${grammar.config.lexer},
-        rules: ${serializeRules(grammar.rules, TypescriptPostProcessors, "  ")},
-        start: ${JSON.stringify(grammar.start)},
-    };
+function ${exportName}(): LanguageDefinition {
+    ${state.body.join('\n')}
+    return ${SerializeState(state, 1)}
 }
 
-export default Grammar;
+export default ${exportName};
 
 `;
 };

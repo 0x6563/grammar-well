@@ -45,7 +45,7 @@ class Compiler {
     import(val) {
         return this.grammarBuilder.import(val);
     }
-    export(format, name = 'grammar') {
+    export(format, name = 'GWLanguage') {
         const grammar = this.grammarBuilder.export();
         const output = format || grammar.config.preprocessor || '_default';
         if (OutputFormats[output]) {

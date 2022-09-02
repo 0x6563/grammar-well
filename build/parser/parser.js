@@ -1,23 +1,21 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Parser = exports.Parse = void 0;
-const parser_1 = require("./algorithms/nearley/parser");
-const parser_2 = require("./algorithms/earley/parser");
+const parser_1 = require("./algorithms/earley/parser");
 const ParserRegistry = {
-    'nearley': parser_1.NearleyParser,
-    'earley': parser_2.EarleyParser
+    'earley': parser_1.EarleyParser
 };
-function Parse(grammar, input, options) {
-    const i = new Parser(grammar, options);
+function Parse(language, input, options) {
+    const i = new Parser(language, options);
     return i.run(input);
 }
 exports.Parse = Parse;
 class Parser {
-    constructor(grammar, options = { algorithm: 'nearley' }) {
-        this.grammar = grammar;
+    constructor(language, options = { algorithm: 'earley' }) {
+        this.language = language;
         this.options = options;
         this.parserClass = ParserRegistry[options.algorithm];
-        this.parser = new this.parserClass(this.grammar, options.parserOptions);
+        this.parser = new this.parserClass(this.language, options.parserOptions);
     }
     get results() {
         return this.parser.results;
@@ -27,7 +25,7 @@ class Parser {
         return this.results;
     }
     run(input) {
-        const parser = new this.parserClass(this.grammar, this.options.parserOptions);
+        const parser = new this.parserClass(this.language, this.options.parserOptions);
         parser.feed(input);
         return parser.results[0];
     }

@@ -1,4 +1,4 @@
-import { Rule } from "../../../typings";
+import { GrammarRule } from "../../../typings";
 import { EarleyParser } from "./parser";
 
 
@@ -9,7 +9,7 @@ export class State {
     right: State | StateToken;
     // a State is a rule at a position from a given starting point in the input stream (reference)
     constructor(
-        public rule: Rule,
+        public rule: GrammarRule,
         public dot: number,
         public reference: number,
         public wantedBy: State[]

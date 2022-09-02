@@ -1,44 +1,28 @@
-import { serializeRules } from "./util";
+import { GeneratorState } from "../../typings";
+import { SerializeState } from "./util";
 
-export const JavascriptPostProcessors = {
-    "joiner": "function joiner({data}) {return data.join('');}",
-    "arrconcat": "function arrconcat({data}) {return [data[0]].concat(data[1]);}",
-    "arrpush": "function arrpush({data}) {return data[0].concat([data[1]]);}",
-    "nuller": "function({data}) {return null;}",
-    "id": "id"
-}
+export function JavascriptOutput(state: GeneratorState, exportName: string) {
+    return `${Compile(state, exportName)}
 
-export function JavascriptOutput(parser, exportName) {
-    return `${Compile(parser)}
-
-if (typeof module !== 'undefined'&& typeof module.exports !== 'undefined') {
-   module.exports = Grammar;
+if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
+    module.exports = ${exportName};
 } else {
-   window.${exportName} = Grammar;
-}
-`;
+    window.${exportName} = ${exportName};
+}`;
 }
 
-export function ESMOutput(parser, exportName) {
-    return `${Compile(parser)}
+export function ESMOutput(state: GeneratorState, exportName: string) {
+    return `${Compile(state, exportName)}
 
-export default Grammar;
-`;
+export default ${exportName};`;
 };
 
-function Compile(parser) {
-    return `// Generated automatically by Grammar-Well, version ${parser.version} 
+function Compile(state: GeneratorState, exportName: string) {
+    return `// Generated automatically by Grammar-Well, version ${state.version} 
 // https://github.com/0x6563/grammar-well
-
-${parser.head.join('\n')}
-
-function Grammar(){
-    function id(x) { return x.data[0]; }
-    ${parser.body.join('\n')}
-    return {
-        lexer: ${parser.config.lexer},
-        rules: ${serializeRules(parser.rules, JavascriptPostProcessors)},
-        start: ${JSON.stringify(parser.start)}
-    }
+${state.head.join('\n')}
+function ${exportName}(){
+    ${state.body.join('\n')}
+    return ${SerializeState(state, 1)}
 }`;
 };

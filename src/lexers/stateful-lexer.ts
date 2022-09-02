@@ -1,8 +1,8 @@
-import { TokenQueue } from "./token-queue";
+import { CompiledStateDefinition, LexerStateMatchRule, ResolvedStateDefinition, LexerStateDefinition, LexerConfig } from "../typings";
 
-class StatefulLexer {
-    private startState: string;
-    private states: { [key: string]: CompiledStateDefinition };
+export class StatefulLexer {
+    private start: string;
+    private states: { [key: string]: CompiledStateDefinition } = Object.create(null);
     private buffer: string;
     private stack: string[];
     private index: number;
@@ -10,13 +10,20 @@ class StatefulLexer {
     private column: number;
     private prefetched?: RegExpExecArray;
     private current: string;
-    private unmatched: MatchRule;
-    private rules: MatchRule[];
+    private unmatched: LexerStateMatchRule;
+    private rules: LexerStateMatchRule[];
     private regexp: RegExp;
 
-    constructor(states: { [key: string]: CompiledStateDefinition }, startState: string) {
-        this.startState = startState;
-        this.states = states;
+    constructor({ states, start }: LexerConfig) {
+        const statemap = ResolveStates(states, start);
+        for (const key in statemap) {
+            this.states[key] = {
+                regexp: CompileRegExp(statemap[key] as ResolvedStateDefinition),
+                rules: statemap[key].rules as LexerStateMatchRule[],
+                unmatched: statemap[key].unmatched ? { type: statemap[key].unmatched } as LexerStateMatchRule : null
+            };
+        }
+        this.start = start;
         this.buffer = '';
         this.stack = [];
         this.feed();
@@ -28,7 +35,7 @@ class StatefulLexer {
         this.line = state ? state.line : 1;
         this.column = state ? state.column : 1;
         this.prefetched = state?.prefetched;
-        this.set(state ? state.state : this.startState);
+        this.set(state ? state.state : this.start);
         this.stack = state && state.stack ? state.stack.slice() : [];
     }
 
@@ -49,7 +56,7 @@ class StatefulLexer {
         }
         const { rule, text, index } = next;
         if (!rule) {
-            throw new Error('No Matching Rule');
+            throw new Error(`No matching rule for ${text}`);
         }
         const token = this.createToken(rule, text, index)
         this.processRule(rule);
@@ -58,10 +65,6 @@ class StatefulLexer {
 
     [Symbol.iterator]() {
         return new LexerIterator(this)
-    }
-
-    flush() {
-
     }
 
     private set(current: string) {
@@ -115,7 +118,7 @@ class StatefulLexer {
         return { index, rule, text }
     }
 
-    private createToken(rule: MatchRule, text: string, offset: number) {
+    private createToken(rule: LexerStateMatchRule, text: string, offset: number) {
         const token = {
             type: rule.type,
             value: text,
@@ -137,7 +140,7 @@ class StatefulLexer {
         return token;
     }
 
-    private processRule(rule: MatchRule) {
+    private processRule(rule: LexerStateMatchRule) {
         if (rule.pop) {
             let i = rule.pop === 'all' ? this.stack.length : rule.pop;
             while (i-- > 0) {
@@ -160,7 +163,7 @@ class StatefulLexer {
         }
     }
 
-    private getGroup(match): MatchRule {
+    private getGroup(match): LexerStateMatchRule {
         for (let i = 0; i < this.rules.length; i++) {
             if (match[i + 1] !== undefined) {
                 return this.rules[i];
@@ -268,9 +271,9 @@ function CompileRegExp(state: ResolvedStateDefinition): RegExp {
     return new RegExp(RegexLib.Join(subexpressions), flags);
 }
 
-export function NormalizeStates(states: StateDefinition[], start: string) {
+export function ResolveStates(states: LexerStateDefinition[], start: string) {
 
-    const statemap: { [key: string]: StateDefinition } = Object.create(null);
+    const statemap: { [key: string]: LexerStateDefinition } = Object.create(null);
     const resolved = new Set<string>();
     const resolving = new Set<string>();
     const chain = new Set<string>();
@@ -290,22 +293,7 @@ export function NormalizeStates(states: StateDefinition[], start: string) {
     return statemap;
 }
 
-export function CompileStates(states: StateDefinition[], start: string): TokenQueue {
-    const statemap = NormalizeStates(states, start);
-
-    const map = Object.create(null);
-    for (const key in statemap) {
-        map[key] = {
-            regexp: CompileRegExp(statemap[key] as ResolvedStateDefinition),
-            rules: statemap[key].rules,
-            unmatched: statemap[key].unmatched ? { type: statemap[key].unmatched } as MatchRule : null
-        };
-    }
-
-    return new TokenQueue(new StatefulLexer(map, start));
-}
-
-function ResolveRuleImports(name: string, states: { [key: string]: StateDefinition }, resolved: Set<string>, resolving: Set<string>, chain: Set<string>) {
+function ResolveRuleImports(name: string, states: { [key: string]: LexerStateDefinition }, resolved: Set<string>, resolving: Set<string>, chain: Set<string>) {
     if (chain.has(name))
         throw new Error(`Can not resolve circular import of ${name}`);
     if (!states[name])
@@ -321,7 +309,7 @@ function ResolveRuleImports(name: string, states: { [key: string]: StateDefiniti
         if ("import" in rule) {
             for (const ref of rule.import) {
                 ResolveRuleImports(ref, states, resolved, resolving, chain);
-                rules.push(...states[ref].rules as MatchRule[]);
+                rules.push(...states[ref].rules as LexerStateMatchRule[]);
             }
         } else {
             rules.push(rule);
@@ -341,9 +329,9 @@ function ResolveRuleImports(name: string, states: { [key: string]: StateDefiniti
 class UniqueRules {
     private regexps = new Set<string>();
     private strings = new Set<string>();
-    rules: MatchRule[] = [];
+    rules: LexerStateMatchRule[] = [];
 
-    push(...rules: MatchRule[]) {
+    push(...rules: LexerStateMatchRule[]) {
         for (const rule of rules) {
             if (RegexLib.IsRegex(rule.when)) {
                 if (!this.regexps.has((rule.when as RegExp).source)) {
@@ -357,39 +345,4 @@ class UniqueRules {
         }
     }
 
-}
-
-interface StateDefinition {
-    name: string;
-    unmatched?: string;
-    default?: string;
-    rules: (ImportRule | MatchRule)[];
-}
-interface ImportRule {
-    import: string[]
-}
-interface MatchRule {
-    when: string | RegExp
-    type?: string;
-    pop?: number | 'all';
-    inset?: number;
-    goto?: string;
-    set?: string;
-}
-
-interface ResolvedStateDefinition {
-    name: string;
-    unmatched?: string;
-    rules: MatchRule[];
-}
-
-interface CompiledStateDefinition {
-    rules: MatchRule[];
-    regexp: RegExp;
-    unmatched?: MatchRule;
-}
-
-interface LexerConfig {
-    config: {}
-    states: StateDefinition[]
 }

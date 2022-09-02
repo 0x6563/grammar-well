@@ -1,6 +1,6 @@
 {
   "name": "grammar-well",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Simple, fast, powerful parser toolkit for JavaScript.",
   "main": "build/index.js",
   "scripts": {

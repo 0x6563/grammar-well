@@ -1,6 +1,5 @@
 /// <reference types="typescript/lib/lib.webworker" />
-
-
+import { ImportResolver } from "../typings";
 export class FileSystemResolver implements ImportResolver {
     private baseDir: string;
     private readFile: (path: string, type: string) => Promise<string>;
@@ -34,14 +33,4 @@ export class BrowserImportResolver implements ImportResolver {
     async body(path: string) {
         return (await fetch(path)).text();
     }
-}
-
-export interface ImportResolver {
-    path(path: string): string;
-    body(path: string): Promise<string>;
-}
-
-
-export interface ImportResolverConstructor {
-    new(basePath: string): ImportResolver;
 }

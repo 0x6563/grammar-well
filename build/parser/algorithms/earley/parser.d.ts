@@ -1,24 +1,25 @@
 import { Column } from "./column";
-import { Dictionary, Lexer, LexerState, ParserAlgorithm, PrecompiledGrammar, Rule } from "../../../typings";
+import { Dictionary, Lexer, LexerConfig, TokenQueueRestorePoint, ParserAlgorithm, LanguageDefinition, GrammarRule } from "../../../typings";
 import { ParserErrorService } from "./error-reporting";
+import { TokenQueue } from "../../../lexers/token-queue";
 export interface ParserOptions {
     keepHistory?: boolean;
-    lexer?: Lexer;
+    lexer?: Lexer | LexerConfig;
 }
 export declare class EarleyParser implements ParserAlgorithm {
     static fail: symbol;
     keepHistory: boolean;
     current: number;
-    rules: Rule[];
+    rules: GrammarRule[];
     start: string;
-    lexer: Lexer;
-    lexerState: LexerState;
+    tokenQueue: TokenQueue;
+    restorePoint: TokenQueueRestorePoint;
     table: Column[];
     results: any;
     errorService: ParserErrorService;
-    ruleMap: Dictionary<Rule[]>;
-    constructor({ rules, start, lexer, map }: PrecompiledGrammar, options?: ParserOptions);
-    next(): any;
+    ruleMap: Dictionary<GrammarRule[]>;
+    constructor({ grammar, lexer }: LanguageDefinition, options?: ParserOptions);
+    next(): import("../../../typings").LexerToken;
     feed(chunk: string): void;
     save(): Column;
     restore(column: Column): void;

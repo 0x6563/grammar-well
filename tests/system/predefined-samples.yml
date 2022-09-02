@@ -97,16 +97,6 @@ Tosh:
         ],
       ]
 
-Fun-Lang:
-  - title: fun-lang memory test (shouldn\'t use excessive memory for error reporting)
-    grammarSource: grammars/fun-lang.ne
-    input: |
-      fun count_smileys(faces) [ 
-      return count(filter(fun (face) [
-        has_eyes = face[0] == ":" #
-      ], faces))
-    errorRegex: Unexpected comment token
-
 JSON:
   - title: JSON 1
     grammarSource: grammars/json.ne

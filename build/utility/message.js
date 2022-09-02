@@ -7,7 +7,7 @@ class Message {
         let token;
         let string = lexer.peek(i).value;
         let lines = 0;
-        const { line, column, index } = lexer.state;
+        const { line, column, offset } = lexer;
         while (token = lexer.peek(--i)) {
             if (token.value == '\n') {
                 lines++;
@@ -23,7 +23,7 @@ class Message {
         string += '\n' + '^'.padStart(pad - 1);
         if (typeof column != 'undefined' && typeof line != 'undefined')
             return `Syntax error at line ${line + 1} col ${column + 1}:\n\n${string}\n`;
-        return `Syntax error at index ${index}:\n\n${string}\n`;
+        return `Syntax error at index ${offset}:\n\n${string}\n`;
     }
     static GetSymbolDisplay(symbol, short, error) {
         if (typeof symbol === 'string') {

@@ -1,8 +1,8 @@
-import { FileSystemResolver, ImportResolver, ImportResolverConstructor } from "./import-resolver";
+import { FileSystemResolver } from "./import-resolver";
 import { Generator } from "./generator";
 import { ESMOutput, JavascriptOutput } from "./outputs/javascript";
 import { TypescriptFormat } from "./outputs/typescript";
-import { RuleDefinition, RuleDefinitionList } from "../typings";
+import { CompileOptions, CompilerState, OutputFormat, LanguageDirective } from "../typings";
 import { JSONFormatter } from "./outputs/json";
 
 const OutputFormats = {
@@ -17,7 +17,7 @@ const OutputFormats = {
     typescript: TypescriptFormat
 }
 
-export async function Compile(rules: string | RuleDefinition | RuleDefinitionList, config: CompileOptions = {}) {
+export async function Compile(rules: string | LanguageDirective | (LanguageDirective[]), config: CompileOptions = {}) {
     const compiler = new Compiler(config);
     await compiler.import(rules);
     return compiler.export(config.format);
@@ -35,15 +35,15 @@ export class Compiler {
     }
 
 
-    import(rule: RuleDefinition): Promise<void>
-    import(rules: RuleDefinitionList): Promise<void>
+    import(rule: LanguageDirective): Promise<void>
+    import(rules: LanguageDirective[]): Promise<void>
     import(source: string): Promise<void>
-    import(source: string | RuleDefinition | RuleDefinitionList): Promise<void>
-    import(val: string | RuleDefinition | RuleDefinitionList): Promise<void> {
+    import(source: string | LanguageDirective | (LanguageDirective[])): Promise<void>
+    import(val: string | LanguageDirective | (LanguageDirective[])): Promise<void> {
         return this.grammarBuilder.import(val as any);
     }
 
-    export<T extends keyof typeof OutputFormats = '_default'>(format: T, name: string = 'grammar'): ReturnType<typeof OutputFormats[OutputFormat<T>]> {
+    export<T extends OutputFormat = '_default'>(format: T, name: string = 'GWLanguage'): ReturnType<typeof OutputFormats[T]> {
         const grammar = this.grammarBuilder.export();
         const output = format || grammar.config.preprocessor || '_default';
         if (OutputFormats[output]) {
@@ -51,20 +51,4 @@ export class Compiler {
         }
         throw new Error("No such preprocessor: " + output)
     };
-}
-
-type OutputFormat<T> = T extends keyof typeof OutputFormats ? T : "_default";
-export interface CompileOptions {
-    version?: string;
-    noscript?: boolean;
-    basedir?: string;
-    resolver?: ImportResolverConstructor;
-    resolverInstance?: ImportResolver;
-    exportName?: string;
-    format?: keyof typeof OutputFormats;
-}
-
-export interface CompilerState {
-    alreadycompiled: Set<string>;
-    resolver: ImportResolver;
 }

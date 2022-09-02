@@ -1,47 +1,31 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ESMOutput = exports.JavascriptOutput = exports.JavascriptPostProcessors = void 0;
+exports.ESMOutput = exports.JavascriptOutput = void 0;
 const util_1 = require("./util");
-exports.JavascriptPostProcessors = {
-    "joiner": "function joiner(d) {return d.join('');}",
-    "arrconcat": "function arrconcat(d) {return [d[0]].concat(d[1]);}",
-    "arrpush": "function arrpush(d) {return d[0].concat([d[1]]);}",
-    "nuller": "function(d) {return null;}",
-    "id": "id"
-};
-function JavascriptOutput(parser, exportName) {
-    return `${Compile(parser)}
+function JavascriptOutput(state, exportName) {
+    return `${Compile(state, exportName)}
 
-if (typeof module !== 'undefined'&& typeof module.exports !== 'undefined') {
-   module.exports = Grammar;
+if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
+    module.exports = ${exportName};
 } else {
-   window.${exportName} = Grammar;
-}
-`;
+    window.${exportName} = ${exportName};
+}`;
 }
 exports.JavascriptOutput = JavascriptOutput;
-function ESMOutput(parser, exportName) {
-    return `${Compile(parser)}
+function ESMOutput(state, exportName) {
+    return `${Compile(state, exportName)}
 
-export default Grammar;
-`;
+export default ${exportName};`;
 }
 exports.ESMOutput = ESMOutput;
 ;
-function Compile(parser) {
-    return `// Generated automatically by Grammar-Well, version ${parser.version} 
+function Compile(state, exportName) {
+    return `// Generated automatically by Grammar-Well, version ${state.version} 
 // https://github.com/0x6563/grammar-well
-
-${parser.head.join('\n')}
-
-function Grammar(){
-    function id(x) { return x[0]; }
-    ${parser.body.join('\n')}
-    return {
-        lexer: ${parser.config.lexer},
-        rules: ${(0, util_1.serializeRules)(parser.rules, exports.JavascriptPostProcessors)},
-        start: ${JSON.stringify(parser.start)}
-    }
+${state.head.join('\n')}
+function ${exportName}(){
+    ${state.body.join('\n')}
+    return ${(0, util_1.SerializeState)(state, 1)}
 }`;
 }
 ;

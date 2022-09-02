@@ -1,6 +1,6 @@
-import { Rule } from "../../../typings";
+import { GrammarRule } from "../../../typings";
 export declare class State {
-    rule: Rule;
+    rule: GrammarRule;
     dot: number;
     reference: number;
     wantedBy: State[];
@@ -8,7 +8,7 @@ export declare class State {
     data: any;
     left: State;
     right: State | StateToken;
-    constructor(rule: Rule, dot: number, reference: number, wantedBy: State[]);
+    constructor(rule: GrammarRule, dot: number, reference: number, wantedBy: State[]);
     nextState(child: State | StateToken): State;
     build(): any[];
     finish(): void;

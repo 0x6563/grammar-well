@@ -1,4 +1,4 @@
-import { Lexer, LexerState, LexerToken } from '../typings';
+import { Lexer, TQRestorePoint, LexerToken } from '../typings';
 
 export class TokenQueue {
     private history: LexerToken[] = [];
@@ -12,7 +12,7 @@ export class TokenQueue {
 
     private get active() { return this.history[this.$historyIndex]; }
 
-    get state(): LexerState {
+    get state(): TQRestorePoint {
         return { historyIndex: this.$historyIndex, offset: this.offset };
     }
 
@@ -24,7 +24,7 @@ export class TokenQueue {
         this.$historyIndex = -1;
     }
 
-    restore(state: LexerState) {
+    restore(state: TQRestorePoint) {
         if (this.history[state.historyIndex].offset != state.offset) {
             return;
         }

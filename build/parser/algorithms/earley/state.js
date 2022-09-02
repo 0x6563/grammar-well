@@ -31,8 +31,8 @@ class State {
         return children;
     }
     finish() {
-        if (this.rule.transform) {
-            this.data = this.rule.transform({
+        if (this.rule.postprocess) {
+            this.data = this.rule.postprocess({
                 data: this.data,
                 reference: this.reference,
                 dot: this.dot,

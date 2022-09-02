@@ -1,65 +1,33 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.serializeRule = exports.serializeSymbol = exports.tabulateString = exports.dedentFunc = exports.serializeRules = void 0;
-function serializeRules(rules, builtinPostprocessors, extraIndent = '') {
-    return '[\n    ' + rules.map(function (rule) {
-        return serializeRule(rule, builtinPostprocessors);
-    }).join(',\n    ') + '\n' + extraIndent + ']';
+exports.SerializeLexerConfig = exports.SerializeGrammar = exports.SerializeState = void 0;
+const PostProcessors = {
+    "joiner": "({data}) => data.join('')",
+    "arrconcat": "({data}) => [data[0]].concat(data[1])",
+    "arrpush": "({data}) => data[0].concat([data[1]])",
+    "nuller": "() => null",
+    "id": "({data}) => data[0]"
+};
+function SerializeState(state, depth = 0) {
+    return `{${NewLine(depth + 1)}grammar: ${SerializeGrammar(state.grammar, depth + 1)},${NewLine(depth + 1)}lexer:${SerializeLexerConfig(state.lexer, depth + 1)}${NewLine(depth)}}`;
 }
-exports.serializeRules = serializeRules;
-function dedentFunc(func) {
-    var lines = func.toString().split(/\n/);
-    if (lines.length === 1) {
-        return [lines[0].replace(/^\s+|\s+$/g, '')];
-    }
-    var indent = null;
-    var tail = lines.slice(1);
-    for (var i = 0; i < tail.length; i++) {
-        var match = /^\s*/.exec(tail[i]);
-        if (match && match[0].length !== tail[i].length) {
-            if (indent === null ||
-                match[0].length < indent.length) {
-                indent = match[0];
-            }
-        }
-    }
-    if (indent === null) {
-        return lines;
-    }
-    return lines.map(function dedent(line) {
-        if (line.slice(0, indent.length) === indent) {
-            return line.slice(indent.length);
-        }
-        return line;
-    });
+exports.SerializeState = SerializeState;
+function SerializeGrammar(grammar, depth = 0) {
+    return `{${NewLine(depth + 1)}start: ${JSON.stringify(grammar.start)},${NewLine(depth + 1)}rules: ${SerializeGrammarRules(grammar.rules, depth + 1)}${NewLine(depth)}}`;
 }
-exports.dedentFunc = dedentFunc;
-function tabulateString(string, indent, options = {}) {
-    var lines;
-    if (Array.isArray(string)) {
-        lines = string;
-    }
-    else {
-        lines = string.toString().split('\n');
-    }
-    var tabulated = lines.map(function addIndent(line, i) {
-        var shouldIndent = true;
-        if (i == 0 && !options.indentFirst) {
-            shouldIndent = false;
-        }
-        if (shouldIndent) {
-            return indent + line;
-        }
-        else {
-            return line;
-        }
-    }).join('\n');
-    return tabulated;
+exports.SerializeGrammar = SerializeGrammar;
+function SerializeGrammarRules(rules, depth = 0) {
+    return `[${rules.map((rule) => NewLine(depth + 1) + SerializeGrammarRule(rule)).join()}${NewLine(depth)}]`;
 }
-exports.tabulateString = tabulateString;
-function serializeSymbol(s) {
-    if (s instanceof RegExp) {
-        return s.toString();
+function Indent(depth) {
+    return ' '.repeat(depth * 4);
+}
+function NewLine(depth) {
+    return '\n' + Indent(depth);
+}
+function SerializeSymbol(s) {
+    if (s.regex) {
+        return `/${s.regex}/${s.flags || ''}`;
     }
     else if (s.token) {
         return s.token;
@@ -68,22 +36,74 @@ function serializeSymbol(s) {
         return JSON.stringify(s);
     }
 }
-exports.serializeSymbol = serializeSymbol;
-function serializeRule(rule, builtinPostprocessors) {
+function SerializeGrammarRule(rule) {
     var ret = '{';
-    ret += '"name": ' + JSON.stringify(rule.name);
-    ret += ', "symbols": [' + rule.symbols.map(serializeSymbol).join(', ') + ']';
-    if (rule.transform) {
-        ret += ', "transform": ' + tabulateString(dedentFunc(rule.transform), '        ', { indentFirst: false });
-    }
-    else if (rule.postprocess) {
+    ret += ' name: ' + JSON.stringify(rule.name);
+    ret += ', symbols: [' + rule.symbols.map(SerializeSymbol).join(', ') + ']';
+    if (rule.postprocess) {
         if (rule.postprocess.builtin) {
-            rule.postprocess = builtinPostprocessors[rule.postprocess.builtin];
+            rule.postprocess = PostProcessors[rule.postprocess.builtin];
         }
-        ret += ', "postprocess": ' + tabulateString(dedentFunc(rule.postprocess), '        ', { indentFirst: false });
+        ret += ', postprocess: ' + rule.postprocess;
     }
     ret += '}';
     return ret;
 }
-exports.serializeRule = serializeRule;
+function SerializeLexerConfig(config, depth = 0) {
+    if (!config) {
+        return 'null';
+    }
+    if (typeof config === 'string')
+        return config;
+    return `{${NewLine(depth + 1)}start: ${JSON.stringify(config.start)},${NewLine(depth + 1)}states: ${SerializeLexerConfigStates(config.states, depth + 1)}${NewLine(depth)}}`;
+}
+exports.SerializeLexerConfig = SerializeLexerConfig;
+function SerializeLexerConfigStates(states, depth) {
+    let s = `[`;
+    let ss = [];
+    for (const state of states) {
+        let r = NewLine(depth + 1) + '{';
+        r += `${NewLine(depth + 2)}name: ${JSON.stringify(state.name)},`;
+        if (state.default) {
+            r += `${NewLine(depth + 2)}default: ${JSON.stringify(state.default)},`;
+        }
+        if (state.unmatched) {
+            r += `${NewLine(depth + 2)}unmatched: ${JSON.stringify(state.unmatched)},`;
+        }
+        r += `${NewLine(depth + 2)}rules: ${SerializeLexerConfigStateRules(state.rules, depth + 2)}`;
+        r += NewLine(depth + 1) + '}';
+        ss.push(r);
+    }
+    s += ss.join();
+    s += NewLine(depth) + ']';
+    return s;
+}
+function SerializeLexerConfigStateRules(rules, depth) {
+    let s = `[`;
+    let ss = [];
+    for (const rule of rules) {
+        let r = NewLine(depth + 1) + '{ ';
+        if ('import' in rule) {
+            r += `import: ${JSON.stringify(rule.import)}`;
+        }
+        else {
+            r += `when: ${SerializeSymbol(rule.when)}`;
+            if ('type' in rule)
+                r += `, type: ${JSON.stringify(rule.type)}`;
+            if ('pop' in rule)
+                r += `, pop: ${JSON.stringify(rule.pop)}`;
+            if ('set' in rule)
+                r += `, set: ${JSON.stringify(rule.set)}`;
+            if ('inset' in rule)
+                r += `, inset: ${JSON.stringify(rule.inset)}`;
+            if ('goto' in rule)
+                r += `, goto: ${JSON.stringify(rule.goto)}`;
+        }
+        r += ' }';
+        ss.push(r);
+    }
+    s += ss.join();
+    s += NewLine(depth) + ']';
+    return s;
+}
 //# sourceMappingURL=util.js.map

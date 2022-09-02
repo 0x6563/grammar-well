@@ -1,16 +1,56 @@
-export = Grammar;
+export default Grammar;
 declare function Grammar(): {
-    lexer: any;
-    rules: ({
-        name: string;
-        symbols: (string | {
-            literal: string;
+    grammar: {
+        start: string;
+        rules: ({
+            name: string;
+            symbols: string[];
+            postprocess: ({ data }: {
+                data: any;
+            }) => any;
+        } | {
+            name: string;
+            symbols: (string | {
+                literal: string;
+            })[];
+            postprocess: ({ data }: {
+                data: any;
+            }) => {};
+        } | {
+            name: string;
+            symbols: (string | {
+                literal: string;
+            })[];
+            postprocess?: undefined;
+        } | {
+            name: string;
+            symbols: {
+                literal: string;
+            }[];
+            postprocess: ({ data }: {
+                data: any;
+            }) => any;
+        } | {
+            name: string;
+            symbols: {
+                type: string;
+            }[];
+            postprocess: ({ data }: {
+                data: any;
+            }) => any;
         })[];
-        postprocess?: undefined;
-    } | {
-        name: string;
-        symbols: any[];
-        postprocess: (d: any) => any;
-    })[];
-    start: string;
+    };
+    lexer: {
+        start: string;
+        states: {
+            name: string;
+            rules: ({
+                when: RegExp;
+                type: string;
+            } | {
+                when: string;
+                type?: undefined;
+            })[];
+        }[];
+    };
 };

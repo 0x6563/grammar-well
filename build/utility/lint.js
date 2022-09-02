@@ -1,10 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.LintGrammarSymbols = void 0;
-function LintGrammarSymbols(grammar) {
+function LintGrammarSymbols(language) {
     const unused = new Set();
     const used = new Set();
-    const { rules } = grammar;
+    const { rules } = language.grammar;
     rules.forEach(r => used.add(r.name));
     for (const { symbols } of rules) {
         for (const symbol of symbols) {

@@ -1,18 +1,16 @@
-import { ParserAlgorithm, ParserConstructor, PrecompiledGrammar } from "../typings";
-import { NearleyParser } from "./algorithms/nearley/parser";
+import { ParserAlgorithm, ParserConstructor, LanguageDefinition } from "../typings";
 import { EarleyParser } from "./algorithms/earley/parser";
 declare const ParserRegistry: {
-    nearley: typeof NearleyParser;
     earley: typeof EarleyParser;
 };
-export declare function Parse(grammar: PrecompiledGrammar, input: string, options?: ParserOptions): any;
+export declare function Parse(language: LanguageDefinition, input: string, options?: ParserOptions): any;
 export declare class Parser {
-    private grammar;
+    private language;
     private options;
     parserClass: ParserConstructor;
     parser: ParserAlgorithm;
     get results(): any[];
-    constructor(grammar: PrecompiledGrammar, options?: ParserOptions);
+    constructor(language: LanguageDefinition, options?: ParserOptions);
     feed(input: string): any[];
     run(input: string): any;
 }

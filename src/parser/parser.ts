@@ -1,28 +1,29 @@
-import { ParserAlgorithm, ParserConstructor, PrecompiledGrammar } from "../typings";
-import { NearleyParser } from "./algorithms/nearley/parser";
+import { CharacterLexer } from "../lexers/character-lexer";
+import { StatefulLexer } from "../lexers/stateful-lexer";
+import { TokenQueue } from "../lexers/token-queue";
+import { ParserAlgorithm, ParserAlgorithmConstructor, LanguageDefinition } from "../typings";
 import { EarleyParser } from "./algorithms/earley/parser";
 
 const ParserRegistry = {
-    'nearley': NearleyParser,
     'earley': EarleyParser
 }
 
-export function Parse(grammar: PrecompiledGrammar, input: string, options?: ParserOptions) {
-    const i = new Parser(grammar, options);
+export function Parse(language: LanguageDefinition, input: string, options?: ParserOptions) {
+    const i = new Parser(language, options);
     return i.run(input);
 }
 
 export class Parser {
-    parserClass: ParserConstructor;
+    parserClass: ParserAlgorithmConstructor;
     parser: ParserAlgorithm;
 
     get results() {
         return this.parser.results
     }
 
-    constructor(private grammar: PrecompiledGrammar, private options: ParserOptions = { algorithm: 'nearley' }) {
+    constructor(private language: LanguageDefinition, private options: ParserOptions = { algorithm: 'earley' }) {
         this.parserClass = ParserRegistry[options.algorithm];
-        this.parser = new this.parserClass(this.grammar, options.parserOptions);
+        this.parser = this.getParserAlgo();
     }
 
     feed(input: string) {
@@ -31,9 +32,24 @@ export class Parser {
     }
 
     run(input: string) {
-        const parser = new this.parserClass(this.grammar, this.options.parserOptions);
+        const parser = this.getParserAlgo();
         parser.feed(input);
         return parser.results[0];
+    }
+
+    private getParserAlgo() {
+        const { lexer } = this.language;
+        let tokenQueue: TokenQueue;
+
+        if (!lexer) {
+            tokenQueue = new TokenQueue(new CharacterLexer());
+        } else if ("states" in lexer) {
+            tokenQueue = new TokenQueue(new StatefulLexer(lexer));
+        } else {
+            tokenQueue = new TokenQueue(lexer);
+        }
+
+        return new this.parserClass({ ...this.language, tokenQueue }, this.options.parserOptions);
     }
 }
 

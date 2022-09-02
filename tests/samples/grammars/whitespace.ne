@@ -1,11 +1,12 @@
-@builtin "whitespace.ne"
+import whitespace
+grammar {{
+   d -> a {{ $0 }}
 
-d -> a
+   a -> b _ "&" 
+      | b
 
-a -> b _ "&"
-   | b
+   b -> letter
+      | "(" _ d _ ")"
 
-b -> letter
-   | "(" _ d _ ")"
-
-letter -> [a-z]
+   letter -> [a-z] {{ $0 }}
+}}

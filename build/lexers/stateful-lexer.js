@@ -1,256 +1,147 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CompileStates = void 0;
-const legacy_adapter_1 = require("./legacy-adapter");
-const DefaultErrorRule = TransformRule('error', { lineBreaks: true, shouldThrow: true });
-function isRegExp(o) { return (o === null || o === void 0 ? void 0 : o.toString()) === '[object RegExp]'; }
-function isObject(o) { return o && typeof o === 'object' && !isRegExp(o) && !Array.isArray(o); }
-function RegexEscape(s) {
-    return s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
-}
-function RegexGroups(s) {
-    return (new RegExp('|' + s)).exec('').length - 1;
-}
-function RegexCapture(source) {
-    return '(' + source + ')';
-}
-function RegexUnion(regexps) {
-    if (!regexps.length)
-        return '(?!)';
-    const source = regexps.map((s) => `(?:${s})`).join('|');
-    return `(?:${source})`;
-}
-function regexpOrLiteral(obj) {
-    if (typeof obj === 'string') {
-        return `(?:${RegexEscape(obj)})`;
+exports.CompileStates = exports.NormalizeStates = void 0;
+const token_queue_1 = require("./token-queue");
+class StatefulLexer {
+    constructor(states, startState) {
+        this.startState = startState;
+        this.states = states;
+        this.buffer = '';
+        this.stack = [];
+        this.feed();
     }
-    if (isRegExp(obj)) {
-        if (obj.ignoreCase)
-            throw new Error('RegExp /i flag not allowed');
-        if (obj.global)
-            throw new Error('RegExp /g flag is implied');
-        if (obj.sticky)
-            throw new Error('RegExp /y flag is implied');
-        if (obj.multiline)
-            throw new Error('RegExp /m flag is implied');
-        return obj.source;
+    feed(data, state) {
+        this.buffer = data || '';
+        this.index = 0;
+        this.line = state ? state.line : 1;
+        this.column = state ? state.column : 1;
+        this.prefetched = state === null || state === void 0 ? void 0 : state.prefetched;
+        this.set(state ? state.state : this.startState);
+        this.stack = state && state.stack ? state.stack.slice() : [];
     }
-    throw new Error('Not a pattern: ' + obj);
-}
-function LastNLines(string, numLines) {
-    let position = string.length;
-    while (numLines > 0 && --position >= 0) {
-        if (string[position] == '\n') {
-            numLines--;
+    state() {
+        return {
+            line: this.line,
+            column: this.column,
+            state: this.current,
+            stack: this.stack.slice(),
+            prefetched: this.prefetched,
+        };
+    }
+    next() {
+        const next = this.matchNext();
+        if (!next) {
+            return;
         }
+        const { rule, text, index } = next;
+        if (!rule) {
+            throw new Error(`No matching rule for ${text}`);
+        }
+        const token = this.createToken(rule, text, index);
+        this.processRule(rule);
+        return token;
     }
-    return string.substring(position + 1).split("\n");
-}
-function ConvertObjectToRules(obj) {
-    const result = [];
-    for (const key in obj) {
-        const rules = [].concat(obj[key]);
-        if (key === 'include') {
-            rules.forEach(rule => result.push({ include: rule }));
+    [Symbol.iterator]() {
+        return new LexerIterator(this);
+    }
+    flush() {
+    }
+    set(current) {
+        if (!current || this.current === current)
+            return;
+        const info = this.states[current];
+        this.current = current;
+        this.rules = info.rules;
+        this.unmatched = info.unmatched;
+        this.regexp = info.regexp;
+    }
+    pop() {
+        this.set(this.stack.pop());
+    }
+    goto(state) {
+        this.stack.push(this.current);
+        this.set(state);
+    }
+    matchNext() {
+        if (this.index === this.buffer.length) {
+            return;
+        }
+        const { index, buffer } = this;
+        let text;
+        let rule;
+        let match;
+        this.regexp.lastIndex = index;
+        if (this.prefetched) {
+            match = this.prefetched;
+            this.prefetched = null;
         }
         else {
-            let match = [];
-            for (const rule of rules) {
-                if (isObject(rule)) {
-                    if (match.length)
-                        result.push(TransformRule(key, match));
-                    result.push(TransformRule(key, rule));
-                    match = [];
-                }
-                else {
-                    match.push(rule);
-                }
-            }
-            if (match.length)
-                result.push(TransformRule(key, match));
+            match = this.regexp.exec(buffer);
         }
-    }
-    return result;
-}
-function ConvertArrayToRules(array) {
-    const result = [];
-    for (const obj of array) {
-        if (obj.include) {
-            const includes = [].concat(obj.include);
-            includes.forEach(include => result.push({ include }));
+        if (match == null) {
+            rule = this.unmatched;
+            text = buffer.slice(index, buffer.length);
         }
-        else if (obj.type) {
-            result.push(TransformRule(obj.type, obj));
+        else if (match.index !== index) {
+            rule = this.unmatched;
+            text = buffer.slice(index, match.index);
+            this.prefetched = match;
         }
         else {
-            throw new Error('Rule has no type: ' + JSON.stringify(obj));
+            rule = this.getGroup(match);
+            text = match[0];
+        }
+        return { index, rule, text };
+    }
+    createToken(rule, text, offset) {
+        const token = {
+            type: rule.type,
+            value: text,
+            text: text,
+            offset: offset,
+            line: this.line,
+            column: this.column,
+            state: this.current
+        };
+        for (let i = 0; i < text.length; i++) {
+            this.index++;
+            this.column++;
+            if (text[i] == '\n') {
+                this.line++;
+                this.column = 1;
+            }
+        }
+        return token;
+    }
+    processRule(rule) {
+        if (rule.pop) {
+            let i = rule.pop === 'all' ? this.stack.length : rule.pop;
+            while (i-- > 0) {
+                this.pop();
+            }
+        }
+        if (rule.set) {
+            this.set(rule.set);
+        }
+        if (rule.goto) {
+            this.goto(rule.goto);
+        }
+        if (rule.inset) {
+            let i = rule.inset;
+            while (--i >= 0) {
+                this.goto(this.current);
+            }
         }
     }
-    return result;
-}
-function TransformRule(type, ref) {
-    const obj = isObject(ref) ? { match: ref } : ref;
-    const options = {
-        defaultType: type,
-        lineBreaks: !!obj.error || !!obj.fallback,
-        pop: false,
-        next: null,
-        push: null,
-        error: false,
-        fallback: false,
-        value: null,
-        type: null,
-        shouldThrow: false,
-    };
-    Object.assign(options, obj);
-    if (typeof options.type === 'string' && type !== options.type) {
-        throw new Error("Type transform cannot be a string (type '" + options.type + "' for token '" + type + "')");
-    }
-    const { match } = options;
-    options.match = Array.isArray(match) ? match : match ? [match] : [];
-    options.match.sort((a, b) => {
-        const isARegex = isRegExp(a);
-        const isBRegex = isRegExp(b);
-        if (isARegex && isBRegex)
-            return 0;
-        if (isARegex)
-            return 1;
-        if (isBRegex)
-            return -1;
-        return b.length - a.length;
-    });
-    return options;
-}
-function CompileRules(rules, hasStates) {
-    const fast = Object.create(null);
-    const groups = [];
-    const parts = [];
-    let errorRule = null;
-    let unicodeFlag = null;
-    let fastAllowed = rules.findIndex((v) => v.fallback) < 0;
-    for (const options of rules) {
-        if (options.error || options.fallback) {
-            if (errorRule) {
-                if (!options.fallback === !errorRule.fallback)
-                    throw new Error("Multiple " + (options.fallback ? "fallback" : "error") + " rules not allowed (for token '" + options.defaultType + "')");
-                throw new Error("fallback and error are mutually exclusive (for token '" + options.defaultType + "')");
-            }
-            errorRule = options;
-        }
-        const matches = options.match.slice();
-        if (fastAllowed) {
-            while (matches.length && typeof matches[0] === 'string' && matches[0].length === 1) {
-                const word = matches.shift();
-                fast[word.charCodeAt(0)] = options;
+    getGroup(match) {
+        for (let i = 0; i < this.rules.length; i++) {
+            if (match[i + 1] !== undefined) {
+                return this.rules[i];
             }
         }
-        if (options.pop || options.push || options.next) {
-            if (!hasStates) {
-                throw new Error("State-switching options are not allowed in stateless lexers (for token '" + options.defaultType + "')");
-            }
-            if (options.fallback) {
-                throw new Error("State-switching options are not allowed on fallback tokens (for token '" + options.defaultType + "')");
-            }
-        }
-        if (matches.length === 0) {
-            continue;
-        }
-        fastAllowed = false;
-        groups.push(options);
-        for (const match of matches) {
-            if (!isRegExp(match)) {
-                continue;
-            }
-            const obj = match;
-            if (unicodeFlag === null) {
-                unicodeFlag = obj.unicode;
-            }
-            else if (unicodeFlag !== obj.unicode && options.fallback === false) {
-                throw new Error('If one rule is /u then all must be');
-            }
-        }
-        const pat = RegexUnion(matches.map(regexpOrLiteral));
-        const regexp = new RegExp(pat);
-        if (regexp.test("")) {
-            throw new Error("RegExp matches empty string: " + regexp);
-        }
-        const groupCount = RegexGroups(pat);
-        if (groupCount > 0) {
-            throw new Error("RegExp has capture groups: " + regexp + "\nUse (?: … ) instead");
-        }
-        if (!options.lineBreaks && regexp.test('\n')) {
-            throw new Error('Rule should declare lineBreaks: ' + regexp);
-        }
-        parts.push(RegexCapture(pat));
-    }
-    let flags = !(errorRule && errorRule.fallback) ? 'ym' : 'gm';
-    if (unicodeFlag === true)
-        flags += "u";
-    const regexp = new RegExp(RegexUnion(parts), flags);
-    return {
-        regexp,
-        groups,
-        fast,
-        error: errorRule || DefaultErrorRule
-    };
-}
-function CheckStateGroup(g, name, map) {
-    const state = g && (g.push || g.next);
-    if (state && !map[state]) {
-        throw new Error("Missing state '" + state + "' (in token '" + g.defaultType + "' of state '" + name + "')");
-    }
-    if (g && g.pop && +g.pop !== 1) {
-        throw new Error("pop must be 1 (in token '" + g.defaultType + "' of state '" + name + "')");
+        throw new Error('Cannot find token type for matched text');
     }
 }
-function CompileStates(states, start) {
-    const ruleMap = Object.create(null);
-    for (const key in states) {
-        start = start || key;
-        ruleMap[key] = Array.isArray(states[key]) ? ConvertArrayToRules(states[key]) : ConvertObjectToRules(states[key]);
-    }
-    for (const key in states) {
-        const rules = ruleMap[key];
-        const included = new Set(rules);
-        const includedState = new Set();
-        for (let j = 0; j < rules.length; j++) {
-            const rule = rules[j];
-            if (!rule.include)
-                continue;
-            const splice = [j, 1];
-            if (rule.include !== key && !includedState.has(rule.include)) {
-                includedState.add(rule.include);
-                const newRules = ruleMap[rule.include];
-                if (!newRules) {
-                    throw new Error("Cannot include nonexistent state '" + rule.include + "' (in state '" + key + "')");
-                }
-                for (const newRule of newRules) {
-                    if (included.has(newRule))
-                        continue;
-                    splice.push(newRule);
-                    included.add(newRule);
-                }
-            }
-            rules.splice.apply(rules, splice);
-            j--;
-        }
-    }
-    const map = Object.create(null);
-    for (const key in states) {
-        map[key] = CompileRules(ruleMap[key], true);
-    }
-    for (const key in states) {
-        const state = map[key];
-        for (const group of state.groups) {
-            CheckStateGroup(group, key, map);
-        }
-        for (const f in state.fast) {
-            CheckStateGroup(state.fast[f], key, map);
-        }
-    }
-    return new legacy_adapter_1.LegacyLexerAdapter(new StatefulLexer(map, start));
-}
-exports.CompileStates = CompileStates;
 class LexerIterator {
     constructor(lexer) {
         this.lexer = lexer;
@@ -263,174 +154,165 @@ class LexerIterator {
         return this;
     }
 }
-class StatefulLexer {
-    constructor(states, state) {
-        this.startState = state;
-        this.states = states;
-        this.buffer = '';
-        this.stack = [];
-        this.reset();
+class RegexLib {
+    static IsRegex(o) {
+        return o instanceof RegExp;
     }
-    reset(data, info) {
-        this.buffer = data || '';
-        this.index = 0;
-        this.line = info ? info.line : 1;
-        this.col = info ? info.col : 1;
-        this.queuedText = info ? info.queuedText : "";
-        this.setState(info ? info.state : this.startState);
-        this.stack = info && info.stack ? info.stack.slice() : [];
+    static Escape(s) {
+        return s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
     }
-    save() {
-        return {
-            line: this.line,
-            col: this.col,
-            state: this.state,
-            stack: this.stack.slice(),
-            queuedText: this.queuedText,
+    static HasGroups(s) {
+        return (new RegExp('|' + s)).exec('').length > 1;
+    }
+    static Capture(source) {
+        return '(' + source + ')';
+    }
+    static Join(regexps) {
+        if (!regexps.length)
+            return '(?!)';
+        const source = regexps.map((s) => `(?:${s})`).join('|');
+        return `(?:${source})`;
+    }
+    static Source(search) {
+        if (typeof search === 'string') {
+            return `(?:${RegexLib.Escape(search)})`;
+        }
+        if (RegexLib.IsRegex(search)) {
+            return search.source;
+        }
+        throw new Error('Not a pattern: ' + search);
+    }
+}
+function CompileRegExp(state) {
+    const rules = [];
+    const subexpressions = [];
+    let isUnicode = null;
+    let isCI = null;
+    for (const options of state.rules) {
+        if (RegexLib.IsRegex(options.when)) {
+            const when = options.when;
+            if (isUnicode === null) {
+                isUnicode = when.unicode;
+            }
+            else if (isUnicode !== when.unicode && !state.unmatched) {
+                throw new Error(`Inconsistent Regex Flag /u in state: ${state.name}`);
+            }
+            if (isCI === null) {
+                isCI = when.ignoreCase;
+            }
+            else if (isCI !== when.ignoreCase) {
+                throw new Error(`Inconsistent Regex Flag /i in state: ${state.name}`);
+            }
+        }
+        else {
+            if (isCI == null) {
+                isCI = false;
+            }
+            else if (isCI != false) {
+                throw new Error(`Inconsistent Regex Flag /i in state: ${state.name}`);
+            }
+        }
+        rules.push(options);
+        const pat = RegexLib.Source(options.when);
+        const regexp = new RegExp(pat);
+        if (regexp.test("")) {
+            throw new Error("RegExp matches empty string: " + regexp);
+        }
+        if (RegexLib.HasGroups(pat)) {
+            throw new Error("RegExp has capture groups: " + regexp + "\nUse (?: … ) instead");
+        }
+        subexpressions.push(RegexLib.Capture(pat));
+    }
+    let flags = !state.unmatched ? 'ym' : 'gm';
+    if (isUnicode === true)
+        flags += "u";
+    if (isCI === true)
+        flags += "i";
+    return new RegExp(RegexLib.Join(subexpressions), flags);
+}
+function NormalizeStates(states, start) {
+    const statemap = Object.create(null);
+    const resolved = new Set();
+    const resolving = new Set();
+    const chain = new Set();
+    start = start || states[0].name;
+    for (const state of states) {
+        statemap[state.name] = state;
+    }
+    ResolveRuleImports(start, statemap, resolved, resolving, chain);
+    for (const key in statemap) {
+        if (!resolved.has(key)) {
+            delete statemap[key];
+        }
+    }
+    return statemap;
+}
+exports.NormalizeStates = NormalizeStates;
+function CompileStates(states, start) {
+    const statemap = NormalizeStates(states, start);
+    const map = Object.create(null);
+    for (const key in statemap) {
+        map[key] = {
+            regexp: CompileRegExp(statemap[key]),
+            rules: statemap[key].rules,
+            unmatched: statemap[key].unmatched ? { type: statemap[key].unmatched } : null
         };
     }
-    setState(state) {
-        if (!state || this.state === state)
-            return;
-        const info = this.states[state];
-        this.state = state;
-        this.groups = info.groups;
-        this.error = info.error;
-        this.regexp = info.regexp;
-        this.fast = info.fast;
-    }
-    pop() {
-        this.setState(this.stack.pop());
-    }
-    push(state) {
-        this.stack.push(this.state);
-        this.setState(state);
-    }
-    next() {
-        const index = this.index;
-        if (this.queuedGroup) {
-            const token = this.token(this.queuedGroup, this.queuedText, index);
-            this.queuedGroup = null;
-            this.queuedText = "";
-            return token;
-        }
-        const buffer = this.buffer;
-        if (index === buffer.length) {
-            return;
-        }
-        let group = this.fast[buffer.charCodeAt(index)];
-        if (group) {
-            return this.token(group, buffer.charAt(index), index);
-        }
-        const re = this.regexp;
-        re.lastIndex = index;
-        const match = re.exec(buffer);
-        const error = this.error;
-        if (match == null) {
-            return this.token(error, buffer.slice(index, buffer.length), index);
-        }
-        group = this.getGroup(match);
-        const text = match[0];
-        if ('fallback' in error && match.index !== index) {
-            this.queuedGroup = group;
-            this.queuedText = text;
-            return this.token(error, buffer.slice(index, match.index), index);
-        }
-        return this.token(group, text, index);
-    }
-    formatError(token, message) {
-        if (token == null) {
-            const text = this.buffer.slice(this.index);
-            token = {
-                text: text,
-                offset: this.index,
-                lineBreaks: text.indexOf('\n') === -1 ? 0 : 1,
-                line: this.line,
-                col: this.col,
-            };
-        }
-        const numLinesAround = 2;
-        const firstDisplayedLine = Math.max(token.line - numLinesAround, 1);
-        const lastDisplayedLine = token.line + numLinesAround;
-        const lastLineDigits = String(lastDisplayedLine).length;
-        const displayedLines = LastNLines(this.buffer, (this.line - token.line) + numLinesAround + 1)
-            .slice(0, 5);
-        const errorLines = [];
-        errorLines.push(message + " at line " + token.line + " col " + token.col + ":");
-        errorLines.push("");
-        for (let i = 0; i < displayedLines.length; i++) {
-            const line = displayedLines[i];
-            const lineNo = firstDisplayedLine + i;
-            errorLines.push(lineNo.toString().padStart(lastLineDigits, ' ') + "  " + line);
-            if (lineNo === token.line) {
-                errorLines.push("".padStart(lastLineDigits + token.col + 1, " ") + "^");
+    return new token_queue_1.TokenQueue(new StatefulLexer(map, start));
+}
+exports.CompileStates = CompileStates;
+function ResolveRuleImports(name, states, resolved, resolving, chain) {
+    if (chain.has(name))
+        throw new Error(`Can not resolve circular import of ${name}`);
+    if (!states[name])
+        throw new Error(`Can not import unknown state ${name}`);
+    if (resolved.has(name) || resolving.has(name))
+        return;
+    const state = states[name];
+    const rules = new UniqueRules();
+    chain.add(name);
+    resolving.add(name);
+    for (let i = 0; i < state.rules.length; i++) {
+        const rule = state.rules[i];
+        if ("import" in rule) {
+            for (const ref of rule.import) {
+                ResolveRuleImports(ref, states, resolved, resolving, chain);
+                rules.push(...states[ref].rules);
             }
         }
-        return errorLines.join("\n");
+        else {
+            rules.push(rule);
+            if ("set" in rule && !resolving.has(rule.set)) {
+                ResolveRuleImports(rule.set, states, resolved, resolving, new Set());
+            }
+            if ("goto" in rule && !resolving.has(rule.goto)) {
+                ResolveRuleImports(rule.goto, states, resolved, resolving, new Set());
+            }
+        }
     }
-    clone() {
-        return new StatefulLexer(this.states, this.state);
+    state.rules = rules.rules;
+    chain.delete(name);
+    resolved.add(name);
+}
+class UniqueRules {
+    constructor() {
+        this.regexps = new Set();
+        this.strings = new Set();
+        this.rules = [];
     }
-    [Symbol.iterator]() {
-        return new LexerIterator(this);
-    }
-    token(group, text, offset) {
-        let lineBreaks = 0;
-        let nl = 0;
-        if (group.lineBreaks) {
-            const matchNL = /\n/g;
-            nl = 1;
-            if (text === '\n') {
-                lineBreaks = 1;
+    push(...rules) {
+        for (const rule of rules) {
+            if (RegexLib.IsRegex(rule.when)) {
+                if (!this.regexps.has(rule.when.source)) {
+                    this.rules.push(rule);
+                }
             }
             else {
-                while (matchNL.exec(text)) {
-                    lineBreaks++;
-                    nl = matchNL.lastIndex;
+                if (!this.strings.has(rule.when)) {
+                    this.rules.push(rule);
                 }
             }
         }
-        const token = {
-            type: (typeof group.type === 'function' && group.type(text)) || group.defaultType,
-            value: typeof group.value === 'function' ? group.value(text) : text,
-            text: text,
-            toString() {
-                return this.value;
-            },
-            offset: offset,
-            lineBreaks: lineBreaks,
-            line: this.line,
-            col: this.col,
-        };
-        const size = text.length;
-        this.index += size;
-        this.line += lineBreaks;
-        if (lineBreaks !== 0) {
-            this.col = size - nl + 1;
-        }
-        else {
-            this.col += size;
-        }
-        if (group.shouldThrow) {
-            const err = new Error(this.formatError(token, "invalid syntax"));
-            throw err;
-        }
-        if (group.pop)
-            this.pop();
-        else if (group.push)
-            this.push(group.push);
-        else if (group.next)
-            this.setState(group.next);
-        return token;
-    }
-    getGroup(match) {
-        const groupCount = this.groups.length;
-        for (let i = 0; i < groupCount; i++) {
-            if (match[i + 1] !== undefined) {
-                return this.groups[i];
-            }
-        }
-        throw new Error('Cannot find token type for matched text');
     }
 }
 //# sourceMappingURL=stateful-lexer.js.map

@@ -1,10 +1,10 @@
-import { PrecompiledGrammar, RuleSymbol } from "../typings";
+import { LanguageDefinition, RuleSymbol } from "../typings";
 
 
-export function LintGrammarSymbols(grammar: PrecompiledGrammar): RuleSymbol[] {
+export function LintGrammarSymbols(language: LanguageDefinition): RuleSymbol[] {
     const unused = new Set<RuleSymbol>();
     const used = new Set<RuleSymbol>();
-    const { rules } = grammar;
+    const { rules } = language.grammar;
     rules.forEach(r => used.add(r.name));
     for (const { symbols } of rules) {
         for (const symbol of symbols) {

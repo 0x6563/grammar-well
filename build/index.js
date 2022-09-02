@@ -18,6 +18,6 @@ __exportStar(require("./compiler/compiler"), exports);
 __exportStar(require("./compiler/generator"), exports);
 __exportStar(require("./compiler/import-resolver"), exports);
 __exportStar(require("./parser/parser"), exports);
-__exportStar(require("./lexers/basic-lexer"), exports);
-__exportStar(require("./lexers/legacy-adapter"), exports);
+__exportStar(require("./lexers/character-lexer"), exports);
+__exportStar(require("./lexers/token-queue"), exports);
 //# sourceMappingURL=index.js.map

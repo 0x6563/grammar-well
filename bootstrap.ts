@@ -8,11 +8,11 @@ const BaseDir = './src/grammars';
     for (const file of files) {
         try {
             console.log(fullpath(file))
-            if (/\.ne$/.test(file)) {
+            if (/\.gwell$/.test(file)) {
                 const json = await Compile(read(file), { format: 'json' });
                 const js = await Compile(read(file), { exportName: 'grammar', format: 'esmodule' });
-                write(file.replace(/.ne$/, '.json'), json);
-                write(file.replace(/.ne$/, '.js'), js);
+                write(file.replace(/.gwell$/, '.json'), json);
+                write(file.replace(/.gwell$/, '.js'), js);
             }
         } catch (error) {
             console.log(file);

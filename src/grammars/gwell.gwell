@@ -1,0 +1,319 @@
+head ${
+ 
+    function Insensitive({ literal }) {
+        const tokens = [];
+        for (let i = 0; i < literal.length; i++) {
+            const c = literal.charAt(i);
+            if (c.toUpperCase() !== c || c.toLowerCase() !== c) {
+                tokens.push(new RegExp("[" + c.toLowerCase() + c.toUpperCase() + "]"));
+            } else {
+                tokens.push({ literal: c });
+            }
+        }
+        return { subexpression: [{ tokens, postprocess: ({data}) => data.join('') }] };
+    }
+    
+	function Rollup(ary){
+		const r = {};
+		for(const i of ary){
+			for(const k in i){
+				r[k] = i[k];
+			}
+		}
+
+		return r;
+	};
+
+	function TemplatePostProcess(str){
+		return "({data}) => { return " + str.replace(/\$(\d+)/g, "data[$1]") + "; }";
+	}
+}
+
+lexer {{
+    start: "start"
+    
+start ->
+	- import: string, js_pre, ws, comment
+	- when: /lexer(?![a-zA-Z\d_])/ type: "T_WORD" goto: lexer_pre
+	- when: /grammar(?![a-zA-Z\d_])/ type: "T_WORD" goto: grammar_pre
+	- when: /config(?![a-zA-Z\d_])/ type: "T_WORD" goto: config_pre
+	- import: kv
+config_pre ->
+	- import: ws
+	- when: "{{" type: "L_TEMPLATEL" set: config
+config ->
+	- import: comment, kv
+	- when: "}}" type: "L_TEMPLATER" pop: 1
+grammar_pre ->
+	- import: ws
+	- when: "{{" type: "L_TEMPLATEL" set: grammar
+grammar ->
+	- import: comment, js_pre, js_templatepre, ws, regex, charclass, l_ebnf_0, l_ebnf_1n, l_ebnf_0n, kv, l_colon, l_comma, l_pipe, l_parenl, l_parenr, l_arrow, l_dsign, l_dash
+	- when: "}}" type: "L_TEMPLATER" pop: 1
+lexer_pre ->
+	- import: ws
+	- when: "{{" type: "L_TEMPLATEL" set: lexer
+lexer ->
+	- import: ws, comment, regex, l_comma, l_arrow, l_dash, kv, js_pre
+	- when: "}}" type: "L_TEMPLATER" pop: 1
+js_pre ->
+	- when: "${" type: "L_JSL" goto: js_wrap
+js_wrap ->
+	default: "T_JSBODY"
+	unmatched: "T_JSBODY"
+	- import: jsignore
+	- when: "{" type: "T_JSBODY" goto: js
+	- when: "}" type: "L_JSR" pop: 1
+js ->
+	default: "T_JSBODY"
+	unmatched: "T_JSBODY"
+	- import: jsignore
+	- when: "{" type: "T_JSBODY" goto: js
+	- when: "}" type: "T_JSBODY" pop: 1
+js_templatepre ->
+	- when: "{{" type: "L_TEMPLATEL" goto: js_templatewrap
+js_templatewrap ->
+	default: "T_JSBODY"
+	unmatched: "T_JSBODY"
+	- import: jsignore
+	- when: "{" type: "T_JSBODY" goto: js
+	- when: "}}" type: "L_TEMPLATER" pop: 1
+kv ->
+	- import: string, ws, word, l_colon, integer
+jsignore ->
+	- when: /"(?:[^"\\]|\\.)*"/ type: "T_JSBODY"
+	- when: /'(?:[^'\\]|\\.)*'/ type: "T_JSBODY"
+	- when: /`(?:[^`\\]|\\.)*`/ type: "T_JSBODY"
+	- when: /\/(?:[^\/\\]|\\.)+\/[gmiyu]*/ type: "T_JSBODY"
+	- when: /\/\/[\n]*/ type: "T_JSBODY"
+	- when: /\/\*.*\*\// type: "T_JSBODY"
+string ->
+	- when: /"(?:[^"\\\r\n]|\\.)*"/ type: "T_STRING"
+string2 ->
+	- when: /'(?:[^'\\\r\n]|\\.)*'/ type: "T_STRING"
+string3 ->
+	- when: /`(?:[^`\\]|\\.)*`/ type: "T_STRING"
+charclass ->
+	- when: /\[(?:[^\]\\]|\\.)+\]/ type: "T_CHARCLASS"
+regex ->
+	- when: /\/(?:[^\/\\\r\n]|\\.)+\// type: "T_REGEX"
+integer ->
+	- when: /\d+/ type: "T_INTEGER"
+word ->
+	- when: /[a-zA-Z_][a-zA-Z_\d]*/ type: "T_WORD"
+ws ->
+	- when: /\s+/ type: "T_WS"
+l_colon ->
+	- when: ":" type: "L_COLON"
+l_ebnf_0 ->
+	- when: ":?" type: "L_EBNF_0"
+l_ebnf_1n ->
+	- when: ":+" type: "L_EBNF_1N"
+l_ebnf_0n ->
+	- when: ":*" type: "L_EBNF_0N"
+l_comma ->
+	- when: "," type: "L_COMMA"
+l_pipe ->
+	- when: "|" type: "L_PIPE"
+l_parenl ->
+	- when: "(" type: "L_PARENL"
+l_parenr ->
+	- when: ")" type: "L_PARENR"
+l_templatel ->
+	- when: "{{" type: "L_TEMPLATEL"
+l_templater ->
+	- when: "}}" type: "L_TEMPLATER"
+l_arrow ->
+	- when: "->" type: "L_ARROW"
+l_dsign ->
+	- when: "$" type: "L_DSIGN"
+l_dash ->
+	- when: "-" type: "L_DASH"
+comment ->
+	- when: /\/\/[\n]*/ type: "T_COMMENT"
+commentmulti ->
+	- when: /\/\*.*\*\// type: "T_COMMENT"
+
+}}
+
+grammar{{
+
+  main ->
+        _ section_list _  {{ $1 }}
+
+    section_list ->
+        section {{ [$0] }}
+        | section T_WS section_list  {{ [$0].concat($2) }}
+
+    section ->
+        K_CONFIG _ L_TEMPLATEL _ kv_list _ L_TEMPLATER {{ ({ config: Rollup($4) }) }}
+        | K_LEXER _ L_TEMPLATEL _ lexer _ L_TEMPLATER {{ ({ lexer: Rollup($4) }) }}
+        | K_GRAMMAR _ L_TEMPLATEL _ grammar _ L_TEMPLATER {{ ({ grammar: $4 }) }}
+        | K_IMPORT _ T_WORD {{ ({ import: $2 } ) }}
+        | K_BODY _ T_JS {{ ({ body: $2 } ) }}
+        | K_HEAD _ T_JS {{ ({ head: $2 } ) }}
+        | K_IMPORT _ T_STRING {{ ({ import: $2, path: true }) }}
+        | K_BODY _ T_STRING {{ ({ body: $2, path: true }) }}
+        | K_HEAD _ T_STRING {{ ({ head: $2, path: true }) }}
+
+    lexer ->
+        kv_list _ state_list {{ $0.concat({ states: $2 }) }}
+        | state_list {{ [{ states: $0 }] }}
+
+    state_list ->
+        state {{ data }}
+        | state _ state_list  {{ [$0].concat($2) }}
+
+    state ->
+        state_declare _ state_definition {{ Rollup([{ name: $0 }].concat($2)) }}
+    state_declare ->
+        T_WORD _ L_ARROW {{ $0 }}
+    state_definition ->
+        kv_list _ token_list {{ Rollup($0.concat([{rules: $2}])) }}
+        | token_list {{ ({ rules: $0 }) }}
+
+    word_list ->
+        T_WORD {{ [$0] }}
+        | T_WORD _ L_COMMA _ word_list  {{ [$0].concat($4) }}
+
+    token_list ->
+        token {{ data }}
+        | token _ token_list  {{ [$0].concat($2) }}
+
+    token ->
+        L_DASH _ K_IMPORT _ L_COLON _ word_list {{ ({ import: $6 }) }}
+        | L_DASH _ token_definition_list {{ Rollup($2) }}
+
+    token_definition_list ->
+        token_definition {{ data }}
+        | token_definition _ token_definition_list  {{ [$0].concat($2) }}
+
+    token_definition ->
+        tag {{ $0 }}
+        | when {{ $0 }}
+        | pop {{ $0 }}
+        | inset {{ $0 }}
+        | set {{ $0 }}
+        | goto {{ $0 }}
+        | type {{ $0 }}
+
+
+    tag ->
+        K_TAG _ L_COLON _ string_list {{ ({ tag: $4 }) }}
+
+    when ->
+        K_WHEN _ L_COLON _ T_STRING {{ ({ when: $4 }) }}
+        | K_WHEN _ L_COLON _ T_REGEX {{ ({ when: $4 }) }}
+
+    type -> K_TYPE _ L_COLON _ T_STRING {{ ({ type: $4 }) }}
+
+    pop ->
+        K_POP {{ ({ pop: 1 }) }}
+        | K_POP _ L_COLON _ T_INTEGER {{ ({ pop: parseInt($4) }) }}
+        | K_POP _ L_COLON _ K_ALL {{ ({ pop: "all" }) }}
+
+    inset ->
+        K_INSET  {{ ({ inset: 1 }) }}
+        | K_INSET _ L_COLON _ T_INTEGER {{ ({ inset: parseInt($4) }) }}
+
+    set ->
+        K_SET _ L_COLON _ T_WORD {{ ({ set: $4 }) }}
+        
+    goto ->
+        K_GOTO _ L_COLON _ T_WORD {{ ({ goto: $4 }) }}
+
+
+    grammar ->
+        kv_list _ rule_list {{ ({ config: Rollup($0), rules: $2 }) }}
+        | rule_list {{ ({ rules: $0 }) }}
+
+    rule_list ->
+        rule {{ [$0] }}
+        | rule _ rule_list  {{ [$0].concat($2) }}
+
+    rule ->
+        T_WORD _ L_ARROW _ expression_ext {{ ({ name: $0, rules: $4 }) }}
+
+    expression_ext ->
+        completeexpression
+        | expression_ext _ L_PIPE _ completeexpression {{ $0.concat([$4]) }}
+
+    completeexpression ->
+        expr {{ ({ tokens: $0 }) }}
+        | expr _ T_JS {{ ({ tokens: $0, postprocess: $2 }) }}
+        | expr _ T_GRAMMAR_TEMPLATE {{ ({ tokens: $0, postprocess: TemplatePostProcess($2) }) }}
+
+
+    expr_member ->
+        T_WORD {{ $0 }}
+        | T_STRING "i":? {{ $1 ? Insensitive($0) : { literal: $0 } }}
+        | L_DSIGN T_WORD {{ ({ token: $1}) }}
+        | L_DSIGN T_STRING {{ ({ token: $1}) }}
+        | T_CHARCLASS {{ { regex: $0 } }}
+        | L_PARENL _ expression_ext _ L_PARENR {{ ({ 'subexpression': $2 }) }}
+        | expr_member _ ebnf_modifier {{ ({ 'ebnf': $0, 'modifier': $2 }) }}
+
+    ebnf_modifier ->
+        L_EBNF_0 {{ $0[0].value }}
+        | L_EBNF_1N {{ $0[0].value }}
+        | L_EBNF_0N {{ $0[0].value }}
+
+    expr ->
+        expr_member
+        | expr T_WS expr_member  {{ $0.concat([$2]) }}
+
+    kv_list ->
+        kv {{ data }}
+        | kv _ kv_list  {{ [$0].concat($2) }}
+
+    kv ->
+        T_WORD _ L_COLON _ (T_WORD|T_STRING|T_INTEGER) {{ ({ [$0]: $4[0] }) }}
+
+    string_list ->
+        T_STRING {{ [$0] }}
+        | T_STRING _ L_COMMA _ string_list  {{ [$0].concat($4) }}
+
+    _ ->
+        T_WS:? {{ null }}
+
+    L_COLON -> $L_COLON
+    L_EBNF_0 -> $L_EBNF_0
+    L_EBNF_1N -> $L_EBNF_1N
+    L_EBNF_0N -> $L_EBNF_0N
+    L_COMMA -> $L_COMMA
+    L_PIPE -> $L_PIPE
+    L_PARENL -> $L_PARENL
+    L_PARENR -> $L_PARENR
+    L_TEMPLATEL -> $L_TEMPLATEL
+    L_TEMPLATER -> $L_TEMPLATER
+    L_ARROW -> $L_ARROW
+    L_DSIGN -> $L_DSIGN
+    L_DASH -> $L_DASH
+
+
+    K_ALL -> "all"
+    K_TAG -> "tag"
+    K_TYPE -> "type"
+    K_WHEN -> "when"
+    K_POP -> "pop"
+    K_INSET -> "inset"
+    K_SET -> "set"
+    K_GOTO -> "goto"
+    K_CONFIG -> "config"
+    K_LEXER -> "lexer"
+    K_GRAMMAR -> "grammar"
+    K_IMPORT -> "import"
+    K_BODY -> "body"
+    K_HEAD -> "head"
+
+    T_JS -> $L_JSL $T_JSBODY:* $L_JSR  {{ $1.map(v=>v.value).join('') }}
+    T_GRAMMAR_TEMPLATE -> $L_TEMPLATEL _ $T_JSBODY:* _ $L_TEMPLATER {{ $2.map(v=>v.value).join('') }}
+    T_STRING -> $T_STRING {{ JSON.parse($0.value) }}
+    T_WORD -> $T_WORD {{ $0.value }}
+    T_REGEX -> $T_REGEX [gmiuy]:* {{ ({ regex: $0.value.slice(1,-1), flags: $1.join('') }) }}
+    T_COMMENT -> $T_COMMENT
+    T_CHARCLASS -> $T_CHARCLASS  {{ $0.value }}
+    T_INTEGER -> $T_INTEGER  {{ $0.value }}
+    T_WS -> $T_WS  {{ null }}
+}}
+

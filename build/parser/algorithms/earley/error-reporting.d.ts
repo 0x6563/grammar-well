@@ -1,4 +1,4 @@
-import { Rule } from "../../../typings";
+import { GrammarRule } from "../../../typings";
 import { EarleyParser } from "./parser";
 import { State } from "./state";
 export declare class ParserErrorService {
@@ -9,5 +9,5 @@ export declare class ParserErrorService {
     private displayStateStack;
     private reportErrorCommon;
     buildFirstStateStack(state: State, visited: Set<State>): any;
-    formatRule(rule: Rule, withCursorAt?: number): string;
+    formatRule(rule: GrammarRule, withCursorAt?: number): string;
 }

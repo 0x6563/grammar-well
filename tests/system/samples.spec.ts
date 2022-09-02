@@ -1,5 +1,5 @@
 import { parse } from 'yaml';
-import { AsyncRun, BuildTest, Expected, GetFile, GetValue, GrammarWellRunner, NearleyRunner } from './testbed';
+import { AsyncRun, BuildTest, Expected, GetFile, GetValue } from './testbed';
 
 describe('Predefined Samples', () => {
     const groups = parse(GetFile('./predefined-samples.yml'));
@@ -26,25 +26,4 @@ describe('Predefined Samples', () => {
             }
         })
     }
-})
-
-describe('Compatibility Samples', () => {
-    const groups = parse(GetFile('./compatibility-samples.yml'));
-    for (const group in groups) {
-        const tests = groups[group];
-        describe(group, () => {
-            for (const test of tests) {
-                it(test.title, async () => {
-                    const grammar = GetValue(test, 'grammar');
-                    const input = GetValue(test, 'input');
-                    const grammarWell = await AsyncRun(async () => (await GrammarWellRunner(grammar))(input));
-                    const nearley = await AsyncRun(async () => (await NearleyRunner(grammar))(input));
-                    Expected(grammarWell.success, nearley.success);
-                    if (grammarWell.success && nearley.success) {
-                        Expected(grammarWell.result, nearley.result);
-                    }
-                })
-            }
-        })
-    }
-})
+}) 

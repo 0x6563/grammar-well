@@ -1,21 +1,4 @@
-import { Dictionary, GrammarBuilderRule, RuleDefinition, RuleDefinitionList } from "../typings";
-import { CompilerState } from "./compiler";
-export interface GeneratorState {
-    rules: GrammarBuilderRule[];
-    head: string[];
-    body: string[];
-    customTokens: Set<string>;
-    config: Dictionary<string>;
-    macros: Dictionary<{
-        args: any;
-        exprs: any;
-    }>;
-    start: string;
-    version: string;
-}
-export interface SerializedGeneratorState extends Omit<GeneratorState, 'customTokens'> {
-    customTokens: string[];
-}
+import { CompilerState, GeneratorState, LanguageDirective } from "../typings";
 export declare class Generator {
     private config;
     private compilerState;
@@ -27,12 +10,16 @@ export declare class Generator {
         version?: string;
     }, compilerState: CompilerState);
     import(source: string): Promise<void>;
-    import(rule: RuleDefinition): Promise<void>;
-    import(rules: RuleDefinitionList): Promise<void>;
+    import(directive: LanguageDirective): Promise<void>;
+    import(directives: LanguageDirective): Promise<void>;
     export(): GeneratorState;
-    private includeBuiltIn;
-    private includeGrammar;
-    private mergeGrammarString;
+    private processImportDirective;
+    private processConfigDirective;
+    private processGrammarDirective;
+    private processLexerDirective;
+    private importBuiltIn;
+    private importGrammar;
+    private mergeLanguageDefinitionString;
     private merge;
     private uuid;
     private buildRules;
@@ -41,5 +28,4 @@ export declare class Generator {
     private buildStringToken;
     private buildSubExpressionToken;
     private buildEBNFToken;
-    private buildMacroCallToken;
 }

@@ -1,4 +1,4 @@
-import { Rule } from "../../../typings";
+import { GrammarRule } from "../../../typings";
 import { Message } from "../../../utility/message";
 import { EarleyParser } from "./parser";
 import { State } from "./state";
@@ -13,7 +13,7 @@ export class ParserErrorService {
         const token = lexerError.token;
         if (token) {
             tokenDisplay = "input " + JSON.stringify(token.text[0]) + " (lexer error)";
-            lexerMessage = Message.LexerTokenError(this.parser.lexer);
+            lexerMessage = Message.LexerTokenError(this.parser.tokenQueue);
         } else {
             tokenDisplay = "input (lexer error)";
             lexerMessage = lexerError.message;
@@ -23,7 +23,7 @@ export class ParserErrorService {
 
     tokenError(token) {
         const tokenDisplay = (token.type ? token.type + " token: " : "") + JSON.stringify(token.value !== undefined ? token.value : token);
-        const lexerMessage = Message.LexerTokenError(this.parser.lexer);
+        const lexerMessage = Message.LexerTokenError(this.parser.tokenQueue);
         const error: any = new Error(this.reportErrorCommon(lexerMessage, tokenDisplay));
         error.offset = this.parser.current;
         error.token = token;
@@ -110,7 +110,7 @@ export class ParserErrorService {
         return [state].concat(childResult);
     }
 
-    formatRule(rule: Rule, withCursorAt?: number) {
+    formatRule(rule: GrammarRule, withCursorAt?: number) {
         let symbolSequence = rule.symbols.slice(0, withCursorAt).map(v => Message.GetSymbolDisplay(v, true, true)).join(' ');
         if (typeof withCursorAt !== "undefined") {
             symbolSequence += " ● " + rule.symbols.slice(withCursorAt).map(v => Message.GetSymbolDisplay(v, true, true)).join(' ');

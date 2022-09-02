@@ -1,6 +1,6 @@
 import { Lexer } from "../typings";
 
-export class BasicLexer implements Lexer {
+export class CharacterLexer implements Lexer {
     private buffer: string | any[] = '';
 
     private $indexOffset = 0;
@@ -33,7 +33,7 @@ export class BasicLexer implements Lexer {
         }
     }
 
-    feed(buffer: string | any[], state?: ReturnType<BasicLexer['state']>) {
+    feed(buffer: string | any[], state?: ReturnType<CharacterLexer['state']>) {
         if (Array.isArray(buffer) && (!this.buffer || Array.isArray(this.buffer))) {
             this.buffer = Array.isArray(this.buffer) ? this.buffer : [];
             this.buffer.push(...buffer);

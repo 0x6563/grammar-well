@@ -1,6 +1,8 @@
-@{%
-const tokenPrint = { literal: "print" };
-const tokenNumber = { test: x => Number.isInteger(x) };
-%}
+head ${
+    const tokenPrint = { literal: "print" };
+    const tokenNumber = { test: x => Number.isInteger(x) };
+}
 
-main -> %tokenPrint %tokenNumber ";;"
+grammar {{
+    main -> $tokenPrint $tokenNumber ";;"
+}}

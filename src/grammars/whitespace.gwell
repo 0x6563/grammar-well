@@ -1,0 +1,6 @@
+grammar {{
+    _  -> wschar:* {{ null }}
+    __ -> wschar:+ {{ null }}
+
+    wschar -> [\t\n\v\f] {{ $0 }}
+}}

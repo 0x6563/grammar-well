@@ -1,15 +1,15 @@
 import { State } from "./state";
-import { Dictionary, LexerState, Rule } from "../../../typings";
+import { Dictionary, TokenQueueRestorePoint, GrammarRule } from "../../../typings";
 export declare class Column {
     private ruleMap;
     index: number;
-    lexerState: LexerState;
+    restorePoint: TokenQueueRestorePoint;
     data: any;
     states: State[];
     wants: Dictionary<State[]>;
     scannable: State[];
     completed: Dictionary<State[]>;
-    constructor(ruleMap: Dictionary<Rule[]>, index: number);
+    constructor(ruleMap: Dictionary<GrammarRule[]>, index: number);
     process(): void;
     predict(exp: string): void;
     private complete;

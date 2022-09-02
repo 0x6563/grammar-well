@@ -2,36 +2,30 @@
 # from the Antlr grammar at: http://www.antlr3.org/grammar/list.html
 # see also: https://github.com/antlr/grammars-v4
 
-@{%
-var appendItem = function (a, b) { return function (d) { return d[a].concat([d[b]]); } };
-var appendItemChar = function (a, b) { return function (d) { return d[a].concat(d[b]); } };
-var empty = function (d) { return []; };
-var emptyStr = function (d) { return ""; };
-%}
 
-file              -> header newline rows             {% function (d) { return { header: d[0], rows: d[2] }; } %}
+file              -> header newline rows             {{ { header: $0, rows: $2 } }}
 
-header            -> row                             {% id %}
+header            -> row                             {{ $0 }}
 
 rows              -> row
-                   | rows newline row                {% appendItem(0,2) %}
+                   | rows newline row                {% $0.concat([$2]) %}
 
 row               -> field
-                   | row "," field                   {% appendItem(0,2) %}
+                   | row "," field                   {% $0.concat([$2]) %}
 
-field             -> unquoted_field                  {% id %}
-                   | "\"" quoted_field "\""          {% function (d) { return d[1]; } %}
+field             -> unquoted_field                  {{ $0 }}
+                   | "\"" quoted_field "\""          {{ $1 }}
 
-quoted_field      -> null                            {% emptyStr %}
-                   | quoted_field quoted_field_char  {% appendItemChar(0,1) %}
+quoted_field      -> null                            {{ "" }}
+                   | quoted_field quoted_field_char  {% $0.concat($1) %}
 
-quoted_field_char -> [^"]                            {% id %}
-                   | "\"" "\""                       {% function (d) { return "\""; } %}
+quoted_field_char -> [^"]                            {{ $0 }}
+                   | "\"" "\""                       {{ "\"" }}
 
-unquoted_field    -> null                            {% emptyStr %}
-                   | unquoted_field char             {% appendItemChar(0,1) %}
+unquoted_field    -> null                            {{ "" }}
+                   | unquoted_field char             {% $0.concat($1) %}
 
-char              -> [^\n\r",]                       {% id %}
+char              -> [^\n\r",]                       {{ $0 }}
 
-newline           -> "\r" "\n"                       {% empty %}
-                   | "\r" | "\n"                     {% empty %}
+newline           -> "\r" "\n"                       {{ [] }}
+                   | "\r" | "\n"                     {{ [] }}

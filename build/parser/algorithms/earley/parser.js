@@ -3,29 +3,35 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.EarleyParser = void 0;
 const column_1 = require("./column");
 const error_reporting_1 = require("./error-reporting");
-const legacy_adapter_1 = require("../../../lexers/legacy-adapter");
-const basic_lexer_1 = require("../../../lexers/basic-lexer");
+const token_queue_1 = require("../../../lexers/token-queue");
+const character_lexer_1 = require("../../../lexers/character-lexer");
+const stateful_lexer_1 = require("../../../lexers/stateful-lexer");
 class EarleyParser {
-    constructor({ rules, start, lexer, map }, options = {}) {
+    constructor({ grammar, lexer }, options = {}) {
         this.keepHistory = false;
         this.current = 0;
         this.ruleMap = Object.create(null);
+        const { rules, start } = grammar;
         this.rules = rules;
         this.start = start || this.rules[0].name;
-        this.lexer = lexer;
-        if (!map) {
-            for (const rule of rules) {
-                if (!this.ruleMap[rule.name])
-                    this.ruleMap[rule.name] = [rule];
-                else
-                    this.ruleMap[rule.name].push(rule);
-            }
+        for (const rule of rules) {
+            if (!this.ruleMap[rule.name])
+                this.ruleMap[rule.name] = [rule];
+            else
+                this.ruleMap[rule.name].push(rule);
         }
         this.keepHistory = !!(options === null || options === void 0 ? void 0 : options.keepHistory);
         this.errorService = new error_reporting_1.ParserErrorService(this);
-        this.lexer = (options === null || options === void 0 ? void 0 : options.lexer) || this.lexer || new basic_lexer_1.BasicLexer();
-        if (!this.lexer.restore)
-            this.lexer = new legacy_adapter_1.LegacyLexerAdapter(this.lexer);
+        const l = (options === null || options === void 0 ? void 0 : options.lexer) || lexer;
+        if (!l) {
+            this.tokenQueue = new token_queue_1.TokenQueue(new character_lexer_1.CharacterLexer());
+        }
+        else if ("states" in l) {
+            this.tokenQueue = (0, stateful_lexer_1.CompileStates)(l.states, l.start);
+        }
+        else {
+            this.tokenQueue = new token_queue_1.TokenQueue(l);
+        }
         const column = new column_1.Column(this.ruleMap, 0);
         this.table = [column];
         column.wants[this.start] = [];
@@ -34,7 +40,7 @@ class EarleyParser {
     }
     next() {
         try {
-            return this.lexer.next();
+            return this.tokenQueue.next();
         }
         catch (e) {
             const nextColumn = new column_1.Column(this.ruleMap, this.current + 1);
@@ -43,9 +49,10 @@ class EarleyParser {
         }
     }
     feed(chunk) {
-        this.lexer.feed(chunk);
-        let token, column;
-        while (token = this.next()) {
+        this.tokenQueue.feed(chunk);
+        let column;
+        let token = this.next();
+        while (token != undefined) {
             column = this.table[this.current];
             if (!this.keepHistory) {
                 delete this.table[this.current - 1];
@@ -53,14 +60,14 @@ class EarleyParser {
             this.current++;
             const nextColumn = new column_1.Column(this.ruleMap, this.current);
             this.table.push(nextColumn);
-            const literal = token.text !== undefined ? token.text : token.value;
-            const data = this.lexer.constructor === basic_lexer_1.BasicLexer ? token.value : token;
+            const literal = token.value;
+            const data = token;
             nextColumn.data = literal;
             const { scannable } = column;
             for (let w = scannable.length; w--;) {
                 const state = scannable[w];
                 const expect = state.rule.symbols[state.dot];
-                if ((expect.test && expect.test(data)) || (expect.type && expect.type === token.type) || (expect === null || expect === void 0 ? void 0 : expect.literal) === literal) {
+                if ((expect.test && expect.test(literal)) || (expect.type && expect.type === token.type) || (expect === null || expect === void 0 ? void 0 : expect.literal) === literal) {
                     const next = state.nextState({ data, token, isToken: true, reference: this.current - 1 });
                     nextColumn.states.push(next);
                 }
@@ -70,17 +77,18 @@ class EarleyParser {
                 throw this.errorService.tokenError(token);
             }
             if (this.keepHistory) {
-                column.lexerState = this.lexer.state;
+                column.restorePoint = this.tokenQueue.state;
             }
+            token = this.next();
         }
         if (column) {
-            this.lexerState = this.lexer.state;
+            this.restorePoint = this.tokenQueue.state;
         }
         this.results = this.finish();
     }
     save() {
         const column = this.table[this.current];
-        column.lexerState = this.lexerState;
+        column.restorePoint = this.restorePoint;
         return column;
     }
     restore(column) {
@@ -88,8 +96,8 @@ class EarleyParser {
         this.current = index;
         this.table[index] = column;
         this.table.splice(index + 1);
-        this.lexerState = column.lexerState;
-        this.lexer.restore(column.lexerState);
+        this.restorePoint = column.restorePoint;
+        this.tokenQueue.restore(column.restorePoint);
         this.results = this.finish();
     }
     rewind(index) {

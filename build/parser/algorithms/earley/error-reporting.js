@@ -11,7 +11,7 @@ class ParserErrorService {
         const token = lexerError.token;
         if (token) {
             tokenDisplay = "input " + JSON.stringify(token.text[0]) + " (lexer error)";
-            lexerMessage = message_1.Message.LexerTokenError(this.parser.lexer);
+            lexerMessage = message_1.Message.LexerTokenError(this.parser.tokenQueue);
         }
         else {
             tokenDisplay = "input (lexer error)";
@@ -21,7 +21,7 @@ class ParserErrorService {
     }
     tokenError(token) {
         const tokenDisplay = (token.type ? token.type + " token: " : "") + JSON.stringify(token.value !== undefined ? token.value : token);
-        const lexerMessage = message_1.Message.LexerTokenError(this.parser.lexer);
+        const lexerMessage = message_1.Message.LexerTokenError(this.parser.tokenQueue);
         const error = new Error(this.reportErrorCommon(lexerMessage, tokenDisplay));
         error.offset = this.parser.current;
         error.token = token;

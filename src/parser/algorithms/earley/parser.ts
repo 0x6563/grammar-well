@@ -1,42 +1,40 @@
 import { Column } from "./column";
-import { Dictionary, Lexer, LexerState, ParserAlgorithm, PrecompiledGrammar, Rule } from "../../../typings";
+import { Dictionary, Lexer, LexerConfig, TQRestorePoint, ParserAlgorithm, GrammarRule } from "../../../typings";
 import { ParserErrorService } from "./error-reporting";
 import { TokenQueue } from "../../../lexers/token-queue";
-import { BasicLexer } from "../../../lexers/basic-lexer";
 
 export interface ParserOptions {
     keepHistory?: boolean;
-    lexer?: Lexer;
+    lexer?: Lexer | LexerConfig;
 }
-
 
 export class EarleyParser implements ParserAlgorithm {
     static fail = Symbol();
     keepHistory: boolean = false;
     current: number = 0;
-    rules: Rule[];
+    rules: GrammarRule[];
     start: string;
-    lexer: TokenQueue;
-    lexerState: LexerState;
+    tokenQueue: TokenQueue;
+    restorePoint: TQRestorePoint;
     table: Column[];
     results: any;
     errorService: ParserErrorService;
-    ruleMap: Dictionary<Rule[]> = Object.create(null);
+    ruleMap: Dictionary<GrammarRule[]> = Object.create(null);
 
-    constructor({ rules, start, lexer, map }: PrecompiledGrammar, options: ParserOptions = {}) {
+    constructor({ grammar, tokenQueue }, options: ParserOptions = {}) {
+        const { rules, start } = grammar;
         this.rules = rules;
         this.start = start || this.rules[0].name;
-        if (!map) {
-            for (const rule of rules) {
-                if (!this.ruleMap[rule.name])
-                    this.ruleMap[rule.name] = [rule];
-                else
-                    this.ruleMap[rule.name].push(rule);
-            }
+        for (const rule of rules) {
+            if (!this.ruleMap[rule.name])
+                this.ruleMap[rule.name] = [rule];
+            else
+                this.ruleMap[rule.name].push(rule);
         }
+        this.tokenQueue = tokenQueue;
         this.keepHistory = !!(options?.keepHistory);
         this.errorService = new ParserErrorService(this);
-        this.lexer = new TokenQueue(options?.lexer || lexer || new BasicLexer());
+
         const column = new Column(this.ruleMap, 0);
         this.table = [column];
 
@@ -47,7 +45,7 @@ export class EarleyParser implements ParserAlgorithm {
 
     next() {
         try {
-            return this.lexer.next();
+            return this.tokenQueue.next();
         } catch (e) {
             const nextColumn = new Column(this.ruleMap, this.current + 1);
             this.table.push(nextColumn);
@@ -56,8 +54,8 @@ export class EarleyParser implements ParserAlgorithm {
     }
 
     feed(chunk: string) {
-        this.lexer.feed(chunk);
-        let column;
+        this.tokenQueue.feed(chunk);
+        let column: Column;
         let token = this.next();
 
         while (token != undefined) {
@@ -74,13 +72,13 @@ export class EarleyParser implements ParserAlgorithm {
 
             // Advance all tokens that expect the symbol
             const literal = token.value;
-            const data = token.value;
+            const data = token;
             nextColumn.data = literal;
             const { scannable } = column;
             for (let w = scannable.length; w--;) {
                 const state = scannable[w];
                 const expect: any = state.rule.symbols[state.dot];
-                if ((expect.test && expect.test(data)) || (expect.type && expect.type === token.type) || expect?.literal === literal) {
+                if ((expect.test && expect.test(literal)) || (expect.type && expect.type === token.type) || expect?.literal === literal) {
                     const next = state.nextState({ data, token, isToken: true, reference: this.current - 1 });
                     nextColumn.states.push(next);
                 }
@@ -95,15 +93,14 @@ export class EarleyParser implements ParserAlgorithm {
             }
 
             if (this.keepHistory) {
-                column.lexerState = this.lexer.state;
+                column.restorePoint = this.tokenQueue.state;
             }
             token = this.next();
-            console.log(token);
         }
 
 
         if (column) {
-            this.lexerState = this.lexer.state;
+            this.restorePoint = this.tokenQueue.state;
         }
 
         // Incrementally keep track of results
@@ -112,19 +109,18 @@ export class EarleyParser implements ParserAlgorithm {
 
     save() {
         const column = this.table[this.current];
-        column.lexerState = this.lexerState;
+        column.restorePoint = this.restorePoint;
         return column;
     }
 
     restore(column: Column) {
-        console.log('restore', column)
         const index = column.index;
         this.current = index;
         this.table[index] = column;
         this.table.splice(index + 1);
-        this.lexerState = column.lexerState;
+        this.restorePoint = column.restorePoint;
 
-        this.lexer.restore(column.lexerState);
+        this.tokenQueue.restore(column.restorePoint);
         // Incrementally keep track of results
         this.results = this.finish();
     }

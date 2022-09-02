@@ -1,10 +1,10 @@
 import { EarleyParser } from "./parser";
 import { State } from "./state";
-import { Dictionary, LexerState, Rule } from "../../../typings";
+import { Dictionary, TQRestorePoint, GrammarRule } from "../../../typings";
 
 
 export class Column {
-    lexerState: LexerState;
+    restorePoint: TQRestorePoint;
     data: any;
     states: State[] = [];
     wants: Dictionary<State[]> = Object.create(null);// states indexed by the non-terminal they expect
@@ -12,7 +12,7 @@ export class Column {
     completed: Dictionary<State[]> = Object.create(null);  // states that are nullable
 
     constructor(
-        private ruleMap: Dictionary<Rule[]>,
+        private ruleMap: Dictionary<GrammarRule[]>,
         public index: number
     ) { }
 
