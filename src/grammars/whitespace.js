@@ -15,8 +15,7 @@ function GWLanguage(){
                 { name: "__", symbols: ["__$ebnf$1"], postprocess: ({data}) => { return null; } },
                 { name: "wschar", symbols: [/[\t\n\v\f]/], postprocess: ({data}) => { return data[0]; } }
             ]
-        },
-        lexer: null
+        }
     }
 }
 

@@ -85,7 +85,10 @@ export interface GrammarDirective {
     }
 }
 export interface LexerDirective {
-    lexer: LexerConfig
+    lexer: {
+        start?: string,
+        states: LexerStateDefinition[];
+    };
 }
 
 export type GrammarRuleSymbol = string | RegExp | GrammarRuleSymbolToken | GrammarRuleSymbolLexerToken | GrammarRuleSymbolTestable | LexerTokenMatch;
@@ -189,7 +192,7 @@ export interface CompiledStateDefinition {
 }
 export interface LexerConfig {
     start?: string
-    states: LexerStateDefinition[];
+    states: Dictionary<LexerStateDefinition>;
 }
 
 export interface GeneratorState {
@@ -197,7 +200,10 @@ export interface GeneratorState {
     config: Dictionary<string>;
     head: string[];
     body: string[];
-    lexer?: LexerConfig;
+    lexer?: {
+        start?: string,
+        states: LexerStateDefinition[];
+    };
     grammar: {
         start: string;
         rules: GrammarBuilderRule[],

@@ -15,12 +15,12 @@ export class StatefulLexer {
     private regexp: RegExp;
 
     constructor({ states, start }: LexerConfig) {
-        const statemap = ResolveStates(states, start);
-        for (const key in statemap) {
+        ResolveStates(states, start);
+        for (const key in states) {
             this.states[key] = {
-                regexp: CompileRegExp(statemap[key] as ResolvedStateDefinition),
-                rules: statemap[key].rules as LexerStateMatchRule[],
-                unmatched: statemap[key].unmatched ? { type: statemap[key].unmatched } as LexerStateMatchRule : null
+                regexp: CompileRegExp(states[key] as ResolvedStateDefinition),
+                rules: states[key].rules as LexerStateMatchRule[],
+                unmatched: states[key].unmatched ? { type: states[key].unmatched } as LexerStateMatchRule : null
             };
         }
         this.start = start;
@@ -271,26 +271,20 @@ function CompileRegExp(state: ResolvedStateDefinition): RegExp {
     return new RegExp(RegexLib.Join(subexpressions), flags);
 }
 
-export function ResolveStates(states: LexerStateDefinition[], start: string) {
+export function ResolveStates(states: { [key: string]: LexerStateDefinition }, start: string) {
 
-    const statemap: { [key: string]: LexerStateDefinition } = Object.create(null);
     const resolved = new Set<string>();
     const resolving = new Set<string>();
     const chain = new Set<string>();
 
-    start = start || states[0].name;
 
-    for (const state of states) {
-        statemap[state.name] = state;
-    }
-
-    ResolveRuleImports(start, statemap, resolved, resolving, chain);
-    for (const key in statemap) {
+    ResolveRuleImports(start, states, resolved, resolving, chain);
+    for (const key in states) {
         if (!resolved.has(key)) {
-            delete statemap[key];
+            delete states[key];
         }
     }
-    return statemap;
+    return states;
 }
 
 function ResolveRuleImports(name: string, states: { [key: string]: LexerStateDefinition }, resolved: Set<string>, resolving: Set<string>, chain: Set<string>) {

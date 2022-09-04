@@ -54,8 +54,7 @@ function GWLanguage(){
                 { name: "jsonfloat$ebnf$4", symbols: [], postprocess: () => null },
                 { name: "jsonfloat", symbols: ["jsonfloat$ebnf$1", "jsonfloat$ebnf$2", "jsonfloat$ebnf$3", "jsonfloat$ebnf$4"], postprocess: ({data}) => { return parseFloat( (data[0] || "") + data[1].join("") + (data[2] ? "."+data[2][1].join("") : "") + (data[3] ? "e" + (data[3][1] || "+") + data[3][2].join("") : "")); } }
             ]
-        },
-        lexer: null
+        }
     }
 }
 

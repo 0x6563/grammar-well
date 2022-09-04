@@ -163,8 +163,8 @@ function GWLanguage(){
         },
         lexer: {
             start: "start",
-            states: [
-                {
+            states: {
+                start: {
                     name: "start",
                     rules: [
                         { import: ["string","js","ws","comment"] },
@@ -174,55 +174,55 @@ function GWLanguage(){
                         { import: ["kv"] }
                     ]
                 },
-                {
+                config: {
                     name: "config",
                     rules: [
                         { import: ["ws"] },
                         { when: "{{", type: "L_TEMPLATEL", set: "config_inner" }
                     ]
                 },
-                {
+                config_inner: {
                     name: "config_inner",
                     rules: [
                         { import: ["comment","kv"] },
                         { when: "}}", type: "L_TEMPLATER", pop: 1 }
                     ]
                 },
-                {
+                grammar: {
                     name: "grammar",
                     rules: [
                         { import: ["ws"] },
                         { when: "{{", type: "L_TEMPLATEL", set: "grammar_inner" }
                     ]
                 },
-                {
+                grammar_inner: {
                     name: "grammar_inner",
                     rules: [
                         { import: ["comment","js","js_template","ws","regex","charclass","l_ebnf_01","l_ebnf_1n","l_ebnf_0n","kv","l_colon","l_comma","l_pipe","l_parenl","l_parenr","l_arrow","l_dsign","l_dash"] },
                         { when: "}}", type: "L_TEMPLATER", pop: 1 }
                     ]
                 },
-                {
+                lexer: {
                     name: "lexer",
                     rules: [
                         { import: ["ws"] },
                         { when: "{{", type: "L_TEMPLATEL", set: "lexer_inner" }
                     ]
                 },
-                {
+                lexer_inner: {
                     name: "lexer_inner",
                     rules: [
                         { import: ["ws","comment","regex","l_comma","l_arrow","l_dash","kv","js"] },
                         { when: "}}", type: "L_TEMPLATER", pop: 1 }
                     ]
                 },
-                {
+                js: {
                     name: "js",
                     rules: [
                         { when: "${", type: "L_JSL", goto: "js_wrap" }
                     ]
                 },
-                {
+                js_wrap: {
                     name: "js_wrap",
                     default: "T_JSBODY",
                     unmatched: "T_JSBODY",
@@ -232,7 +232,7 @@ function GWLanguage(){
                         { when: "}", type: "L_JSR", pop: 1 }
                     ]
                 },
-                {
+                js_literal: {
                     name: "js_literal",
                     default: "T_JSBODY",
                     unmatched: "T_JSBODY",
@@ -242,13 +242,13 @@ function GWLanguage(){
                         { when: "}", type: "T_JSBODY", pop: 1 }
                     ]
                 },
-                {
+                js_template: {
                     name: "js_template",
                     rules: [
                         { when: "{{", type: "L_TEMPLATEL", goto: "js_template_inner" }
                     ]
                 },
-                {
+                js_template_inner: {
                     name: "js_template_inner",
                     default: "T_JSBODY",
                     unmatched: "T_JSBODY",
@@ -258,13 +258,13 @@ function GWLanguage(){
                         { when: "}}", type: "L_TEMPLATER", pop: 1 }
                     ]
                 },
-                {
+                kv: {
                     name: "kv",
                     rules: [
                         { import: ["string","ws","word","l_colon","integer"] }
                     ]
                 },
-                {
+                jsignore: {
                     name: "jsignore",
                     rules: [
                         { when: /"(?:[^"\\]|\\.)*"/, type: "T_JSBODY" },
@@ -275,145 +275,145 @@ function GWLanguage(){
                         { when: /\/\*.*\*\//, type: "T_JSBODY" }
                     ]
                 },
-                {
+                string: {
                     name: "string",
                     rules: [
                         { when: /"(?:[^"\\\r\n]|\\.)*"/, type: "T_STRING" }
                     ]
                 },
-                {
+                string2: {
                     name: "string2",
                     rules: [
                         { when: /'(?:[^'\\\r\n]|\\.)*'/, type: "T_STRING" }
                     ]
                 },
-                {
+                string3: {
                     name: "string3",
                     rules: [
                         { when: /`(?:[^`\\]|\\.)*`/, type: "T_STRING" }
                     ]
                 },
-                {
+                charclass: {
                     name: "charclass",
                     rules: [
                         { when: /\[(?:[^\]\\]|\\.)+\]/, type: "T_CHARCLASS" }
                     ]
                 },
-                {
+                regex: {
                     name: "regex",
                     rules: [
                         { when: /\/(?:[^\/\\\r\n]|\\.)+\//, type: "T_REGEX" }
                     ]
                 },
-                {
+                integer: {
                     name: "integer",
                     rules: [
                         { when: /\d+/, type: "T_INTEGER" }
                     ]
                 },
-                {
+                word: {
                     name: "word",
                     rules: [
                         { when: /[a-zA-Z_][a-zA-Z_\d]*/, type: "T_WORD" }
                     ]
                 },
-                {
+                ws: {
                     name: "ws",
                     rules: [
                         { when: /\s+/, type: "T_WS" }
                     ]
                 },
-                {
+                l_colon: {
                     name: "l_colon",
                     rules: [
                         { when: ":", type: "L_COLON" }
                     ]
                 },
-                {
+                l_ebnf_01: {
                     name: "l_ebnf_01",
                     rules: [
                         { when: "?", type: "L_EBNF_01" }
                     ]
                 },
-                {
+                l_ebnf_1n: {
                     name: "l_ebnf_1n",
                     rules: [
                         { when: "+", type: "L_EBNF_1N" }
                     ]
                 },
-                {
+                l_ebnf_0n: {
                     name: "l_ebnf_0n",
                     rules: [
                         { when: "*", type: "L_EBNF_0N" }
                     ]
                 },
-                {
+                l_comma: {
                     name: "l_comma",
                     rules: [
                         { when: ",", type: "L_COMMA" }
                     ]
                 },
-                {
+                l_pipe: {
                     name: "l_pipe",
                     rules: [
                         { when: "|", type: "L_PIPE" }
                     ]
                 },
-                {
+                l_parenl: {
                     name: "l_parenl",
                     rules: [
                         { when: "(", type: "L_PARENL" }
                     ]
                 },
-                {
+                l_parenr: {
                     name: "l_parenr",
                     rules: [
                         { when: ")", type: "L_PARENR" }
                     ]
                 },
-                {
+                l_templatel: {
                     name: "l_templatel",
                     rules: [
                         { when: "{{", type: "L_TEMPLATEL" }
                     ]
                 },
-                {
+                l_templater: {
                     name: "l_templater",
                     rules: [
                         { when: "}}", type: "L_TEMPLATER" }
                     ]
                 },
-                {
+                l_arrow: {
                     name: "l_arrow",
                     rules: [
                         { when: "->", type: "L_ARROW" }
                     ]
                 },
-                {
+                l_dsign: {
                     name: "l_dsign",
                     rules: [
                         { when: "$", type: "L_DSIGN" }
                     ]
                 },
-                {
+                l_dash: {
                     name: "l_dash",
                     rules: [
                         { when: "-", type: "L_DASH" }
                     ]
                 },
-                {
+                comment: {
                     name: "comment",
                     rules: [
                         { when: /\/\/[\n]*/, type: "T_COMMENT" }
                     ]
                 },
-                {
+                commentmulti: {
                     name: "commentmulti",
                     rules: [
                         { when: /\/\*.*\*\//, type: "T_COMMENT" }
                     ]
                 }
-            ]
+            }
         }
     }
 }

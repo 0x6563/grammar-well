@@ -1,4 +1,4 @@
-import { GeneratorState, LexerConfig } from "../../typings";
+import { GeneratorState, GrammarBuilderRule, LexerConfig, LexerDirective, LexerStateDefinition } from "../../typings";
 
 const PostProcessors = {
     "joiner": "({data}) => data.join('')",
@@ -16,14 +16,22 @@ export function SerializeState(state: GeneratorState, depth: number = 0) {
 }
 
 export function SerializeGrammar(grammar: GeneratorState['grammar'], depth: number = 0) {
+    if (!grammar) {
+        return null;
+    }
     return PrettyObject({
         start: JSON.stringify(grammar.start),
         rules: SerializeGrammarRules(grammar.rules, depth + 1)
     }, depth);
 }
 
-function SerializeGrammarRules(rules, depth: number = 0) {
-    return `[${rules.map((rule) => NewLine(depth + 1) + SerializeGrammarRule(rule)).join()}${NewLine(depth)}]`;
+function SerializeGrammarRules(rules: GrammarBuilderRule[], depth: number = 0) {
+    const map = {};
+    for (const rule of rules) {
+        map[rule.name] = map[rule.name] || [];
+        map[rule.name].push(rule);
+    }
+    return PrettyObject(map, depth);
 }
 
 function NewLine(depth: number) {
@@ -49,30 +57,30 @@ function SerializeGrammarRule(rule) {
     }, -1);
 }
 
-export function SerializeLexerConfig(config: LexerConfig | string, depth: number = 0) {
+export function SerializeLexerConfig(config: GeneratorState['lexer'] | string, depth: number = 0) {
     if (!config) {
-        return 'null';
+        return null;
     }
     if (typeof config === 'string')
         return config;
-    return `{${NewLine(depth + 1)}start: ${JSON.stringify(config.start)},${NewLine(depth + 1)}states: ${SerializeLexerConfigStates(config.states, depth + 1)}${NewLine(depth)}}`;
+    return PrettyObject({
+        start: JSON.stringify(config.start),
+        states: SerializeLexerConfigStates(config.states, depth + 1)
+    }, depth);
 }
 
-function SerializeLexerConfigStates(states: LexerConfig['states'], depth: number) {
-    let s = `[`;
-    let ss = [];
+function SerializeLexerConfigStates(states: LexerStateDefinition[], depth: number) {
+    const map = {};
     for (const state of states) {
-        let r = NewLine(depth + 1) + PrettyObject({
+        map[state.name] = PrettyObject({
             name: JSON.stringify(state.name),
             default: state.default ? JSON.stringify(state.default) : null,
             unmatched: state.unmatched ? JSON.stringify(state.unmatched) : null,
             rules: SerializeLexerConfigStateRules(state.rules, depth + 2)
         }, depth + 1);
-        ss.push(r);
+        // ss.push(r);
     }
-    s += ss.join();
-    s += NewLine(depth) + ']';
-    return s;
+    return PrettyObject(map, depth);
 }
 
 function SerializeLexerConfigStateRules(rules: LexerConfig['states'][0]['rules'], depth: number) {
@@ -100,19 +108,32 @@ function SerializeLexerConfigStateRules(rules: LexerConfig['states'][0]['rules']
     s += NewLine(depth) + ']';
     return s;
 }
+
 function PrettyObject(obj: { [key: string]: string }, depth = 0) {
     let r = `{`;
     const keys = Object.keys(obj).filter(v => isVal(obj[v]));
     for (let i = 0; i < keys.length; i++) {
         const key = keys[i];
         const value = obj[key];
-        r += `${depth >= 0 ? NewLine(depth + 1) : ' '}${key}: ${value}${(isVal(obj[keys[i + 1]]) ? ',' : '')}`;
+        if (Array.isArray(value)) {
+            r += `${depth >= 0 ? NewLine(depth + 1) : ' '}${key}: ${PrettyArray(value, depth >= 0 ? depth + 1 : -1)}${(isVal(obj[keys[i + 1]]) ? ',' : '')}`;
+        } {
+            r += `${depth >= 0 ? NewLine(depth + 1) : ' '}${key}: ${value}${(isVal(obj[keys[i + 1]]) ? ',' : '')}`;
+        }
     }
     r += `${depth >= 0 ? NewLine(depth) : ' '}}`;
     return r;
-
 }
 
+function PrettyArray(obj: string[], depth = 0) {
+    let r = `[`;
+    for (let i = 0; i < obj.length; i++) {
+        const value = obj[i];
+        r += `${depth >= 0 ? NewLine(depth + 1) : ' '}${value}${(isVal(obj[i + 1]) ? ',' : '')}`;
+    }
+    r += `${depth >= 0 ? NewLine(depth) : ' '}]`;
+    return r;
+}
 function isVal(value) {
     return typeof value !== 'undefined' && value !== null;
 }

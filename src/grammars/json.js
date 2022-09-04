@@ -64,8 +64,8 @@ function GWLanguage(){
         },
         lexer: {
             start: "start",
-            states: [
-                {
+            states: {
+                start: {
                     name: "start",
                     rules: [
                         { when: /\s+/, type: "space" },
@@ -82,7 +82,7 @@ function GWLanguage(){
                         { when: "null" }
                     ]
                 }
-            ]
+            }
         }
     }
 }
