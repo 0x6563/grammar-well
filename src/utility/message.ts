@@ -1,5 +1,5 @@
 import { TokenQueue } from "../lexers/token-queue";
-import { RuleSymbol } from "../typings";
+import { GrammarRule, GrammarRuleSymbol } from "../typings";
 
 export class Message {
 
@@ -29,7 +29,7 @@ export class Message {
         return `Syntax error at index ${offset}:\n\n${string}\n`;
     }
 
-    static GetSymbolDisplay(symbol: RuleSymbol, short?: boolean, error?: boolean) {
+    static GetSymbolDisplay(symbol: GrammarRuleSymbol, short?: boolean, error?: boolean) {
         if (typeof symbol === 'string') {
             return symbol;
         } else {
@@ -42,8 +42,16 @@ export class Message {
             } else if ("test" in symbol) {
                 return short ? `<${symbol.test.toString()}>` : `token matching ${symbol.test.toString()}`;
             } else if (error) {
-                throw new Error('Unknown symbol type: ' + JSON.stringify(symbol));
+                return 'Unknown symbol type: ' + JSON.stringify(symbol);
             }
         }
+    }
+
+    static FormatGrammarRule(rule: GrammarRule, withCursorAt?: number) {
+        let symbolSequence = rule.symbols.slice(0, withCursorAt).map(v => Message.GetSymbolDisplay(v, true, true)).join(' ');
+        if (typeof withCursorAt !== "undefined") {
+            symbolSequence += " ● " + rule.symbols.slice(withCursorAt).map(v => Message.GetSymbolDisplay(v, true, true)).join(' ');
+        };
+        return rule.name + " → " + symbolSequence;
     }
 }

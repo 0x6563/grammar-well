@@ -1,9 +1,9 @@
-import { LanguageDefinition, RuleSymbol } from "../typings";
+import { LanguageDefinition, GrammarRuleSymbol } from "../typings";
 
 
-export function LintGrammarSymbols(language: LanguageDefinition): RuleSymbol[] {
-    const unused = new Set<RuleSymbol>();
-    const used = new Set<RuleSymbol>();
+export function LintGrammarSymbols(language: LanguageDefinition): GrammarRuleSymbol[] {
+    const unused = new Set<GrammarRuleSymbol>();
+    const used = new Set<GrammarRuleSymbol>();
     const { rules } = language.grammar;
     rules.forEach(r => used.add(r.name));
     for (const { symbols } of rules) {

@@ -1,5 +1,5 @@
-export default Grammar;
-declare function Grammar(): {
+export default GWLanguage;
+declare function GWLanguage(): {
     grammar: {
         start: string;
         rules: ({

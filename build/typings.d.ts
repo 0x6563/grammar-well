@@ -1,3 +1,4 @@
+import { TokenQueue } from "./lexers/token-queue";
 export interface CompileOptions {
     version?: string;
     noscript?: boolean;
@@ -22,9 +23,9 @@ export interface ImportResolverConstructor {
 }
 interface PostProcessorPayload {
     data: any[];
+    rule: GrammarRule;
     reference: number;
     dot: number;
-    name: string;
     reject: Symbol;
 }
 export declare type BuiltInPostProcessor = {
@@ -59,7 +60,7 @@ export interface LexerTokenMatch {
 }
 export interface EBNFModified {
     ebnf: ExpressionToken;
-    modifier: ":+" | ":*" | ":?";
+    modifier: "+" | "*" | "?";
 }
 export interface TokenLiteral {
     literal: string;
@@ -76,32 +77,34 @@ export interface GrammarDirective {
 export interface LexerDirective {
     lexer: LexerConfig;
 }
-export declare type RuleSymbol = string | RegExp | RuleSymbolToken | RuleSymbolLexerToken | LexerTokenMatch | RuleSymbolTestable;
-interface RuleSymbolToken {
+export declare type GrammarRuleSymbol = string | RegExp | GrammarRuleSymbolToken | GrammarRuleSymbolLexerToken | GrammarRuleSymbolTestable | LexerTokenMatch;
+interface GrammarRuleSymbolToken {
     literal: any;
 }
-interface RuleSymbolTestable {
+interface GrammarRuleSymbolTestable {
     test: (data: any) => boolean;
 }
-interface RuleSymbolLexerToken {
+interface GrammarRuleSymbolLexerToken {
     type: string;
 }
 export interface GrammarBuilderRule {
     name: string;
-    symbols: RuleSymbol[];
+    symbols: GrammarRuleSymbol[];
     postprocess?: BuiltInPostProcessor | string;
 }
 export interface GrammarRule {
     name: string;
-    symbols: RuleSymbol[];
+    symbols: GrammarRuleSymbol[];
     postprocess?: PostProcessor;
 }
 export interface ParserAlgorithm {
     results: any[];
     feed(path: string): void;
 }
-export interface ParserConstructor {
-    new (language: LanguageDefinition, options?: any): ParserAlgorithm;
+export interface ParserAlgorithmConstructor {
+    new (language: LanguageDefinition & {
+        tokenQueue: TokenQueue;
+    }, options?: any): ParserAlgorithm;
 }
 export interface LanguageDefinition {
     lexer?: Lexer | LexerConfig;
@@ -110,7 +113,7 @@ export interface LanguageDefinition {
         rules: GrammarRule[];
     };
 }
-export interface TokenQueueRestorePoint {
+export interface TQRestorePoint {
     historyIndex: number;
     offset: number;
 }
@@ -173,6 +176,9 @@ export interface GeneratorState {
     grammar: {
         start: string;
         rules: GrammarBuilderRule[];
+        names: {
+            [key: string]: number;
+        };
     };
 }
 export {};

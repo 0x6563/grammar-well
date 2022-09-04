@@ -26,7 +26,7 @@ function Rollup(ary) {
 function TemplatePostProcess(str) {
     return "({data}) => { return " + str.replace(/\$(\d+)/g, "data[$1]") + "; }";
 }
-function Grammar() {
+function GWLanguage() {
     return {
         grammar: {
             start: "main",
@@ -96,7 +96,7 @@ function Grammar() {
                 { name: "expr_member", symbols: ["T_CHARCLASS"], postprocess: ({ data }) => { return { regex: data[0] }; } },
                 { name: "expr_member", symbols: ["L_PARENL", "_", "expression_ext", "_", "L_PARENR"], postprocess: ({ data }) => { return ({ 'subexpression': data[2] }); } },
                 { name: "expr_member", symbols: ["expr_member", "_", "ebnf_modifier"], postprocess: ({ data }) => { return ({ 'ebnf': data[0], 'modifier': data[2] }); } },
-                { name: "ebnf_modifier", symbols: ["L_EBNF_0"], postprocess: ({ data }) => { return data[0][0].value; } },
+                { name: "ebnf_modifier", symbols: ["L_EBNF_01"], postprocess: ({ data }) => { return data[0][0].value; } },
                 { name: "ebnf_modifier", symbols: ["L_EBNF_1N"], postprocess: ({ data }) => { return data[0][0].value; } },
                 { name: "ebnf_modifier", symbols: ["L_EBNF_0N"], postprocess: ({ data }) => { return data[0][0].value; } },
                 { name: "expr", symbols: ["expr_member"] },
@@ -113,7 +113,7 @@ function Grammar() {
                 { name: "_$ebnf$1", symbols: [], postprocess: () => null },
                 { name: "_", symbols: ["_$ebnf$1"], postprocess: ({ data }) => { return null; } },
                 { name: "L_COLON", symbols: [{ type: "L_COLON" }] },
-                { name: "L_EBNF_0", symbols: [{ type: "L_EBNF_0" }] },
+                { name: "L_EBNF_01", symbols: [{ type: "L_EBNF_01" }] },
                 { name: "L_EBNF_1N", symbols: [{ type: "L_EBNF_1N" }] },
                 { name: "L_EBNF_0N", symbols: [{ type: "L_EBNF_0N" }] },
                 { name: "L_COMMA", symbols: [{ type: "L_COMMA" }] },
@@ -144,7 +144,7 @@ function Grammar() {
                 { name: "T_JS", symbols: [{ type: "L_JSL" }, "T_JS$ebnf$1", { type: "L_JSR" }], postprocess: ({ data }) => { return data[1].map(v => v.value).join(''); } },
                 { name: "T_GRAMMAR_TEMPLATE$ebnf$1", symbols: [] },
                 { name: "T_GRAMMAR_TEMPLATE$ebnf$1", symbols: ["T_GRAMMAR_TEMPLATE$ebnf$1", { type: "T_JSBODY" }], postprocess: ({ data }) => data[0].concat([data[1]]) },
-                { name: "T_GRAMMAR_TEMPLATE", symbols: [{ type: "L_TEMPLATEL" }, "_", "T_GRAMMAR_TEMPLATE$ebnf$1", "_", { type: "L_TEMPLATER" }], postprocess: ({ data }) => { return data[2].map(v => v.value).join(''); } },
+                { name: "T_GRAMMAR_TEMPLATE", symbols: [{ type: "L_TEMPLATEL" }, "_", "T_GRAMMAR_TEMPLATE$ebnf$1", "_", { type: "L_TEMPLATER" }], postprocess: ({ data }) => { return data[2].map(v => v.value).join('').trim(); } },
                 { name: "T_STRING", symbols: [{ type: "T_STRING" }], postprocess: ({ data }) => { return JSON.parse(data[0].value); } },
                 { name: "T_WORD", symbols: [{ type: "T_WORD" }], postprocess: ({ data }) => { return data[0].value; } },
                 { name: "T_REGEX$ebnf$1", symbols: [] },
@@ -162,57 +162,57 @@ function Grammar() {
                 {
                     name: "start",
                     rules: [
-                        { import: ["string", "js_pre", "ws", "comment"] },
-                        { when: /lexer(?![a-zA-Z\d_])/, type: "T_WORD", goto: "lexer_pre" },
-                        { when: /grammar(?![a-zA-Z\d_])/, type: "T_WORD", goto: "grammar_pre" },
-                        { when: /config(?![a-zA-Z\d_])/, type: "T_WORD", goto: "config_pre" },
+                        { import: ["string", "js", "ws", "comment"] },
+                        { when: /lexer(?![a-zA-Z\d_])/, type: "T_WORD", goto: "lexer" },
+                        { when: /grammar(?![a-zA-Z\d_])/, type: "T_WORD", goto: "grammar" },
+                        { when: /config(?![a-zA-Z\d_])/, type: "T_WORD", goto: "config" },
                         { import: ["kv"] }
                     ]
                 },
                 {
-                    name: "config_pre",
+                    name: "config",
                     rules: [
                         { import: ["ws"] },
-                        { when: "{{", type: "L_TEMPLATEL", set: "config" }
+                        { when: "{{", type: "L_TEMPLATEL", set: "config_inner" }
                     ]
                 },
                 {
-                    name: "config",
+                    name: "config_inner",
                     rules: [
                         { import: ["comment", "kv"] },
                         { when: "}}", type: "L_TEMPLATER", pop: 1 }
                     ]
                 },
                 {
-                    name: "grammar_pre",
-                    rules: [
-                        { import: ["ws"] },
-                        { when: "{{", type: "L_TEMPLATEL", set: "grammar" }
-                    ]
-                },
-                {
                     name: "grammar",
                     rules: [
-                        { import: ["comment", "js_pre", "js_templatepre", "ws", "regex", "charclass", "l_ebnf_0", "l_ebnf_1n", "l_ebnf_0n", "kv", "l_colon", "l_comma", "l_pipe", "l_parenl", "l_parenr", "l_arrow", "l_dsign", "l_dash"] },
-                        { when: "}}", type: "L_TEMPLATER", pop: 1 }
+                        { import: ["ws"] },
+                        { when: "{{", type: "L_TEMPLATEL", set: "grammar_inner" }
                     ]
                 },
                 {
-                    name: "lexer_pre",
+                    name: "grammar_inner",
                     rules: [
-                        { import: ["ws"] },
-                        { when: "{{", type: "L_TEMPLATEL", set: "lexer" }
+                        { import: ["comment", "js", "js_template", "ws", "regex", "charclass", "l_ebnf_01", "l_ebnf_1n", "l_ebnf_0n", "kv", "l_colon", "l_comma", "l_pipe", "l_parenl", "l_parenr", "l_arrow", "l_dsign", "l_dash"] },
+                        { when: "}}", type: "L_TEMPLATER", pop: 1 }
                     ]
                 },
                 {
                     name: "lexer",
                     rules: [
-                        { import: ["ws", "comment", "regex", "l_comma", "l_arrow", "l_dash", "kv", "js_pre"] },
+                        { import: ["ws"] },
+                        { when: "{{", type: "L_TEMPLATEL", set: "lexer_inner" }
+                    ]
+                },
+                {
+                    name: "lexer_inner",
+                    rules: [
+                        { import: ["ws", "comment", "regex", "l_comma", "l_arrow", "l_dash", "kv", "js"] },
                         { when: "}}", type: "L_TEMPLATER", pop: 1 }
                     ]
                 },
                 {
-                    name: "js_pre",
+                    name: "js",
                     rules: [
                         { when: "${", type: "L_JSL", goto: "js_wrap" }
                     ]
@@ -223,33 +223,33 @@ function Grammar() {
                     unmatched: "T_JSBODY",
                     rules: [
                         { import: ["jsignore"] },
-                        { when: "{", type: "T_JSBODY", goto: "js" },
+                        { when: "{", type: "T_JSBODY", goto: "js_literal" },
                         { when: "}", type: "L_JSR", pop: 1 }
                     ]
                 },
                 {
-                    name: "js",
+                    name: "js_literal",
                     default: "T_JSBODY",
                     unmatched: "T_JSBODY",
                     rules: [
                         { import: ["jsignore"] },
-                        { when: "{", type: "T_JSBODY", goto: "js" },
+                        { when: "{", type: "T_JSBODY", goto: "js_literal" },
                         { when: "}", type: "T_JSBODY", pop: 1 }
                     ]
                 },
                 {
-                    name: "js_templatepre",
+                    name: "js_template",
                     rules: [
-                        { when: "{{", type: "L_TEMPLATEL", goto: "js_templatewrap" }
+                        { when: "{{", type: "L_TEMPLATEL", goto: "js_template_inner" }
                     ]
                 },
                 {
-                    name: "js_templatewrap",
+                    name: "js_template_inner",
                     default: "T_JSBODY",
                     unmatched: "T_JSBODY",
                     rules: [
                         { import: ["jsignore"] },
-                        { when: "{", type: "T_JSBODY", goto: "js" },
+                        { when: "{", type: "T_JSBODY", goto: "js_literal" },
                         { when: "}}", type: "L_TEMPLATER", pop: 1 }
                     ]
                 },
@@ -325,21 +325,21 @@ function Grammar() {
                     ]
                 },
                 {
-                    name: "l_ebnf_0",
+                    name: "l_ebnf_01",
                     rules: [
-                        { when: ":?", type: "L_EBNF_0" }
+                        { when: "?", type: "L_EBNF_01" }
                     ]
                 },
                 {
                     name: "l_ebnf_1n",
                     rules: [
-                        { when: ":+", type: "L_EBNF_1N" }
+                        { when: "+", type: "L_EBNF_1N" }
                     ]
                 },
                 {
                     name: "l_ebnf_0n",
                     rules: [
-                        { when: ":*", type: "L_EBNF_0N" }
+                        { when: "*", type: "L_EBNF_0N" }
                     ]
                 },
                 {
@@ -412,5 +412,5 @@ function Grammar() {
         }
     };
 }
-exports.default = Grammar;
+exports.default = GWLanguage;
 //# sourceMappingURL=gwell.js.map

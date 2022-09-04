@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-function Grammar() {
+function GWLanguage() {
     return {
         grammar: {
             start: "dqstring",
@@ -27,5 +27,5 @@ function Grammar() {
         lexer: null
     };
 }
-exports.default = Grammar;
+exports.default = GWLanguage;
 //# sourceMappingURL=string.js.map

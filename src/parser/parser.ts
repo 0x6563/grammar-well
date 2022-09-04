@@ -2,7 +2,7 @@ import { CharacterLexer } from "../lexers/character-lexer";
 import { StatefulLexer } from "../lexers/stateful-lexer";
 import { TokenQueue } from "../lexers/token-queue";
 import { ParserAlgorithm, ParserAlgorithmConstructor, LanguageDefinition } from "../typings";
-import { EarleyParser } from "./algorithms/earley/parser";
+import { EarleyParser } from "./algorithms/earley/earley";
 
 const ParserRegistry = {
     'earley': EarleyParser
@@ -21,7 +21,7 @@ export class Parser {
         return this.parser.results
     }
 
-    constructor(private language: LanguageDefinition, private options: ParserOptions = { algorithm: 'earley' }) {
+    constructor(private language: LanguageDefinition, private options: ParserOptions = { algorithm: 'earley', parserOptions: {} }) {
         this.parserClass = ParserRegistry[options.algorithm];
         this.parser = this.getParserAlgo();
     }
@@ -43,10 +43,10 @@ export class Parser {
 
         if (!lexer) {
             tokenQueue = new TokenQueue(new CharacterLexer());
-        } else if ("states" in lexer) {
-            tokenQueue = new TokenQueue(new StatefulLexer(lexer));
-        } else {
+        } else if ("feed" in lexer && typeof lexer.feed == 'function') {
             tokenQueue = new TokenQueue(lexer);
+        } else if ('states' in lexer) {
+            tokenQueue = new TokenQueue(new StatefulLexer(lexer));
         }
 
         return new this.parserClass({ ...this.language, tokenQueue }, this.options.parserOptions);

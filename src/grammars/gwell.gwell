@@ -33,50 +33,50 @@ lexer {{
     start: "start"
     
 start ->
-	- import: string, js_pre, ws, comment
-	- when: /lexer(?![a-zA-Z\d_])/ type: "T_WORD" goto: lexer_pre
-	- when: /grammar(?![a-zA-Z\d_])/ type: "T_WORD" goto: grammar_pre
-	- when: /config(?![a-zA-Z\d_])/ type: "T_WORD" goto: config_pre
+	- import: string, js, ws, comment
+	- when: /lexer(?![a-zA-Z\d_])/ type: "T_WORD" goto: lexer
+	- when: /grammar(?![a-zA-Z\d_])/ type: "T_WORD" goto: grammar
+	- when: /config(?![a-zA-Z\d_])/ type: "T_WORD" goto: config
 	- import: kv
-config_pre ->
-	- import: ws
-	- when: "{{" type: "L_TEMPLATEL" set: config
 config ->
+	- import: ws
+	- when: "{{" type: "L_TEMPLATEL" set: config_inner
+config_inner ->
 	- import: comment, kv
 	- when: "}}" type: "L_TEMPLATER" pop: 1
-grammar_pre ->
-	- import: ws
-	- when: "{{" type: "L_TEMPLATEL" set: grammar
 grammar ->
-	- import: comment, js_pre, js_templatepre, ws, regex, charclass, l_ebnf_01, l_ebnf_1n, l_ebnf_0n, kv, l_colon, l_comma, l_pipe, l_parenl, l_parenr, l_arrow, l_dsign, l_dash
-	- when: "}}" type: "L_TEMPLATER" pop: 1
-lexer_pre ->
 	- import: ws
-	- when: "{{" type: "L_TEMPLATEL" set: lexer
-lexer ->
-	- import: ws, comment, regex, l_comma, l_arrow, l_dash, kv, js_pre
+	- when: "{{" type: "L_TEMPLATEL" set: grammar_inner
+grammar_inner ->
+	- import: comment, js, js_template, ws, regex, charclass, l_ebnf_01, l_ebnf_1n, l_ebnf_0n, kv, l_colon, l_comma, l_pipe, l_parenl, l_parenr, l_arrow, l_dsign, l_dash
 	- when: "}}" type: "L_TEMPLATER" pop: 1
-js_pre ->
+lexer ->
+	- import: ws
+	- when: "{{" type: "L_TEMPLATEL" set: lexer_inner
+lexer_inner ->
+	- import: ws, comment, regex, l_comma, l_arrow, l_dash, kv, js
+	- when: "}}" type: "L_TEMPLATER" pop: 1
+js ->
 	- when: "${" type: "L_JSL" goto: js_wrap
 js_wrap ->
 	default: "T_JSBODY"
 	unmatched: "T_JSBODY"
 	- import: jsignore
-	- when: "{" type: "T_JSBODY" goto: js
+	- when: "{" type: "T_JSBODY" goto: js_literal
 	- when: "}" type: "L_JSR" pop: 1
-js ->
+js_literal ->
 	default: "T_JSBODY"
 	unmatched: "T_JSBODY"
 	- import: jsignore
-	- when: "{" type: "T_JSBODY" goto: js
+	- when: "{" type: "T_JSBODY" goto: js_literal
 	- when: "}" type: "T_JSBODY" pop: 1
-js_templatepre ->
-	- when: "{{" type: "L_TEMPLATEL" goto: js_templatewrap
-js_templatewrap ->
+js_template ->
+	- when: "{{" type: "L_TEMPLATEL" goto: js_template_inner
+js_template_inner ->
 	default: "T_JSBODY"
 	unmatched: "T_JSBODY"
 	- import: jsignore
-	- when: "{" type: "T_JSBODY" goto: js
+	- when: "{" type: "T_JSBODY" goto: js_literal
 	- when: "}}" type: "L_TEMPLATER" pop: 1
 kv ->
 	- import: string, ws, word, l_colon, integer
@@ -307,7 +307,7 @@ grammar{{
     K_HEAD -> "head"
 
     T_JS -> $L_JSL $T_JSBODY* $L_JSR  {{ $1.map(v=>v.value).join('') }}
-    T_GRAMMAR_TEMPLATE -> $L_TEMPLATEL _ $T_JSBODY* _ $L_TEMPLATER {{ $2.map(v=>v.value).join('') }}
+    T_GRAMMAR_TEMPLATE -> $L_TEMPLATEL _ $T_JSBODY* _ $L_TEMPLATER {{ $2.map(v=>v.value).join('').trim() }}
     T_STRING -> $T_STRING {{ JSON.parse($0.value) }}
     T_WORD -> $T_WORD {{ $0.value }}
     T_REGEX -> $T_REGEX [gmiuy]* {{ ({ regex: $0.value.slice(1,-1), flags: $1.join('') }) }}

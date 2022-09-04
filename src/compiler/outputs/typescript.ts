@@ -6,6 +6,8 @@ export function TypescriptFormat(state: GeneratorState, exportName: string) {
     return `// Generated automatically by Grammar-Well, version ${state.version} 
 // https://github.com/0x6563/grammar-well
 
+${state.head.join('\n')}
+
 interface LanguageDefinition {
     lexer?: Lexer | LexerConfig;
     grammar: {
@@ -66,6 +68,7 @@ interface GrammarRule {
     symbols: RuleSymbol[];
     postprocess?: PostProcessor;
 }
+
 type RuleSymbol = string | RegExp | RuleSymbolToken | RuleSymbolLexerToken | LexerTokenMatch | RuleSymbolTestable;
 
 interface RuleSymbolToken {
@@ -93,8 +96,6 @@ interface PostProcessorPayload {
     name: string;
     reject: Symbol;
 }
-
-${state.head.join('\n')}
 
 function ${exportName}(): LanguageDefinition {
     ${state.body.join('\n')}

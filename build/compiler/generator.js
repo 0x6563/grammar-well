@@ -24,12 +24,12 @@ class Generator {
     constructor(config, compilerState) {
         this.config = config;
         this.compilerState = compilerState;
-        this.names = Object.create(null);
         this.parser = new parser_1.Parser((0, gwell_1.default)(), { algorithm: 'earley' });
         this.state = {
             grammar: {
                 start: '',
                 rules: [],
+                names: Object.create(null)
             },
             lexer: null,
             head: [],
@@ -149,8 +149,8 @@ class Generator {
         Object.assign(this.state.config, state.config);
     }
     uuid(name) {
-        this.names[name] = (this.names[name] || 0) + 1;
-        return name + '$' + this.names[name];
+        this.state.grammar.names[name] = (this.state.grammar.names[name] || 0) + 1;
+        return name + '$' + this.state.grammar.names[name];
     }
     buildRules(name, rules, scope) {
         for (let i = 0; i < rules.length; i++) {
@@ -218,16 +218,16 @@ class Generator {
         const id = this.uuid(name + "$ebnf");
         let expr1 = { tokens: [] };
         let expr2 = { tokens: [] };
-        if (token.modifier == ':+') {
+        if (token.modifier == '+') {
             expr1.tokens = [token.ebnf];
             expr2.tokens = [id, token.ebnf];
             expr2.postprocess = { builtin: "arrpush" };
         }
-        else if (token.modifier == ':*') {
+        else if (token.modifier == '*') {
             expr2.tokens = [id, token.ebnf];
             expr2.postprocess = { builtin: "arrpush" };
         }
-        else if (token.modifier == ':?') {
+        else if (token.modifier == '?') {
             expr1.tokens = [token.ebnf];
             expr1.postprocess = { builtin: "id" };
             expr2.postprocess = { builtin: "nuller" };

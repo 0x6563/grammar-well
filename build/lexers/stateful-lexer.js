@@ -1,11 +1,18 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CompileStates = exports.NormalizeStates = void 0;
-const token_queue_1 = require("./token-queue");
+exports.ResolveStates = exports.StatefulLexer = void 0;
 class StatefulLexer {
-    constructor(states, startState) {
-        this.startState = startState;
-        this.states = states;
+    constructor({ states, start }) {
+        this.states = Object.create(null);
+        const statemap = ResolveStates(states, start);
+        for (const key in statemap) {
+            this.states[key] = {
+                regexp: CompileRegExp(statemap[key]),
+                rules: statemap[key].rules,
+                unmatched: statemap[key].unmatched ? { type: statemap[key].unmatched } : null
+            };
+        }
+        this.start = start;
         this.buffer = '';
         this.stack = [];
         this.feed();
@@ -16,7 +23,7 @@ class StatefulLexer {
         this.line = state ? state.line : 1;
         this.column = state ? state.column : 1;
         this.prefetched = state === null || state === void 0 ? void 0 : state.prefetched;
-        this.set(state ? state.state : this.startState);
+        this.set(state ? state.state : this.start);
         this.stack = state && state.stack ? state.stack.slice() : [];
     }
     state() {
@@ -43,8 +50,6 @@ class StatefulLexer {
     }
     [Symbol.iterator]() {
         return new LexerIterator(this);
-    }
-    flush() {
     }
     set(current) {
         if (!current || this.current === current)
@@ -142,6 +147,7 @@ class StatefulLexer {
         throw new Error('Cannot find token type for matched text');
     }
 }
+exports.StatefulLexer = StatefulLexer;
 class LexerIterator {
     constructor(lexer) {
         this.lexer = lexer;
@@ -230,7 +236,7 @@ function CompileRegExp(state) {
         flags += "i";
     return new RegExp(RegexLib.Join(subexpressions), flags);
 }
-function NormalizeStates(states, start) {
+function ResolveStates(states, start) {
     const statemap = Object.create(null);
     const resolved = new Set();
     const resolving = new Set();
@@ -247,20 +253,7 @@ function NormalizeStates(states, start) {
     }
     return statemap;
 }
-exports.NormalizeStates = NormalizeStates;
-function CompileStates(states, start) {
-    const statemap = NormalizeStates(states, start);
-    const map = Object.create(null);
-    for (const key in statemap) {
-        map[key] = {
-            regexp: CompileRegExp(statemap[key]),
-            rules: statemap[key].rules,
-            unmatched: statemap[key].unmatched ? { type: statemap[key].unmatched } : null
-        };
-    }
-    return new token_queue_1.TokenQueue(new StatefulLexer(map, start));
-}
-exports.CompileStates = CompileStates;
+exports.ResolveStates = ResolveStates;
 function ResolveRuleImports(name, states, resolved, resolving, chain) {
     if (chain.has(name))
         throw new Error(`Can not resolve circular import of ${name}`);

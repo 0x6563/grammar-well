@@ -6,19 +6,6 @@ class ParserErrorService {
     constructor(parser) {
         this.parser = parser;
     }
-    lexerError(lexerError) {
-        let tokenDisplay, lexerMessage;
-        const token = lexerError.token;
-        if (token) {
-            tokenDisplay = "input " + JSON.stringify(token.text[0]) + " (lexer error)";
-            lexerMessage = message_1.Message.LexerTokenError(this.parser.tokenQueue);
-        }
-        else {
-            tokenDisplay = "input (lexer error)";
-            lexerMessage = lexerError.message;
-        }
-        return this.reportErrorCommon(lexerMessage, tokenDisplay);
-    }
     tokenError(token) {
         const tokenDisplay = (token.type ? token.type + " token: " : "") + JSON.stringify(token.value !== undefined ? token.value : token);
         const lexerMessage = message_1.Message.LexerTokenError(this.parser.tokenQueue);
@@ -32,7 +19,7 @@ class ParserErrorService {
         let sameDisplayCount = 0;
         for (let j = 0; j < stateStack.length; j++) {
             const state = stateStack[j];
-            const display = this.formatRule(state.rule, state.dot);
+            const display = message_1.Message.FormatGrammarRule(state.rule, state.dot);
             if (display === lastDisplay) {
                 sameDisplayCount++;
             }
@@ -89,14 +76,6 @@ class ParserErrorService {
             return null;
         }
         return [state].concat(childResult);
-    }
-    formatRule(rule, withCursorAt) {
-        let symbolSequence = rule.symbols.slice(0, withCursorAt).map(v => message_1.Message.GetSymbolDisplay(v, true, true)).join(' ');
-        if (typeof withCursorAt !== "undefined") {
-            symbolSequence += " ● " + rule.symbols.slice(withCursorAt).map(v => message_1.Message.GetSymbolDisplay(v, true, true)).join(' ');
-        }
-        ;
-        return rule.name + " → " + symbolSequence;
     }
 }
 exports.ParserErrorService = ParserErrorService;

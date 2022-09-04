@@ -30,9 +30,9 @@ export interface ImportResolverConstructor {
 
 interface PostProcessorPayload {
     data: any[];
+    rule: GrammarRule;
     reference: number;
     dot: number;
-    name: string;
     reject: Symbol;
 }
 
@@ -88,30 +88,29 @@ export interface LexerDirective {
     lexer: LexerConfig
 }
 
-export type RuleSymbol = string | RegExp | RuleSymbolToken | RuleSymbolLexerToken | LexerTokenMatch | RuleSymbolTestable;
+export type GrammarRuleSymbol = string | RegExp | GrammarRuleSymbolToken | GrammarRuleSymbolLexerToken | GrammarRuleSymbolTestable | LexerTokenMatch;
 
-interface RuleSymbolToken {
+interface GrammarRuleSymbolToken {
     literal: any;
 }
 
-interface RuleSymbolTestable {
+interface GrammarRuleSymbolTestable {
     test: (data: any) => boolean;
 }
 
-interface RuleSymbolLexerToken {
+interface GrammarRuleSymbolLexerToken {
     type: string;
 }
 
-
 export interface GrammarBuilderRule {
     name: string;
-    symbols: RuleSymbol[];
+    symbols: GrammarRuleSymbol[];
     postprocess?: BuiltInPostProcessor | string;
 }
 
 export interface GrammarRule {
     name: string;
-    symbols: RuleSymbol[];
+    symbols: GrammarRuleSymbol[];
     postprocess?: PostProcessor;
 }
 
@@ -202,5 +201,6 @@ export interface GeneratorState {
     grammar: {
         start: string;
         rules: GrammarBuilderRule[],
+        names: { [key: string]: number }
     }
 }

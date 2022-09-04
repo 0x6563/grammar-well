@@ -1,4 +1,4 @@
-import { Lexer, TokenQueueRestorePoint, LexerToken } from '../typings';
+import { Lexer, TQRestorePoint, LexerToken } from '../typings';
 export declare class TokenQueue {
     private lexer;
     private history;
@@ -8,10 +8,10 @@ export declare class TokenQueue {
     get line(): number;
     get column(): number;
     private get active();
-    get state(): TokenQueueRestorePoint;
+    get state(): TQRestorePoint;
     constructor(lexer: Lexer);
     reset(buffer: string): void;
-    restore(state: TokenQueueRestorePoint): void;
+    restore(state: TQRestorePoint): void;
     feed(buffer: string, flush?: boolean): void;
     flush(): void;
     previous(): LexerToken;

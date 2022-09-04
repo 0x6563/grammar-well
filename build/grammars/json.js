@@ -20,7 +20,7 @@ function extractArray({ data }) {
     }
     return output;
 }
-function Grammar() {
+function GWLanguage() {
     return {
         grammar: {
             start: "json",
@@ -77,5 +77,5 @@ function Grammar() {
         }
     };
 }
-exports.default = Grammar;
+exports.default = GWLanguage;
 //# sourceMappingURL=json.js.map

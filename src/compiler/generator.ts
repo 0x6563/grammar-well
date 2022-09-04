@@ -5,7 +5,6 @@ import * as number from '../grammars/number.json';
 import * as string from '../grammars/string.json';
 import * as whitespace from '../grammars/whitespace.json';
 import Language from '../grammars/gwell';
-import { writeFileSync } from "fs";
 
 const BuiltInRegistry = {
     number,
@@ -14,18 +13,18 @@ const BuiltInRegistry = {
 }
 
 export class Generator {
-    private names = Object.create(null);
     private parser = new Parser(Language(), { algorithm: 'earley' });
 
     private state: GeneratorState = {
         grammar: {
             start: '',
             rules: [],
+            names: Object.create(null)
         },
         lexer: null,
-        head: [], // @directives list
-        body: [], // @directives list
-        config: {}, // @config value
+        head: [],
+        body: [],
+        config: {},
         version: 'unknown',
     }
 
@@ -43,7 +42,6 @@ export class Generator {
             return;
         }
         directives = Array.isArray(directives) ? directives : [directives];
-        writeFileSync('./out.json', JSON.stringify(directives, null, 2))
         for (const directive of directives) {
             if ("head" in directive) {
                 if (this.config.noscript)
@@ -145,8 +143,8 @@ export class Generator {
     }
 
     private uuid(name: string) {
-        this.names[name] = (this.names[name] || 0) + 1;
-        return name + '$' + this.names[name];
+        this.state.grammar.names[name] = (this.state.grammar.names[name] || 0) + 1;
+        return name + '$' + this.state.grammar.names[name];
     }
 
     private buildRules(name: string, rules: Expression[], scope: Dictionary<string>) {

@@ -1,2 +1,2 @@
-import { LanguageDefinition, RuleSymbol } from "../typings";
-export declare function LintGrammarSymbols(language: LanguageDefinition): RuleSymbol[];
+import { LanguageDefinition, GrammarRuleSymbol } from "../typings";
+export declare function LintGrammarSymbols(language: LanguageDefinition): GrammarRuleSymbol[];

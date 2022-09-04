@@ -45,11 +45,16 @@ class TokenQueue {
         }
     }
     next() {
-        if (this.$historyIndex + 1 >= this.history.length) {
-            this.lexerNext();
+        try {
+            if (this.$historyIndex + 1 >= this.history.length) {
+                this.lexerNext();
+            }
+            if (this.$historyIndex + 1 < this.history.length) {
+                return this.history[++this.$historyIndex];
+            }
         }
-        if (this.$historyIndex + 1 < this.history.length) {
-            return this.history[++this.$historyIndex];
+        catch (error) {
+            throw error;
         }
     }
     peek(offset) {

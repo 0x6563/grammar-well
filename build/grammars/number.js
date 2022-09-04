@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-function Grammar() {
+function GWLanguage() {
     return {
         grammar: {
             start: "unsigned_int",
@@ -56,5 +56,5 @@ function Grammar() {
         lexer: null
     };
 }
-exports.default = Grammar;
+exports.default = GWLanguage;
 //# sourceMappingURL=number.js.map

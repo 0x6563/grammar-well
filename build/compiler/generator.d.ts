@@ -2,7 +2,6 @@ import { CompilerState, GeneratorState, LanguageDirective } from "../typings";
 export declare class Generator {
     private config;
     private compilerState;
-    private names;
     private parser;
     private state;
     constructor(config: {

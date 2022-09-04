@@ -43,9 +43,17 @@ class Message {
                 return short ? `<${symbol.test.toString()}>` : `token matching ${symbol.test.toString()}`;
             }
             else if (error) {
-                throw new Error('Unknown symbol type: ' + JSON.stringify(symbol));
+                return 'Unknown symbol type: ' + JSON.stringify(symbol);
             }
         }
+    }
+    static FormatGrammarRule(rule, withCursorAt) {
+        let symbolSequence = rule.symbols.slice(0, withCursorAt).map(v => Message.GetSymbolDisplay(v, true, true)).join(' ');
+        if (typeof withCursorAt !== "undefined") {
+            symbolSequence += " ● " + rule.symbols.slice(withCursorAt).map(v => Message.GetSymbolDisplay(v, true, true)).join(' ');
+        }
+        ;
+        return rule.name + " → " + symbolSequence;
     }
 }
 exports.Message = Message;
