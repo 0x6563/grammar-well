@@ -48,7 +48,7 @@ export interface ConfigDirective {
 }
 export interface ImportDirective {
     import: string;
-    builtin?: boolean;
+    path?: boolean;
 }
 export interface ExpressionDefinition {
     name: string;
@@ -89,6 +89,7 @@ export type LanguageDirective = (JavascriptDirective | ImportDirective | ConfigD
 
 export interface GrammarDirective {
     grammar: {
+        config?: Dictionary<any>;
         rules: ExpressionDefinition[];
     }
 }

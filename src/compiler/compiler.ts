@@ -99,10 +99,10 @@ export class Compiler {
     }
 
     private async processImportDirective(directive: ImportDirective) {
-        if (directive.builtin) {
-            this.importBuiltIn(directive.import);
-        } else {
+        if (directive.path) {
             await this.importGrammar(directive.import);
+        } else {
+            this.importBuiltIn(directive.import);
         }
     }
 
@@ -111,6 +111,10 @@ export class Compiler {
     }
 
     private processGrammarDirective(directive: GrammarDirective) {
+        if (directive.grammar.config) {
+            this.state.grammar.start = directive.grammar.config.start || this.state.grammar.start;
+        }
+
         for (const rule of directive.grammar.rules) {
             this.buildRules(rule.name, rule.rules, {});
             this.state.grammar.start = this.state.grammar.start || rule.name;
@@ -156,7 +160,6 @@ export class Compiler {
     }
 
     private merge(state: GeneratorState) {
-
         this.state.grammar.rules.push(...state.grammar.rules)
         this.state.grammar.start = state.grammar.start || this.state.grammar.start;
         if (state.lexer) {

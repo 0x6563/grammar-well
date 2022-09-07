@@ -43,7 +43,7 @@ export interface ConfigDirective {
 }
 export interface ImportDirective {
     import: string;
-    builtin?: boolean;
+    path?: boolean;
 }
 export interface ExpressionDefinition {
     name: string;
@@ -83,6 +83,7 @@ export declare type ParserAlgorithm = ((language: LanguageDefinition & {
 export declare type LanguageDirective = (JavascriptDirective | ImportDirective | ConfigDirective | GrammarDirective | LexerDirective);
 export interface GrammarDirective {
     grammar: {
+        config?: Dictionary<any>;
         rules: ExpressionDefinition[];
     };
 }

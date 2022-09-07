@@ -108,11 +108,11 @@ class Compiler {
     }
     processImportDirective(directive) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (directive.builtin) {
-                this.importBuiltIn(directive.import);
+            if (directive.path) {
+                yield this.importGrammar(directive.import);
             }
             else {
-                yield this.importGrammar(directive.import);
+                this.importBuiltIn(directive.import);
             }
         });
     }
@@ -120,6 +120,9 @@ class Compiler {
         Object.assign(this.state.config, directive.config);
     }
     processGrammarDirective(directive) {
+        if (directive.grammar.config) {
+            this.state.grammar.start = directive.grammar.config.start || this.state.grammar.start;
+        }
         for (const rule of directive.grammar.rules) {
             this.buildRules(rule.name, rule.rules, {});
             this.state.grammar.start = this.state.grammar.start || rule.name;

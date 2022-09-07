@@ -20,7 +20,7 @@ function GWLanguage() {
                     { name: "__", symbols: ["__$RPT1Nx1"], postprocess: ({ data }) => { return null; } }
                 ],
                 wschar: [
-                    { name: "wschar", symbols: [/[\t\n\v\f]/], postprocess: ({ data }) => { return data[0]; } }
+                    { name: "wschar", symbols: [/[\t\n\v\f]/], postprocess: ({ data }) => { return data[0].value; } }
                 ]
             }
         }
