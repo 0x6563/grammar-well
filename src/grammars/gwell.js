@@ -24,10 +24,6 @@
         return r;
     };
 
-    function TemplatePostProcess(str){
-        return "({data}) => { return " + str.replace(/\$(\d+)/g, "data[$1]") + "; }";
-    }
-
 function GWLanguage(){
     
     return {
@@ -113,24 +109,29 @@ function GWLanguage(){
                 expression: [
                     { name: "expression", symbols: [ "expression_symbol_list" ], postprocess: ({data}) => { return { symbols: data[0] }; } },
                     { name: "expression", symbols: [ "expression_symbol_list", "_", "T_JS" ], postprocess: ({data}) => { return { symbols: data[0], postprocess: data[2] }; } },
-                    { name: "expression", symbols: [ "expression_symbol_list", "_", "T_GRAMMAR_TEMPLATE" ], postprocess: ({data}) => { return { symbols: data[0], postprocess: TemplatePostProcess(data[2]) }; } }
+                    { name: "expression", symbols: [ "expression_symbol_list", "_", "T_GRAMMAR_TEMPLATE" ], postprocess: ({data}) => { return { symbols: data[0], postprocess: { template: data[2] } }; } }
                 ],
                 expression_symbol_list: [
                     { name: "expression_symbol_list", symbols: [ "expression_symbol" ] },
                     { name: "expression_symbol_list", symbols: [ "expression_symbol_list", "T_WS", "expression_symbol" ], postprocess: ({data}) => { return data[0].concat([data[2]]); } }
                 ],
                 expression_symbol: [
-                    { name: "expression_symbol", symbols: [ "T_WORD" ], postprocess: ({data}) => { return { rule: data[0] }; } },
-                    { name: "expression_symbol", symbols: [ "T_STRING", "expression_symbol$RPT01x1" ], postprocess: ({data}) => { return data[1] ? Insensitive(data[0]) : { literal: data[0] }; } },
-                    { name: "expression_symbol", symbols: [ "L_DSIGN", "T_WORD" ], postprocess: ({data}) => { return { token: data[1]}; } },
-                    { name: "expression_symbol", symbols: [ "L_DSIGN", "T_STRING" ], postprocess: ({data}) => { return { token: data[1]}; } },
-                    { name: "expression_symbol", symbols: [ "T_CHARCLASS" ], postprocess: ({data}) => { return { regex: data[0] }; } },
-                    { name: "expression_symbol", symbols: [ "L_PARENL", "_", "expression_list", "_", "L_PARENR" ], postprocess: ({data}) => { return { subexpression: data[2] }; } },
-                    { name: "expression_symbol", symbols: [ "expression_symbol", "expression_repeater" ], postprocess: ({data}) => { return { expression: data[0], repeat: data[1] }; } }
+                    { name: "expression_symbol", symbols: [ "expression_symbol_match" ], postprocess: ({data}) => { return data[0]; } },
+                    { name: "expression_symbol", symbols: [ "expression_symbol_match", "L_COLON", "T_WORD" ], postprocess: ({data}) => { return { ...data[0],  alias: data[2] }; } },
+                    { name: "expression_symbol", symbols: [ "expression_symbol_match", "expression_repeater" ], postprocess: ({data}) => { return { expression: data[0], repeat: data[1] }; } },
+                    { name: "expression_symbol", symbols: [ "expression_symbol_match", "expression_repeater", "L_COLON", "T_WORD" ], postprocess: ({data}) => { return { expression: data[0], repeat: data[1], alias: data[4] }; } }
                 ],
-                expression_symbol$RPT01x1: [
-                    { name: "expression_symbol$RPT01x1", symbols: [ {"literal":"i"} ], postprocess: ({data}) => data[0] },
-                    { name: "expression_symbol$RPT01x1", symbols: [ ], postprocess: () => null }
+                expression_symbol_match: [
+                    { name: "expression_symbol_match", symbols: [ "T_WORD" ], postprocess: ({data}) => { return { rule: data[0] }; } },
+                    { name: "expression_symbol_match", symbols: [ "T_STRING", "expression_symbol_match$RPT01x1" ], postprocess: ({data}) => { return data[1] ? Insensitive(data[0]) : { literal: data[0] }; } },
+                    { name: "expression_symbol_match", symbols: [ "L_DSIGN", "T_WORD" ], postprocess: ({data}) => { return { token: data[1]}; } },
+                    { name: "expression_symbol_match", symbols: [ "L_DSIGN", "T_STRING" ], postprocess: ({data}) => { return { token: data[1]}; } },
+                    { name: "expression_symbol_match", symbols: [ "T_CHARCLASS" ], postprocess: ({data}) => { return { regex: data[0] }; } },
+                    { name: "expression_symbol_match", symbols: [ "L_PARENL", "_", "expression_list", "_", "L_PARENR" ], postprocess: ({data}) => { return { subexpression: data[2] }; } }
+                ],
+                expression_symbol_match$RPT01x1: [
+                    { name: "expression_symbol_match$RPT01x1", symbols: [ {"literal":"i"} ], postprocess: ({data}) => data[0] },
+                    { name: "expression_symbol_match$RPT01x1", symbols: [ ], postprocess: () => null }
                 ],
                 expression_repeater: [
                     { name: "expression_repeater", symbols: [ "L_REPEAT_01" ], postprocess: ({data}) => { return data[0][0].value; } },

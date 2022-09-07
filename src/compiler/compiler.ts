@@ -191,9 +191,7 @@ export class Compiler {
         const symbols: GrammarBuilderRuleSymbol[] = [];
         for (let i = 0; i < rule.symbols.length; i++) {
             const symbol = this.buildSymbol(name, rule.symbols[i], scope);
-            if (symbol !== null) {
-                symbols.push(symbol);
-            }
+            symbols.push(symbol);
         }
         return { name, symbols, postprocess: this.config.noscript ? null : rule.postprocess };
     }

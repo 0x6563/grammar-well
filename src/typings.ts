@@ -35,7 +35,8 @@ interface PostProcessorPayload {
     reject: Symbol;
 }
 
-export type BuiltInPostProcessor = { builtin: string };
+export type PostProcessorBuiltIn = { builtin: string };
+export type PostProcessorTemplate = { template: string };
 
 export interface Dictionary<T> {
     [key: string]: T;
@@ -56,7 +57,7 @@ export interface ExpressionDefinition {
 }
 export interface GrammarBuilderExpression {
     symbols: GrammarBuilderSymbol[];
-    postprocess?: string | BuiltInPostProcessor;
+    postprocess?: string | PostProcessorBuiltIn | PostProcessorTemplate;
 }
 export type GrammarBuilderSymbol = GrammarBuilderSymbolRule | GrammarBuilderSymbolRegex | GrammarBuilderSymbolSubexpression | GrammarBuilderSymbolToken | GrammarBuilderSymbolRepeat | GrammarBuilderSymbolLiteral;
 
@@ -113,10 +114,10 @@ export interface GrammarRule {
 export interface GrammarBuilderRule {
     name: string;
     symbols: GrammarBuilderRuleSymbol[];
-    postprocess?: BuiltInPostProcessor | string;
+    postprocess?: PostProcessorTemplate | PostProcessorBuiltIn | string;
 }
 
-export type GrammarBuilderRuleSymbol = GrammarBuilderSymbolRule | GrammarBuilderSymbolRegex | GrammarBuilderSymbolLiteral | GrammarBuilderSymbolToken;
+export type GrammarBuilderRuleSymbol = { alias?: string } & (GrammarBuilderSymbolRule | GrammarBuilderSymbolRegex | GrammarBuilderSymbolLiteral | GrammarBuilderSymbolToken);
 
 export type GrammarRuleSymbol = string | RegExp | GrammarBuilderSymbolLiteral | GrammarBuilderSymbolToken | GrammarRuleSymbolTestable;
 

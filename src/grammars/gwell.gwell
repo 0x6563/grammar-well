@@ -21,10 +21,6 @@ head ${
         }
         return r;
     };
-
-    function TemplatePostProcess(str){
-        return "({data}) => { return " + str.replace(/\$(\d+)/g, "data[$1]") + "; }";
-    }
 }
 
 lexer {{
@@ -215,20 +211,27 @@ grammar{{
     expression ->
         expression_symbol_list {{ { symbols: $0 } }}
         | expression_symbol_list _ T_JS {{ { symbols: $0, postprocess: $2 } }}
-        | expression_symbol_list _ T_GRAMMAR_TEMPLATE {{ { symbols: $0, postprocess: TemplatePostProcess($2) } }}
+        | expression_symbol_list _ T_GRAMMAR_TEMPLATE {{ { symbols: $0, postprocess: { template: $2 } } }}
 
     expression_symbol_list ->
         expression_symbol
         | expression_symbol_list T_WS expression_symbol {{ $0.concat([$2]) }}
 
+    
     expression_symbol ->
+        expression_symbol_match {{ $0 }}
+        | expression_symbol_match L_COLON T_WORD {{ { ...$0,  alias: $2 } }}
+        | expression_symbol_match expression_repeater {{ { expression: $0, repeat: $1 } }}
+        | expression_symbol_match expression_repeater L_COLON T_WORD {{ { expression: $0, repeat: $1, alias: $4 } }}
+
+
+    expression_symbol_match ->
         T_WORD {{ { rule: $0 } }}
         | T_STRING "i"? {{ $1 ? Insensitive($0) : { literal: $0 } }}
         | L_DSIGN T_WORD {{ { token: $1} }}
         | L_DSIGN T_STRING {{ { token: $1} }}
         | T_CHARCLASS {{ { regex: $0 } }}
         | L_PARENL _ expression_list _ L_PARENR {{ { subexpression: $2 } }}
-        | expression_symbol expression_repeater {{ { expression: $0, repeat: $1 } }}
 
     expression_repeater ->
         L_REPEAT_01 {{ $0[0].value }}

@@ -1,4 +1,4 @@
-import { GeneratorState, GrammarBuilderRule, GrammarBuilderRuleSymbol, LexerConfig, LexerStateDefinition } from "../typings";
+import { Dictionary, GeneratorState, GrammarBuilderRule, GrammarBuilderRuleSymbol, LexerConfig, LexerStateDefinition } from "../typings";
 
 const PostProcessors = {
     "join": "({data}) => data.join('')",
@@ -52,12 +52,40 @@ function SerializeSymbol(s: GrammarBuilderRuleSymbol) {
 }
 
 function SerializeGrammarRule(rule: GrammarBuilderRule) {
+    const symbols = [];
+    const alias = {};
+    let hasAlias = false;
+    for (let i = 0; i < rule.symbols.length; i++) {
+        symbols.push(SerializeSymbol(rule.symbols[i]));
+        if (rule.symbols[i].alias) {
+            alias[rule.symbols[i].alias] = i;
+            hasAlias = true;
+        }
+    }
     return PrettyObject({
         name: JSON.stringify(rule.name),
-        symbols: PrettyArray(rule.symbols.map(SerializeSymbol), -1),
-        postprocess: rule.postprocess ? (rule.postprocess as any).builtin ? PostProcessors[(rule.postprocess as any).builtin] : rule.postprocess : null
+        symbols: PrettyArray(symbols, -1),
+        postprocess: SerializePostProcess(rule.postprocess, alias)
 
     }, -1);
+}
+
+
+function SerializePostProcess(postprocess: GrammarBuilderRule['postprocess'], alias: Dictionary<number>) {
+    if (!postprocess)
+        return null;
+    if (typeof postprocess == 'string')
+        return postprocess;
+    if ('builtin' in postprocess)
+        return PostProcessors[postprocess.builtin];
+    if ('template' in postprocess)
+        return TemplatePostProcess(postprocess.template, alias);
+}
+function TemplatePostProcess(str, alias) {
+    for (const key in alias) {
+        str = str.replace(new RegExp('(?:\\$)' + key + '(?![a-zA-Z\\d\\$_])'), `data[${alias[key]}]`);
+    }
+    return "({data}) => { return " + str.replace(/\$(\d+)/g, "data[$1]") + "; }";
 }
 
 function SerializeLexerConfig(config: GeneratorState['lexer'] | string, depth: number = 0) {
