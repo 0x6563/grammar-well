@@ -1,19 +1,6 @@
 // Generated automatically by Grammar-Well, version unknown 
 // https://github.com/0x6563/grammar-well
 
-    function Insensitive({ literal }) {
-        const symbols = [];
-        for (let i = 0; i < literal.length; i++) {
-            const c = literal.charAt(i);
-            if (c.toUpperCase() !== c || c.toLowerCase() !== c) {
-                symbols.push(new RegExp("[" + c.toLowerCase() + c.toUpperCase() + "]"));
-            } else {
-                symbols.push({ literal: c });
-            }
-        }
-        return { subexpression: [{ symbols, postprocess: ({data}) => data.join('') }] };
-    }
-
     function Rollup(ary){
         const r = {};
         for(const i of ary){
@@ -123,14 +110,14 @@ function GWLanguage(){
                 ],
                 expression_symbol_match: [
                     { name: "expression_symbol_match", symbols: [ "T_WORD" ], postprocess: ({data}) => { return { rule: data[0] }; } },
-                    { name: "expression_symbol_match", symbols: [ "T_STRING", "expression_symbol_match$RPT01x1" ], postprocess: ({data}) => { return data[1] ? Insensitive(data[0]) : { literal: data[0] }; } },
+                    { name: "expression_symbol_match", symbols: [ "T_STRING", "expression_symbol_match$RPT01x1" ], postprocess: ({data}) => { return { literal: data[0], insensitive: !!data[1] }; } },
                     { name: "expression_symbol_match", symbols: [ "L_DSIGN", "T_WORD" ], postprocess: ({data}) => { return { token: data[1]}; } },
                     { name: "expression_symbol_match", symbols: [ "L_DSIGN", "T_STRING" ], postprocess: ({data}) => { return { token: data[1]}; } },
                     { name: "expression_symbol_match", symbols: [ "T_CHARCLASS" ], postprocess: ({data}) => { return { regex: data[0] }; } },
                     { name: "expression_symbol_match", symbols: [ "L_PARENL", "_", "expression_list", "_", "L_PARENR" ], postprocess: ({data}) => { return { subexpression: data[2] }; } }
                 ],
                 expression_symbol_match$RPT01x1: [
-                    { name: "expression_symbol_match$RPT01x1", symbols: [ {"literal":"i"} ], postprocess: ({data}) => data[0] },
+                    { name: "expression_symbol_match$RPT01x1", symbols: [ {"literal":"i","insensitive":false} ], postprocess: ({data}) => data[0] },
                     { name: "expression_symbol_match$RPT01x1", symbols: [ ], postprocess: () => null }
                 ],
                 expression_repeater: [
@@ -205,46 +192,46 @@ function GWLanguage(){
                     { name: "L_DASH", symbols: [ { token: "L_DASH" } ] }
                 ],
                 K_ALL: [
-                    { name: "K_ALL", symbols: [ {"literal":"all"} ] }
+                    { name: "K_ALL", symbols: [ {"literal":"all","insensitive":false} ] }
                 ],
                 K_TAG: [
-                    { name: "K_TAG", symbols: [ {"literal":"tag"} ] }
+                    { name: "K_TAG", symbols: [ {"literal":"tag","insensitive":false} ] }
                 ],
                 K_TYPE: [
-                    { name: "K_TYPE", symbols: [ {"literal":"type"} ] }
+                    { name: "K_TYPE", symbols: [ {"literal":"type","insensitive":false} ] }
                 ],
                 K_WHEN: [
-                    { name: "K_WHEN", symbols: [ {"literal":"when"} ] }
+                    { name: "K_WHEN", symbols: [ {"literal":"when","insensitive":false} ] }
                 ],
                 K_POP: [
-                    { name: "K_POP", symbols: [ {"literal":"pop"} ] }
+                    { name: "K_POP", symbols: [ {"literal":"pop","insensitive":false} ] }
                 ],
                 K_INSET: [
-                    { name: "K_INSET", symbols: [ {"literal":"inset"} ] }
+                    { name: "K_INSET", symbols: [ {"literal":"inset","insensitive":false} ] }
                 ],
                 K_SET: [
-                    { name: "K_SET", symbols: [ {"literal":"set"} ] }
+                    { name: "K_SET", symbols: [ {"literal":"set","insensitive":false} ] }
                 ],
                 K_GOTO: [
-                    { name: "K_GOTO", symbols: [ {"literal":"goto"} ] }
+                    { name: "K_GOTO", symbols: [ {"literal":"goto","insensitive":false} ] }
                 ],
                 K_CONFIG: [
-                    { name: "K_CONFIG", symbols: [ {"literal":"config"} ] }
+                    { name: "K_CONFIG", symbols: [ {"literal":"config","insensitive":false} ] }
                 ],
                 K_LEXER: [
-                    { name: "K_LEXER", symbols: [ {"literal":"lexer"} ] }
+                    { name: "K_LEXER", symbols: [ {"literal":"lexer","insensitive":false} ] }
                 ],
                 K_GRAMMAR: [
-                    { name: "K_GRAMMAR", symbols: [ {"literal":"grammar"} ] }
+                    { name: "K_GRAMMAR", symbols: [ {"literal":"grammar","insensitive":false} ] }
                 ],
                 K_IMPORT: [
-                    { name: "K_IMPORT", symbols: [ {"literal":"import"} ] }
+                    { name: "K_IMPORT", symbols: [ {"literal":"import","insensitive":false} ] }
                 ],
                 K_BODY: [
-                    { name: "K_BODY", symbols: [ {"literal":"body"} ] }
+                    { name: "K_BODY", symbols: [ {"literal":"body","insensitive":false} ] }
                 ],
                 K_HEAD: [
-                    { name: "K_HEAD", symbols: [ {"literal":"head"} ] }
+                    { name: "K_HEAD", symbols: [ {"literal":"head","insensitive":false} ] }
                 ],
                 T_JS$RPT0Nx1: [
                     { name: "T_JS$RPT0Nx1", symbols: [ ] },

@@ -1,17 +1,4 @@
 head ${
-    function Insensitive({ literal }) {
-        const symbols = [];
-        for (let i = 0; i < literal.length; i++) {
-            const c = literal.charAt(i);
-            if (c.toUpperCase() !== c || c.toLowerCase() !== c) {
-                symbols.push(new RegExp("[" + c.toLowerCase() + c.toUpperCase() + "]"));
-            } else {
-                symbols.push({ literal: c });
-            }
-        }
-        return { subexpression: [{ symbols, postprocess: ({data}) => data.join('') }] };
-    }
-
     function Rollup(ary){
         const r = {};
         for(const i of ary){
@@ -227,7 +214,7 @@ grammar{{
 
     expression_symbol_match ->
         T_WORD {{ { rule: $0 } }}
-        | T_STRING "i"? {{ $1 ? Insensitive($0) : { literal: $0 } }}
+        | T_STRING "i"? {{ { literal: $0, insensitive: !!$1 } }}
         | L_DSIGN T_WORD {{ { token: $1} }}
         | L_DSIGN T_STRING {{ { token: $1} }}
         | T_CHARCLASS {{ { regex: $0 } }}

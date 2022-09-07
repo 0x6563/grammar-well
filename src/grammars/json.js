@@ -42,35 +42,35 @@ function GWLanguage(){
                     { name: "json", symbols: [ "_", "json$SUBx1", "_" ], postprocess: ({data}) => { return data[1][0]; } }
                 ],
                 object: [
-                    { name: "object", symbols: [ {"literal":"{"}, "_", {"literal":"}"} ], postprocess: ({data}) => { return {}; } },
-                    { name: "object", symbols: [ {"literal":"{"}, "_", "pair", "object$RPT0Nx1", "_", {"literal":"}"} ], postprocess:  extractObject  }
+                    { name: "object", symbols: [ {"literal":"{","insensitive":false}, "_", {"literal":"}","insensitive":false} ], postprocess: ({data}) => { return {}; } },
+                    { name: "object", symbols: [ {"literal":"{","insensitive":false}, "_", "pair", "object$RPT0Nx1", "_", {"literal":"}","insensitive":false} ], postprocess:  extractObject  }
                 ],
                 object$RPT0Nx1: [
                     { name: "object$RPT0Nx1", symbols: [ ] },
                     { name: "object$RPT0Nx1", symbols: [ "object$RPT0Nx1", "object$RPT0Nx1$SUBx1" ], postprocess: ({data}) => data[0].concat([data[1]]) }
                 ],
                 object$RPT0Nx1$SUBx1: [
-                    { name: "object$RPT0Nx1$SUBx1", symbols: [ "_", {"literal":","}, "_", "pair" ] }
+                    { name: "object$RPT0Nx1$SUBx1", symbols: [ "_", {"literal":",","insensitive":false}, "_", "pair" ] }
                 ],
                 array: [
-                    { name: "array", symbols: [ {"literal":"["}, "_", {"literal":"]"} ], postprocess: ({data}) => { return []; } },
-                    { name: "array", symbols: [ {"literal":"["}, "_", "value", "array$RPT0Nx1", "_", {"literal":"]"} ], postprocess:  extractArray  }
+                    { name: "array", symbols: [ {"literal":"[","insensitive":false}, "_", {"literal":"]","insensitive":false} ], postprocess: ({data}) => { return []; } },
+                    { name: "array", symbols: [ {"literal":"[","insensitive":false}, "_", "value", "array$RPT0Nx1", "_", {"literal":"]","insensitive":false} ], postprocess:  extractArray  }
                 ],
                 array$RPT0Nx1: [
                     { name: "array$RPT0Nx1", symbols: [ ] },
                     { name: "array$RPT0Nx1", symbols: [ "array$RPT0Nx1", "array$RPT0Nx1$SUBx1" ], postprocess: ({data}) => data[0].concat([data[1]]) }
                 ],
                 array$RPT0Nx1$SUBx1: [
-                    { name: "array$RPT0Nx1$SUBx1", symbols: [ "_", {"literal":","}, "_", "value" ] }
+                    { name: "array$RPT0Nx1$SUBx1", symbols: [ "_", {"literal":",","insensitive":false}, "_", "value" ] }
                 ],
                 value: [
                     { name: "value", symbols: [ "object" ], postprocess: ({data}) => { return data[0]; } },
                     { name: "value", symbols: [ "array" ], postprocess: ({data}) => { return data[0]; } },
                     { name: "value", symbols: [ "number" ], postprocess: ({data}) => { return data[0]; } },
                     { name: "value", symbols: [ "string" ], postprocess: ({data}) => { return data[0]; } },
-                    { name: "value", symbols: [ {"literal":"true"} ], postprocess: ({data}) => { return true; } },
-                    { name: "value", symbols: [ {"literal":"false"} ], postprocess: ({data}) => { return false; } },
-                    { name: "value", symbols: [ {"literal":"null"} ], postprocess: ({data}) => { return null; } }
+                    { name: "value", symbols: [ {"literal":"true","insensitive":false} ], postprocess: ({data}) => { return true; } },
+                    { name: "value", symbols: [ {"literal":"false","insensitive":false} ], postprocess: ({data}) => { return false; } },
+                    { name: "value", symbols: [ {"literal":"null","insensitive":false} ], postprocess: ({data}) => { return null; } }
                 ],
                 number: [
                     { name: "number", symbols: [ { token: "number" } ], postprocess: ({data}) => { return parseFloat(data[0].value); } }
@@ -79,7 +79,7 @@ function GWLanguage(){
                     { name: "string", symbols: [ { token: "string" } ], postprocess: ({data}) => { return JSON.parse(data[0].value); } }
                 ],
                 pair: [
-                    { name: "pair", symbols: [ "key", "_", {"literal":":"}, "_", "value" ], postprocess: ({data}) => { return [data[0], data[4]]; } }
+                    { name: "pair", symbols: [ "key", "_", {"literal":":","insensitive":false}, "_", "value" ], postprocess: ({data}) => { return [data[0], data[4]]; } }
                 ],
                 key: [
                     { name: "key", symbols: [ "string" ], postprocess: ({data}) => { return data[0]; } }

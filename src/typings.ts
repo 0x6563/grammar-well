@@ -78,6 +78,7 @@ export interface GrammarBuilderSymbolRepeat {
 
 export interface GrammarBuilderSymbolLiteral {
     literal: string;
+    insensitive?: boolean;
 }
 
 export interface GrammarBuilderSymbolSubexpression {

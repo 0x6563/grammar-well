@@ -229,7 +229,13 @@ export class Compiler {
         const id = this.uuid(name + "$STR");
         this.buildRules(id, [
             {
-                symbols: symbol.literal.split("").map((literal) => ({ literal })),
+                symbols: symbol.literal
+                    .split("")
+                    .map((literal) => {
+                        if (symbol.insensitive && literal.toLowerCase() != literal.toUpperCase())
+                            return { regex: literal, flags: 'i' }
+                        return { literal }
+                    }),
                 postprocess: { builtin: "join" }
             }
         ], scope);
