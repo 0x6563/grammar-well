@@ -1,11 +1,11 @@
 import { CharacterLexer } from "../lexers/character-lexer";
 import { StatefulLexer } from "../lexers/stateful-lexer";
 import { TokenQueue } from "../lexers/token-queue";
-import { ParserAlgorithm, ParserAlgorithmConstructor, LanguageDefinition } from "../typings";
-import { EarleyParser } from "./algorithms/earley/earley";
+import { GrammarRule, GrammarRuleSymbol, LanguageDefinition, LexerToken, ParserAlgorithm } from "../typings";
+import { Earley } from "./algorithms/earley";
 
-const ParserRegistry = {
-    'earley': EarleyParser
+const ParserRegistry: { [key: string]: ParserAlgorithm } = {
+    'earley': Earley
 }
 
 export function Parse(language: LanguageDefinition, input: string, options?: ParserOptions) {
@@ -14,46 +14,52 @@ export function Parse(language: LanguageDefinition, input: string, options?: Par
 }
 
 export class Parser {
-    parserClass: ParserAlgorithmConstructor;
-    parser: ParserAlgorithm;
+    static Reject = Symbol();
 
-    get results() {
-        return this.parser.results
+    constructor(private language: LanguageDefinition, private options: ParserOptions = { algorithm: 'earley', parserOptions: {} }) { }
+
+    run(input: string): { results: any[] } {
+        const tokenQueue = this.getTokenQueue();
+        tokenQueue.feed(input);
+        if (typeof this.options.algorithm == 'function')
+            return this.options.algorithm({ ...this.language, tokens: tokenQueue }, this.options.parserOptions);
+        return ParserRegistry[this.options.algorithm]({ ...this.language, tokens: tokenQueue }, this.options.parserOptions);
     }
 
-    constructor(private language: LanguageDefinition, private options: ParserOptions = { algorithm: 'earley', parserOptions: {} }) {
-        this.parserClass = ParserRegistry[options.algorithm];
-        this.parser = this.getParserAlgo();
-    }
-
-    feed(input: string) {
-        this.parser.feed(input);
-        return this.results;
-    }
-
-    run(input: string) {
-        const parser = this.getParserAlgo();
-        parser.feed(input);
-        return parser.results[0];
-    }
-
-    private getParserAlgo() {
+    private getTokenQueue() {
         const { lexer } = this.language;
-        let tokenQueue: TokenQueue;
-
         if (!lexer) {
-            tokenQueue = new TokenQueue(new CharacterLexer());
+            return new TokenQueue(new CharacterLexer());
         } else if ("feed" in lexer && typeof lexer.feed == 'function') {
-            tokenQueue = new TokenQueue(lexer);
+            return new TokenQueue(lexer);
         } else if ('states' in lexer) {
-            tokenQueue = new TokenQueue(new StatefulLexer(lexer));
+            return new TokenQueue(new StatefulLexer(lexer));
         }
+    }
 
-        return new this.parserClass({ ...this.language, tokenQueue }, this.options.parserOptions);
+    static SymbolMatchesToken(rule: GrammarRuleSymbol & {}, token: LexerToken) {
+        if ("test" in rule)
+            return rule.test(token.value);
+        if ("token" in rule)
+            return rule.token === token.type;
+        if ("literal" in rule)
+            return rule.literal === token.value;
+    }
+
+    static PostProcessGrammarRule(rule: GrammarRule, data: any, meta?: any) {
+        if (rule.postprocess) {
+            return rule.postprocess({
+                rule,
+                data,
+                meta,
+                reject: Parser.Reject
+            });
+        }
+        return data;
     }
 }
 
 interface ParserOptions {
-    algorithm: keyof typeof ParserRegistry,
+    algorithm: (keyof typeof ParserRegistry) | ParserAlgorithm,
     parserOptions?: any;
 }

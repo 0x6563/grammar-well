@@ -1,5 +1,5 @@
 import { GeneratorState } from "../../typings";
-import { SerializeState } from "./util";
+import { SerializeState } from "../generator";
 
 export function JavascriptOutput(state: GeneratorState, exportName: string) {
     return `${Compile(state, exportName)}

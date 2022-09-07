@@ -55,17 +55,6 @@ Parentheses:
     input: "((((())))(())()"
     throw: false
 
-Token:
-  - title: Token 1 Pass
-    grammarSource: grammars/token.ne
-    input: [123, 456, " ", 789]
-    result: [123, [[456, " ", 789]]]
-
-  - title: Token 2 Fail
-    grammarSource: grammars/token2.ne
-    input: ["print", "blah", 12, ";", ";"]
-    errorRegex: A token matching x \=\> Number\.isInteger\(x\)
-
 Tosh:
   - title: Tosh 1 Pass
     grammarSource: grammars/tosh.ne

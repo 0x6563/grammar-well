@@ -50,7 +50,7 @@ export async function Build(grammar): Promise<any> {
 }
 
 export async function BuildTest(grammar, input) {
-    return Parse((await Build(grammar))(), input);
+    return Parse((await Build(grammar))(), input).results[0];
 }
 
 

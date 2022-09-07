@@ -13,14 +13,21 @@ describe('Predefined Samples', () => {
                     const result = GetValue(test, 'result');
                     const error = GetValue(test, 'error');
                     const execution = await AsyncRun(() => BuildTest(grammar, input));
-                    if (typeof test.throw == 'boolean') {
-                        Expected(execution.success, !test.throw, `Expected to ${test.throw ? '' : 'not '}throw.`);
-                    } else if (error) {
-                        Expected(execution.error, error);
-                        Expected(execution.success, false, 'Expected to throw error.');
-                    } else {
-                        Expected(execution.result, result);
-                        Expected(execution.success, true, 'Expected to not throw error.');
+                    try {
+                        if (typeof test.throw == 'boolean') {
+                            Expected(execution.success, !test.throw, `Expected to ${test.throw ? '' : 'not '}throw.`);
+                        } else if (error) {
+                            Expected(execution.error, error);
+                            Expected(execution.success, false, 'Expected to throw error.');
+                        } else {
+                            Expected(execution.result, result);
+                            Expected(execution.success, true, 'Expected to not throw error.');
+                        }
+                    } catch (error) {
+                        if (execution.error) { 
+                            console.error(execution.error);
+                        }
+                        throw error;
                     }
                 })
             }

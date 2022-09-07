@@ -4,17 +4,26 @@ function GWLanguage() {
     return {
         grammar: {
             start: "_",
-            rules: [
-                { name: "_$ebnf$1", symbols: [] },
-                { name: "_$ebnf$1", symbols: ["_$ebnf$1", "wschar"], postprocess: ({ data }) => data[0].concat([data[1]]) },
-                { name: "_", symbols: ["_$ebnf$1"], postprocess: ({ data }) => { return null; } },
-                { name: "__$ebnf$1", symbols: ["wschar"] },
-                { name: "__$ebnf$1", symbols: ["__$ebnf$1", "wschar"], postprocess: ({ data }) => data[0].concat([data[1]]) },
-                { name: "__", symbols: ["__$ebnf$1"], postprocess: ({ data }) => { return null; } },
-                { name: "wschar", symbols: [/[\t\n\v\f]/], postprocess: ({ data }) => { return data[0]; } }
-            ]
-        },
-        lexer: null
+            rules: {
+                _$RPT0Nx1: [
+                    { name: "_$RPT0Nx1", symbols: [] },
+                    { name: "_$RPT0Nx1", symbols: ["_$RPT0Nx1", "wschar"], postprocess: ({ data }) => data[0].concat([data[1]]) }
+                ],
+                _: [
+                    { name: "_", symbols: ["_$RPT0Nx1"], postprocess: ({ data }) => { return null; } }
+                ],
+                __$RPT1Nx1: [
+                    { name: "__$RPT1Nx1", symbols: ["wschar"] },
+                    { name: "__$RPT1Nx1", symbols: ["__$RPT1Nx1", "wschar"], postprocess: ({ data }) => data[0].concat([data[1]]) }
+                ],
+                __: [
+                    { name: "__", symbols: ["__$RPT1Nx1"], postprocess: ({ data }) => { return null; } }
+                ],
+                wschar: [
+                    { name: "wschar", symbols: [/[\t\n\v\f]/], postprocess: ({ data }) => { return data[0]; } }
+                ]
+            }
+        }
     };
 }
 exports.default = GWLanguage;

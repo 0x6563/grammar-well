@@ -2,30 +2,29 @@ lexer {{
 start: "start"
 
 start ->
-    - when: /\s+/ type: "space"
     - when: /-?(?:[0-9]|[1-9][0-9]+)(?:\.[0-9]+)?(?:[eE][-+]?[0-9]+)?\b/ type: "number"
     - when: /"(?:\\["bfnrt\/\\]|\\u[a-fA-F0-9]{4}|[^"\\])*"/ type: "string"
-    - when: "{" tag: "{"
-    - when: "}" tag: "}"
-    - when: "[" tag: "["
-    - when: "]" tag: "]"
-    - when: "," tag: ","
-    - when: ":" tag: ":"
-    - when: "true" tag: "true"
-    - when: "false" tag: "false"
-    - when: "null" tag: "null"
+    - when: /\s+/ type: "space"
+    - when: "{" type: "{"
+    - when: "}" type: "}"
+    - when: "[" type: "["
+    - when: "]" type: "]"
+    - when: "," type: ","
+    - when: ":" type: ":"
+    - when: "true" type: "true"
+    - when: "false" type: "false"
+    - when: "null" type: "null"
 
 }}
 
 grammar {{
-
     json -> _ (object | array) _ {{ $1[0] }}
 
     object -> "{" _ "}" {{ {} }}
-        | "{" _ pair (_ "," _ pair):* _ "}" ${ extractObject }
+        | "{" _ pair (_ "," _ pair)* _ "}" ${ extractObject }
 
     array -> "[" _ "]" {{ [] }}
-        | "[" _ value (_ "," _ value):* _ "]" ${ extractArray }
+        | "[" _ value (_ "," _ value)* _ "]" ${ extractArray }
 
     value ->
         object {{ $0 }}
@@ -44,7 +43,7 @@ grammar {{
 
     key -> string {{ $0 }}
 
-    _ -> null | $space {{ null }}
+    _ -> $space? {{ null }}
 }}
 
 head ${

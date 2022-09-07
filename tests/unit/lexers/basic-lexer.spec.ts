@@ -1,6 +1,6 @@
 import { expect } from "chai";
 import { CharacterLexer } from "../../../src/lexers/character-lexer";
-import { LexerState } from "../../../src/typings";
+// import { LexerState } from "../../../src/typings";
 describe('Basic Lexer', () => {
     const ABC = 'ABC';
     const DEF = 'DEF';

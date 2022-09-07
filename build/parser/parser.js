@@ -4,9 +4,9 @@ exports.Parser = exports.Parse = void 0;
 const character_lexer_1 = require("../lexers/character-lexer");
 const stateful_lexer_1 = require("../lexers/stateful-lexer");
 const token_queue_1 = require("../lexers/token-queue");
-const earley_1 = require("./algorithms/earley/earley");
+const earley_1 = require("./algorithms/earley");
 const ParserRegistry = {
-    'earley': earley_1.EarleyParser
+    'earley': earley_1.Earley
 };
 function Parse(language, input, options) {
     const i = new Parser(language, options);
@@ -17,35 +17,46 @@ class Parser {
     constructor(language, options = { algorithm: 'earley', parserOptions: {} }) {
         this.language = language;
         this.options = options;
-        this.parserClass = ParserRegistry[options.algorithm];
-        this.parser = this.getParserAlgo();
-    }
-    get results() {
-        return this.parser.results;
-    }
-    feed(input) {
-        this.parser.feed(input);
-        return this.results;
     }
     run(input) {
-        const parser = this.getParserAlgo();
-        parser.feed(input);
-        return parser.results[0];
+        const tokenQueue = this.getTokenQueue();
+        tokenQueue.feed(input);
+        if (typeof this.options.algorithm == 'function')
+            return this.options.algorithm(Object.assign(Object.assign({}, this.language), { tokens: tokenQueue }), this.options.parserOptions);
+        return ParserRegistry[this.options.algorithm](Object.assign(Object.assign({}, this.language), { tokens: tokenQueue }), this.options.parserOptions);
     }
-    getParserAlgo() {
+    getTokenQueue() {
         const { lexer } = this.language;
-        let tokenQueue;
         if (!lexer) {
-            tokenQueue = new token_queue_1.TokenQueue(new character_lexer_1.CharacterLexer());
+            return new token_queue_1.TokenQueue(new character_lexer_1.CharacterLexer());
         }
         else if ("feed" in lexer && typeof lexer.feed == 'function') {
-            tokenQueue = new token_queue_1.TokenQueue(lexer);
+            return new token_queue_1.TokenQueue(lexer);
         }
         else if ('states' in lexer) {
-            tokenQueue = new token_queue_1.TokenQueue(new stateful_lexer_1.StatefulLexer(lexer));
+            return new token_queue_1.TokenQueue(new stateful_lexer_1.StatefulLexer(lexer));
         }
-        return new this.parserClass(Object.assign(Object.assign({}, this.language), { tokenQueue }), this.options.parserOptions);
+    }
+    static SymbolMatchesToken(rule, token) {
+        if ("test" in rule)
+            return rule.test(token.value);
+        if ("token" in rule)
+            return rule.token === token.type;
+        if ("literal" in rule)
+            return rule.literal === token.value;
+    }
+    static PostProcessGrammarRule(rule, data, meta) {
+        if (rule.postprocess) {
+            return rule.postprocess({
+                rule,
+                data,
+                meta,
+                reject: Parser.Reject
+            });
+        }
+        return data;
     }
 }
 exports.Parser = Parser;
+Parser.Reject = Symbol();
 //# sourceMappingURL=parser.js.map

@@ -28,7 +28,7 @@ predicate -> simple_predicate {{ $0 }}
 join -> "join" __ jpart __ jpart ${ ({data}) => ["concatenate:with:", data[2], data[4]] }
 
 jpart -> s0 {{ $0 }}
-       | "_" ${ ({data}) => "" }
+       | "_" {{ "" }}
        | join {{ $0 }}
        | r_parens {{ $0 }}
        | b_parens {{ $0 }}
@@ -115,25 +115,25 @@ c0 -> "red" {{ $0 }}
     | "pink" {{ $0 }}
     | "brown" {{ $0 }}
 
-m_attribute -> "x" __ "position" ${ ({data}) => "x position" }
-             | "y" __ "position" ${ ({data}) => "y position" }
+m_attribute -> "x" __ "position" {{ "x position" }}
+             | "y" __ "position" {{ "y position" }}
              | "direction" {{ $0 }}
-             | "costume" __ "#" ${ ({data}) => "costume #" }
-             | "costume" __ "name" ${ ({data}) => "costume name" }
-             | "backdrop" __ "#" ${ ({data}) => "backdrop #" }
-             | "backdrop" __ "name" ${ ({data}) => "backdrop name" }
+             | "costume" __ "#" {{ "costume #" }}
+             | "costume" __ "name" {{ "costume name" }}
+             | "backdrop" __ "#" {{ "backdrop #" }}
+             | "backdrop" __ "name" {{ "backdrop name" }}
              | "size" {{ $0 }}
              | "volume" {{ $0 }}
-             | "_" ${ ({data}) => "" }
+             | "_" {{ "" }}
 
 m_backdrop -> jpart {{ $0 }}
-            | "_" ${ ({data}) => "" }
+            | "_" {{ "" }}
 
 m_broadcast -> jpart {{ $0 }}
-             | "_" ${ ({data}) => "" }
+             | "_" {{ "" }}
 
 m_costume -> jpart {{ $0 }}
-           | "_" ${ ({data}) => "" }
+           | "_" {{ "" }}
 
 m_effect -> "color" {{ $0 }}
           | "fisheye" {{ $0 }}
@@ -142,24 +142,24 @@ m_effect -> "color" {{ $0 }}
           | "mosaic" {{ $0 }}
           | "brightness" {{ $0 }}
           | "ghost" {{ $0 }}
-          | "_" ${ ({data}) => "" }
+          | "_" {{ "" }}
 
 m_key -> "space" {{ $0 }}
-       | "up" __ "arrow" ${ ({data}) => "up arrow" }
-       | "down" __ "arrow" ${ ({data}) => "down arrow" }
-       | "right" __ "arrow" ${ ({data}) => "right arrow" }
-       | "left" __ "arrow" ${ ({data}) => "left arrow" }
+       | "up" __ "arrow" {{ "up arrow" }}
+       | "down" __ "arrow" {{ "down arrow" }}
+       | "right" __ "arrow" {{ "right arrow" }}
+       | "left" __ "arrow" {{ "left arrow" }}
        | "any" {{ $0 }}
        | [a-z0-9] {{ $0 }}
-       | "_" ${ ({data}) => "" }
+       | "_" {{ "" }}
 
 m_list -> ListName {{ $0 }}
-        | "_" ${ ({data}) => "" }
+        | "_" {{ "" }}
 
 m_location -> jpart {{ $0 }}
-            | "mouse-pointer" ${ ({data}) => "_mouse_" }
-            | "random" __ "position" ${ ({data}) => "_random_" }
-            | "_" ${ ({data}) => "" }
+            | "mouse-pointer" {{ "_mouse_" }}
+            | "random" __ "position" {{ "_random_" }}
+            | "_" {{ "" }}
 
 m_mathOp -> "abs" {{ $0 }}
           | "floor" {{ $0 }}
@@ -173,75 +173,75 @@ m_mathOp -> "abs" {{ $0 }}
           | "atan" {{ $0 }}
           | "ln" {{ $0 }}
           | "log" {{ $0 }}
-          | "e" _ "^" ${ ({data}) => "e ^" }
-          | "10" _ "^" ${ ({data}) => "10 ^" }
-          | "_" ${ ({data}) => "" }
+          | "e" _ "^" {{ "e ^" }}
+          | "10" _ "^" {{ "10 ^" }}
+          | "_" {{ "" }}
 
 m_rotationStyle -> "left-right" {{ $0 }}
-                 | "don't" __ "rotate" ${ ({data}) => "don't rotate" }
-                 | "all" __ "around" ${ ({data}) => "all around" }
-                 | "_" ${ ({data}) => "" }
+                 | "don't" __ "rotate" {{ "don't rotate" }}
+                 | "all" __ "around" {{ "all around" }}
+                 | "_" {{ "" }}
 
 m_scene -> jpart {{ $0 }}
-         | "_" ${ ({data}) => "" }
+         | "_" {{ "" }}
 
 m_sound -> jpart {{ $0 }}
-         | "_" ${ ({data}) => "" }
+         | "_" {{ "" }}
 
 m_spriteOnly -> jpart {{ $0 }}
-              | "myself" ${ ({data}) => "_myself_" }
-              | "_" ${ ({data}) => "" }
+              | "myself" {{ "_myself_" }}
+              | "_" {{ "" }}
 
 m_spriteOrMouse -> jpart {{ $0 }}
-                 | "mouse-pointer" ${ ({data}) => "_mouse_" }
-                 | "_" ${ ({data}) => "" }
+                 | "mouse-pointer" {{ "_mouse_" }}
+                 | "_" {{ "" }}
 
 m_spriteOrStage -> jpart {{ $0 }}
-                 | "Stage" ${ ({data}) => "_stage_" }
-                 | "_" ${ ({data}) => "" }
+                 | "Stage" {{ "_stage_" }}
+                 | "_" {{ "" }}
 
-m_stageOrThis -> "Stage" ${ ({data}) => "_stage_" }
-               | "this" __ "sprite" ${ ({data}) => "this sprite" }
-               | "_" ${ ({data}) => "" }
+m_stageOrThis -> "Stage" {{ "_stage_" }}
+               | "this" __ "sprite" {{ "this sprite" }}
+               | "_" {{ "" }}
 
 m_stop -> "all" {{ $0 }}
-        | "this" __ "script" ${ ({data}) => "this script" }
-        | "other" __ "scripts" __ "in" __ "sprite" ${ ({data}) => "other scripts in sprite" }
-        | "_" ${ ({data}) => "" }
+        | "this" __ "script" {{ "this script" }}
+        | "other" __ "scripts" __ "in" __ "sprite" {{ "other scripts in sprite" }}
+        | "_" {{ "" }}
 
 m_timeAndDate -> "year" {{ $0 }}
                | "month" {{ $0 }}
                | "date" {{ $0 }}
-               | "day" __ "of" __ "week" ${ ({data}) => "day of week" }
+               | "day" __ "of" __ "week" {{ "day of week" }}
                | "hour" {{ $0 }}
                | "minute" {{ $0 }}
                | "second" {{ $0 }}
-               | "_" ${ ({data}) => "" }
+               | "_" {{ "" }}
 
 m_touching -> jpart {{ $0 }}
-            | "mouse-pointer" ${ ({data}) => "_mouse_" }
-            | "edge" ${ ({data}) => "_edge_" }
-            | "_" ${ ({data}) => "" }
+            | "mouse-pointer" {{ "_mouse_" }}
+            | "edge" {{ "_edge_" }}
+            | "_" {{ "" }}
 
 m_triggerSensor -> "loudness" {{ $0 }}
                  | "timer" {{ $0 }}
-                 | "video" __ "motion" ${ ({data}) => "video motion" }
-                 | "_" ${ ({data}) => "" }
+                 | "video" __ "motion" {{ "video motion" }}
+                 | "_" {{ "" }}
 
 m_var -> VariableName {{ $0 }}
-       | "_" ${ ({data}) => "" }
+       | "_" {{ "" }}
 
 m_varName -> VariableName {{ $0 }}
-           | "_" ${ ({data}) => "" }
+           | "_" {{ "" }}
 
 m_videoMotionType -> "motion" {{ $0 }}
                    | "direction" {{ $0 }}
-                   | "_" ${ ({data}) => "" }
+                   | "_" {{ "" }}
 
 m_videoState -> "off" {{ $0 }}
               | "on" {{ $0 }}
               | "on-flipped" {{ $0 }}
-              | "_" ${ ({data}) => "" }
+              | "_" {{ "" }}
 
 d_direction -> n {{ $0 }}
 
@@ -383,19 +383,19 @@ block -> "else" ${ ({data}) => ["else"] }
        | "..." ${ ({data}) => ["ellips"] }
 
 
-_ -> [ ]:* ${ ({data}) => null }
-__ -> [ ]:+ ${ ({data}) => null }
+_ -> [ ]* ${ ({data}) => null }
+__ -> [ ]+ ${ ({data}) => null }
 
 string -> "'hello'"             ${ ({data}) => 'hello' }
 number -> digits                ${ ({data}) => parseInt(data[0]) }
 number -> digits [.] digits     ${ ({data}) => parseFloat(data[0] + '.' + data[2]) }
 
-digits -> [0-9]:+   ${ ({data}) =>  data[0].map(v=>v.value).join('') }
+digits -> [0-9]+   ${ ({data}) =>  data[0].map(v=>v.value).join('') }
 
 color -> [#] [0-9a-z] [0-9a-z] [0-9a-z] [0-9a-z] [0-9a-z] [0-9a-z]
        | [#] [0-9a-z] [0-9a-z] [0-9a-z]
 
-VariableName -> "foo" {{ $0 }}
-ListName -> "list" {{ $0 }}
+VariableName -> "foo" {{ "foo" }}
+ListName -> "list"  {{ "list" }}
 
 }}

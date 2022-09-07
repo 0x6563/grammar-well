@@ -1,7 +1,32 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Message = void 0;
-class Message {
+exports.TextFormatter = void 0;
+class TextFormatter {
+    static UnexpectedToken(queue, expected) {
+        const token = queue.active;
+        const tokenDisplay = TextFormatter.LexerTokenShort(token);
+        const lines = [];
+        lines.push('Unexpected token: ' + tokenDisplay + ' at line: ' + token.line + ' column: ' + token.column);
+        if (expected.length === 0) {
+            lines.push('End of input was expected.');
+        }
+        else {
+            lines.push('Instead, I was expecting to see one of the following:\n');
+            for (const ex of expected) {
+                const nextSymbol = ex.symbols[ex.index];
+                const symbolDisplay = TextFormatter.GrammarRuleSymbol(nextSymbol, false, true);
+                lines.push('A ' + symbolDisplay + ' based on:');
+                lines.push(TextFormatter.GrammarRule(ex, ex.index));
+            }
+            lines.push("");
+            return lines.join("\n");
+        }
+    }
+    static LexerTokenShort(token) {
+        if (token.type)
+            return `[${token.type}] ${JSON.stringify(token.value)}`;
+        return `${JSON.stringify(token.value)}`;
+    }
     static LexerTokenError(lexer) {
         let i = 0;
         let token;
@@ -25,7 +50,7 @@ class Message {
             return `Syntax error at line ${line + 1} col ${column + 1}:\n\n${string}\n`;
         return `Syntax error at index ${offset}:\n\n${string}\n`;
     }
-    static GetSymbolDisplay(symbol, short, error) {
+    static GrammarRuleSymbol(symbol, short, error) {
         if (typeof symbol === 'string') {
             return symbol;
         }
@@ -36,8 +61,8 @@ class Message {
             else if (symbol instanceof RegExp) {
                 return short ? symbol.toString() : `character matching ${symbol.toString()}`;
             }
-            else if ("type" in symbol) {
-                return short ? `%${symbol.type}` : `${symbol.type} token`;
+            else if ("token" in symbol) {
+                return short ? `%${symbol.token}` : `${symbol.token} token`;
             }
             else if ("test" in symbol) {
                 return short ? `<${symbol.test.toString()}>` : `token matching ${symbol.test.toString()}`;
@@ -47,14 +72,14 @@ class Message {
             }
         }
     }
-    static FormatGrammarRule(rule, withCursorAt) {
-        let symbolSequence = rule.symbols.slice(0, withCursorAt).map(v => Message.GetSymbolDisplay(v, true, true)).join(' ');
+    static GrammarRule(rule, withCursorAt) {
+        let symbolSequence = rule.symbols.slice(0, withCursorAt).map(v => TextFormatter.GrammarRuleSymbol(v, true, true)).join(' ');
         if (typeof withCursorAt !== "undefined") {
-            symbolSequence += " ● " + rule.symbols.slice(withCursorAt).map(v => Message.GetSymbolDisplay(v, true, true)).join(' ');
+            symbolSequence += " ● " + rule.symbols.slice(withCursorAt).map(v => TextFormatter.GrammarRuleSymbol(v, true, true)).join(' ');
         }
         ;
         return rule.name + " → " + symbolSequence;
     }
 }
-exports.Message = Message;
-//# sourceMappingURL=message.js.map
+exports.TextFormatter = TextFormatter;
+//# sourceMappingURL=text-format.js.map

@@ -9,8 +9,7 @@ export class TokenQueue {
     get offset() { return this.active?.offset || 0 }
     get line() { return this.active?.line || 0 }
     get column() { return this.active?.column || 0; }
-
-    private get active() { return this.history[this.$historyIndex]; }
+    get active() { return this.history[this.$historyIndex]; }
 
     get state(): TQRestorePoint {
         return { historyIndex: this.$historyIndex, offset: this.offset };
@@ -84,6 +83,22 @@ export class TokenQueue {
             this.history.push(token);
         return token;
     }
+
+    [Symbol.iterator]() {
+        return new TokenIterator(this)
+    }
+
 }
 
+class TokenIterator {
+    constructor(private queue: TokenQueue) { }
 
+    next() {
+        const token = this.queue.next()
+        return { value: token, done: !token }
+    }
+
+    [Symbol.iterator]() {
+        return this
+    }
+}

@@ -44,7 +44,7 @@ grammar {{
 
     key -> string {{ $0 }}
 
-    _ -> null | $space {{ null }}
+    _ -> $space? {{ null }}
 }}
 
 head ${

@@ -74,6 +74,21 @@ class TokenQueue {
             this.history.push(token);
         return token;
     }
+    [Symbol.iterator]() {
+        return new TokenIterator(this);
+    }
 }
 exports.TokenQueue = TokenQueue;
+class TokenIterator {
+    constructor(queue) {
+        this.queue = queue;
+    }
+    next() {
+        const token = this.queue.next();
+        return { value: token, done: !token };
+    }
+    [Symbol.iterator]() {
+        return this;
+    }
+}
 //# sourceMappingURL=token-queue.js.map

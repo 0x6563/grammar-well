@@ -30,7 +30,6 @@ export declare class StatefulLexer {
         column: number;
         state: string;
     };
-    [Symbol.iterator](): LexerIterator;
     private set;
     private pop;
     private goto;
@@ -39,24 +38,8 @@ export declare class StatefulLexer {
     private processRule;
     private getGroup;
 }
-declare class LexerIterator {
-    private lexer;
-    constructor(lexer: StatefulLexer);
-    next(): {
-        value: {
-            type: string;
-            value: string;
-            text: string;
-            offset: number;
-            line: number;
-            column: number;
-            state: string;
-        };
-        done: boolean;
-    };
-    [Symbol.iterator](): this;
-}
-export declare function ResolveStates(states: LexerStateDefinition[], start: string): {
+export declare function ResolveStates(states: {
+    [key: string]: LexerStateDefinition;
+}, start: string): {
     [key: string]: LexerStateDefinition;
 };
-export {};

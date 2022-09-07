@@ -1,5 +1,5 @@
 import { GeneratorState } from "../../typings";
-import { SerializeState } from "./util";
+import { SerializeState } from "../generator";
 
 
 export function TypescriptFormat(state: GeneratorState, exportName: string) {

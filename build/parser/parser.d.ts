@@ -1,22 +1,24 @@
-import { ParserAlgorithm, ParserAlgorithmConstructor, LanguageDefinition } from "../typings";
-import { EarleyParser } from "./algorithms/earley/earley";
+import { GrammarRule, GrammarRuleSymbol, LanguageDefinition, LexerToken, ParserAlgorithm } from "../typings";
 declare const ParserRegistry: {
-    earley: typeof EarleyParser;
+    [key: string]: ParserAlgorithm;
 };
-export declare function Parse(language: LanguageDefinition, input: string, options?: ParserOptions): any;
+export declare function Parse(language: LanguageDefinition, input: string, options?: ParserOptions): {
+    results: any[];
+};
 export declare class Parser {
     private language;
     private options;
-    parserClass: ParserAlgorithmConstructor;
-    parser: ParserAlgorithm;
-    get results(): any[];
+    static Reject: symbol;
     constructor(language: LanguageDefinition, options?: ParserOptions);
-    feed(input: string): any[];
-    run(input: string): any;
-    private getParserAlgo;
+    run(input: string): {
+        results: any[];
+    };
+    private getTokenQueue;
+    static SymbolMatchesToken(rule: GrammarRuleSymbol & {}, token: LexerToken): boolean;
+    static PostProcessGrammarRule(rule: GrammarRule, data: any, meta?: any): any;
 }
 interface ParserOptions {
-    algorithm: keyof typeof ParserRegistry;
+    algorithm: (keyof typeof ParserRegistry) | ParserAlgorithm;
     parserOptions?: any;
 }
 export {};

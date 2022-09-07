@@ -1,6 +1,6 @@
 import { expect } from "chai";
 import { TokenQueue } from "../../../src/lexers/token-queue";
-import { LexerState } from "../../../src/typings";
+// import { LexerState } from "../../../src/typings";
 const moo = require("moo");
 describe('Lexer Adapter', () => {
     const ABC = 'ABC';

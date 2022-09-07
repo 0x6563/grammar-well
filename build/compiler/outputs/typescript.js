@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TypescriptFormat = void 0;
-const util_1 = require("./util");
+const generator_1 = require("../generator");
 function TypescriptFormat(state, exportName) {
     return `// Generated automatically by Grammar-Well, version ${state.version} 
 // https://github.com/0x6563/grammar-well
@@ -99,7 +99,7 @@ interface PostProcessorPayload {
 
 function ${exportName}(): LanguageDefinition {
     ${state.body.join('\n')}
-    return ${(0, util_1.SerializeState)(state, 1)}
+    return ${(0, generator_1.SerializeState)(state, 1)}
 }
 
 export default ${exportName};

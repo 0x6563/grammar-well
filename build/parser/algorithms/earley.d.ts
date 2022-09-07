@@ -1,34 +1,28 @@
-import { Dictionary, ParserAlgorithm, GrammarRule, LanguageDefinition } from "../../../typings";
-import { TokenQueue } from "../../../lexers/token-queue";
-export interface ParserOptions {
+import { Dictionary, GrammarRule, LanguageDefinition } from "../../typings";
+import { TokenQueue } from "../../lexers/token-queue";
+export interface EarleyParserOptions {
     keepHistory?: boolean;
 }
-export declare class EarleyParser implements ParserAlgorithm {
-    static reject: symbol;
-    private keepHistory;
-    private start;
-    private errorService;
-    private rules;
-    current: number;
-    tokenQueue: TokenQueue;
-    table: Column[];
-    results: any;
-    constructor({ grammar, tokenQueue }: LanguageDefinition & {
-        tokenQueue: TokenQueue;
-    }, options?: ParserOptions);
-    feed(input: string): any;
-}
+export declare function Earley(language: LanguageDefinition & {
+    tokens: TokenQueue;
+}, options?: EarleyParserOptions): {
+    results: any[];
+    info: {
+        table: Column[];
+    };
+};
 declare class Column {
-    private ruleMap;
+    private rules;
     index: number;
     data: any;
     states: State[];
     wants: Dictionary<State[]>;
     scannable: State[];
     completed: Dictionary<State[]>;
-    constructor(ruleMap: Dictionary<GrammarRule[]>, index: number);
+    constructor(rules: Dictionary<GrammarRule[]>, index: number);
     process(): void;
     predict(exp: string): void;
+    expects(): GrammarRule[];
     private complete;
 }
 declare class State {

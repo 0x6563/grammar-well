@@ -1,236 +1,130 @@
-import { CompilerState, ConfigDirective, Dictionary, EBNFModified, Expression, ExpressionToken, GeneratorState, GrammarBuilderRule, GrammarDirective, ImportDirective, LexerDirective, LexerTokenMatch, LanguageDirective, SubExpression, TokenLiteral } from "../typings";
-import { Parser } from "../parser/parser";
+import { GeneratorState, GrammarBuilderRule, GrammarBuilderRuleSymbol, LexerConfig, LexerStateDefinition } from "../typings";
 
-import * as number from '../grammars/number.json';
-import * as string from '../grammars/string.json';
-import * as whitespace from '../grammars/whitespace.json';
-import Language from '../grammars/gwell';
+const PostProcessors = {
+    "join": "({data}) => data.join('')",
+    "concat": "({data}) => data[0].concat([data[1]])",
+    "null": "() => null",
+    "first": "({data}) => data[0]"
+};
 
-const BuiltInRegistry = {
-    number,
-    string,
-    whitespace,
+export function SerializeState(state: GeneratorState, depth: number = 0) {
+    return PrettyObject({
+        grammar: SerializeGrammar(state.grammar, depth + 1),
+        lexer: SerializeLexerConfig(state.lexer, depth + 1)
+    }, depth);
 }
 
-export class Generator {
-    private parser = new Parser(Language(), { algorithm: 'earley' });
-
-    private state: GeneratorState = {
-        grammar: {
-            start: '',
-            rules: [],
-            names: Object.create(null)
-        },
-        lexer: null,
-        head: [],
-        body: [],
-        config: {},
-        version: 'unknown',
+function SerializeGrammar(grammar: GeneratorState['grammar'], depth: number = 0) {
+    if (!grammar) {
+        return null;
     }
+    return PrettyObject({
+        start: JSON.stringify(grammar.start),
+        rules: SerializeGrammarRules(grammar.rules, depth + 1)
+    }, depth);
+}
 
-    constructor(private config: { noscript?: boolean; version?: string }, private compilerState: CompilerState) {
-        this.state.version = config.version || this.state.version;
+function SerializeGrammarRules(rules: GrammarBuilderRule[], depth: number = 0) {
+    const map = {};
+    for (const rule of rules) {
+        map[rule.name] = map[rule.name] || [];
+        map[rule.name].push(SerializeGrammarRule(rule));
     }
+    return PrettyObject(map, depth);
+}
 
+function NewLine(depth: number) {
+    return '\n' + ' '.repeat(depth * 4);
+}
 
-    async import(source: string): Promise<void>
-    async import(directive: LanguageDirective): Promise<void>
-    async import(directives: LanguageDirective): Promise<void>
-    async import(directives: string | LanguageDirective | LanguageDirective[]): Promise<void> {
-        if (typeof directives == 'string') {
-            await this.mergeLanguageDefinitionString(directives);
-            return;
-        }
-        directives = Array.isArray(directives) ? directives : [directives];
-        for (const directive of directives) {
-            if ("head" in directive) {
-                if (this.config.noscript)
-                    continue;
-                this.state.head.push(directive.head);
-            } else if ("body" in directive) {
-                if (this.config.noscript)
-                    continue;
-                this.state.body.push(directive.body);
-            } else if ("import" in directive) {
-                await this.processImportDirective(directive);
-            } else if ("config" in directive) {
-                this.processConfigDirective(directive);
-            } else if ("grammar" in directive) {
-                this.processGrammarDirective(directive);
-            } else if ("lexer" in directive) {
-                this.processLexerDirective(directive);
-            }
-        }
+function SerializeSymbol(s: GrammarBuilderRuleSymbol) {
+    if (typeof s === 'string') {
+        return JSON.stringify(s);
+    } else if ('rule' in s) {
+        return JSON.stringify(s.rule);
+    } else if ('regex' in s) {
+        return `/${s.regex}/${s.flags || ''}`;
+    } else if ('token' in s) {
+        return `{ token: ${JSON.stringify(s.token)} }`;
+    } else {
+        return JSON.stringify(s);
     }
+}
 
-    export() {
-        return this.state;
+function SerializeGrammarRule(rule: GrammarBuilderRule) {
+    return PrettyObject({
+        name: JSON.stringify(rule.name),
+        symbols: PrettyArray(rule.symbols.map(SerializeSymbol), -1),
+        postprocess: rule.postprocess ? (rule.postprocess as any).builtin ? PostProcessors[(rule.postprocess as any).builtin] : rule.postprocess : null
+
+    }, -1);
+}
+
+function SerializeLexerConfig(config: GeneratorState['lexer'] | string, depth: number = 0) {
+    if (!config) {
+        return null;
     }
+    if (typeof config === 'string')
+        return config;
+    return PrettyObject({
+        start: JSON.stringify(config.start),
+        states: SerializeLexerConfigStates(config.states, depth + 1)
+    }, depth);
+}
 
-    private async processImportDirective(directive: ImportDirective) {
-        if (directive.builtin) {
-            this.importBuiltIn(directive.import);
-        } else {
-            await this.importGrammar(directive.import);
-        }
+function SerializeLexerConfigStates(states: LexerStateDefinition[], depth: number) {
+    const map = {};
+    for (const state of states) {
+        map[state.name] = PrettyObject({
+            name: JSON.stringify(state.name),
+            default: state.default ? JSON.stringify(state.default) : null,
+            unmatched: state.unmatched ? JSON.stringify(state.unmatched) : null,
+            rules: SerializeLexerConfigStateRules(state.rules, depth + 2)
+        }, depth + 1);
     }
+    return PrettyObject(map, depth);
+}
 
-    private processConfigDirective(directive: ConfigDirective) {
-        Object.assign(this.state.config, directive.config);
+function SerializeLexerConfigStateRules(rules: LexerConfig['states'][0]['rules'], depth: number) {
+    const ary = rules.map(rule => {
+        if ('import' in rule)
+            return PrettyObject({ import: JSON.stringify(rule.import) }, -1)
+        return PrettyObject({
+            when: SerializeSymbol(rule.when as any),
+            type: JSON.stringify(rule.type),
+            pop: JSON.stringify(rule.pop),
+            set: JSON.stringify(rule.set),
+            inset: JSON.stringify(rule.inset),
+            goto: JSON.stringify(rule.goto),
+        }, -1);
+    });
+    return PrettyArray(ary, depth);
+}
+
+function PrettyObject(obj: { [key: string]: string | (string[]) }, depth = 0) {
+    let r = `{`;
+    const keys = Object.keys(obj).filter(v => isVal(obj[v]));
+    const prefix = depth >= 0 ? NewLine(depth + 1) : ' ';
+    for (let i = 0; i < keys.length; i++) {
+        const key = /[a-z_][a-z\d_$]*/i.test(keys[i]) ? keys[i] : keys[i];
+        const value = Array.isArray(obj[keys[i]]) ? PrettyArray(obj[keys[i]] as string[], depth >= 0 ? depth + 1 : -1) : obj[keys[i]];
+        const suffix = (isVal(obj[keys[i + 1]]) ? ',' : '');
+        r += `${prefix}${key}: ${value}${suffix}`;
     }
+    r += `${depth >= 0 ? NewLine(depth) : ' '}}`;
+    return r;
+}
 
-    private processGrammarDirective(directive: GrammarDirective) {
-        for (const rule of directive.grammar.rules) {
-            this.buildRules(rule.name, rule.rules, {});
-            this.state.grammar.start = this.state.grammar.start || rule.name;
-        }
+function PrettyArray(obj: string[], depth = 0) {
+    let r = `[`;
+    for (let i = 0; i < obj.length; i++) {
+        const value = obj[i];
+        r += `${depth >= 0 ? NewLine(depth + 1) : ' '}${value}${(isVal(obj[i + 1]) ? ',' : '')}`;
     }
+    r += `${depth >= 0 ? NewLine(depth) : ' '}]`;
+    return r;
+}
 
-    private processLexerDirective(directive: LexerDirective) {
-        if (!this.state.lexer) {
-            this.state.lexer = {
-                start: '',
-                states: []
-            };
-        }
-        this.state.lexer.start = directive.lexer.start || this.state.lexer.start;
-        this.state.lexer.states.push(...directive.lexer.states);
-    }
-
-
-    private importBuiltIn(name: string) {
-        name = name.toLowerCase();
-        if (!this.compilerState.alreadycompiled.has(name)) {
-            this.compilerState.alreadycompiled.add(name);
-            if (!BuiltInRegistry[name])
-                return;
-            this.merge(BuiltInRegistry[name].state);
-        }
-    }
-
-    private async importGrammar(name) {
-        const resolver = this.compilerState.resolver;
-        const path = resolver.path(name);
-        if (!this.compilerState.alreadycompiled.has(path)) {
-            this.compilerState.alreadycompiled.add(path);
-            await this.mergeLanguageDefinitionString(await resolver.body(path))
-        }
-    }
-
-    private async mergeLanguageDefinitionString(body: string) {
-        const builder = new Generator(this.config, this.compilerState);
-        await builder.import(this.parser.run(body));
-        const state = builder.export();
-        this.merge(state);
-        return state;
-    }
-
-    private merge(state: GeneratorState) {
-
-        this.state.grammar.rules.push(...state.grammar.rules)
-        this.state.grammar.start = state.grammar.start || this.state.grammar.start;
-        if (state.lexer) {
-            if (this.state.lexer) {
-                this.state.lexer.states.push(...state.lexer.states);
-                this.state.lexer.start = state.lexer.start || this.state.lexer.start;
-            } else {
-                this.state.lexer = state.lexer;
-            }
-        }
-        this.state.head.push(...state.head);
-        this.state.body.push(...state.body);
-        Object.assign(this.state.config, state.config);
-    }
-
-    private uuid(name: string) {
-        this.state.grammar.names[name] = (this.state.grammar.names[name] || 0) + 1;
-        return name + '$' + this.state.grammar.names[name];
-    }
-
-    private buildRules(name: string, rules: Expression[], scope: Dictionary<string>) {
-        for (let i = 0; i < rules.length; i++) {
-            const rule = this.buildRule(name, rules[i], scope);
-            if (this.config.noscript) {
-                rule.postprocess = null;
-            }
-            this.state.grammar.rules.push(rule);
-        }
-    }
-
-    private buildRule(name: string, rule: Expression, scope: Dictionary<string>): GrammarBuilderRule {
-        const symbols: (string | RegExp | TokenLiteral | LexerTokenMatch)[] = [];
-        for (let i = 0; i < rule.tokens.length; i++) {
-            const symbol = this.buildSymbol(name, rule.tokens[i], scope);
-            if (symbol !== null) {
-                symbols.push(symbol);
-            }
-        }
-        return { name, symbols, postprocess: rule.postprocess };
-    }
-
-    private buildSymbol(name: string, token: ExpressionToken, scope: Dictionary<string>): string | RegExp | TokenLiteral | LexerTokenMatch | null {
-        if (typeof token === 'string') {
-            return token === 'null' ? null : token;
-        }
-        if ('regex' in token) {
-            return token;
-        }
-        if ('literal' in token) {
-            if (!token.literal.length) {
-                return null;
-            }
-            if (token.literal.length === 1 || this.state.lexer) {
-                return token;
-            }
-            return this.buildStringToken(name, token, scope);
-        }
-        if ('token' in token) {
-            const name = token.token;
-            return { token: `{ type: ${JSON.stringify(name)}}` };
-        }
-        if ('subexpression' in token) {
-            return this.buildSubExpressionToken(name, token, scope);
-        }
-        if ('ebnf' in token) {
-            return this.buildEBNFToken(name, token, scope);
-        }
-        throw new Error("unrecognized token: " + JSON.stringify(token));
-    }
-
-    private buildStringToken(name: string, token: TokenLiteral, scope: Dictionary<string>) {
-        const id = this.uuid(name + "$string");
-        this.buildRules(id, [
-            {
-                tokens: token.literal.split("").map((literal) => ({ literal })),
-                postprocess: { builtin: "joiner" }
-            }
-        ], scope);
-        return id;
-    }
-
-    private buildSubExpressionToken(name: string, token: SubExpression, scope: Dictionary<string>) {
-        const id = this.uuid(name + "$subexpression");
-        this.buildRules(id, token.subexpression, scope);
-        return id;
-    }
-
-    private buildEBNFToken(name: string, token: EBNFModified, scope: Dictionary<string>) {
-        const id = this.uuid(name + "$ebnf");
-        let expr1: Expression = { tokens: [] };
-        let expr2: Expression = { tokens: [] };
-        if (token.modifier == '+') {
-            expr1.tokens = [token.ebnf];
-            expr2.tokens = [id, token.ebnf];
-            expr2.postprocess = { builtin: "arrpush" };
-        } else if (token.modifier == '*') {
-            expr2.tokens = [id, token.ebnf];
-            expr2.postprocess = { builtin: "arrpush" };
-        } else if (token.modifier == '?') {
-            expr1.tokens = [token.ebnf];
-            expr1.postprocess = { builtin: "id" };
-            expr2.postprocess = { builtin: "nuller" };
-        }
-        this.buildRules(id, [expr1, expr2], scope);
-        return id;
-    }
+function isVal(value) {
+    return typeof value !== 'undefined' && value !== null;
 }

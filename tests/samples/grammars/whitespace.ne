@@ -1,12 +1,15 @@
-import whitespace
 grammar {{
-   d -> a {{ $0 }}
+   d -> a {{ data }}
 
-   a -> b _ "&" 
-      | b
+   a -> b _ "&"  {{ data }}
+      | b {{ data }}
 
-   b -> letter
-      | "(" _ d _ ")"
+   b -> letter {{ data }}
+      | "(" _ d _ ")" {{ [$0.value, $1, $2, $3, $4.value ] }}
 
-   letter -> [a-z] {{ $0 }}
+   letter -> [a-z] {{ [$0.value] }}
+    _  -> wschar* {{ null }}
+    __ -> wschar+ {{ null }}
+
+    wschar -> [\t\n\v\f] {{ $0.value }}
 }}

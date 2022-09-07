@@ -15,7 +15,6 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 __exportStar(require("./compiler/compiler"), exports);
-__exportStar(require("./compiler/generator"), exports);
 __exportStar(require("./compiler/import-resolver"), exports);
 __exportStar(require("./parser/parser"), exports);
 __exportStar(require("./lexers/character-lexer"), exports);

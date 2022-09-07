@@ -4,12 +4,12 @@ exports.ResolveStates = exports.StatefulLexer = void 0;
 class StatefulLexer {
     constructor({ states, start }) {
         this.states = Object.create(null);
-        const statemap = ResolveStates(states, start);
-        for (const key in statemap) {
+        ResolveStates(states, start);
+        for (const key in states) {
             this.states[key] = {
-                regexp: CompileRegExp(statemap[key]),
-                rules: statemap[key].rules,
-                unmatched: statemap[key].unmatched ? { type: statemap[key].unmatched } : null
+                regexp: CompileRegExp(states[key]),
+                rules: states[key].rules,
+                unmatched: states[key].unmatched ? { type: states[key].unmatched } : null
             };
         }
         this.start = start;
@@ -47,9 +47,6 @@ class StatefulLexer {
         const token = this.createToken(rule, text, index);
         this.processRule(rule);
         return token;
-    }
-    [Symbol.iterator]() {
-        return new LexerIterator(this);
     }
     set(current) {
         if (!current || this.current === current)
@@ -148,18 +145,6 @@ class StatefulLexer {
     }
 }
 exports.StatefulLexer = StatefulLexer;
-class LexerIterator {
-    constructor(lexer) {
-        this.lexer = lexer;
-    }
-    next() {
-        const token = this.lexer.next();
-        return { value: token, done: !token };
-    }
-    [Symbol.iterator]() {
-        return this;
-    }
-}
 class RegexLib {
     static IsRegex(o) {
         return o instanceof RegExp;
@@ -237,21 +222,16 @@ function CompileRegExp(state) {
     return new RegExp(RegexLib.Join(subexpressions), flags);
 }
 function ResolveStates(states, start) {
-    const statemap = Object.create(null);
     const resolved = new Set();
     const resolving = new Set();
     const chain = new Set();
-    start = start || states[0].name;
-    for (const state of states) {
-        statemap[state.name] = state;
-    }
-    ResolveRuleImports(start, statemap, resolved, resolving, chain);
-    for (const key in statemap) {
+    ResolveRuleImports(start, states, resolved, resolving, chain);
+    for (const key in states) {
         if (!resolved.has(key)) {
-            delete statemap[key];
+            delete states[key];
         }
     }
-    return statemap;
+    return states;
 }
 exports.ResolveStates = ResolveStates;
 function ResolveRuleImports(name, states, resolved, resolving, chain) {

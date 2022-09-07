@@ -7,7 +7,7 @@ export declare class TokenQueue {
     get offset(): number;
     get line(): number;
     get column(): number;
-    private get active();
+    get active(): LexerToken;
     get state(): TQRestorePoint;
     constructor(lexer: Lexer);
     reset(buffer: string): void;
@@ -18,4 +18,15 @@ export declare class TokenQueue {
     next(): LexerToken;
     peek(offset: number): LexerToken;
     private lexerNext;
+    [Symbol.iterator](): TokenIterator;
 }
+declare class TokenIterator {
+    private queue;
+    constructor(queue: TokenQueue);
+    next(): {
+        value: LexerToken;
+        done: boolean;
+    };
+    [Symbol.iterator](): this;
+}
+export {};

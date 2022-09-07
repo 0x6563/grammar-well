@@ -63,10 +63,6 @@ export class StatefulLexer {
         return token;
     }
 
-    [Symbol.iterator]() {
-        return new LexerIterator(this)
-    }
-
     private set(current: string) {
         if (!current || this.current === current)
             return
@@ -170,19 +166,6 @@ export class StatefulLexer {
             }
         }
         throw new Error('Cannot find token type for matched text')
-    }
-}
-
-class LexerIterator {
-    constructor(private lexer: StatefulLexer) { }
-
-    next() {
-        const token = this.lexer.next()
-        return { value: token, done: !token }
-    }
-
-    [Symbol.iterator]() {
-        return this
     }
 }
 
