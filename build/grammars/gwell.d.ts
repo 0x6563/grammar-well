@@ -23,7 +23,7 @@ declare function GWLanguage(): {
                 postprocess: ({ data }: {
                     data: any;
                 }) => {
-                    config: {};
+                    config: any;
                 };
             } | {
                 name: string;
@@ -39,7 +39,7 @@ declare function GWLanguage(): {
                 postprocess: ({ data }: {
                     data: any;
                 }) => {
-                    lexer: {};
+                    lexer: any;
                 };
             } | {
                 name: string;
@@ -85,7 +85,7 @@ declare function GWLanguage(): {
                 symbols: string[];
                 postprocess: ({ data }: {
                     data: any;
-                }) => {};
+                }) => any;
             }[];
             state_declare: {
                 name: string;
@@ -99,7 +99,7 @@ declare function GWLanguage(): {
                 symbols: string[];
                 postprocess: ({ data }: {
                     data: any;
-                }) => {};
+                }) => any;
             }[];
             token_list: {
                 name: string;
@@ -113,7 +113,7 @@ declare function GWLanguage(): {
                 symbols: string[];
                 postprocess: ({ data }: {
                     data: any;
-                }) => {};
+                }) => any;
             }[];
             token_definition_list: {
                 name: string;

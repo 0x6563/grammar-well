@@ -25,10 +25,10 @@ function GWLanguage(){
                     { name: "section_list", symbols: [ "section", "T_WS", "section_list" ], postprocess: ({data}) => { return [data[0]].concat(data[2]); } }
                 ],
                 section: [
-                    { name: "section", symbols: [ "K_CONFIG", "_", "L_TEMPLATEL", "_", "kv_list", "_", "L_TEMPLATER" ], postprocess: ({data}) => { return { config: Rollup(data[4]) }; } },
+                    { name: "section", symbols: [ "K_CONFIG", "_", "L_TEMPLATEL", "_", "kv_list", "_", "L_TEMPLATER" ], postprocess: ({data}) => { return { config: Object.assign(...data[4]) }; } },
                     { name: "section", symbols: [ "K_IMPORT", "_", "L_STAR", "_", "K_FROM", "__", "T_WORD", "_", "L_SCOLON" ], postprocess: ({data}) => { return { import: data[6] }; } },
                     { name: "section", symbols: [ "K_IMPORT", "_", "L_STAR", "_", "K_FROM", "__", "T_STRING", "_", "L_SCOLON" ], postprocess: ({data}) => { return { import: data[6], path: true }; } },
-                    { name: "section", symbols: [ "K_LEXER", "_", "L_TEMPLATEL", "_", "lexer", "_", "L_TEMPLATER" ], postprocess: ({data}) => { return { lexer: Rollup(data[4]) }; } },
+                    { name: "section", symbols: [ "K_LEXER", "_", "L_TEMPLATEL", "_", "lexer", "_", "L_TEMPLATER" ], postprocess: ({data}) => { return { lexer: Object.assign(...data[4]) }; } },
                     { name: "section", symbols: [ "K_GRAMMAR", "_", "L_TEMPLATEL", "_", "grammar", "_", "L_TEMPLATER" ], postprocess: ({data}) => { return { grammar: data[4] }; } },
                     { name: "section", symbols: [ "K_BODY", "_", "T_JS" ], postprocess: ({data}) => { return { body: data[2] }; } },
                     { name: "section", symbols: [ "K_BODY", "_", "T_STRING" ], postprocess: ({data}) => { return { body: data[2], path: true }; } },
@@ -44,13 +44,13 @@ function GWLanguage(){
                     { name: "state_list", symbols: [ "state", "_", "state_list" ], postprocess: ({data}) => { return [data[0]].concat(data[2]); } }
                 ],
                 state: [
-                    { name: "state", symbols: [ "state_declare", "_", "state_definition" ], postprocess: ({data}) => { return Rollup([{ name: data[0] }].concat(data[2])); } }
+                    { name: "state", symbols: [ "state_declare", "_", "state_definition" ], postprocess: ({data}) => { return Object.assign({ name: data[0] }, data[2]); } }
                 ],
                 state_declare: [
                     { name: "state_declare", symbols: [ "T_WORD", "_", "L_ARROW" ], postprocess: ({data}) => { return data[0]; } }
                 ],
                 state_definition: [
-                    { name: "state_definition", symbols: [ "kv_list", "_", "token_list" ], postprocess: ({data}) => { return Rollup(data[0].concat([{rules: data[2]}])); } },
+                    { name: "state_definition", symbols: [ "kv_list", "_", "token_list" ], postprocess: ({data}) => { return Object.assign(...data[0],{rules: data[2]}); } },
                     { name: "state_definition", symbols: [ "token_list" ], postprocess: ({data}) => { return { rules: data[0] }; } }
                 ],
                 token_list: [
@@ -59,7 +59,7 @@ function GWLanguage(){
                 ],
                 token: [
                     { name: "token", symbols: [ "L_DASH", "_", "K_IMPORT", "_", "L_COLON", "_", "word_list" ], postprocess: ({data}) => { return { import: data[6] }; } },
-                    { name: "token", symbols: [ "L_DASH", "_", "token_definition_list" ], postprocess: ({data}) => { return Rollup(data[2]); } }
+                    { name: "token", symbols: [ "L_DASH", "_", "token_definition_list" ], postprocess: ({data}) => { return Object.assign(...data[2]); } }
                 ],
                 token_definition_list: [
                     { name: "token_definition_list", symbols: [ "token_definition" ], postprocess: ({data}) => { return data; } },
@@ -79,7 +79,7 @@ function GWLanguage(){
                     { name: "token_definition", symbols: [ "K_TYPE", "_", "L_COLON", "_", "T_STRING" ], postprocess: ({data}) => { return { type: data[4] }; } }
                 ],
                 grammar: [
-                    { name: "grammar", symbols: [ "kv_list", "_", "grammar_rule_list" ], postprocess: ({data}) => { return { config: Rollup(data[0]), rules: data[2] }; } },
+                    { name: "grammar", symbols: [ "kv_list", "_", "grammar_rule_list" ], postprocess: ({data}) => { return { config: Object.assign(...data[0]), rules: data[2] }; } },
                     { name: "grammar", symbols: [ "grammar_rule_list" ], postprocess: ({data}) => { return { rules: data[0] }; } }
                 ],
                 grammar_rule_list: [
