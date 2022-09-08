@@ -41,7 +41,7 @@ export class Parser {
         if ("test" in rule)
             return rule.test(token.value);
         if ("token" in rule)
-            return rule.token === token.type;
+            return rule.token === token.type || token.tag?.has(rule.token);
         if ("literal" in rule)
             return rule.literal === token.value;
     }

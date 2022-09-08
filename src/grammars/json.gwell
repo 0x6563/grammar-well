@@ -2,9 +2,9 @@ lexer {{
 start: "start"
 
 start ->
-    - when: /\s+/ type: "space"
-    - when: /-?(?:[0-9]|[1-9][0-9]+)(?:\.[0-9]+)?(?:[eE][-+]?[0-9]+)?\b/ type: "number"
-    - when: /"(?:\\["bfnrt\/\\]|\\u[a-fA-F0-9]{4}|[^"\\])*"/ type: "string"
+    - when: /\s+/ tag: "space"
+    - when: /-?(?:[0-9]|[1-9][0-9]+)(?:\.[0-9]+)?(?:[eE][-+]?[0-9]+)?\b/ tag: "number"
+    - when: /"(?:\\["bfnrt\/\\]|\\u[a-fA-F0-9]{4}|[^"\\])*"/ tag: "string"
     - when: "{" tag: "{"
     - when: "}" tag: "}"
     - when: "[" tag: "["

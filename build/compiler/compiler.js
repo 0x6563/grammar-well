@@ -50,7 +50,7 @@ class Compiler {
         this.state = {
             grammar: {
                 start: '',
-                rules: [],
+                rules: {},
                 names: Object.create(null)
             },
             lexer: null,
@@ -132,11 +132,20 @@ class Compiler {
         if (!this.state.lexer) {
             this.state.lexer = {
                 start: '',
-                states: []
+                states: {}
             };
         }
-        this.state.lexer.start = directive.lexer.start || this.state.lexer.start;
-        this.state.lexer.states.push(...directive.lexer.states);
+        this.state.lexer.start = directive.lexer.start || this.state.lexer.start || (directive.lexer.states.length ? directive.lexer.states[0].name : '');
+        for (const state of directive.lexer.states) {
+            this.mergeLexerState(state);
+        }
+    }
+    mergeLexerState(state) {
+        this.state.lexer.states[state.name] = this.state.lexer.states[state.name] || { name: state.name, rules: [] };
+        const target = this.state.lexer.states[state.name];
+        target.default = typeof state.default == 'string' ? state.default : target.default;
+        target.unmatched = typeof state.unmatched == 'string' ? state.unmatched : target.unmatched;
+        target.rules.push(...state.rules);
     }
     importBuiltIn(name) {
         name = name.toLowerCase();
@@ -166,16 +175,16 @@ class Compiler {
         });
     }
     merge(state) {
-        this.state.grammar.rules.push(...state.grammar.rules);
+        Object.assign(this.state.grammar.rules, state.grammar.rules);
         this.state.grammar.start = state.grammar.start || this.state.grammar.start;
         if (state.lexer) {
             if (this.state.lexer) {
-                this.state.lexer.states.push(...state.lexer.states);
-                this.state.lexer.start = state.lexer.start || this.state.lexer.start;
+                Object.assign(this.state.lexer.states, state.lexer.states);
             }
             else {
                 this.state.lexer = state.lexer;
             }
+            this.state.lexer.start = state.lexer.start || this.state.lexer.start;
         }
         this.state.head.push(...state.head);
         this.state.body.push(...state.body);
@@ -188,16 +197,15 @@ class Compiler {
     buildRules(name, rules, scope) {
         for (let i = 0; i < rules.length; i++) {
             const rule = this.buildRule(name, rules[i], scope);
-            this.state.grammar.rules.push(rule);
+            this.state.grammar.rules[rule.name] = this.state.grammar.rules[rule.name] || [];
+            this.state.grammar.rules[rule.name].push(rule);
         }
     }
     buildRule(name, rule, scope) {
         const symbols = [];
         for (let i = 0; i < rule.symbols.length; i++) {
             const symbol = this.buildSymbol(name, rule.symbols[i], scope);
-            if (symbol !== null) {
-                symbols.push(symbol);
-            }
+            symbols.push(symbol);
         }
         return { name, symbols, postprocess: this.config.noscript ? null : rule.postprocess };
     }
@@ -232,7 +240,13 @@ class Compiler {
         const id = this.uuid(name + "$STR");
         this.buildRules(id, [
             {
-                symbols: symbol.literal.split("").map((literal) => ({ literal })),
+                symbols: symbol.literal
+                    .split("")
+                    .map((literal) => {
+                    if (symbol.insensitive && literal.toLowerCase() != literal.toUpperCase())
+                        return { regex: literal, flags: 'i' };
+                    return { literal };
+                }),
                 postprocess: { builtin: "join" }
             }
         ], scope);

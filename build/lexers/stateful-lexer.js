@@ -4,6 +4,7 @@ exports.ResolveStates = exports.StatefulLexer = void 0;
 class StatefulLexer {
     constructor({ states, start }) {
         this.states = Object.create(null);
+        this.tags = new Map();
         ResolveStates(states, start);
         for (const key in states) {
             this.states[key] = {
@@ -98,6 +99,7 @@ class StatefulLexer {
     createToken(rule, text, offset) {
         const token = {
             type: rule.type,
+            tag: this.getTags(rule.tag),
             value: text,
             text: text,
             offset: offset,
@@ -114,6 +116,13 @@ class StatefulLexer {
             }
         }
         return token;
+    }
+    getTags(tags) {
+        if (!tags)
+            return undefined;
+        if (!this.tags.has(tags))
+            this.tags.set(tags, new Set(tags));
+        return this.tags.get(tags);
     }
     processRule(rule) {
         if (rule.pop) {

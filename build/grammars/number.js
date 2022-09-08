@@ -13,8 +13,8 @@ function GWLanguage() {
                     { name: "unsigned_int", symbols: ["unsigned_int$RPT1Nx1"], postprocess: ({ data }) => { return parseInt(data[0].join("")); } }
                 ],
                 int$RPT01x1$SUBx1: [
-                    { name: "int$RPT01x1$SUBx1", symbols: [{ "literal": "-" }] },
-                    { name: "int$RPT01x1$SUBx1", symbols: [{ "literal": "+" }] }
+                    { name: "int$RPT01x1$SUBx1", symbols: [{ literal: "-" }] },
+                    { name: "int$RPT01x1$SUBx1", symbols: [{ literal: "+" }] }
                 ],
                 int$RPT01x1: [
                     { name: "int$RPT01x1", symbols: ["int$RPT01x1$SUBx1"], postprocess: ({ data }) => data[0] },
@@ -36,7 +36,7 @@ function GWLanguage() {
                     { name: "unsigned_decimal$RPT01x1$SUBx1$RPT1Nx1", symbols: ["unsigned_decimal$RPT01x1$SUBx1$RPT1Nx1", /[0-9]/], postprocess: ({ data }) => data[0].concat([data[1]]) }
                 ],
                 unsigned_decimal$RPT01x1$SUBx1: [
-                    { name: "unsigned_decimal$RPT01x1$SUBx1", symbols: [{ "literal": "." }, "unsigned_decimal$RPT01x1$SUBx1$RPT1Nx1"] }
+                    { name: "unsigned_decimal$RPT01x1$SUBx1", symbols: [{ literal: "." }, "unsigned_decimal$RPT01x1$SUBx1$RPT1Nx1"] }
                 ],
                 unsigned_decimal$RPT01x1: [
                     { name: "unsigned_decimal$RPT01x1", symbols: ["unsigned_decimal$RPT01x1$SUBx1"], postprocess: ({ data }) => data[0] },
@@ -46,7 +46,7 @@ function GWLanguage() {
                     { name: "unsigned_decimal", symbols: ["unsigned_decimal$RPT1Nx1", "unsigned_decimal$RPT01x1"], postprocess: ({ data }) => { return parseFloat(data[0].join("") + (data[1] ? "." + data[1][1].join("") : "")); } }
                 ],
                 decimal$RPT01x1: [
-                    { name: "decimal$RPT01x1", symbols: [{ "literal": "-" }], postprocess: ({ data }) => data[0] },
+                    { name: "decimal$RPT01x1", symbols: [{ literal: "-" }], postprocess: ({ data }) => data[0] },
                     { name: "decimal$RPT01x1", symbols: [], postprocess: () => null }
                 ],
                 decimal$RPT1Nx1: [
@@ -58,7 +58,7 @@ function GWLanguage() {
                     { name: "decimal$RPT01x2$SUBx1$RPT1Nx1", symbols: ["decimal$RPT01x2$SUBx1$RPT1Nx1", /[0-9]/], postprocess: ({ data }) => data[0].concat([data[1]]) }
                 ],
                 decimal$RPT01x2$SUBx1: [
-                    { name: "decimal$RPT01x2$SUBx1", symbols: [{ "literal": "." }, "decimal$RPT01x2$SUBx1$RPT1Nx1"] }
+                    { name: "decimal$RPT01x2$SUBx1", symbols: [{ literal: "." }, "decimal$RPT01x2$SUBx1$RPT1Nx1"] }
                 ],
                 decimal$RPT01x2: [
                     { name: "decimal$RPT01x2", symbols: ["decimal$RPT01x2$SUBx1"], postprocess: ({ data }) => data[0] },
@@ -68,10 +68,10 @@ function GWLanguage() {
                     { name: "decimal", symbols: ["decimal$RPT01x1", "decimal$RPT1Nx1", "decimal$RPT01x2"], postprocess: ({ data }) => { return parseFloat((data[0] || "") + data[1].join("") + (data[2] ? "." + data[2][1].join("") : "")); } }
                 ],
                 percentage: [
-                    { name: "percentage", symbols: ["decimal", { "literal": "%" }], postprocess: ({ data }) => { return data[0] / 100; } }
+                    { name: "percentage", symbols: ["decimal", { literal: "%" }], postprocess: ({ data }) => { return data[0] / 100; } }
                 ],
                 jsonfloat$RPT01x1: [
-                    { name: "jsonfloat$RPT01x1", symbols: [{ "literal": "-" }], postprocess: ({ data }) => data[0] },
+                    { name: "jsonfloat$RPT01x1", symbols: [{ literal: "-" }], postprocess: ({ data }) => data[0] },
                     { name: "jsonfloat$RPT01x1", symbols: [], postprocess: () => null }
                 ],
                 jsonfloat$RPT1Nx1: [
@@ -83,7 +83,7 @@ function GWLanguage() {
                     { name: "jsonfloat$RPT01x2$SUBx1$RPT1Nx1", symbols: ["jsonfloat$RPT01x2$SUBx1$RPT1Nx1", /[0-9]/], postprocess: ({ data }) => data[0].concat([data[1]]) }
                 ],
                 jsonfloat$RPT01x2$SUBx1: [
-                    { name: "jsonfloat$RPT01x2$SUBx1", symbols: [{ "literal": "." }, "jsonfloat$RPT01x2$SUBx1$RPT1Nx1"] }
+                    { name: "jsonfloat$RPT01x2$SUBx1", symbols: [{ literal: "." }, "jsonfloat$RPT01x2$SUBx1$RPT1Nx1"] }
                 ],
                 jsonfloat$RPT01x2: [
                     { name: "jsonfloat$RPT01x2", symbols: ["jsonfloat$RPT01x2$SUBx1"], postprocess: ({ data }) => data[0] },

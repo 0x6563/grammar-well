@@ -38,10 +38,11 @@ class Parser {
         }
     }
     static SymbolMatchesToken(rule, token) {
+        var _a;
         if ("test" in rule)
             return rule.test(token.value);
         if ("token" in rule)
-            return rule.token === token.type;
+            return rule.token === token.type || ((_a = token.tag) === null || _a === void 0 ? void 0 : _a.has(rule.token));
         if ("literal" in rule)
             return rule.literal === token.value;
     }

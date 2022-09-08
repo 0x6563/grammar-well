@@ -27,8 +27,11 @@ interface PostProcessorPayload {
     meta: any;
     reject: Symbol;
 }
-export declare type BuiltInPostProcessor = {
+export declare type PostProcessorBuiltIn = {
     builtin: string;
+};
+export declare type PostProcessorTemplate = {
+    template: string;
 };
 export interface Dictionary<T> {
     [key: string]: T;
@@ -51,7 +54,7 @@ export interface ExpressionDefinition {
 }
 export interface GrammarBuilderExpression {
     symbols: GrammarBuilderSymbol[];
-    postprocess?: string | BuiltInPostProcessor;
+    postprocess?: string | PostProcessorBuiltIn | PostProcessorTemplate;
 }
 export declare type GrammarBuilderSymbol = GrammarBuilderSymbolRule | GrammarBuilderSymbolRegex | GrammarBuilderSymbolSubexpression | GrammarBuilderSymbolToken | GrammarBuilderSymbolRepeat | GrammarBuilderSymbolLiteral;
 export interface GrammarBuilderSymbolRule {
@@ -70,6 +73,7 @@ export interface GrammarBuilderSymbolRepeat {
 }
 export interface GrammarBuilderSymbolLiteral {
     literal: string;
+    insensitive?: boolean;
 }
 export interface GrammarBuilderSymbolSubexpression {
     subexpression: GrammarBuilderExpression[];
@@ -104,9 +108,11 @@ export interface GrammarRule {
 export interface GrammarBuilderRule {
     name: string;
     symbols: GrammarBuilderRuleSymbol[];
-    postprocess?: BuiltInPostProcessor | string;
+    postprocess?: PostProcessorTemplate | PostProcessorBuiltIn | string;
 }
-export declare type GrammarBuilderRuleSymbol = GrammarBuilderSymbolRule | GrammarBuilderSymbolRegex | GrammarBuilderSymbolLiteral | GrammarBuilderSymbolToken;
+export declare type GrammarBuilderRuleSymbol = {
+    alias?: string;
+} & (GrammarBuilderSymbolRule | GrammarBuilderSymbolRegex | GrammarBuilderSymbolLiteral | GrammarBuilderSymbolToken);
 export declare type GrammarRuleSymbol = string | RegExp | GrammarBuilderSymbolLiteral | GrammarBuilderSymbolToken | GrammarRuleSymbolTestable;
 export interface LanguageDefinition {
     lexer?: Lexer | LexerConfig;
@@ -127,6 +133,7 @@ export interface Lexer {
 }
 export interface LexerToken {
     type?: string | undefined;
+    tag?: Set<String>;
     value: string;
     offset: number;
     line: number;
@@ -150,6 +157,7 @@ export interface LexerStateImportRule {
 export interface LexerStateMatchRule {
     when: string | RegExp;
     type?: string;
+    tag?: string[];
     pop?: number | 'all';
     inset?: number;
     goto?: string;
@@ -176,11 +184,11 @@ export interface GeneratorState {
     body: string[];
     lexer?: {
         start?: string;
-        states: LexerStateDefinition[];
+        states: Dictionary<LexerStateDefinition>;
     };
     grammar: {
         start: string;
-        rules: GrammarBuilderRule[];
+        rules: Dictionary<GrammarBuilderRule[]>;
         names: {
             [key: string]: number;
         };

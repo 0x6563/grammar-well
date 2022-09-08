@@ -1,4 +1,4 @@
-import { CompileOptions, CompilerContext, OutputFormat, LanguageDirective, GeneratorState, ConfigDirective, Dictionary, GrammarBuilderSymbolRepeat, GrammarBuilderExpression, GrammarBuilderRule, GrammarDirective, ImportDirective, LexerDirective, GrammarBuilderSymbolSubexpression, GrammarBuilderSymbolLiteral, GrammarBuilderRuleSymbol, GrammarBuilderSymbol } from "../typings";
+import { CompileOptions, CompilerContext, OutputFormat, LanguageDirective, GeneratorState, ConfigDirective, Dictionary, GrammarBuilderSymbolRepeat, GrammarBuilderExpression, GrammarBuilderRule, GrammarDirective, ImportDirective, LexerDirective, GrammarBuilderSymbolSubexpression, GrammarBuilderSymbolLiteral, GrammarBuilderRuleSymbol, GrammarBuilderSymbol, LexerStateDefinition } from "../typings";
 
 import { Parser } from "../parser/parser";
 import { FileSystemResolver } from "./import-resolver";
@@ -42,7 +42,7 @@ export class Compiler {
     state: GeneratorState = {
         grammar: {
             start: '',
-            rules: [],
+            rules: {},
             names: Object.create(null)
         },
         lexer: null,
@@ -125,13 +125,22 @@ export class Compiler {
         if (!this.state.lexer) {
             this.state.lexer = {
                 start: '',
-                states: []
+                states: {}
             };
         }
-        this.state.lexer.start = directive.lexer.start || this.state.lexer.start;
-        this.state.lexer.states.push(...directive.lexer.states);
+        this.state.lexer.start = directive.lexer.start || this.state.lexer.start || (directive.lexer.states.length ? directive.lexer.states[0].name : '');
+        for (const state of directive.lexer.states) {
+            this.mergeLexerState(state);
+        }
     }
 
+    private mergeLexerState(state: LexerStateDefinition) {
+        this.state.lexer.states[state.name] = this.state.lexer.states[state.name] || { name: state.name, rules: [] }
+        const target = this.state.lexer.states[state.name];
+        target.default = typeof state.default == 'string' ? state.default : target.default;
+        target.unmatched = typeof state.unmatched == 'string' ? state.unmatched : target.unmatched;
+        target.rules.push(...state.rules);
+    }
 
     private importBuiltIn(name: string) {
         name = name.toLowerCase();
@@ -160,15 +169,16 @@ export class Compiler {
     }
 
     private merge(state: GeneratorState) {
-        this.state.grammar.rules.push(...state.grammar.rules)
+        Object.assign(this.state.grammar.rules, state.grammar.rules);
         this.state.grammar.start = state.grammar.start || this.state.grammar.start;
+
         if (state.lexer) {
             if (this.state.lexer) {
-                this.state.lexer.states.push(...state.lexer.states);
-                this.state.lexer.start = state.lexer.start || this.state.lexer.start;
+                Object.assign(this.state.lexer.states, state.lexer.states);
             } else {
                 this.state.lexer = state.lexer;
             }
+            this.state.lexer.start = state.lexer.start || this.state.lexer.start;
         }
         this.state.head.push(...state.head);
         this.state.body.push(...state.body);
@@ -183,7 +193,8 @@ export class Compiler {
     private buildRules(name: string, rules: GrammarBuilderExpression[], scope: Dictionary<string>) {
         for (let i = 0; i < rules.length; i++) {
             const rule = this.buildRule(name, rules[i], scope);
-            this.state.grammar.rules.push(rule);
+            this.state.grammar.rules[rule.name] = this.state.grammar.rules[rule.name] || [];
+            this.state.grammar.rules[rule.name].push(rule);
         }
     }
 

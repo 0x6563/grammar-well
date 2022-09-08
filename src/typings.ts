@@ -144,6 +144,7 @@ export interface Lexer {
 
 export interface LexerToken {
     type?: string | undefined;
+    tag?: Set<String>;
     value: string;
     offset: number;
     line: number;
@@ -169,6 +170,7 @@ export interface LexerStateImportRule {
 export interface LexerStateMatchRule {
     when: string | RegExp
     type?: string;
+    tag?: string[];
     pop?: number | 'all';
     inset?: number;
     goto?: string;
@@ -198,11 +200,11 @@ export interface GeneratorState {
     body: string[];
     lexer?: {
         start?: string,
-        states: LexerStateDefinition[];
+        states: Dictionary<LexerStateDefinition>;
     };
     grammar: {
         start: string;
-        rules: GrammarBuilderRule[],
+        rules: Dictionary<GrammarBuilderRule[]>,
         names: { [key: string]: number }
     }
 }

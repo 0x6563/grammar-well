@@ -34,6 +34,7 @@ export declare class Compiler {
     private processConfigDirective;
     private processGrammarDirective;
     private processLexerDirective;
+    private mergeLexerState;
     private importBuiltIn;
     private importGrammar;
     private mergeLanguageDefinitionString;

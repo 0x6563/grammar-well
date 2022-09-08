@@ -13,6 +13,7 @@ export class StatefulLexer {
     private unmatched: LexerStateMatchRule;
     private rules: LexerStateMatchRule[];
     private regexp: RegExp;
+    private tags = new Map<string[], Set<string>>();
 
     constructor({ states, start }: LexerConfig) {
         ResolveStates(states, start);
@@ -117,6 +118,7 @@ export class StatefulLexer {
     private createToken(rule: LexerStateMatchRule, text: string, offset: number) {
         const token = {
             type: rule.type,
+            tag: this.getTags(rule.tag),
             value: text,
             text: text,
             offset: offset,
@@ -134,6 +136,14 @@ export class StatefulLexer {
             }
         }
         return token;
+    }
+
+    private getTags(tags?: string[]) {
+        if (!tags)
+            return undefined;
+        if (!this.tags.has(tags))
+            this.tags.set(tags, new Set(tags));
+        return this.tags.get(tags);
     }
 
     private processRule(rule: LexerStateMatchRule) {

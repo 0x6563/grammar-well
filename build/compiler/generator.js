@@ -25,9 +25,8 @@ function SerializeGrammar(grammar, depth = 0) {
 }
 function SerializeGrammarRules(rules, depth = 0) {
     const map = {};
-    for (const rule of rules) {
-        map[rule.name] = map[rule.name] || [];
-        map[rule.name].push(SerializeGrammarRule(rule));
+    for (const rule in rules) {
+        map[rule] = rules[rule].map(v => SerializeGrammarRule(v));
     }
     return PrettyObject(map, depth);
 }
@@ -47,16 +46,45 @@ function SerializeSymbol(s) {
     else if ('token' in s) {
         return `{ token: ${JSON.stringify(s.token)} }`;
     }
+    else if ('literal' in s) {
+        return `{ literal: ${JSON.stringify(s.literal)} }`;
+    }
     else {
         return JSON.stringify(s);
     }
 }
 function SerializeGrammarRule(rule) {
+    const symbols = [];
+    const alias = {};
+    let hasAlias = false;
+    for (let i = 0; i < rule.symbols.length; i++) {
+        symbols.push(SerializeSymbol(rule.symbols[i]));
+        if (rule.symbols[i].alias) {
+            alias[rule.symbols[i].alias] = i;
+            hasAlias = true;
+        }
+    }
     return PrettyObject({
         name: JSON.stringify(rule.name),
-        symbols: PrettyArray(rule.symbols.map(SerializeSymbol), -1),
-        postprocess: rule.postprocess ? rule.postprocess.builtin ? PostProcessors[rule.postprocess.builtin] : rule.postprocess : null
+        symbols: PrettyArray(symbols, -1),
+        postprocess: SerializePostProcess(rule.postprocess, alias)
     }, -1);
+}
+function SerializePostProcess(postprocess, alias) {
+    if (!postprocess)
+        return null;
+    if (typeof postprocess == 'string')
+        return postprocess;
+    if ('builtin' in postprocess)
+        return PostProcessors[postprocess.builtin];
+    if ('template' in postprocess)
+        return TemplatePostProcess(postprocess.template, alias);
+}
+function TemplatePostProcess(str, alias) {
+    for (const key in alias) {
+        str = str.replace(new RegExp('(?:\\$)' + key + '(?![a-zA-Z\\d\\$_])'), `data[${alias[key]}]`);
+    }
+    return "({data}) => { return " + str.replace(/\$(\d+)/g, "data[$1]") + "; }";
 }
 function SerializeLexerConfig(config, depth = 0) {
     if (!config) {
@@ -71,7 +99,8 @@ function SerializeLexerConfig(config, depth = 0) {
 }
 function SerializeLexerConfigStates(states, depth) {
     const map = {};
-    for (const state of states) {
+    for (const key in states) {
+        const state = states[key];
         map[state.name] = PrettyObject({
             name: JSON.stringify(state.name),
             default: state.default ? JSON.stringify(state.default) : null,
@@ -88,6 +117,7 @@ function SerializeLexerConfigStateRules(rules, depth) {
         return PrettyObject({
             when: SerializeSymbol(rule.when),
             type: JSON.stringify(rule.type),
+            tag: JSON.stringify(rule.tag),
             pop: JSON.stringify(rule.pop),
             set: JSON.stringify(rule.set),
             inset: JSON.stringify(rule.inset),

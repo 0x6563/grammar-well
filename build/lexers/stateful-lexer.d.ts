@@ -12,6 +12,7 @@ export declare class StatefulLexer {
     private unmatched;
     private rules;
     private regexp;
+    private tags;
     constructor({ states, start }: LexerConfig);
     feed(data?: string, state?: ReturnType<StatefulLexer['state']>): void;
     state(): {
@@ -23,6 +24,7 @@ export declare class StatefulLexer {
     };
     next(): {
         type: string;
+        tag: Set<string>;
         value: string;
         text: string;
         offset: number;
@@ -35,6 +37,7 @@ export declare class StatefulLexer {
     private goto;
     private matchNext;
     private createToken;
+    private getTags;
     private processRule;
     private getGroup;
 }

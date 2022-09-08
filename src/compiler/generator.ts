@@ -24,11 +24,10 @@ function SerializeGrammar(grammar: GeneratorState['grammar'], depth: number = 0)
     }, depth);
 }
 
-function SerializeGrammarRules(rules: GrammarBuilderRule[], depth: number = 0) {
+function SerializeGrammarRules(rules: Dictionary<GrammarBuilderRule[]>, depth: number = 0) {
     const map = {};
-    for (const rule of rules) {
-        map[rule.name] = map[rule.name] || [];
-        map[rule.name].push(SerializeGrammarRule(rule));
+    for (const rule in rules) {
+        map[rule] = rules[rule].map(v => SerializeGrammarRule(v))
     }
     return PrettyObject(map, depth);
 }
@@ -46,6 +45,8 @@ function SerializeSymbol(s: GrammarBuilderRuleSymbol) {
         return `/${s.regex}/${s.flags || ''}`;
     } else if ('token' in s) {
         return `{ token: ${JSON.stringify(s.token)} }`;
+    } else if ('literal' in s) {
+        return `{ literal: ${JSON.stringify(s.literal)} }`;
     } else {
         return JSON.stringify(s);
     }
@@ -100,9 +101,10 @@ function SerializeLexerConfig(config: GeneratorState['lexer'] | string, depth: n
     }, depth);
 }
 
-function SerializeLexerConfigStates(states: LexerStateDefinition[], depth: number) {
+function SerializeLexerConfigStates(states: Dictionary<LexerStateDefinition>, depth: number) {
     const map = {};
-    for (const state of states) {
+    for (const key in states) {
+        const state = states[key];
         map[state.name] = PrettyObject({
             name: JSON.stringify(state.name),
             default: state.default ? JSON.stringify(state.default) : null,
@@ -120,6 +122,7 @@ function SerializeLexerConfigStateRules(rules: LexerConfig['states'][0]['rules']
         return PrettyObject({
             when: SerializeSymbol(rule.when as any),
             type: JSON.stringify(rule.type),
+            tag: JSON.stringify(rule.tag),
             pop: JSON.stringify(rule.pop),
             set: JSON.stringify(rule.set),
             inset: JSON.stringify(rule.inset),

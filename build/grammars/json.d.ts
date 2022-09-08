@@ -140,10 +140,10 @@ declare function GWLanguage(): {
                 name: string;
                 rules: ({
                     when: RegExp;
-                    type: string;
+                    tag: string[];
                 } | {
                     when: string;
-                    type?: undefined;
+                    tag: string[];
                 })[];
             };
         };
