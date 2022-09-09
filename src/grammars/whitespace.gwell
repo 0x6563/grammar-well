@@ -1,6 +1,6 @@
-grammar {{
-    _  -> wschar* {{ null }}
-    __ -> wschar+ {{ null }}
+grammar: {{
+    _  -> wschar* : {{ null }}
+    __ -> wschar+ : {{ null }}
 
-    wschar -> [\t\n\v\f] {{ $0.value }}
+    wschar -> [\t\n\v\f] : {{ $0.value }}
 }}

@@ -1,16 +1,6 @@
 // Generated automatically by Grammar-Well, version unknown 
 // https://github.com/0x6563/grammar-well
 
-    function Rollup(ary){
-        const r = {};
-        for(const i of ary){
-            for(const k in i){
-                r[k] = i[k];
-            }
-        }
-        return r;
-    };
-
 function GWLanguage(){
     
     return {
@@ -25,15 +15,15 @@ function GWLanguage(){
                     { name: "section_list", symbols: [ "section", "T_WS", "section_list" ], postprocess: ({data}) => { return [data[0]].concat(data[2]); } }
                 ],
                 section: [
-                    { name: "section", symbols: [ "K_CONFIG", "_", "L_TEMPLATEL", "_", "kv_list", "_", "L_TEMPLATER" ], postprocess: ({data}) => { return { config: Object.assign(...data[4]) }; } },
+                    { name: "section", symbols: [ "K_CONFIG", "_", "L_COLON", "_", "L_TEMPLATEL", "_", "kv_list", "_", "L_TEMPLATER" ], postprocess: ({data}) => { return { config: Object.assign(...data[4]) }; } },
                     { name: "section", symbols: [ "K_IMPORT", "_", "L_STAR", "_", "K_FROM", "__", "T_WORD", "_", "L_SCOLON" ], postprocess: ({data}) => { return { import: data[6] }; } },
                     { name: "section", symbols: [ "K_IMPORT", "_", "L_STAR", "_", "K_FROM", "__", "T_STRING", "_", "L_SCOLON" ], postprocess: ({data}) => { return { import: data[6], path: true }; } },
-                    { name: "section", symbols: [ "K_LEXER", "_", "L_TEMPLATEL", "_", "lexer", "_", "L_TEMPLATER" ], postprocess: ({data}) => { return { lexer: Object.assign(...data[4]) }; } },
-                    { name: "section", symbols: [ "K_GRAMMAR", "_", "L_TEMPLATEL", "_", "grammar", "_", "L_TEMPLATER" ], postprocess: ({data}) => { return { grammar: data[4] }; } },
-                    { name: "section", symbols: [ "K_BODY", "_", "T_JS" ], postprocess: ({data}) => { return { body: data[2] }; } },
-                    { name: "section", symbols: [ "K_BODY", "_", "T_STRING" ], postprocess: ({data}) => { return { body: data[2], path: true }; } },
-                    { name: "section", symbols: [ "K_HEAD", "_", "T_JS" ], postprocess: ({data}) => { return { head: data[2] }; } },
-                    { name: "section", symbols: [ "K_HEAD", "_", "T_STRING" ], postprocess: ({data}) => { return { head: data[2], path: true }; } }
+                    { name: "section", symbols: [ "K_LEXER", "_", "L_COLON", "_", "L_TEMPLATEL", "_", "lexer", "_", "L_TEMPLATER" ], postprocess: ({data}) => { return { lexer: Object.assign(...data[6]) }; } },
+                    { name: "section", symbols: [ "K_GRAMMAR", "_", "L_COLON", "_", "L_TEMPLATEL", "_", "grammar", "_", "L_TEMPLATER" ], postprocess: ({data}) => { return { grammar: data[6] }; } },
+                    { name: "section", symbols: [ "K_BODY", "_", "L_COLON", "_", "T_JS" ], postprocess: ({data}) => { return { body: data[2] }; } },
+                    { name: "section", symbols: [ "K_BODY", "_", "L_COLON", "_", "T_STRING" ], postprocess: ({data}) => { return { body: data[2], path: true }; } },
+                    { name: "section", symbols: [ "K_HEAD", "_", "L_COLON", "_", "T_JS" ], postprocess: ({data}) => { return { head: data[2] }; } },
+                    { name: "section", symbols: [ "K_HEAD", "_", "L_COLON", "_", "T_STRING" ], postprocess: ({data}) => { return { head: data[2], path: true }; } }
                 ],
                 lexer: [
                     { name: "lexer", symbols: [ "kv_list", "_", "state_list" ], postprocess: ({data}) => { return data[0].concat({ states: data[2] }); } },
@@ -95,8 +85,8 @@ function GWLanguage(){
                 ],
                 expression: [
                     { name: "expression", symbols: [ "expression_symbol_list" ], postprocess: ({data}) => { return { symbols: data[0] }; } },
-                    { name: "expression", symbols: [ "expression_symbol_list", "_", "T_JS" ], postprocess: ({data}) => { return { symbols: data[0], postprocess: data[2] }; } },
-                    { name: "expression", symbols: [ "expression_symbol_list", "_", "T_GRAMMAR_TEMPLATE" ], postprocess: ({data}) => { return { symbols: data[0], postprocess: { template: data[2] } }; } }
+                    { name: "expression", symbols: [ "expression_symbol_list", "__", "L_COLON", "_", "T_JS" ], postprocess: ({data}) => { return { symbols: data[0], postprocess: data[4] }; } },
+                    { name: "expression", symbols: [ "expression_symbol_list", "__", "L_COLON", "_", "T_GRAMMAR_TEMPLATE" ], postprocess: ({data}) => { return { symbols: data[0], postprocess: { template: data[4] } }; } }
                 ],
                 expression_symbol_list: [
                     { name: "expression_symbol_list", symbols: [ "expression_symbol" ] },
@@ -114,7 +104,8 @@ function GWLanguage(){
                     { name: "expression_symbol_match", symbols: [ "L_DSIGN", "T_WORD" ], postprocess: ({data}) => { return { token: data[1]}; } },
                     { name: "expression_symbol_match", symbols: [ "L_DSIGN", "T_STRING" ], postprocess: ({data}) => { return { token: data[1]}; } },
                     { name: "expression_symbol_match", symbols: [ "T_CHARCLASS" ], postprocess: ({data}) => { return { regex: data[0] }; } },
-                    { name: "expression_symbol_match", symbols: [ "L_PARENL", "_", "expression_list", "_", "L_PARENR" ], postprocess: ({data}) => { return { subexpression: data[2] }; } }
+                    { name: "expression_symbol_match", symbols: [ "L_PARENL", "_", "expression_list", "_", "L_PARENR" ], postprocess: ({data}) => { return { subexpression: data[2] }; } },
+                    { name: "expression_symbol_match", symbols: [ "T_JS" ], postprocess: ({data}) => { return { js: data[0] }; } }
                 ],
                 expression_symbol_match$RPT01x1: [
                     { name: "expression_symbol_match$RPT01x1", symbols: [ { literal: "i" } ], postprocess: ({data}) => data[0] },
@@ -152,12 +143,12 @@ function GWLanguage(){
                 _: [
                     { name: "_", symbols: [ "_$RPT01x1" ], postprocess: ({data}) => { return null; } }
                 ],
-                __$RPT01x1: [
-                    { name: "__$RPT01x1", symbols: [ "T_WS" ], postprocess: ({data}) => data[0] },
-                    { name: "__$RPT01x1", symbols: [ ], postprocess: () => null }
+                __$RPT1Nx1: [
+                    { name: "__$RPT1Nx1", symbols: [ "T_WS" ] },
+                    { name: "__$RPT1Nx1", symbols: [ "__$RPT1Nx1", "T_WS" ], postprocess: ({data}) => data[0].concat([data[1]]) }
                 ],
                 __: [
-                    { name: "__", symbols: [ "__$RPT01x1" ], postprocess: ({data}) => { return null; } }
+                    { name: "__", symbols: [ "__$RPT1Nx1" ], postprocess: ({data}) => { return null; } }
                 ],
                 L_COLON: [
                     { name: "L_COLON", symbols: [ { token: "L_COLON" } ] }
@@ -303,7 +294,7 @@ function GWLanguage(){
                 config: {
                     name: "config",
                     rules: [
-                        { import: ["ws"] },
+                        { import: ["ws","l_colon"] },
                         { when: "{{", tag: ["L_TEMPLATEL"], set: "config_inner" }
                     ]
                 },
@@ -317,7 +308,7 @@ function GWLanguage(){
                 grammar: {
                     name: "grammar",
                     rules: [
-                        { import: ["ws"] },
+                        { import: ["ws","l_colon"] },
                         { when: "{{", tag: ["L_TEMPLATEL"], set: "grammar_inner" }
                     ]
                 },
@@ -331,7 +322,7 @@ function GWLanguage(){
                 lexer: {
                     name: "lexer",
                     rules: [
-                        { import: ["ws"] },
+                        { import: ["ws","l_colon"] },
                         { when: "{{", tag: ["L_TEMPLATEL"], set: "lexer_inner" }
                     ]
                 },

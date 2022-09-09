@@ -1,4 +1,4 @@
-lexer {{
+lexer: {{
     start: "start"
 
     start ->
@@ -8,19 +8,19 @@ lexer {{
         - when: /config(?![a-zA-Z\d_])/ tag: "T_WORD" goto: config
         - import: kv
     config ->
-        - import: ws
+        - import: ws, l_colon
         - when: "{{" tag: "L_TEMPLATEL" set: config_inner
     config_inner ->
         - import: comment, kv
         - when: "}}" tag: "L_TEMPLATER" pop: 1
     grammar ->
-        - import: ws
+        - import: ws, l_colon
         - when: "{{" tag: "L_TEMPLATEL" set: grammar_inner
     grammar_inner ->
         - import: comment, js, js_template, ws, regex, charclass, l_qmark, l_plus, l_star, kv, l_colon, l_comma, l_pipe, l_parenl, l_parenr, l_arrow, l_dsign, l_dash
         - when: "}}" tag: "L_TEMPLATER" pop: 1
     lexer ->
-        - import: ws
+        - import: ws, l_colon
         - when: "{{" tag: "L_TEMPLATEL" set: lexer_inner
     lexer_inner ->
         - import: ws, comment, regex, l_comma, l_arrow, l_dash, kv, js
@@ -107,133 +107,134 @@ lexer {{
 
 }}
 
-grammar{{
+grammar: {{
 
     main ->
-        _ section_list _ {{ $1 }}
+        _ section_list _ : {{ $1 }}
 
     section_list ->
-        section {{ [$0] }}
-        | section T_WS section_list {{ [$0].concat($2) }}
+        section : {{ [$0] }}
+        | section T_WS section_list : {{ [$0].concat($2) }}
 
     section ->
-        K_CONFIG _ L_TEMPLATEL _ kv_list _ L_TEMPLATER {{ { config: Object.assign(...$4) } }}
-        | K_IMPORT _ L_STAR _ K_FROM __ T_WORD:import _ L_SCOLON {{ { import: $import } }}
-        | K_IMPORT _ L_STAR _ K_FROM __ T_STRING:import _ L_SCOLON {{ { import: $import, path: true } }}
-        | K_LEXER _ L_TEMPLATEL _ lexer _ L_TEMPLATER {{ { lexer: Object.assign(...$4) } }}
-        | K_GRAMMAR _ L_TEMPLATEL _ grammar _ L_TEMPLATER {{ { grammar: $4 } }}
-        | K_BODY _ T_JS {{ { body: $2 } }}
-        | K_BODY _ T_STRING {{ { body: $2, path: true } }}
-        | K_HEAD _ T_JS {{ { head: $2 } }}
-        | K_HEAD _ T_STRING {{ { head: $2, path: true } }}
+        K_CONFIG _ L_COLON _ L_TEMPLATEL _ kv_list _ L_TEMPLATER : {{ { config: Object.assign(...$4) } }}
+        | K_IMPORT _ L_STAR _ K_FROM __ T_WORD:import _ L_SCOLON : {{ { import: $import } }}
+        | K_IMPORT _ L_STAR _ K_FROM __ T_STRING:import _ L_SCOLON : {{ { import: $import, path: true } }}
+        | K_LEXER _ L_COLON _ L_TEMPLATEL _ lexer:lexer _ L_TEMPLATER : {{ { lexer: Object.assign(...$lexer) } }}
+        | K_GRAMMAR _ L_COLON _ L_TEMPLATEL _ grammar:grammar _ L_TEMPLATER : {{ { grammar: $grammar } }}
+        | K_BODY _ L_COLON _ T_JS : {{ { body: $2 } }}
+        | K_BODY _ L_COLON _ T_STRING : {{ { body: $2, path: true } }}
+        | K_HEAD _ L_COLON _ T_JS : {{ { head: $2 } }}
+        | K_HEAD _ L_COLON _ T_STRING : {{ { head: $2, path: true } }}
 
     lexer ->
-        kv_list _ state_list {{ $0.concat({ states: $2 }) }}
-        | state_list {{ [{ states: $0 }] }}
+        kv_list _ state_list : {{ $0.concat({ states: $2 }) }}
+        | state_list : {{ [{ states: $0 }] }}
 
     state_list ->
-        state {{ data }}
-        | state _ state_list {{ [$0].concat($2) }}
+        state : {{ data }}
+        | state _ state_list : {{ [$0].concat($2) }}
 
     state ->
-        state_declare _ state_definition {{ Object.assign({ name: $0 }, $2) }}
+        state_declare _ state_definition : {{ Object.assign({ name: $0 }, $2) }}
 
     state_declare ->
-        T_WORD _ L_ARROW {{ $0 }}
+        T_WORD _ L_ARROW : {{ $0 }}
 
     state_definition ->
-        kv_list _ token_list {{ Object.assign(...$0,{rules: $2}) }}
-        | token_list {{ { rules: $0 } }}
+        kv_list _ token_list : {{ Object.assign(...$0,{rules: $2}) }}
+        | token_list : {{ { rules: $0 } }}
 
     token_list ->
-        token {{ data }}
-        | token _ token_list {{ [$0].concat($2) }}
+        token : {{ data }}
+        | token _ token_list : {{ [$0].concat($2) }}
 
     token ->
-        L_DASH _ K_IMPORT _ L_COLON _ word_list {{ { import: $6 } }}
-        | L_DASH _ token_definition_list {{ Object.assign(...$2) }}
+        L_DASH _ K_IMPORT _ L_COLON _ word_list : {{ { import: $6 } }}
+        | L_DASH _ token_definition_list : {{ Object.assign(...$2) }}
 
     token_definition_list ->
-        token_definition {{ data }}
-        | token_definition _ token_definition_list {{ [$0].concat($2) }}
+        token_definition : {{ data }}
+        | token_definition _ token_definition_list : {{ [$0].concat($2) }}
 
     token_definition ->
-        K_TAG _ L_COLON _ string_list {{ { tag: $4 } }}
-        | K_WHEN _ L_COLON _ T_STRING {{ { when: $4 } }}
-        | K_WHEN _ L_COLON _ T_REGEX {{ { when: $4 } }}
-        | K_POP {{ { pop: 1 } }}
-        | K_POP _ L_COLON _ T_INTEGER {{ { pop: parseInt($4) } }}
-        | K_POP _ L_COLON _ K_ALL {{ { pop: "all" } }}
-        | K_INSET {{ { inset: 1 } }}
-        | K_INSET _ L_COLON _ T_INTEGER {{ { inset: parseInt($4) } }}
-        | K_SET _ L_COLON _ T_WORD {{ { set: $4 } }}
-        | K_GOTO _ L_COLON _ T_WORD {{ { goto: $4 } }}
-        | K_TYPE _ L_COLON _ T_STRING {{ { type: $4 } }}
+        K_TAG _ L_COLON _ string_list : {{ { tag: $4 } }}
+        | K_WHEN _ L_COLON _ T_STRING : {{ { when: $4 } }}
+        | K_WHEN _ L_COLON _ T_REGEX : {{ { when: $4 } }}
+        | K_POP : {{ { pop: 1 } }}
+        | K_POP _ L_COLON _ T_INTEGER : {{ { pop: parseInt($4) } }}
+        | K_POP _ L_COLON _ K_ALL : {{ { pop: "all" } }}
+        | K_INSET : {{ { inset: 1 } }}
+        | K_INSET _ L_COLON _ T_INTEGER : {{ { inset: parseInt($4) } }}
+        | K_SET _ L_COLON _ T_WORD : {{ { set: $4 } }}
+        | K_GOTO _ L_COLON _ T_WORD : {{ { goto: $4 } }}
+        | K_TYPE _ L_COLON _ T_STRING : {{ { type: $4 } }}
 
     grammar ->
-        kv_list _ grammar_rule_list {{ { config: Object.assign(...$0), rules: $2 } }}
-        | grammar_rule_list {{ { rules: $0 } }}
+        kv_list _ grammar_rule_list : {{ { config: Object.assign(...$0), rules: $2 } }}
+        | grammar_rule_list : {{ { rules: $0 } }}
 
     grammar_rule_list ->
-        grammar_rule {{ [$0] }}
-        | grammar_rule _ grammar_rule_list {{ [$0].concat($2) }}
+        grammar_rule : {{ [$0] }}
+        | grammar_rule _ grammar_rule_list : {{ [$0].concat($2) }}
 
     grammar_rule ->
-        T_WORD _ L_ARROW _ expression_list {{ { name: $0, rules: $4 } }}
+        T_WORD _ L_ARROW _ expression_list : {{ { name: $0, rules: $4 } }}
 
     expression_list ->
         expression
-        | expression_list _ L_PIPE _ expression {{ $0.concat([$4]) }}
+        | expression_list _ L_PIPE _ expression : {{ $0.concat([$4]) }}
 
     expression ->
-        expression_symbol_list {{ { symbols: $0 } }}
-        | expression_symbol_list _ T_JS {{ { symbols: $0, postprocess: $2 } }}
-        | expression_symbol_list _ T_GRAMMAR_TEMPLATE {{ { symbols: $0, postprocess: { template: $2 } } }}
+        expression_symbol_list : {{ { symbols: $0 } }}
+        | expression_symbol_list __ L_COLON _ T_JS:js : {{ { symbols: $0, postprocess: $js } }}
+        | expression_symbol_list __ L_COLON _ T_GRAMMAR_TEMPLATE:template : {{ { symbols: $0, postprocess: { template: $template } } }}
 
     expression_symbol_list ->
         expression_symbol
-        | expression_symbol_list T_WS expression_symbol {{ $0.concat([$2]) }}
+        | expression_symbol_list T_WS expression_symbol : {{ $0.concat([$2]) }}
 
     
     expression_symbol ->
-        expression_symbol_match {{ $0 }}
-        | expression_symbol_match L_COLON T_WORD {{ { ...$0,  alias: $2 } }}
-        | expression_symbol_match expression_repeater {{ { expression: $0, repeat: $1 } }}
-        | expression_symbol_match expression_repeater L_COLON T_WORD {{ { expression: $0, repeat: $1, alias: $4 } }}
+        expression_symbol_match : {{ $0 }}
+        | expression_symbol_match L_COLON T_WORD : {{ { ...$0,  alias: $2 } }}
+        | expression_symbol_match expression_repeater : {{ { expression: $0, repeat: $1 } }}
+        | expression_symbol_match expression_repeater L_COLON T_WORD : {{ { expression: $0, repeat: $1, alias: $4 } }}
 
 
     expression_symbol_match ->
-        T_WORD {{ { rule: $0 } }}
-        | T_STRING "i"? {{ { literal: $0, insensitive: !!$1 } }}
-        | L_DSIGN T_WORD {{ { token: $1} }}
-        | L_DSIGN T_STRING {{ { token: $1} }}
-        | T_CHARCLASS {{ { regex: $0 } }}
-        | L_PARENL _ expression_list _ L_PARENR {{ { subexpression: $2 } }}
+        T_WORD : {{ { rule: $0 } }}
+        | T_STRING "i"? : {{ { literal: $0, insensitive: !!$1 } }}
+        | L_DSIGN T_WORD : {{ { token: $1} }}
+        | L_DSIGN T_STRING : {{ { token: $1} }}
+        | T_CHARCLASS : {{ { regex: $0 } }}
+        | L_PARENL _ expression_list _ L_PARENR : {{ { subexpression: $2 } }}
+        | T_JS : {{ { js: $0 } }}
 
     expression_repeater ->
-        L_QMARK {{ $0[0].value }}
-        | L_PLUS {{ $0[0].value }}
-        | L_STAR {{ $0[0].value }}
+        L_QMARK : {{ $0[0].value }}
+        | L_PLUS : {{ $0[0].value }}
+        | L_STAR : {{ $0[0].value }}
 
     kv_list ->
-        kv {{ data }}
-        | kv _ kv_list {{ [$0].concat($2) }}
+        kv : {{ data }}
+        | kv _ kv_list : {{ [$0].concat($2) }}
 
     kv ->
-        T_WORD _ L_COLON _ (T_WORD|T_STRING|T_INTEGER) {{ { [$0]: $4[0] } }}
+        T_WORD _ L_COLON _ (T_WORD|T_STRING|T_INTEGER) : {{ { [$0]: $4[0] } }}
 
     string_list ->
-        T_STRING {{ [$0] }}
-        | T_STRING _ L_COMMA _ string_list {{ [$0].concat($4) }}
+        T_STRING : {{ [$0] }}
+        | T_STRING _ L_COMMA _ string_list : {{ [$0].concat($4) }}
 
     word_list ->
-        T_WORD {{ [$0] }}
-        | T_WORD _ L_COMMA _ word_list {{ [$0].concat($4) }}
+        T_WORD : {{ [$0] }}
+        | T_WORD _ L_COMMA _ word_list : {{ [$0].concat($4) }}
 
     _ ->
-        T_WS? {{ null }}
+        T_WS? : {{ null }}
     __ ->
-        T_WS? {{ null }}
+        T_WS+ : {{ null }}
 
     L_COLON -> $L_COLON
     L_SCOLON -> $L_SCOLON
@@ -266,13 +267,13 @@ grammar{{
     K_BODY -> "body"
     K_HEAD -> "head"
 
-    T_JS -> $L_JSL $T_JSBODY* $L_JSR {{ $1.map(v=>v.value).join('') }}
-    T_GRAMMAR_TEMPLATE -> $L_TEMPLATEL _ $T_JSBODY* _ $L_TEMPLATER {{ $2.map(v=>v.value).join('').trim() }}
-    T_STRING -> $T_STRING {{ JSON.parse($0.value) }}
-    T_WORD -> $T_WORD {{ $0.value }}
-    T_REGEX -> $T_REGEX [gmiuy]* {{ { regex: $0.value.slice(1,-1), flags: $1.join('') } }}
+    T_JS -> $L_JSL $T_JSBODY* $L_JSR : {{ $1.map(v=>v.value).join('') }}
+    T_GRAMMAR_TEMPLATE -> $L_TEMPLATEL _ $T_JSBODY* _ $L_TEMPLATER : {{ $2.map(v=>v.value).join('').trim() }}
+    T_STRING -> $T_STRING : {{ JSON.parse($0.value) }}
+    T_WORD -> $T_WORD : {{ $0.value }}
+    T_REGEX -> $T_REGEX [gmiuy]* : {{ { regex: $0.value.slice(1,-1), flags: $1.join('') } }}
     T_COMMENT -> $T_COMMENT
-    T_CHARCLASS -> $T_CHARCLASS {{ $0.value }}
-    T_INTEGER -> $T_INTEGER {{ $0.value }}
-    T_WS -> $T_WS {{ null }}
+    T_CHARCLASS -> $T_CHARCLASS : {{ $0.value }}
+    T_INTEGER -> $T_INTEGER : {{ $0.value }}
+    T_WS -> $T_WS : {{ null }}
 }}
