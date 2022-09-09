@@ -102,9 +102,7 @@ export interface LexerDirective {
     };
 }
 
-interface GrammarRuleSymbolTestable {
-    test: (data: any) => boolean;
-}
+type GrammarRuleSymbolTestable = (data: LexerToken) => boolean;
 
 export interface GrammarRule {
     name: string;

@@ -85,10 +85,10 @@ function GWLanguage() {
             }
         },
         lexer: {
-            start: "start",
+            start: "json",
             states: {
-                start: {
-                    name: "start",
+                json: {
+                    name: "json",
                     rules: [
                         { when: /\s+/, tag: ["space"] },
                         { when: /-?(?:[0-9]|[1-9][0-9]+)(?:\.[0-9]+)?(?:[eE][-+]?[0-9]+)?\b/, tag: ["number"] },

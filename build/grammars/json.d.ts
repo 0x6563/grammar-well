@@ -136,7 +136,7 @@ declare function GWLanguage(): {
     lexer: {
         start: string;
         states: {
-            start: {
+            json: {
                 name: string;
                 rules: ({
                     when: RegExp;

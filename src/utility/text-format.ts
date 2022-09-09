@@ -7,7 +7,7 @@ export class TextFormatter {
         const token = queue.active;
         const tokenDisplay = TextFormatter.LexerTokenShort(token);
         const lines = [];
-        lines.push('Unexpected token: ' + tokenDisplay + ' at line: ' + token.line + ' column: '+ token.column);
+        lines.push('Unexpected token: ' + tokenDisplay + ' at line: ' + token.line + ' column: ' + token.column);
         if (expected.length === 0) {
             lines.push('End of input was expected.');
         } else {
@@ -58,6 +58,8 @@ export class TextFormatter {
     static GrammarRuleSymbol(symbol: GrammarRuleSymbol, short?: boolean, error?: boolean) {
         if (typeof symbol === 'string') {
             return symbol;
+        } else if (typeof symbol === 'function') {
+            return short ? `<${symbol.toString()}>` : `token matching ${symbol.toString()}`;
         } else {
             if ("literal" in symbol) {
                 return JSON.stringify(symbol.literal);
@@ -65,8 +67,6 @@ export class TextFormatter {
                 return short ? symbol.toString() : `character matching ${symbol.toString()}`;
             } else if ("token" in symbol) {
                 return short ? `%${symbol.token}` : `${symbol.token} token`;
-            } else if ("test" in symbol) {
-                return short ? `<${symbol.test.toString()}>` : `token matching ${symbol.test.toString()}`;
             } else if (error) {
                 return 'Unknown symbol type: ' + JSON.stringify(symbol);
             }

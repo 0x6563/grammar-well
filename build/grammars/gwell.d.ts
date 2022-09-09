@@ -292,6 +292,14 @@ declare function GWLanguage(): {
                 }) => {
                     subexpression: any;
                 };
+            } | {
+                name: string;
+                symbols: string[];
+                postprocess: ({ data }: {
+                    data: any;
+                }) => {
+                    js: any;
+                };
             })[];
             expression_symbol_match$RPT01x1: {
                 name: string;
@@ -357,13 +365,17 @@ declare function GWLanguage(): {
                     data: any;
                 }) => any;
             }[];
-            __$RPT01x1: {
+            __$RPT1Nx1: ({
+                name: string;
+                symbols: string[];
+                postprocess?: undefined;
+            } | {
                 name: string;
                 symbols: string[];
                 postprocess: ({ data }: {
                     data: any;
                 }) => any;
-            }[];
+            })[];
             __: {
                 name: string;
                 symbols: string[];

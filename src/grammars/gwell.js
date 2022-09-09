@@ -20,10 +20,10 @@ function GWLanguage(){
                     { name: "section", symbols: [ "K_IMPORT", "_", "L_STAR", "_", "K_FROM", "__", "T_STRING", "_", "L_SCOLON" ], postprocess: ({data}) => { return { import: data[6], path: true }; } },
                     { name: "section", symbols: [ "K_LEXER", "_", "L_COLON", "_", "L_TEMPLATEL", "_", "lexer", "_", "L_TEMPLATER" ], postprocess: ({data}) => { return { lexer: Object.assign(...data[6]) }; } },
                     { name: "section", symbols: [ "K_GRAMMAR", "_", "L_COLON", "_", "L_TEMPLATEL", "_", "grammar", "_", "L_TEMPLATER" ], postprocess: ({data}) => { return { grammar: data[6] }; } },
-                    { name: "section", symbols: [ "K_BODY", "_", "L_COLON", "_", "T_JS" ], postprocess: ({data}) => { return { body: data[2] }; } },
-                    { name: "section", symbols: [ "K_BODY", "_", "L_COLON", "_", "T_STRING" ], postprocess: ({data}) => { return { body: data[2], path: true }; } },
-                    { name: "section", symbols: [ "K_HEAD", "_", "L_COLON", "_", "T_JS" ], postprocess: ({data}) => { return { head: data[2] }; } },
-                    { name: "section", symbols: [ "K_HEAD", "_", "L_COLON", "_", "T_STRING" ], postprocess: ({data}) => { return { head: data[2], path: true }; } }
+                    { name: "section", symbols: [ "K_BODY", "_", "L_COLON", "_", "T_JS" ], postprocess: ({data}) => { return { body: data[4] }; } },
+                    { name: "section", symbols: [ "K_BODY", "_", "L_COLON", "_", "T_STRING" ], postprocess: ({data}) => { return { body: data[4], path: true }; } },
+                    { name: "section", symbols: [ "K_HEAD", "_", "L_COLON", "_", "T_JS" ], postprocess: ({data}) => { return { head: data[4] }; } },
+                    { name: "section", symbols: [ "K_HEAD", "_", "L_COLON", "_", "T_STRING" ], postprocess: ({data}) => { return { head: data[4], path: true }; } }
                 ],
                 lexer: [
                     { name: "lexer", symbols: [ "kv_list", "_", "state_list" ], postprocess: ({data}) => { return data[0].concat({ states: data[2] }); } },

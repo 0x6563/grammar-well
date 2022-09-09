@@ -39,6 +39,8 @@ class Parser {
     }
     static SymbolMatchesToken(rule, token) {
         var _a;
+        if (typeof rule == 'function')
+            return rule(token);
         if ("test" in rule)
             return rule.test(token.value);
         if ("token" in rule)

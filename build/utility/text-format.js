@@ -54,6 +54,9 @@ class TextFormatter {
         if (typeof symbol === 'string') {
             return symbol;
         }
+        else if (typeof symbol === 'function') {
+            return short ? `<${symbol.toString()}>` : `token matching ${symbol.toString()}`;
+        }
         else {
             if ("literal" in symbol) {
                 return JSON.stringify(symbol.literal);
@@ -63,9 +66,6 @@ class TextFormatter {
             }
             else if ("token" in symbol) {
                 return short ? `%${symbol.token}` : `${symbol.token} token`;
-            }
-            else if ("test" in symbol) {
-                return short ? `<${symbol.test.toString()}>` : `token matching ${symbol.test.toString()}`;
             }
             else if (error) {
                 return 'Unknown symbol type: ' + JSON.stringify(symbol);
