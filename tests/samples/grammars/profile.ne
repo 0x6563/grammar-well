@@ -1,11 +1,11 @@
-# mainly for profiling
+// mainly for profiling
 
-head ${
+head : ${
 /* This comment should exist. */
 var f = 0;
 }
 
-grammar {{
+grammar : {{
 
 p -> "(" p ")" | [a-z] q {{ 1 }}
 q -> null

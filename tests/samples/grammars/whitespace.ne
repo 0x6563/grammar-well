@@ -1,16 +1,16 @@
 import * from whitespace;
 
-grammar {{
+grammar : {{
    start: "d"
 
-   d -> a {{ data }}
+   d -> a : {{ data }}
 
-   a -> b _ "&"  {{ data }}
-      | b {{ data }}
+   a -> b _ "&"  : {{ data }}
+      | b : {{ data }}
 
-   b -> letter {{ data }}
-      | "(" _ d _ ")" {{ [ $0.value, $1, $2, $3, $4.value ] }}
+   b -> letter : {{ data }}
+      | "(" _ d _ ")" : {{ [ $0.value, $1, $2, $3, $4.value ] }}
 
-   letter -> [a-z] {{ [ $0.value ] }}
+   letter -> [a-z] : {{ [ $0.value ] }}
 }}
 

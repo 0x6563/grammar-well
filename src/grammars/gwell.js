@@ -40,7 +40,7 @@ function GWLanguage(){
                     { name: "state_declare", symbols: [ "T_WORD", "_", "L_ARROW" ], postprocess: ({data}) => { return data[0]; } }
                 ],
                 state_definition: [
-                    { name: "state_definition", symbols: [ "kv_list", "_", "token_list" ], postprocess: ({data}) => { return Object.assign(...data[0],{rules: data[2]}); } },
+                    { name: "state_definition", symbols: [ "kv_list", "_", "token_list" ], postprocess: ({data}) => { return Object.assign(...data[0], { rules: data[2] }); } },
                     { name: "state_definition", symbols: [ "token_list" ], postprocess: ({data}) => { return { rules: data[0] }; } }
                 ],
                 token_list: [

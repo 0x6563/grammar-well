@@ -205,7 +205,8 @@ class Compiler {
         const symbols = [];
         for (let i = 0; i < expression.symbols.length; i++) {
             const symbol = this.buildSymbol(name, expression.symbols[i]);
-            symbols.push(symbol);
+            if (symbol)
+                symbols.push(symbol);
         }
         return { name, symbols, postprocess: this.config.noscript ? null : expression.postprocess || (rule === null || rule === void 0 ? void 0 : rule.postprocess) };
     }
@@ -234,7 +235,6 @@ class Compiler {
         if ('subexpression' in symbol) {
             return this.buildSubExpressionRules(name, symbol);
         }
-        throw new Error("Unrecognized symbol: " + JSON.stringify(symbol));
     }
     buildCharacterRules(name, symbol) {
         const id = this.uuid(name + "$STR");
