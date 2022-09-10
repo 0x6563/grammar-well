@@ -84,12 +84,12 @@ class Compiler {
                 if ("head" in directive) {
                     if (this.config.noscript)
                         continue;
-                    this.state.head.push(directive.head);
+                    this.state.head.push(directive.head.js);
                 }
                 else if ("body" in directive) {
                     if (this.config.noscript)
                         continue;
-                    this.state.body.push(directive.body);
+                    this.state.body.push(directive.body.js);
                 }
                 else if ("import" in directive) {
                     yield this.processImportDirective(directive);
@@ -124,7 +124,7 @@ class Compiler {
             this.state.grammar.start = directive.grammar.config.start || this.state.grammar.start;
         }
         for (const rule of directive.grammar.rules) {
-            this.buildRules(rule.name, rule.rules, {});
+            this.buildRules(rule.name, rule.expressions, rule);
             this.state.grammar.start = this.state.grammar.start || rule.name;
         }
     }
@@ -194,24 +194,24 @@ class Compiler {
         this.state.grammar.names[name] = (this.state.grammar.names[name] || 0) + 1;
         return name + 'x' + this.state.grammar.names[name];
     }
-    buildRules(name, rules, scope) {
-        for (let i = 0; i < rules.length; i++) {
-            const rule = this.buildRule(name, rules[i], scope);
-            this.state.grammar.rules[rule.name] = this.state.grammar.rules[rule.name] || [];
-            this.state.grammar.rules[rule.name].push(rule);
+    buildRules(name, expressions, rule) {
+        for (let i = 0; i < expressions.length; i++) {
+            const r = this.buildRule(name, expressions[i], rule);
+            this.state.grammar.rules[r.name] = this.state.grammar.rules[r.name] || [];
+            this.state.grammar.rules[r.name].push(r);
         }
     }
-    buildRule(name, rule, scope) {
+    buildRule(name, expression, rule) {
         const symbols = [];
-        for (let i = 0; i < rule.symbols.length; i++) {
-            const symbol = this.buildSymbol(name, rule.symbols[i], scope);
+        for (let i = 0; i < expression.symbols.length; i++) {
+            const symbol = this.buildSymbol(name, expression.symbols[i]);
             symbols.push(symbol);
         }
-        return { name, symbols, postprocess: this.config.noscript ? null : rule.postprocess };
+        return { name, symbols, postprocess: this.config.noscript ? null : expression.postprocess || (rule === null || rule === void 0 ? void 0 : rule.postprocess) };
     }
-    buildSymbol(name, symbol, scope) {
+    buildSymbol(name, symbol) {
         if ('repeat' in symbol) {
-            return this.buildRepeatRules(name, symbol, scope);
+            return this.buildRepeatRules(name, symbol);
         }
         if ('rule' in symbol) {
             return symbol;
@@ -229,14 +229,14 @@ class Compiler {
             if (symbol.literal.length === 1 || this.state.lexer) {
                 return symbol;
             }
-            return this.buildCharacterRules(name, symbol, scope);
+            return this.buildCharacterRules(name, symbol);
         }
         if ('subexpression' in symbol) {
-            return this.buildSubExpressionRules(name, symbol, scope);
+            return this.buildSubExpressionRules(name, symbol);
         }
         throw new Error("Unrecognized symbol: " + JSON.stringify(symbol));
     }
-    buildCharacterRules(name, symbol, scope) {
+    buildCharacterRules(name, symbol) {
         const id = this.uuid(name + "$STR");
         this.buildRules(id, [
             {
@@ -249,15 +249,15 @@ class Compiler {
                 }),
                 postprocess: { builtin: "join" }
             }
-        ], scope);
+        ]);
         return { rule: id };
     }
-    buildSubExpressionRules(name, symbol, scope) {
+    buildSubExpressionRules(name, symbol) {
         const id = this.uuid(name + "$SUB");
-        this.buildRules(id, symbol.subexpression, scope);
+        this.buildRules(id, symbol.subexpression);
         return { rule: id };
     }
-    buildRepeatRules(name, symbol, scope) {
+    buildRepeatRules(name, symbol) {
         let id;
         let expr1 = { symbols: [] };
         let expr2 = { symbols: [] };
@@ -278,7 +278,7 @@ class Compiler {
             expr1.postprocess = { builtin: "first" };
             expr2.postprocess = { builtin: "null" };
         }
-        this.buildRules(id, [expr1, expr2], scope);
+        this.buildRules(id, [expr1, expr2]);
         return { rule: id };
     }
 }

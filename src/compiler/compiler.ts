@@ -1,4 +1,4 @@
-import { CompileOptions, CompilerContext, OutputFormat, LanguageDirective, GeneratorState, ConfigDirective, Dictionary, GrammarBuilderSymbolRepeat, GrammarBuilderExpression, GrammarBuilderRule, GrammarDirective, ImportDirective, LexerDirective, GrammarBuilderSymbolSubexpression, GrammarBuilderSymbolLiteral, GrammarBuilderRuleSymbol, GrammarBuilderSymbol, LexerStateDefinition } from "../typings";
+import { CompileOptions, CompilerContext, OutputFormat, LanguageDirective, GeneratorState, ConfigDirective, GrammarBuilderSymbolRepeat, GrammarBuilderExpression, GeneratorGrammarRule, GrammarDirective, ImportDirective, LexerDirective, GrammarBuilderSymbolSubexpression, GrammarTypeLiteral, GeneratorGrammarSymbol, GrammarBuilderSymbol, LexerStateDefinition, GrammarBuilderRule } from "../typings";
 
 import { Parser } from "../parser/parser";
 import { FileSystemResolver } from "./import-resolver";
@@ -81,11 +81,11 @@ export class Compiler {
             if ("head" in directive) {
                 if (this.config.noscript)
                     continue;
-                this.state.head.push(directive.head);
+                this.state.head.push(directive.head.js);
             } else if ("body" in directive) {
                 if (this.config.noscript)
                     continue;
-                this.state.body.push(directive.body);
+                this.state.body.push(directive.body.js);
             } else if ("import" in directive) {
                 await this.processImportDirective(directive);
             } else if ("config" in directive) {
@@ -116,7 +116,7 @@ export class Compiler {
         }
 
         for (const rule of directive.grammar.rules) {
-            this.buildRules(rule.name, rule.rules, {});
+            this.buildRules(rule.name, rule.expressions, rule);
             this.state.grammar.start = this.state.grammar.start || rule.name;
         }
     }
@@ -190,28 +190,28 @@ export class Compiler {
         return name + 'x' + this.state.grammar.names[name];
     }
 
-    private buildRules(name: string, rules: GrammarBuilderExpression[], scope: Dictionary<string>) {
-        for (let i = 0; i < rules.length; i++) {
-            const rule = this.buildRule(name, rules[i], scope);
-            this.state.grammar.rules[rule.name] = this.state.grammar.rules[rule.name] || [];
-            this.state.grammar.rules[rule.name].push(rule);
+    private buildRules(name: string, expressions: GrammarBuilderExpression[], rule?: GrammarBuilderRule) {
+        for (let i = 0; i < expressions.length; i++) {
+            const r = this.buildRule(name, expressions[i], rule);
+            this.state.grammar.rules[r.name] = this.state.grammar.rules[r.name] || [];
+            this.state.grammar.rules[r.name].push(r);
         }
     }
 
-    private buildRule(name: string, rule: GrammarBuilderExpression, scope: Dictionary<string>): GrammarBuilderRule {
-        const symbols: GrammarBuilderRuleSymbol[] = [];
-        for (let i = 0; i < rule.symbols.length; i++) {
-            const symbol = this.buildSymbol(name, rule.symbols[i], scope);
-            symbols.push(symbol);
+    private buildRule(name: string, expression: GrammarBuilderExpression, rule?: GrammarBuilderRule): GeneratorGrammarRule {
+        const symbols: GeneratorGrammarSymbol[] = [];
+        for (let i = 0; i < expression.symbols.length; i++) {
+            const symbol = this.buildSymbol(name, expression.symbols[i]);
+            if (symbol)
+                symbols.push(symbol);
         }
-        return { name, symbols, postprocess: this.config.noscript ? null : rule.postprocess };
+        return { name, symbols, postprocess: this.config.noscript ? null : expression.postprocess || rule?.postprocess };
     }
 
-    private buildSymbol(name: string, symbol: GrammarBuilderSymbol, scope: Dictionary<string>): GrammarBuilderRuleSymbol {
+    private buildSymbol(name: string, symbol: GrammarBuilderSymbol): GeneratorGrammarSymbol {
         if ('repeat' in symbol) {
-            return this.buildRepeatRules(name, symbol, scope);
+            return this.buildRepeatRules(name, symbol);
         }
-
         if ('rule' in symbol) {
             return symbol;
         }
@@ -228,15 +228,14 @@ export class Compiler {
             if (symbol.literal.length === 1 || this.state.lexer) {
                 return symbol;
             }
-            return this.buildCharacterRules(name, symbol, scope);
+            return this.buildCharacterRules(name, symbol);
         }
         if ('subexpression' in symbol) {
-            return this.buildSubExpressionRules(name, symbol, scope);
+            return this.buildSubExpressionRules(name, symbol);
         }
-        throw new Error("Unrecognized symbol: " + JSON.stringify(symbol));
     }
 
-    private buildCharacterRules(name: string, symbol: GrammarBuilderSymbolLiteral, scope: Dictionary<string>) {
+    private buildCharacterRules(name: string, symbol: GrammarTypeLiteral) {
         const id = this.uuid(name + "$STR");
         this.buildRules(id, [
             {
@@ -249,17 +248,17 @@ export class Compiler {
                     }),
                 postprocess: { builtin: "join" }
             }
-        ], scope);
+        ]);
         return { rule: id };
     }
 
-    private buildSubExpressionRules(name: string, symbol: GrammarBuilderSymbolSubexpression, scope: Dictionary<string>) {
+    private buildSubExpressionRules(name: string, symbol: GrammarBuilderSymbolSubexpression) {
         const id = this.uuid(name + "$SUB");
-        this.buildRules(id, symbol.subexpression, scope);
+        this.buildRules(id, symbol.subexpression);
         return { rule: id };
     }
 
-    private buildRepeatRules(name: string, symbol: GrammarBuilderSymbolRepeat, scope: Dictionary<string>) {
+    private buildRepeatRules(name: string, symbol: GrammarBuilderSymbolRepeat) {
         let id: string;
         let expr1: GrammarBuilderExpression = { symbols: [] };
         let expr2: GrammarBuilderExpression = { symbols: [] };
@@ -278,7 +277,7 @@ export class Compiler {
             expr1.postprocess = { builtin: "first" };
             expr2.postprocess = { builtin: "null" };
         }
-        this.buildRules(id, [expr1, expr2], scope);
+        this.buildRules(id, [expr1, expr2]);
         return { rule: id };
     }
 }

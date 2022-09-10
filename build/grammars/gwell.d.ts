@@ -210,7 +210,7 @@ declare function GWLanguage(): {
                     data: any;
                 }) => {
                     name: any;
-                    rules: any;
+                    expressions: any;
                 };
             }[];
             expression_list: ({
@@ -251,56 +251,13 @@ declare function GWLanguage(): {
                     data: any;
                 }) => any;
             }[];
-            expression_symbol_match: ({
+            expression_symbol_match: {
                 name: string;
                 symbols: string[];
                 postprocess: ({ data }: {
                     data: any;
-                }) => {
-                    rule: any;
-                };
-            } | {
-                name: string;
-                symbols: string[];
-                postprocess: ({ data }: {
-                    data: any;
-                }) => {
-                    literal: any;
-                    insensitive: boolean;
-                };
-            } | {
-                name: string;
-                symbols: string[];
-                postprocess: ({ data }: {
-                    data: any;
-                }) => {
-                    token: any;
-                };
-            } | {
-                name: string;
-                symbols: string[];
-                postprocess: ({ data }: {
-                    data: any;
-                }) => {
-                    regex: any;
-                };
-            } | {
-                name: string;
-                symbols: string[];
-                postprocess: ({ data }: {
-                    data: any;
-                }) => {
-                    subexpression: any;
-                };
-            } | {
-                name: string;
-                symbols: string[];
-                postprocess: ({ data }: {
-                    data: any;
-                }) => {
-                    js: any;
-                };
-            })[];
+                }) => any;
+            }[];
             expression_symbol_match$RPT01x1: {
                 name: string;
                 symbols: {
@@ -577,7 +534,9 @@ declare function GWLanguage(): {
                 })[];
                 postprocess: ({ data }: {
                     data: any;
-                }) => any;
+                }) => {
+                    js: any;
+                };
             }[];
             T_GRAMMAR_TEMPLATE$RPT0Nx1: ({
                 name: string;
@@ -599,7 +558,9 @@ declare function GWLanguage(): {
                 })[];
                 postprocess: ({ data }: {
                     data: any;
-                }) => any;
+                }) => {
+                    template: any;
+                };
             }[];
             T_STRING: {
                 name: string;

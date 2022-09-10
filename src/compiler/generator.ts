@@ -1,4 +1,4 @@
-import { Dictionary, GeneratorState, GrammarBuilderRule, GrammarBuilderRuleSymbol, LexerConfig, LexerStateDefinition } from "../typings";
+import { Dictionary, GeneratorState, GeneratorGrammarRule, GeneratorGrammarSymbol, LexerConfig, LexerStateDefinition } from "../typings";
 
 const PostProcessors = {
     "join": "({data}) => data.join('')",
@@ -24,7 +24,7 @@ function SerializeGrammar(grammar: GeneratorState['grammar'], depth: number = 0)
     }, depth);
 }
 
-function SerializeGrammarRules(rules: Dictionary<GrammarBuilderRule[]>, depth: number = 0) {
+function SerializeGrammarRules(rules: Dictionary<GeneratorGrammarRule[]>, depth: number = 0) {
     const map = {};
     for (const rule in rules) {
         map[rule] = rules[rule].map(v => SerializeGrammarRule(v))
@@ -36,7 +36,7 @@ function NewLine(depth: number) {
     return '\n' + ' '.repeat(depth * 4);
 }
 
-function SerializeSymbol(s: GrammarBuilderRuleSymbol) {
+function SerializeSymbol(s: GeneratorGrammarSymbol) {
     if (typeof s === 'string') {
         return JSON.stringify(s);
     } else if ('rule' in s) {
@@ -47,12 +47,14 @@ function SerializeSymbol(s: GrammarBuilderRuleSymbol) {
         return `{ token: ${JSON.stringify(s.token)} }`;
     } else if ('literal' in s) {
         return `{ literal: ${JSON.stringify(s.literal)} }`;
+    } else if ('js' in s) {
+        return s.js;
     } else {
         return JSON.stringify(s);
     }
 }
 
-function SerializeGrammarRule(rule: GrammarBuilderRule) {
+function SerializeGrammarRule(rule: GeneratorGrammarRule) {
     const symbols = [];
     const alias = {};
     let hasAlias = false;
@@ -72,11 +74,13 @@ function SerializeGrammarRule(rule: GrammarBuilderRule) {
 }
 
 
-function SerializePostProcess(postprocess: GrammarBuilderRule['postprocess'], alias: Dictionary<number>) {
+function SerializePostProcess(postprocess: GeneratorGrammarRule['postprocess'], alias: Dictionary<number>) {
     if (!postprocess)
         return null;
     if (typeof postprocess == 'string')
         return postprocess;
+    if ('js' in postprocess)
+        return postprocess.js;
     if ('builtin' in postprocess)
         return PostProcessors[postprocess.builtin];
     if ('template' in postprocess)

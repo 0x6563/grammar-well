@@ -75,7 +75,9 @@ function GWLanguage() {
                     { name: "grammar_rule_list", symbols: ["grammar_rule", "_", "grammar_rule_list"], postprocess: ({ data }) => { return [data[0]].concat(data[2]); } }
                 ],
                 grammar_rule: [
-                    { name: "grammar_rule", symbols: ["T_WORD", "_", "L_ARROW", "_", "expression_list"], postprocess: ({ data }) => { return { name: data[0], rules: data[4] }; } }
+                    { name: "grammar_rule", symbols: ["T_WORD", "_", "L_ARROW", "_", "expression_list"], postprocess: ({ data }) => { return { name: data[0], expressions: data[4] }; } },
+                    { name: "grammar_rule", symbols: ["T_WORD", "__", "L_COLON", "_", "T_JS", "_", "L_ARROW", "_", "expression_list"], postprocess: ({ data }) => { return { name: data[0], expressions: data[8], postprocess: data[4] }; } },
+                    { name: "grammar_rule", symbols: ["T_WORD", "__", "L_COLON", "_", "T_GRAMMAR_TEMPLATE", "_", "L_ARROW", "_", "expression_list"], postprocess: ({ data }) => { return { name: data[0], expressions: data[8], postprocess: data[4] }; } }
                 ],
                 expression_list: [
                     { name: "expression_list", symbols: ["expression"] },
@@ -84,7 +86,7 @@ function GWLanguage() {
                 expression: [
                     { name: "expression", symbols: ["expression_symbol_list"], postprocess: ({ data }) => { return { symbols: data[0] }; } },
                     { name: "expression", symbols: ["expression_symbol_list", "__", "L_COLON", "_", "T_JS"], postprocess: ({ data }) => { return { symbols: data[0], postprocess: data[4] }; } },
-                    { name: "expression", symbols: ["expression_symbol_list", "__", "L_COLON", "_", "T_GRAMMAR_TEMPLATE"], postprocess: ({ data }) => { return { symbols: data[0], postprocess: { template: data[4] } }; } }
+                    { name: "expression", symbols: ["expression_symbol_list", "__", "L_COLON", "_", "T_GRAMMAR_TEMPLATE"], postprocess: ({ data }) => { return { symbols: data[0], postprocess: data[4] }; } }
                 ],
                 expression_symbol_list: [
                     { name: "expression_symbol_list", symbols: ["expression_symbol"] },
@@ -103,7 +105,7 @@ function GWLanguage() {
                     { name: "expression_symbol_match", symbols: ["L_DSIGN", "T_STRING"], postprocess: ({ data }) => { return { token: data[1] }; } },
                     { name: "expression_symbol_match", symbols: ["T_CHARCLASS"], postprocess: ({ data }) => { return { regex: data[0] }; } },
                     { name: "expression_symbol_match", symbols: ["L_PARENL", "_", "expression_list", "_", "L_PARENR"], postprocess: ({ data }) => { return { subexpression: data[2] }; } },
-                    { name: "expression_symbol_match", symbols: ["T_JS"], postprocess: ({ data }) => { return { js: data[0] }; } }
+                    { name: "expression_symbol_match", symbols: ["T_JS"], postprocess: ({ data }) => { return data[0]; } }
                 ],
                 expression_symbol_match$RPT01x1: [
                     { name: "expression_symbol_match$RPT01x1", symbols: [{ literal: "i" }], postprocess: ({ data }) => data[0] },
@@ -121,7 +123,9 @@ function GWLanguage() {
                 kv$SUBx1: [
                     { name: "kv$SUBx1", symbols: ["T_WORD"] },
                     { name: "kv$SUBx1", symbols: ["T_STRING"] },
-                    { name: "kv$SUBx1", symbols: ["T_INTEGER"] }
+                    { name: "kv$SUBx1", symbols: ["T_INTEGER"] },
+                    { name: "kv$SUBx1", symbols: ["T_JS"] },
+                    { name: "kv$SUBx1", symbols: ["T_GRAMMAR_TEMPLATE"] }
                 ],
                 kv: [
                     { name: "kv", symbols: ["T_WORD", "_", "L_COLON", "_", "kv$SUBx1"], postprocess: ({ data }) => { return { [data[0]]: data[4][0] }; } }
@@ -240,14 +244,14 @@ function GWLanguage() {
                     { name: "T_JS$RPT0Nx1", symbols: ["T_JS$RPT0Nx1", { token: "T_JSBODY" }], postprocess: ({ data }) => data[0].concat([data[1]]) }
                 ],
                 T_JS: [
-                    { name: "T_JS", symbols: [{ token: "L_JSL" }, "T_JS$RPT0Nx1", { token: "L_JSR" }], postprocess: ({ data }) => { return data[1].map(v => v.value).join(''); } }
+                    { name: "T_JS", symbols: [{ token: "L_JSL" }, "T_JS$RPT0Nx1", { token: "L_JSR" }], postprocess: ({ data }) => { return { js: data[1].map(v => v.value).join('') }; } }
                 ],
                 T_GRAMMAR_TEMPLATE$RPT0Nx1: [
                     { name: "T_GRAMMAR_TEMPLATE$RPT0Nx1", symbols: [] },
                     { name: "T_GRAMMAR_TEMPLATE$RPT0Nx1", symbols: ["T_GRAMMAR_TEMPLATE$RPT0Nx1", { token: "T_JSBODY" }], postprocess: ({ data }) => data[0].concat([data[1]]) }
                 ],
                 T_GRAMMAR_TEMPLATE: [
-                    { name: "T_GRAMMAR_TEMPLATE", symbols: [{ token: "L_TEMPLATEL" }, "_", "T_GRAMMAR_TEMPLATE$RPT0Nx1", "_", { token: "L_TEMPLATER" }], postprocess: ({ data }) => { return data[2].map(v => v.value).join('').trim(); } }
+                    { name: "T_GRAMMAR_TEMPLATE", symbols: [{ token: "L_TEMPLATEL" }, "_", "T_GRAMMAR_TEMPLATE$RPT0Nx1", "_", { token: "L_TEMPLATER" }], postprocess: ({ data }) => { return { template: data[2].map(v => v.value).join('').trim() }; } }
                 ],
                 T_STRING: [
                     { name: "T_STRING", symbols: [{ token: "T_STRING" }], postprocess: ({ data }) => { return JSON.parse(data[0].value); } }

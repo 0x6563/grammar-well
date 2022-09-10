@@ -49,6 +49,9 @@ function SerializeSymbol(s) {
     else if ('literal' in s) {
         return `{ literal: ${JSON.stringify(s.literal)} }`;
     }
+    else if ('js' in s) {
+        return s.js;
+    }
     else {
         return JSON.stringify(s);
     }
@@ -75,6 +78,8 @@ function SerializePostProcess(postprocess, alias) {
         return null;
     if (typeof postprocess == 'string')
         return postprocess;
+    if ('js' in postprocess)
+        return postprocess.js;
     if ('builtin' in postprocess)
         return PostProcessors[postprocess.builtin];
     if ('template' in postprocess)

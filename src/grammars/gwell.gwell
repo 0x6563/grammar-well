@@ -142,7 +142,7 @@ grammar: {{
         T_WORD _ L_ARROW : {{ $0 }}
 
     state_definition ->
-        kv_list _ token_list : {{ Object.assign(...$0,{rules: $2}) }}
+        kv_list _ token_list : {{ Object.assign(...$0, { rules: $2 }) }}
         | token_list : {{ { rules: $0 } }}
 
     token_list ->
@@ -179,7 +179,9 @@ grammar: {{
         | grammar_rule _ grammar_rule_list : {{ [$0].concat($2) }}
 
     grammar_rule ->
-        T_WORD _ L_ARROW _ expression_list : {{ { name: $0, rules: $4 } }}
+        T_WORD _ L_ARROW _ expression_list : {{ { name: $0, expressions: $4 } }}
+        | T_WORD  __ L_COLON _ T_JS:js _ L_ARROW _ expression_list:expressions : {{ { name: $0, expressions: $expressions, postprocess: $js } }}
+        | T_WORD  __ L_COLON _ T_GRAMMAR_TEMPLATE:template _ L_ARROW _ expression_list:expressions : {{ { name: $0, expressions: $expressions, postprocess: $template } }}
 
     expression_list ->
         expression
@@ -188,7 +190,7 @@ grammar: {{
     expression ->
         expression_symbol_list : {{ { symbols: $0 } }}
         | expression_symbol_list __ L_COLON _ T_JS:js : {{ { symbols: $0, postprocess: $js } }}
-        | expression_symbol_list __ L_COLON _ T_GRAMMAR_TEMPLATE:template : {{ { symbols: $0, postprocess: { template: $template } } }}
+        | expression_symbol_list __ L_COLON _ T_GRAMMAR_TEMPLATE:template : {{ { symbols: $0, postprocess: $template } }}
 
     expression_symbol_list ->
         expression_symbol
@@ -209,19 +211,19 @@ grammar: {{
         | L_DSIGN T_STRING : {{ { token: $1} }}
         | T_CHARCLASS : {{ { regex: $0 } }}
         | L_PARENL _ expression_list _ L_PARENR : {{ { subexpression: $2 } }}
-        | T_JS : {{ { js: $0 } }}
+        | T_JS : {{ $0 }}
 
-    expression_repeater ->
-        L_QMARK : {{ $0[0].value }}
-        | L_PLUS : {{ $0[0].value }}
-        | L_STAR : {{ $0[0].value }}
+    expression_repeater : {{ $0[0].value }} ->
+        L_QMARK
+        | L_PLUS
+        | L_STAR
 
     kv_list ->
         kv : {{ data }}
         | kv _ kv_list : {{ [$0].concat($2) }}
 
     kv ->
-        T_WORD _ L_COLON _ (T_WORD|T_STRING|T_INTEGER) : {{ { [$0]: $4[0] } }}
+        T_WORD _ L_COLON _ ( T_WORD| T_STRING| T_INTEGER | T_JS | T_GRAMMAR_TEMPLATE) : {{ { [$0]: $4[0] } }}
 
     string_list ->
         T_STRING : {{ [$0] }}
@@ -267,8 +269,8 @@ grammar: {{
     K_BODY -> "body"
     K_HEAD -> "head"
 
-    T_JS -> $L_JSL $T_JSBODY* $L_JSR : {{ $1.map(v=>v.value).join('') }}
-    T_GRAMMAR_TEMPLATE -> $L_TEMPLATEL _ $T_JSBODY* _ $L_TEMPLATER : {{ $2.map(v=>v.value).join('').trim() }}
+    T_JS -> $L_JSL $T_JSBODY* $L_JSR : {{ { js: $1.map(v=>v.value).join('') } }}
+    T_GRAMMAR_TEMPLATE -> $L_TEMPLATEL _ $T_JSBODY* _ $L_TEMPLATER : {{ { template: $2.map(v=>v.value).join('').trim() } }}
     T_STRING -> $T_STRING : {{ JSON.parse($0.value) }}
     T_WORD -> $T_WORD : {{ $0.value }}
     T_REGEX -> $T_REGEX [gmiuy]* : {{ { regex: $0.value.slice(1,-1), flags: $1.join('') } }}
