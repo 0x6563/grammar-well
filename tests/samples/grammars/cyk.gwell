@@ -1,0 +1,18 @@
+lexer : {{
+
+    start: "start"
+
+    start ->
+        default: word
+        unmatched: word
+        - when: /[A-Za-z\d]/ tag: "char"
+
+}}
+
+grammar: {{
+    S -> s
+    s -> A B | B C
+    A -> "A"
+    B -> "B"
+    C -> "C"
+}}

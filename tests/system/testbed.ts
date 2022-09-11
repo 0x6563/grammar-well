@@ -49,8 +49,8 @@ export async function Build(grammar): Promise<any> {
     return Evalr(compiled);
 }
 
-export async function BuildTest(grammar, input) {
-    return Parse((await Build(grammar))(), input).results[0];
+export async function BuildTest(grammar, input, options) {
+    return Parse((await Build(grammar))(), input, options).results[0];
 }
 
 

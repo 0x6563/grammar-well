@@ -8,11 +8,13 @@ describe('Predefined Samples', () => {
         describe(group, () => {
             for (const test of tests) {
                 it(test.title, async () => {
+                    const options: any = {};
                     const grammar = GetValue(test, 'grammar');
                     const input = GetValue(test, 'input');
                     const result = GetValue(test, 'result');
                     const error = GetValue(test, 'error');
-                    const execution = await AsyncRun(() => BuildTest(grammar, input));
+                    options.algorithm = GetValue(test, 'algorithm') || 'earley';
+                    const execution = await AsyncRun(() => BuildTest(grammar, input, options));
                     try {
                         if (typeof test.throw == 'boolean') {
                             Expected(execution.success, !test.throw, `Expected to ${test.throw ? '' : 'not '}throw.`);
@@ -24,7 +26,7 @@ describe('Predefined Samples', () => {
                             Expected(execution.success, true, 'Expected to not throw error.');
                         }
                     } catch (error) {
-                        if (execution.error) { 
+                        if (execution.error) {
                             console.error(execution.error);
                         }
                         throw error;

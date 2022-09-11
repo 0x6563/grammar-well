@@ -96,3 +96,10 @@ JSON:
     grammarSource: grammars/json.ne
     inputSource: json2.json
     resultJSON: json2.json
+
+CYK:
+  - title: CYK
+    algorithm: cyk
+    grammarSource: grammars/cyk.gwell
+    input: AB
+    result: true

@@ -2,10 +2,12 @@ import { CharacterLexer } from "../lexers/character-lexer";
 import { StatefulLexer } from "../lexers/stateful-lexer";
 import { TokenQueue } from "../lexers/token-queue";
 import { GrammarRule, GrammarRuleSymbol, LanguageDefinition, LexerToken, ParserAlgorithm } from "../typings";
+import { CYK } from "./algorithms/cyk";
 import { Earley } from "./algorithms/earley";
 
 const ParserRegistry: { [key: string]: ParserAlgorithm } = {
-    'earley': Earley
+    earley: Earley,
+    cyk: CYK
 }
 
 export function Parse(language: LanguageDefinition, input: string, options?: ParserOptions) {
@@ -37,7 +39,9 @@ export class Parser {
         }
     }
 
-    static SymbolMatchesToken(rule: GrammarRuleSymbol & ({}), token: LexerToken) {
+    static SymbolMatchesToken(rule: GrammarRuleSymbol, token: LexerToken) {
+        if (typeof rule === 'string')
+            throw 'Attempted to match token against non-terminal';
         if (typeof rule == 'function')
             return rule(token);
         if ("test" in rule)
@@ -46,6 +50,10 @@ export class Parser {
             return rule.token === token.type || token.tag?.has(rule.token);
         if ("literal" in rule)
             return rule.literal === token.value;
+    }
+
+    static SymbolIsTerminal(rule: GrammarRuleSymbol) {
+        return typeof rule != 'string';
     }
 
     static PostProcessGrammarRule(rule: GrammarRule, data: any, meta?: any) {
