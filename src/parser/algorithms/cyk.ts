@@ -11,27 +11,23 @@ export function CYK(language: LanguageDefinition & { tokens: TokenQueue }, optio
         for (const rule of grammar.rules[name]) {
             const { symbols } = rule;
             for (const symbol of symbols) {
-                if (typeof symbol != 'string') {
+                if (Parser.SymbolIsTerminal(symbol)) {
                     terminals.set(symbol, rule);
                 } else {
-                    nonTerminals.set(symbol, rule);
+                    nonTerminals.set(symbol as string, rule);
                 }
             }
         }
     }
 
-    const tokens = [];
+    let currentTokenIndex = -1;
+    const chart = new Matrix(0, 0, () => new Set<string>());
     for (const token of language.tokens) {
-        tokens.push(token);
-    }
-
-    const totalTokens = tokens.length;
-    const chart = new Matrix<Set<string>>(totalTokens, totalTokens, () => new Set<string>());
-
-    for (let currentTokenIndex = 0; currentTokenIndex < totalTokens; currentTokenIndex++) {
+        currentTokenIndex++;
+        chart.resize(currentTokenIndex + 1, currentTokenIndex + 1);
         for (const name in grammar.rules) {
             for (const rule of grammar.rules[name]) {
-                if (Parser.SymbolIsTerminal(rule.symbols[0]) && Parser.SymbolMatchesToken(rule.symbols[0], tokens[currentTokenIndex])) {
+                if (Parser.SymbolIsTerminal(rule.symbols[0]) && Parser.SymbolMatchesToken(rule.symbols[0], token)) {
                     chart.get(currentTokenIndex, currentTokenIndex).add(name)
                 }
             }
@@ -53,13 +49,19 @@ export function CYK(language: LanguageDefinition & { tokens: TokenQueue }, optio
         }
     }
 
-    console.log(chart);
-    return { results: [chart.get(0, totalTokens - 1).size != 0] };
+    console.log(JSON.stringify(chart, (_key, value) => (value instanceof Set ? [...value] : value)), 2);
+    return { results: [chart.get(0, currentTokenIndex).size != 0] };
 }
 
 export class Matrix<T> {
-    matrix: T[][];
-    constructor(public x: number, public y: number, private value?: CallbackOrValue) {
+    get x() { return this.matrix.length; }
+    set x(x: number) { this.resize(x, this.y); }
+    get y() { return this.matrix[0]?.length || 0; }
+    set y(y: number) { this.resize(this.x, y); }
+
+    matrix: GetCallbackOrValue<T>[][];
+
+    constructor(x: number, y: number, private value?: T | ((...args: any) => T)) {
         this.matrix = Matrix.CreateArray(x, () => Matrix.CreateArray(y, value))
     }
 
@@ -74,24 +76,21 @@ export class Matrix<T> {
     resize(x: number, y: number) {
         if (x < this.x) {
             this.matrix.splice(x);
-            this.x = x;
         }
         if (y > this.y) {
             this.matrix.forEach(a => a.push(...Matrix.CreateArray(y - this.y, this.value)));
         } else if (y < this.y) {
             this.matrix.forEach(a => a.splice(y + 1));
         }
-        this.y = y;
         if (x > this.x) {
-            const ext = Matrix.CreateArray(x - this.x, () => Matrix.CreateArray(this.y, this.value))
+            const ext = Matrix.CreateArray(x - this.x, () => Matrix.CreateArray(y, this.value))
             this.matrix.push(...ext);
         }
     }
 
-    static CreateArray<T extends CallbackOrValue>(length, value?: T): GetCallbackOrValue<T>[] {
+    static CreateArray<T>(length, value?: T | ((...args: any) => T)): GetCallbackOrValue<T>[] {
         return Array.from({ length }, (typeof value == 'function' ? value : () => value) as any);
     }
 }
 
 type GetCallbackOrValue<T> = T extends (...args: any) => any ? ReturnType<T> : T;
-type CallbackOrValue = ((...args: any) => any) | any | any[];
