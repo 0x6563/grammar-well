@@ -1,8 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-undefined;
 function GWLanguage() {
-    undefined;
     return {
         grammar: {
             start: "main",
@@ -392,7 +390,7 @@ function GWLanguage() {
                         { when: /'(?:[^'\\]|\\.)*'/, tag: ["T_JSBODY"] },
                         { when: /`(?:[^`\\]|\\.)*`/, tag: ["T_JSBODY"] },
                         { when: /\/(?:[^\/\\]|\\.)+\/[gmiyu]*/, tag: ["T_JSBODY"] },
-                        { when: /\/\/[\n]*/, tag: ["T_JSBODY"] },
+                        { when: /\/\/[^\n]*/, tag: ["T_JSBODY"] },
                         { when: /\/\*.*\*\//, tag: ["T_JSBODY"] }
                     ]
                 },

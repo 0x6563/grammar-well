@@ -13,7 +13,7 @@ class Generator {
             grammar: {
                 start: '',
                 rules: {},
-                names: Object.create(null)
+                uuids: {}
             },
             lexer: null,
             head: [],
@@ -55,8 +55,8 @@ class Generator {
         Object.assign(this.state.config, state.config);
     }
     grammarUUID(name) {
-        this.state.grammar.names[name] = (this.state.grammar.names[name] || 0) + 1;
-        return name + 'x' + this.state.grammar.names[name];
+        this.state.grammar.uuids[name] = (this.state.grammar.uuids[name] || 0) + 1;
+        return name + 'x' + this.state.grammar.uuids[name];
     }
     addGrammarRule(rule) {
         this.state.grammar.rules[rule.name] = this.state.grammar.rules[rule.name] || [];

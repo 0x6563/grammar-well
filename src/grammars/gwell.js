@@ -392,7 +392,7 @@ function GWLanguage(){
                         { when: /'(?:[^'\\]|\\.)*'/, tag: ["T_JSBODY"] },
                         { when: /`(?:[^`\\]|\\.)*`/, tag: ["T_JSBODY"] },
                         { when: /\/(?:[^\/\\]|\\.)+\/[gmiyu]*/, tag: ["T_JSBODY"] },
-                        { when: /\/\/[\n]*/, tag: ["T_JSBODY"] },
+                        { when: /\/\/[^\n]*/, tag: ["T_JSBODY"] },
                         { when: /\/\*.*\*\//, tag: ["T_JSBODY"] }
                     ]
                 },

@@ -13,7 +13,7 @@ export class Generator {
         grammar: {
             start: '',
             rules: {},
-            names: Object.create(null)
+            uuids: {}
         },
         lexer: null,
         head: [],
@@ -44,6 +44,7 @@ export class Generator {
     }
 
     merge(state: GeneratorState) {
+        // TODO: Resolve Conflicting Rules and UUIDS
         Object.assign(this.state.grammar.rules, state.grammar.rules);
         this.state.grammar.start = state.grammar.start || this.state.grammar.start;
 
@@ -61,8 +62,8 @@ export class Generator {
     }
 
     grammarUUID(name: string) {
-        this.state.grammar.names[name] = (this.state.grammar.names[name] || 0) + 1;
-        return name + 'x' + this.state.grammar.names[name];
+        this.state.grammar.uuids[name] = (this.state.grammar.uuids[name] || 0) + 1;
+        return name + 'x' + this.state.grammar.uuids[name];
     }
 
     addGrammarRule(rule: GeneratorGrammarRule) {

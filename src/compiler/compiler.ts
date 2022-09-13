@@ -46,7 +46,9 @@ export class GrammarBuilder {
         this.context = context || {
             alreadyCompiled: new Set(),
             resolver: config.resolverInstance ? config.resolverInstance : config.resolver ? new config.resolver(config.basedir) : new FileSystemResolver(config.basedir),
+            uuids: {}
         }
+        this.generator.state.grammar.uuids = this.context.uuids;
     }
 
     export<T extends OutputFormat = '_default'>(format: T, name: string = 'GWLanguage'): ReturnType<typeof OutputFormats[T]> {

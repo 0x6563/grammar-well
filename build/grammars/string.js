@@ -1,8 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-undefined;
 function GWLanguage() {
-    undefined;
     return {
         grammar: {
             start: "dqstring",

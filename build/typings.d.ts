@@ -15,6 +15,7 @@ export declare type OutputFormat = '_default' | 'object' | 'json' | 'js' | 'java
 export interface GrammarBuilderContext {
     alreadyCompiled: Set<string>;
     resolver: ImportResolver;
+    uuids: Dictionary<number>;
 }
 export interface ImportResolver {
     path(path: string): string;
@@ -188,7 +189,7 @@ export interface GeneratorState {
     grammar: {
         start: string;
         rules: Dictionary<GeneratorGrammarRule[]>;
-        names: {
+        uuids: {
             [key: string]: number;
         };
     };

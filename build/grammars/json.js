@@ -1,8 +1,26 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-undefined;
+function extractPair(kv, output) {
+    if (kv[0]) {
+        output[kv[0]] = kv[1];
+    }
+}
+function extractObject({ data }) {
+    let output = {};
+    extractPair(data[2], output);
+    for (let i in data[3]) {
+        extractPair(data[3][i][3], output);
+    }
+    return output;
+}
+function extractArray({ data }) {
+    let output = [data[2]];
+    for (let i in data[3]) {
+        output.push(data[3][i][3]);
+    }
+    return output;
+}
 function GWLanguage() {
-    undefined;
     return {
         grammar: {
             start: "json",

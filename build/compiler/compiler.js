@@ -52,7 +52,9 @@ class GrammarBuilder {
         this.context = context || {
             alreadyCompiled: new Set(),
             resolver: config.resolverInstance ? config.resolverInstance : config.resolver ? new config.resolver(config.basedir) : new import_resolver_1.FileSystemResolver(config.basedir),
+            uuids: {}
         };
+        this.generator.state.grammar.uuids = this.context.uuids;
     }
     export(format, name = 'GWLanguage') {
         const grammar = this.generator.state;
