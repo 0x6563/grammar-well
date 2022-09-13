@@ -4,9 +4,11 @@ exports.Parser = exports.Parse = void 0;
 const character_lexer_1 = require("../lexers/character-lexer");
 const stateful_lexer_1 = require("../lexers/stateful-lexer");
 const token_queue_1 = require("../lexers/token-queue");
+const cyk_1 = require("./algorithms/cyk");
 const earley_1 = require("./algorithms/earley");
 const ParserRegistry = {
-    'earley': earley_1.Earley
+    earley: earley_1.Earley,
+    cyk: cyk_1.CYK
 };
 function Parse(language, input, options) {
     const i = new Parser(language, options);
@@ -39,14 +41,21 @@ class Parser {
     }
     static SymbolMatchesToken(rule, token) {
         var _a;
+        if (typeof rule === 'string')
+            throw 'Attempted to match token against non-terminal';
         if (typeof rule == 'function')
             return rule(token);
+        if (!rule)
+            return;
         if ("test" in rule)
             return rule.test(token.value);
         if ("token" in rule)
             return rule.token === token.type || ((_a = token.tag) === null || _a === void 0 ? void 0 : _a.has(rule.token));
         if ("literal" in rule)
             return rule.literal === token.value;
+    }
+    static SymbolIsTerminal(rule) {
+        return typeof rule != 'string';
     }
     static PostProcessGrammarRule(rule, data, meta) {
         if (rule.postprocess) {

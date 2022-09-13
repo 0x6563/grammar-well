@@ -14,7 +14,8 @@ export declare class Parser {
         results: any[];
     };
     private getTokenQueue;
-    static SymbolMatchesToken(rule: GrammarRuleSymbol & ({}), token: LexerToken): boolean;
+    static SymbolMatchesToken(rule: GrammarRuleSymbol, token: LexerToken): boolean;
+    static SymbolIsTerminal(rule: GrammarRuleSymbol): boolean;
     static PostProcessGrammarRule(rule: GrammarRule, data: any, meta?: any): any;
 }
 interface ParserOptions {

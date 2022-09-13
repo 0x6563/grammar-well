@@ -1,63 +1,63 @@
 General:
   - title: Nullable Whitespace Bug
-    grammarSource: grammars/whitespace.ne
+    grammarSource: grammars/whitespace.gwell
     input: "(x)"
     result: [[["(", null, [[[["x"]]]], null, ")"]]]
 
 Parentheses:
   - title: Parentheses Pass 1
-    grammarSource: grammars/parentheses.ne
+    grammarSource: grammars/parentheses.gwell
     input: "()"
     result: true
 
   - title: Parentheses Pass 2
-    grammarSource: grammars/parentheses.ne
+    grammarSource: grammars/parentheses.gwell
     input: "[(){}<>]"
     result: true
 
   - title: Parentheses Pass 3
-    grammarSource: grammars/parentheses.ne
+    grammarSource: grammars/parentheses.gwell
     input: "[(((<>)()({})())(()())(())[])]"
     result: true
 
   - title: Parentheses Pass 4
-    grammarSource: grammars/parentheses.ne
+    grammarSource: grammars/parentheses.gwell
     input: "<<[([])]>([(<>[]{}{}<>())[{}[][]{}{}[]<>[]{}<>{}<>[]<>{}()][[][][]()()()]({})<[]>{(){}()<>}(<>[])]())({})>"
     result: true
 
   - title: Parentheses Fail 1
-    grammarSource: grammars/parentheses.ne
+    grammarSource: grammars/parentheses.gwell
     input: " "
     throw: true
 
   - title: Parentheses Fail 2
-    grammarSource: grammars/parentheses.ne
+    grammarSource: grammars/parentheses.gwell
     input: "[}"
     throw: true
 
   - title: Parentheses Fail 3
-    grammarSource: grammars/parentheses.ne
+    grammarSource: grammars/parentheses.gwell
     input: "[(){}><]"
     throw: true
 
   - title: Parentheses Fail 4
-    grammarSource: grammars/parentheses.ne
+    grammarSource: grammars/parentheses.gwell
     input: "(((())))(()))"
     throw: true
 
   - title: Parentheses Not Fail 1
-    grammarSource: grammars/parentheses.ne
+    grammarSource: grammars/parentheses.gwell
     input: ""
     throw: false
 
   - title: Parentheses Not Fail 2
-    grammarSource: grammars/parentheses.ne
+    grammarSource: grammars/parentheses.gwell
     input: "((((())))(())()"
     throw: false
 
 Tosh:
   - title: Tosh 1 Pass
-    grammarSource: grammars/tosh.ne
+    grammarSource: grammars/tosh.gwell
     input: "set foo to 2 * e^ of ( foo * -0.05 + 0.5) * (1 - e ^ of (foo * -0.05 + 0.5))"
     result:
       [
@@ -88,12 +88,12 @@ Tosh:
 
 JSON:
   - title: JSON 1
-    grammarSource: grammars/json.ne
+    grammarSource: grammars/json.gwell
     inputSource: json1.json
     resultJSON: json1.json
 
   - title: JSON 2
-    grammarSource: grammars/json.ne
+    grammarSource: grammars/json.gwell
     inputSource: json2.json
     resultJSON: json2.json
 
@@ -101,5 +101,5 @@ CYK:
   - title: CYK
     algorithm: cyk
     grammarSource: grammars/cyk.gwell
-    input: AB
-    result: true
+    input: ABC
+    result: [A, [B, C]]

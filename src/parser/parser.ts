@@ -44,6 +44,8 @@ export class Parser {
             throw 'Attempted to match token against non-terminal';
         if (typeof rule == 'function')
             return rule(token);
+        if (!rule)
+            return
         if ("test" in rule)
             return rule.test(token.value);
         if ("token" in rule)
