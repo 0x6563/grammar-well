@@ -1,7 +1,8 @@
-import { CompileOptions, CompilerContext, OutputFormat, LanguageDirective, GeneratorState } from "../typings";
+import { CompileOptions, GrammarBuilderContext, OutputFormat, LanguageDirective } from "../typings";
 import { ESMOutput, JavascriptOutput } from "./outputs/javascript";
 import { TypescriptFormat } from "./outputs/typescript";
 import { JSONFormatter } from "./outputs/json";
+import { Generator } from "./generator";
 declare const OutputFormats: {
     _default: typeof JavascriptOutput;
     object: (grammar: any, exportName: any) => {
@@ -20,12 +21,12 @@ export declare function Compile(rules: string | LanguageDirective | (LanguageDir
     grammar: any;
     exportName: any;
 }>;
-export declare class Compiler {
+export declare class GrammarBuilder {
     private config;
     private parser;
     private context;
-    state: GeneratorState;
-    constructor(config?: CompileOptions, context?: CompilerContext);
+    generator: Generator;
+    constructor(config?: CompileOptions, context?: GrammarBuilderContext);
     export<T extends OutputFormat = '_default'>(format: T, name?: string): ReturnType<typeof OutputFormats[T]>;
     import(source: string): Promise<void>;
     import(directive: LanguageDirective): Promise<void>;
@@ -34,12 +35,9 @@ export declare class Compiler {
     private processConfigDirective;
     private processGrammarDirective;
     private processLexerDirective;
-    private mergeLexerState;
     private importBuiltIn;
     private importGrammar;
     private mergeLanguageDefinitionString;
-    private merge;
-    private uuid;
     private buildRules;
     private buildRule;
     private buildSymbol;

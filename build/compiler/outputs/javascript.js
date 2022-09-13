@@ -1,9 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ESMOutput = exports.JavascriptOutput = void 0;
-const generator_1 = require("../generator");
-function JavascriptOutput(state, exportName) {
-    return `${Compile(state, exportName)}
+function JavascriptOutput(generator, exportName) {
+    return `${Generate(generator, exportName)}
 
 if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
     module.exports = ${exportName};
@@ -12,20 +11,20 @@ if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
 }`;
 }
 exports.JavascriptOutput = JavascriptOutput;
-function ESMOutput(state, exportName) {
-    return `${Compile(state, exportName)}
+function ESMOutput(generator, exportName) {
+    return `${Generate(generator, exportName)}
 
 export default ${exportName};`;
 }
 exports.ESMOutput = ESMOutput;
 ;
-function Compile(state, exportName) {
-    return `// Generated automatically by Grammar-Well, version ${state.version} 
+function Generate(generator, exportName) {
+    return `// Generated automatically by Grammar-Well, version ${generator.state.version} 
 // https://github.com/0x6563/grammar-well
-${state.head.join('\n')}
+${generator.serializeHead()}
 function ${exportName}(){
-    ${state.body.join('\n')}
-    return ${(0, generator_1.SerializeState)(state, 1)}
+    ${generator.serializeBody()}
+    return ${generator.serializeLanguage(1)}
 }`;
 }
 ;

@@ -1,5 +1,5 @@
-import { GeneratorState } from "../../typings";
+import { Generator } from "../generator";
 
-export function JSONFormatter(state: GeneratorState, exportName) {
-    return JSON.stringify({ state, exportName });
+export function JSONFormatter(generator: Generator, exportName) {
+    return JSON.stringify({ state: generator.state, exportName });
 };

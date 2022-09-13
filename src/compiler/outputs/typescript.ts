@@ -1,12 +1,10 @@
-import { GeneratorState } from "../../typings";
-import { SerializeState } from "../generator";
+import { Generator } from "../generator";
 
-
-export function TypescriptFormat(state: GeneratorState, exportName: string) {
-    return `// Generated automatically by Grammar-Well, version ${state.version} 
+export function TypescriptFormat(generator: Generator, exportName: string) {
+    return `// Generated automatically by Grammar-Well, version ${generator.state.version} 
 // https://github.com/0x6563/grammar-well
 
-${state.head.join('\n')}
+${generator.serializeHead()}
 
 interface LanguageDefinition {
     lexer?: Lexer | LexerConfig;
@@ -98,8 +96,8 @@ interface PostProcessorPayload {
 }
 
 function ${exportName}(): LanguageDefinition {
-    ${state.body.join('\n')}
-    return ${SerializeState(state, 1)}
+    ${generator.serializeBody()}
+    return ${generator.serializeLanguage(1)}
 }
 
 export default ${exportName};

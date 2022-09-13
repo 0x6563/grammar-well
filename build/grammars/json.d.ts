@@ -19,9 +19,7 @@ declare function GWLanguage(): {
                 symbols: (string | {
                     literal: string;
                 })[];
-                postprocess: ({ data }: {
-                    data: any;
-                }) => {};
+                postprocess: any;
             }[];
             object$RPT0Nx1: ({
                 name: string;
@@ -45,9 +43,7 @@ declare function GWLanguage(): {
                 symbols: (string | {
                     literal: string;
                 })[];
-                postprocess: ({ data }: {
-                    data: any;
-                }) => any[];
+                postprocess: any;
             }[];
             array$RPT0Nx1: ({
                 name: string;

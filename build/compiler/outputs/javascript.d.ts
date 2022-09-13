@@ -1,3 +1,3 @@
-import { GeneratorState } from "../../typings";
-export declare function JavascriptOutput(state: GeneratorState, exportName: string): string;
-export declare function ESMOutput(state: GeneratorState, exportName: string): string;
+import { Generator } from "../generator";
+export declare function JavascriptOutput(generator: Generator, exportName: string): string;
+export declare function ESMOutput(generator: Generator, exportName: string): string;

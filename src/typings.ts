@@ -16,8 +16,8 @@ export interface CompileOptions {
 
 export type OutputFormat = '_default' | 'object' | 'json' | 'js' | 'javascript' | 'module' | 'esmodule' | 'ts' | 'typescript'
 
-export interface CompilerContext {
-    alreadycompiled: Set<string>;
+export interface GrammarBuilderContext {
+    alreadyCompiled: Set<string>;
     resolver: ImportResolver;
 }
 

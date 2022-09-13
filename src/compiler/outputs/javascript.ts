@@ -1,8 +1,7 @@
-import { GeneratorState } from "../../typings";
-import { SerializeState } from "../generator";
+import { Generator } from "../generator";
 
-export function JavascriptOutput(state: GeneratorState, exportName: string) {
-    return `${Compile(state, exportName)}
+export function JavascriptOutput(generator: Generator, exportName: string) {
+    return `${Generate(generator, exportName)}
 
 if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
     module.exports = ${exportName};
@@ -11,18 +10,18 @@ if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
 }`;
 }
 
-export function ESMOutput(state: GeneratorState, exportName: string) {
-    return `${Compile(state, exportName)}
+export function ESMOutput(generator: Generator, exportName: string) {
+    return `${Generate(generator, exportName)}
 
 export default ${exportName};`;
 };
 
-function Compile(state: GeneratorState, exportName: string) {
-    return `// Generated automatically by Grammar-Well, version ${state.version} 
+function Generate(generator: Generator, exportName: string) {
+    return `// Generated automatically by Grammar-Well, version ${generator.state.version} 
 // https://github.com/0x6563/grammar-well
-${state.head.join('\n')}
+${generator.serializeHead()}
 function ${exportName}(){
-    ${state.body.join('\n')}
-    return ${SerializeState(state, 1)}
+    ${generator.serializeBody()}
+    return ${generator.serializeLanguage(1)}
 }`;
 };

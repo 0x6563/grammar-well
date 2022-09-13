@@ -1,2 +1,2 @@
-import { GeneratorState } from "../../typings";
-export declare function TypescriptFormat(state: GeneratorState, exportName: string): string;
+import { Generator } from "../generator";
+export declare function TypescriptFormat(generator: Generator, exportName: string): string;
