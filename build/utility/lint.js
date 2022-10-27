@@ -1,19 +1,28 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.LintGrammarSymbols = void 0;
-function LintGrammarSymbols(grammar) {
+function LintGrammarSymbols(language) {
     const unused = new Set();
-    const used = new Set();
-    const { rules } = grammar;
-    rules.forEach(r => used.add(r.name));
-    for (const { symbols } of rules) {
-        for (const symbol of symbols) {
-            if (typeof symbol == 'string' && !used.has(symbol)) {
-                unused.add(symbol);
-            }
-        }
+    const { rules, start } = language.grammar;
+    for (const rule in rules) {
+        unused.add(rule);
     }
+    TraverseRule(start, rules, unused);
     return Array.from(unused);
 }
 exports.LintGrammarSymbols = LintGrammarSymbols;
+function TraverseRule(name, rules, unvisited) {
+    if (!unvisited.has(name)) {
+        return;
+    }
+    unvisited.add(name);
+    const n = rules[name];
+    for (const { symbols } of n) {
+        for (const symbol of symbols) {
+            if (typeof symbol == 'string') {
+                TraverseRule(symbol, rules, unvisited);
+            }
+        }
+    }
+}
 //# sourceMappingURL=lint.js.map

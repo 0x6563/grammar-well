@@ -1,3 +1,4 @@
+import { ImportResolver } from "../typings";
 export declare class FileSystemResolver implements ImportResolver {
     private baseDir;
     private readFile;
@@ -11,11 +12,4 @@ export declare class BrowserImportResolver implements ImportResolver {
     constructor(baseURL: string);
     path(path: string): string;
     body(path: string): Promise<string>;
-}
-export interface ImportResolver {
-    path(path: string): string;
-    body(path: string): Promise<string>;
-}
-export interface ImportResolverConstructor {
-    new (basePath: string): ImportResolver;
 }

@@ -1,44 +1,27 @@
-import { serializeRules } from "./util";
+import { Generator } from "../generator";
 
-export const JavascriptPostProcessors = {
-    "joiner": "function joiner(d) {return d.join('');}",
-    "arrconcat": "function arrconcat(d) {return [d[0]].concat(d[1]);}",
-    "arrpush": "function arrpush(d) {return d[0].concat([d[1]]);}",
-    "nuller": "function(d) {return null;}",
-    "id": "id"
-}
+export function JavascriptOutput(generator: Generator, exportName: string) {
+    return `${Generate(generator, exportName)}
 
-export function JavascriptOutput(parser, exportName) {
-    return `${Compile(parser)}
-
-if (typeof module !== 'undefined'&& typeof module.exports !== 'undefined') {
-   module.exports = Grammar;
+if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
+    module.exports = ${exportName};
 } else {
-   window.${exportName} = Grammar;
-}
-`;
+    window.${exportName} = ${exportName};
+}`;
 }
 
-export function ESMOutput(parser, exportName) {
-    return `${Compile(parser)}
+export function ESMOutput(generator: Generator, exportName: string) {
+    return `${Generate(generator, exportName)}
 
-export default Grammar;
-`;
+export default ${exportName};`;
 };
 
-function Compile(parser) {
-    return `// Generated automatically by Grammar-Well, version ${parser.version} 
+function Generate(generator: Generator, exportName: string) {
+    return `// Generated automatically by Grammar-Well, version ${generator.state.version} 
 // https://github.com/0x6563/grammar-well
-
-${parser.head.join('\n')}
-
-function Grammar(){
-    function id(x) { return x[0]; }
-    ${parser.body.join('\n')}
-    return {
-        lexer: ${parser.config.lexer},
-        rules: ${serializeRules(parser.rules, JavascriptPostProcessors)},
-        start: ${JSON.stringify(parser.start)}
-    }
+${generator.serializeHead()}
+function ${exportName}(){
+    ${generator.serializeBody()}
+    return ${generator.serializeLanguage(1)}
 }`;
 };

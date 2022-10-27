@@ -1,176 +1,221 @@
-export type NearleyPostProcessor = (data: any[], location: number, reject: Symbol) => any;
-export type PostTransform = (payload: PostTransformPayload) => any;
-
-interface PostTransformPayload {
-    data: any[];
-    reference: number;
-    dot: number;
-    name: string;
-    reject: Symbol;
-}
-
-export type BuiltInPostProcessor = { builtin: string };
+import { TokenBuffer } from "./lexers/token-buffer";
 
 export interface Dictionary<T> {
     [key: string]: T;
 }
 
-
-export type PostProcessorResult = ExpressionDefinition
-    | IncludeDefinition
-    | ConfigDefinition
-    | JavascriptDefinition
-    | MacroDefinition
-
-    | TokenLiteral
-    | SubExpression
-    | LexerToken
-    | EBNFModified
-    | MixIn
-    | null;
-
-
-export interface MacroDefinition {
-    macro: string;
-    args: string[];
-    exprs: Expression[];
-}
-export type JavascriptDefinition = {
-    body: string;
-} | { head: string }
-export interface ConfigDefinition {
-    config: string;
-    value: string;
-}
-export interface IncludeDefinition {
-    include: string;
-    builtin?: boolean;
-}
-export interface ExpressionDefinition {
-    name: string;
-    rules: Expression[];
-}
-export interface Expression {
-    tokens: ExpressionToken[];
-    postprocess?: string | BuiltInPostProcessor;
-    transform?: string;
-}
-export type ExpressionToken = string | MixIn | MacroCall | SubExpression | LexerToken | EBNFModified | TokenLiteral;
-
-export interface MacroCall {
-    macrocall: string;
-    args: ExpressionToken[];
-}
-export interface LexerToken {
-    token: string;
-}
-export interface MixIn {
-    mixin: string;
-}
-export interface EBNFModified {
-    ebnf: ExpressionToken;
-    modifier: ":+" | ":*" | ":?";
+export interface CompileOptions {
+    version?: string;
+    noscript?: boolean;
+    basedir?: string;
+    resolver?: ImportResolverConstructor;
+    resolverInstance?: ImportResolver;
+    exportName?: string;
+    format?: OutputFormat;
 }
 
-export interface TokenLiteral {
-    literal: string;
+export type OutputFormat = '_default' | 'object' | 'json' | 'js' | 'javascript' | 'module' | 'esmodule' | 'ts' | 'typescript'
+
+export interface GrammarBuilderContext {
+    alreadyCompiled: Set<string>;
+    resolver: ImportResolver;
+    uuids: Dictionary<number>;
 }
 
-export interface SubExpression {
-    subexpression: Expression[];
+
+export interface ImportResolver {
+    path(path: string): string;
+    body(path: string): Promise<string>;
 }
 
-export interface ProductionRule {
-    body: any;
-    builtin: any;
-    include: any;
-    macro: any;
-    args: any;
-    exprs: any;
-    config: any;
-    value: any;
-    rules: any;
-    name: any;
+export interface ImportResolverConstructor {
+    new(basePath: string): ImportResolver;
 }
 
-export type RuleDefinition = (JavascriptDefinition | IncludeDefinition | MacroDefinition | ConfigDefinition | ExpressionDefinition);
-export type RuleDefinitionList = (JavascriptDefinition | IncludeDefinition | MacroDefinition | ConfigDefinition | ExpressionDefinition)[];
+export type PostProcessor = (payload: PostProcessorPayload) => any;
 
-
-export type RuleSymbol = string | RegExp | RuleSymbolToken | RuleSymbolLexerToken | LexerToken | RuleSymbolTestable;
-
-interface RuleSymbolToken {
-    literal: any;
+interface PostProcessorPayload {
+    data: any[];
+    rule: GrammarRule;
+    meta: any;
+    reject: Symbol;
 }
 
-interface RuleSymbolTestable {
-    test: (data: any) => boolean;
+export type JavascriptDirective = { body: GrammarTypeJS; } | { head: GrammarTypeJS }
+
+export interface ImportDirective {
+    import: string;
+    path?: boolean;
 }
 
-interface RuleSymbolLexerToken {
-    type: string;
-    value: string;
-    text: string;
+export interface ConfigDirective {
+    config: Dictionary<any>;
 }
 
+export interface GrammarDirective {
+    grammar: {
+        config?: Dictionary<any>;
+        rules: GrammarBuilderRule[];
+    }
+}
+
+export interface LexerDirective {
+    lexer: {
+        start?: string,
+        states: LexerStateDefinition[];
+    };
+}
 
 export interface GrammarBuilderRule {
     name: string;
-    symbols: RuleSymbol[];
-    postprocess?: BuiltInPostProcessor | string;
-    transform?: BuiltInPostProcessor | string;
+    expressions: GrammarBuilderExpression[];
+    postprocess?: GrammarTypeJS | GrammarTypeBuiltIn | GrammarTypeTemplate;
 }
 
-export interface Rule {
+export interface GrammarBuilderExpression {
+    symbols: GrammarBuilderSymbol[];
+    postprocess?: GrammarTypeJS | GrammarTypeBuiltIn | GrammarTypeTemplate;
+}
+
+export type GrammarBuilderSymbol = GrammarTypeRule | GrammarTypeRegex | GrammarTypeToken | GrammarTypeLiteral | GrammarBuilderSymbolRepeat | GrammarBuilderSymbolSubexpression;
+
+export interface GrammarBuilderSymbolSubexpression {
+    subexpression: GrammarBuilderExpression[];
+}
+
+export interface GrammarBuilderSymbolRepeat {
+    expression: GrammarBuilderSymbol;
+    repeat: "+" | "*" | "?";
+}
+
+export interface GrammarTypeRule {
+    rule: string;
+}
+
+export interface GrammarTypeRegex {
+    regex: string;
+    flags?: string
+}
+
+export interface GrammarTypeToken {
+    token: string;
+}
+
+export interface GrammarTypeLiteral {
+    literal: string;
+    insensitive?: boolean;
+}
+
+export type GrammarTypeBuiltIn = { builtin: string };
+export type GrammarTypeTemplate = { template: string };
+export type GrammarTypeJS = { js: string };
+
+
+export type ParserAlgorithm = ((language: LanguageDefinition & { tokens: TokenBuffer }, options?: any) => { results: any[], info?: any });
+
+export type LanguageDirective = (JavascriptDirective | ImportDirective | ConfigDirective | GrammarDirective | LexerDirective);
+
+type GrammarRuleSymbolFunction = (data: LexerToken) => boolean;
+
+export interface GrammarRule {
     name: string;
-    symbols: RuleSymbol[];
-    postprocess?: NearleyPostProcessor;
-    transform?: PostTransform;
+    symbols: GrammarRuleSymbol[];
+    postprocess?: PostProcessor;
 }
 
-export interface ParserAlgorithm {
-    results: any[];
-    feed(path: string): void;
+export type GrammarRuleSymbol = string | RegExp | GrammarTypeLiteral | GrammarTypeToken | GrammarRuleSymbolFunction;
+
+export interface GeneratorGrammarRule {
+    name: string;
+    symbols: GeneratorGrammarSymbol[];
+    postprocess?: GrammarTypeTemplate | GrammarTypeBuiltIn | GrammarTypeJS;
 }
 
-export interface ParserConstructor {
-    new(grammar: PrecompiledGrammar, options?: any): ParserAlgorithm;
+export type GeneratorGrammarSymbol = { alias?: string } & (GrammarTypeRule | GrammarTypeRegex | GrammarTypeLiteral | GrammarTypeToken | GrammarTypeJS);
+
+export interface LanguageDefinition {
+    lexer?: Lexer | LexerConfig;
+    grammar: {
+        start: string;
+        rules: Dictionary<GrammarRule[]>;
+    }
 }
 
-export interface PrecompiledGrammar {
-    lexer?: Lexer;
-    start: string;
-    rules: Rule[];
-    map?: { [key: string]: Rule[] };
+export interface TQRestorePoint {
+    historyIndex: number;
+    offset: number;
 }
-
-
 
 export interface Lexer {
-    readonly line?: number;
-    readonly column?: number;
-    readonly index: number;
-    readonly current: any;
-    readonly state: LexerState;
-
-    feed(chunk: string, flush?: boolean): void;
-    flush(): void;
-    reset(chunk?: string): void;
-    restore(state: LexerState): void;
-    next(): any;
-    previous(): any;
-    peek(offset: number): any;
+    next(): LexerToken | undefined;
+    feed(chunk?: string, state?: ReturnType<Lexer['state']>): void;
+    state(): any;
+    flush?(): void;
 }
 
-export interface LexerState {
+export interface LexerToken {
+    type?: string | undefined;
+    tag?: Set<String>;
+    value: string;
+    offset: number;
+    line: number;
+    column: number;
+}
+
+export interface LexerStatus {
     index: number;
-    indexOffset: number;
-    line?: number;
-    lineOffset?: number;
-    column?: number;
+    line: number;
+    column: number;
+    state: string;
 }
 
-export interface LexerHistory {
-    token: any;
-    state: LexerState;
+export interface LexerStateDefinition {
+    name: string;
+    unmatched?: string;
+    default?: string;
+    rules: (LexerStateImportRule | LexerStateMatchRule)[];
+}
+
+export interface LexerStateImportRule {
+    import: string[]
+}
+
+export interface LexerStateMatchRule {
+    when: string | RegExp
+    type?: string;
+    tag?: string[];
+    pop?: number | 'all';
+    inset?: number;
+    goto?: string;
+    set?: string;
+}
+
+export interface ResolvedStateDefinition {
+    name: string;
+    unmatched?: string;
+    rules: LexerStateMatchRule[];
+}
+
+export interface CompiledStateDefinition {
+    regexp: RegExp;
+    unmatched?: LexerStateMatchRule;
+    rules: LexerStateMatchRule[];
+}
+
+export interface LexerConfig {
+    start?: string
+    states: Dictionary<LexerStateDefinition>;
+}
+
+export interface GeneratorState {
+    version: string;
+    config: Dictionary<string>;
+    head: string[];
+    body: string[];
+    lexer?: LexerConfig;
+    grammar: {
+        start: string;
+        rules: Dictionary<GeneratorGrammarRule[]>,
+        uuids: { [key: string]: number }
+    }
 }

@@ -1,23 +1,30 @@
-function Grammar() {
-    function id(x) { return x[0]; }
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+function GWLanguage() {
     return {
-        lexer: undefined,
-        rules: [
-            { "name": "_$ebnf$1", "symbols": [] },
-            { "name": "_$ebnf$1", "symbols": ["_$ebnf$1", "wschar"], "postprocess": function arrpush(d) { return d[0].concat([d[1]]); } },
-            { "name": "_", "symbols": ["_$ebnf$1"], "postprocess": function (d) { return null; } },
-            { "name": "__$ebnf$1", "symbols": ["wschar"] },
-            { "name": "__$ebnf$1", "symbols": ["__$ebnf$1", "wschar"], "postprocess": function arrpush(d) { return d[0].concat([d[1]]); } },
-            { "name": "__", "symbols": ["__$ebnf$1"], "postprocess": function (d) { return null; } },
-            { "name": "wschar", "symbols": [/[ \t\n\v\f]/], "postprocess": id }
-        ],
-        start: "_"
+        grammar: {
+            start: "_",
+            rules: {
+                _$RPT0Nx1: [
+                    { name: "_$RPT0Nx1", symbols: [] },
+                    { name: "_$RPT0Nx1", symbols: ["_$RPT0Nx1", "wschar"], postprocess: ({ data }) => data[0].concat([data[1]]) }
+                ],
+                _: [
+                    { name: "_", symbols: ["_$RPT0Nx1"], postprocess: ({ data }) => { return null; } }
+                ],
+                __$RPT1Nx1: [
+                    { name: "__$RPT1Nx1", symbols: ["wschar"] },
+                    { name: "__$RPT1Nx1", symbols: ["__$RPT1Nx1", "wschar"], postprocess: ({ data }) => data[0].concat([data[1]]) }
+                ],
+                __: [
+                    { name: "__", symbols: ["__$RPT1Nx1"], postprocess: ({ data }) => { return null; } }
+                ],
+                wschar: [
+                    { name: "wschar", symbols: [/[\t\n\v\f]/], postprocess: ({ data }) => { return data[0].value; } }
+                ]
+            }
+        }
     };
 }
-if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
-    module.exports = Grammar;
-}
-else {
-    window.grammar = Grammar;
-}
+exports.default = GWLanguage;
 //# sourceMappingURL=whitespace.js.map

@@ -1,46 +1,52 @@
 // Generated automatically by Grammar-Well, version unknown 
 // https://github.com/0x6563/grammar-well
 
-
-
-function Grammar(){
-    function id(x) { return x[0]; }
+function GWLanguage(){
     
     return {
-        lexer: undefined,
-        rules: [
-    {"name": "dqstring$ebnf$1", "symbols": []},
-    {"name": "dqstring$ebnf$1", "symbols": ["dqstring$ebnf$1", "dstrchar"], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
-    {"name": "dqstring", "symbols": [{"literal":"\""}, "dqstring$ebnf$1", {"literal":"\""}], "postprocess": function(d) {return d[1].join(""); }},
-    {"name": "sqstring$ebnf$1", "symbols": []},
-    {"name": "sqstring$ebnf$1", "symbols": ["sqstring$ebnf$1", "sstrchar"], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
-    {"name": "sqstring", "symbols": [{"literal":"'"}, "sqstring$ebnf$1", {"literal":"'"}], "postprocess": function(d) {return d[1].join(""); }},
-    {"name": "btstring$ebnf$1", "symbols": []},
-    {"name": "btstring$ebnf$1", "symbols": ["btstring$ebnf$1", /[^`]/], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
-    {"name": "btstring", "symbols": [{"literal":"`"}, "btstring$ebnf$1", {"literal":"`"}], "postprocess": function(d) {return d[1].join(""); }},
-    {"name": "dstrchar", "symbols": [/[^\\"\n]/], "postprocess": id},
-    {"name": "dstrchar", "symbols": [{"literal":"\\"}, "strescape"], "postprocess": 
-        function(d) {
-            return JSON.parse("\""+d.join("")+"\"");
+        grammar: {
+            start: "dqstring",
+            rules: {
+                dqstring$RPT0Nx1: [
+                    { name: "dqstring$RPT0Nx1", symbols: [ ] },
+                    { name: "dqstring$RPT0Nx1", symbols: [ "dqstring$RPT0Nx1", "dstrchar" ], postprocess: ({data}) => data[0].concat([data[1]]) }
+                ],
+                dqstring: [
+                    { name: "dqstring", symbols: [ { literal: "\"" }, "dqstring$RPT0Nx1", { literal: "\"" } ], postprocess: ({data}) => { return data[1].join(""); } }
+                ],
+                sqstring$RPT0Nx1: [
+                    { name: "sqstring$RPT0Nx1", symbols: [ ] },
+                    { name: "sqstring$RPT0Nx1", symbols: [ "sqstring$RPT0Nx1", "sstrchar" ], postprocess: ({data}) => data[0].concat([data[1]]) }
+                ],
+                sqstring: [
+                    { name: "sqstring", symbols: [ { literal: "'" }, "sqstring$RPT0Nx1", { literal: "'" } ], postprocess: ({data}) => { return data[1].join(""); } }
+                ],
+                btstring$RPT0Nx1: [
+                    { name: "btstring$RPT0Nx1", symbols: [ ] },
+                    { name: "btstring$RPT0Nx1", symbols: [ "btstring$RPT0Nx1", /[^`]/ ], postprocess: ({data}) => data[0].concat([data[1]]) }
+                ],
+                btstring: [
+                    { name: "btstring", symbols: [ { literal: "`" }, "btstring$RPT0Nx1", { literal: "`" } ], postprocess: ({data}) => { return data[1].join(""); } }
+                ],
+                dstrchar: [
+                    { name: "dstrchar", symbols: [ /[^\\"\n]/ ], postprocess: ({data}) => { return data[0]; } },
+                    { name: "dstrchar", symbols: [ { literal: "\\" }, "strescape" ], postprocess: ({data}) => { return JSON.parse("\""+data.join("")+"\""); } }
+                ],
+                sstrchar: [
+                    { name: "sstrchar", symbols: [ /[^\\'\n]/ ], postprocess: ({data}) => { return data[0]; } },
+                    { name: "sstrchar", symbols: [ { literal: "\\" }, "strescape" ], postprocess: ({data}) => { return JSON.parse("\""+data.join("")+"\""); } },
+                    { name: "sstrchar", symbols: [ "sstrchar$STRx1" ], postprocess: ({data}) => { return "'"; } }
+                ],
+                sstrchar$STRx1: [
+                    { name: "sstrchar$STRx1", symbols: [ { literal: "\\" }, { literal: "'" } ], postprocess: ({data}) => data.join('') }
+                ],
+                strescape: [
+                    { name: "strescape", symbols: [ /["\/bfnrt]/ ], postprocess: ({data}) => { return data[0]; } },
+                    { name: "strescape", symbols: [ { literal: "u" }, /[a-fA-F0-9]/, /[a-fA-F0-9]/, /[a-fA-F0-9]/, /[a-fA-F0-9]/ ], postprocess: ({data}) => { return data.join(""); } }
+                ]
+            }
         }
-        },
-    {"name": "sstrchar", "symbols": [/[^\\'\n]/], "postprocess": id},
-    {"name": "sstrchar", "symbols": [{"literal":"\\"}, "strescape"], "postprocess": function(d) { return JSON.parse("\""+d.join("")+"\""); }},
-    {"name": "sstrchar$string$1", "symbols": [{"literal":"\\"}, {"literal":"'"}], "postprocess": function joiner(d) {return d.join('');}},
-    {"name": "sstrchar", "symbols": ["sstrchar$string$1"], "postprocess": function(d) {return "'"; }},
-    {"name": "strescape", "symbols": [/["\\/bfnrt]/], "postprocess": id},
-    {"name": "strescape", "symbols": [{"literal":"u"}, /[a-fA-F0-9]/, /[a-fA-F0-9]/, /[a-fA-F0-9]/, /[a-fA-F0-9]/], "postprocess": 
-        function(d) {
-            return d.join("");
-        }
-        }
-],
-        start: "dqstring"
     }
 }
 
-if (typeof module !== 'undefined'&& typeof module.exports !== 'undefined') {
-   module.exports = Grammar;
-} else {
-   window.grammar = Grammar;
-}
+export default GWLanguage;
