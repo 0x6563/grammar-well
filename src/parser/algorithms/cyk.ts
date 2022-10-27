@@ -1,8 +1,8 @@
-import { TokenQueue } from "../../lexers/token-queue";
+import { TokenBuffer } from "../../lexers/token-buffer";
 import { GrammarRule, GrammarRuleSymbol, LanguageDefinition, LexerToken } from "../../typings";
 import { Parser } from "../parser";
 
-export function CYK(language: LanguageDefinition & { tokens: TokenQueue }, options = {}) {
+export function CYK(language: LanguageDefinition & { tokens: TokenBuffer }, options = {}) {
     const { grammar, tokens } = language;
 
     const terminals: GrammarRule[] = [];

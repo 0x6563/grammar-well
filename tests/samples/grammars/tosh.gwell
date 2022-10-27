@@ -150,7 +150,7 @@ grammar : {{
         | "right" __ "arrow" : {{ "right arrow" }}
         | "left" __ "arrow" : {{ "left arrow" }}
         | "any" : {{ $0 }}
-        | [a-z0-9] : {{ $0 }}
+        | /[a-z0-9]/ : {{ $0 }}
         | "_" : {{ "" }}
 
     m_list -> ListName : {{ $0 }}
@@ -383,17 +383,17 @@ grammar : {{
         | "..." : ${ ({data}) => ["ellips"] }
 
 
-    _ -> [ ]* : ${ ({data}) => null }
-    __ -> [ ]+ : ${ ({data}) => null }
+    _ -> /[ ]/* : ${ ({data}) => null }
+    __ -> /[ ]/+ : ${ ({data}) => null }
 
     string -> "'hello'"             : ${ ({data}) => 'hello' }
     number -> digits                : ${ ({data}) => parseInt(data[0]) }
-    number -> digits [.] digits     : ${ ({data}) => parseFloat(data[0] + '.' + data[2]) }
+    number -> digits /[.]/ digits     : ${ ({data}) => parseFloat(data[0] + '.' + data[2]) }
 
-    digits -> [0-9]+   : ${ ({data}) =>  data[0].map(v=>v.value).join('') }
+    digits -> /[0-9]/+   : ${ ({data}) =>  data[0].map(v=>v.value).join('') }
 
-    color -> [#] [0-9a-z] [0-9a-z] [0-9a-z] [0-9a-z] [0-9a-z] [0-9a-z]
-        | [#] [0-9a-z] [0-9a-z] [0-9a-z]
+    color -> /[#]/ /[0-9a-z]/ /[0-9a-z]/ /[0-9a-z]/ /[0-9a-z]/ /[0-9a-z]/ /[0-9a-z]/
+        | /[#]/ /[0-9a-z]/ /[0-9a-z]/ /[0-9a-z]/
 
     VariableName -> "foo" : {{ "foo" }}
     ListName -> "list"  : {{ "list" }}

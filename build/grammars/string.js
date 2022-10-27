@@ -39,7 +39,7 @@ function GWLanguage() {
                     { name: "sstrchar$STRx1", symbols: [{ literal: "\\" }, { literal: "'" }], postprocess: ({ data }) => data.join('') }
                 ],
                 strescape: [
-                    { name: "strescape", symbols: [/["\\/bfnrt]/], postprocess: ({ data }) => { return data[0]; } },
+                    { name: "strescape", symbols: [/["\/bfnrt]/], postprocess: ({ data }) => { return data[0]; } },
                     { name: "strescape", symbols: [{ literal: "u" }, /[a-fA-F0-9]/, /[a-fA-F0-9]/, /[a-fA-F0-9]/, /[a-fA-F0-9]/], postprocess: ({ data }) => { return data.join(""); } }
                 ]
             }

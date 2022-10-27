@@ -1,8 +1,8 @@
 import { Lexer, TQRestorePoint, LexerToken } from '../typings';
 
-export class TokenQueue {
+export class TokenBuffer {
     private history: LexerToken[] = [];
-    private buffer: string = '';
+    private queued: string = '';
 
     private $historyIndex = -1;
 
@@ -31,7 +31,7 @@ export class TokenQueue {
     }
 
     feed(buffer: string, flush?: boolean) {
-        this.buffer += buffer;
+        this.queued += buffer;
         if (flush) {
             this.flush();
         }
@@ -74,9 +74,9 @@ export class TokenQueue {
     private lexerNext() {
         let token = this.lexer.next();
 
-        if (typeof token === 'undefined' && this.buffer) {
-            this.lexer.feed(this.buffer, this.$historyIndex >= 0 ? this.lexer.state() : undefined);
-            this.buffer = '';
+        if (typeof token === 'undefined' && this.queued) {
+            this.lexer.feed(this.queued, this.$historyIndex >= 0 ? this.lexer.state() : undefined);
+            this.queued = '';
             token = this.lexer.next();
         }
         if (token)
@@ -91,10 +91,10 @@ export class TokenQueue {
 }
 
 class TokenIterator {
-    constructor(private queue: TokenQueue) { }
+    constructor(private buffer: TokenBuffer) { }
 
     next() {
-        const token = this.queue.next()
+        const token = this.buffer.next()
         return { value: token, done: !token }
     }
 

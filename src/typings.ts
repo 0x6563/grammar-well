@@ -1,4 +1,4 @@
-import { TokenQueue } from "./lexers/token-queue";
+import { TokenBuffer } from "./lexers/token-buffer";
 
 export interface Dictionary<T> {
     [key: string]: T;
@@ -111,7 +111,7 @@ export type GrammarTypeTemplate = { template: string };
 export type GrammarTypeJS = { js: string };
 
 
-export type ParserAlgorithm = ((language: LanguageDefinition & { tokens: TokenQueue }, options?: any) => { results: any[], info?: any });
+export type ParserAlgorithm = ((language: LanguageDefinition & { tokens: TokenBuffer }, options?: any) => { results: any[], info?: any });
 
 export type LanguageDirective = (JavascriptDirective | ImportDirective | ConfigDirective | GrammarDirective | LexerDirective);
 

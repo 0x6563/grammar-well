@@ -22,7 +22,7 @@ grammar: {{
     unquoted_field    -> null                            {{ "" }}
                     | unquoted_field char             {{ $0.concat($1) }}
 
-    char              -> [^\n\r",]                       {{ $0 }}
+    char              -> /[^\\n\\r",]/                       {{ $0 }}
 
     newline           -> "\r" "\n"                       {{ [] }}
                     | "\r" | "\n"                     {{ [] }}

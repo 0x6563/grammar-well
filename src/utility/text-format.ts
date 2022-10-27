@@ -1,9 +1,9 @@
-import { TokenQueue } from "../lexers/token-queue";
+import { TokenBuffer } from "../lexers/token-buffer";
 import { GrammarRule, GrammarRuleSymbol, LexerToken } from "../typings";
 
 export class TextFormatter {
 
-    static UnexpectedToken(queue: TokenQueue, expected: (GrammarRule & { index?: number })[]) {
+    static UnexpectedToken(queue: TokenBuffer, expected: (GrammarRule & { index?: number })[]) {
         const token = queue.active;
         const tokenDisplay = TextFormatter.LexerTokenShort(token);
         const lines = [];
@@ -29,7 +29,7 @@ export class TextFormatter {
         return `${JSON.stringify(token.value)}`;
     }
 
-    static LexerTokenError(lexer: TokenQueue) {
+    static LexerTokenError(lexer: TokenBuffer) {
         let i = 0;
         let token;
         let string = lexer.peek(i).value;

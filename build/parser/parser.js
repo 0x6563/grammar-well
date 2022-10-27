@@ -3,12 +3,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Parser = exports.Parse = void 0;
 const character_lexer_1 = require("../lexers/character-lexer");
 const stateful_lexer_1 = require("../lexers/stateful-lexer");
-const token_queue_1 = require("../lexers/token-queue");
+const token_buffer_1 = require("../lexers/token-buffer");
 const cyk_1 = require("./algorithms/cyk");
 const earley_1 = require("./algorithms/earley");
+const lr_1 = require("./algorithms/lr");
 const ParserRegistry = {
     earley: earley_1.Earley,
-    cyk: cyk_1.CYK
+    cyk: cyk_1.CYK,
+    lr0: lr_1.LR
 };
 function Parse(language, input, options) {
     const i = new Parser(language, options);
@@ -30,13 +32,13 @@ class Parser {
     getTokenQueue() {
         const { lexer } = this.language;
         if (!lexer) {
-            return new token_queue_1.TokenQueue(new character_lexer_1.CharacterLexer());
+            return new token_buffer_1.TokenBuffer(new character_lexer_1.CharacterLexer());
         }
         else if ("feed" in lexer && typeof lexer.feed == 'function') {
-            return new token_queue_1.TokenQueue(lexer);
+            return new token_buffer_1.TokenBuffer(lexer);
         }
         else if ('states' in lexer) {
-            return new token_queue_1.TokenQueue(new stateful_lexer_1.StatefulLexer(lexer));
+            return new token_buffer_1.TokenBuffer(new stateful_lexer_1.StatefulLexer(lexer));
         }
     }
     static SymbolMatchesToken(rule, token) {

@@ -609,15 +609,6 @@ declare function GWLanguage(): {
                     token: string;
                 }[];
             }[];
-            T_CHARCLASS: {
-                name: string;
-                symbols: {
-                    token: string;
-                }[];
-                postprocess: ({ data }: {
-                    data: any;
-                }) => any;
-            }[];
             T_INTEGER: {
                 name: string;
                 symbols: {
@@ -855,13 +846,6 @@ declare function GWLanguage(): {
                 }[];
             };
             string3: {
-                name: string;
-                rules: {
-                    when: RegExp;
-                    tag: string[];
-                }[];
-            };
-            charclass: {
                 name: string;
                 rules: {
                     when: RegExp;

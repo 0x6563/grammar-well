@@ -103,7 +103,7 @@ function GWLanguage() {
                     { name: "expression_symbol_match", symbols: ["T_STRING", "expression_symbol_match$RPT01x1"], postprocess: ({ data }) => { return { literal: data[0], insensitive: !!data[1] }; } },
                     { name: "expression_symbol_match", symbols: ["L_DSIGN", "T_WORD"], postprocess: ({ data }) => { return { token: data[1] }; } },
                     { name: "expression_symbol_match", symbols: ["L_DSIGN", "T_STRING"], postprocess: ({ data }) => { return { token: data[1] }; } },
-                    { name: "expression_symbol_match", symbols: ["T_CHARCLASS"], postprocess: ({ data }) => { return { regex: data[0] }; } },
+                    { name: "expression_symbol_match", symbols: ["T_REGEX"], postprocess: ({ data }) => { return data[0]; } },
                     { name: "expression_symbol_match", symbols: ["L_PARENL", "_", "expression_list", "_", "L_PARENR"], postprocess: ({ data }) => { return { subexpression: data[2] }; } },
                     { name: "expression_symbol_match", symbols: ["T_JS"], postprocess: ({ data }) => { return data[0]; } }
                 ],
@@ -264,13 +264,10 @@ function GWLanguage() {
                     { name: "T_REGEX$RPT0Nx1", symbols: ["T_REGEX$RPT0Nx1", /[gmiuy]/], postprocess: ({ data }) => data[0].concat([data[1]]) }
                 ],
                 T_REGEX: [
-                    { name: "T_REGEX", symbols: [{ token: "T_REGEX" }, "T_REGEX$RPT0Nx1"], postprocess: ({ data }) => { return { regex: data[0].value.slice(1, -1), flags: data[1].join('') }; } }
+                    { name: "T_REGEX", symbols: [{ token: "T_REGEX" }, "T_REGEX$RPT0Nx1"], postprocess: ({ data }) => { return { regex: data[0].value.replace(/\\\\\//g, '/').slice(1, -1), flags: data[1].join('') }; } }
                 ],
                 T_COMMENT: [
                     { name: "T_COMMENT", symbols: [{ token: "T_COMMENT" }] }
-                ],
-                T_CHARCLASS: [
-                    { name: "T_CHARCLASS", symbols: [{ token: "T_CHARCLASS" }], postprocess: ({ data }) => { return data[0].value; } }
                 ],
                 T_INTEGER: [
                     { name: "T_INTEGER", symbols: [{ token: "T_INTEGER" }], postprocess: ({ data }) => { return data[0].value; } }
@@ -317,7 +314,7 @@ function GWLanguage() {
                 grammar_inner: {
                     name: "grammar_inner",
                     rules: [
-                        { import: ["comment", "js", "js_template", "ws", "regex", "charclass", "l_qmark", "l_plus", "l_star", "kv", "l_colon", "l_comma", "l_pipe", "l_parenl", "l_parenr", "l_arrow", "l_dsign", "l_dash"] },
+                        { import: ["comment", "js", "js_template", "ws", "regex", "l_qmark", "l_plus", "l_star", "kv", "l_colon", "l_comma", "l_pipe", "l_parenl", "l_parenr", "l_arrow", "l_dsign", "l_dash"] },
                         { when: "}}", tag: ["L_TEMPLATER"], pop: 1 }
                     ]
                 },
@@ -386,10 +383,10 @@ function GWLanguage() {
                 jsignore: {
                     name: "jsignore",
                     rules: [
-                        { when: /"(?:[^"\\]|\\.)*"/, tag: ["T_JSBODY"] },
-                        { when: /'(?:[^'\\]|\\.)*'/, tag: ["T_JSBODY"] },
+                        { when: /"(?:[^"\\\r\n]|\\.)*"/, tag: ["T_JSBODY"] },
+                        { when: /'(?:[^'\\\r\n]|\\.)*'/, tag: ["T_JSBODY"] },
                         { when: /`(?:[^`\\]|\\.)*`/, tag: ["T_JSBODY"] },
-                        { when: /\/(?:[^\/\\]|\\.)+\/[gmiyu]*/, tag: ["T_JSBODY"] },
+                        { when: /\/(?:[^\/\\\r\n]|\\.)+\/[gmiyu]*/, tag: ["T_JSBODY"] },
                         { when: /\/\/[^\n]*/, tag: ["T_JSBODY"] },
                         { when: /\/\*.*\*\//, tag: ["T_JSBODY"] }
                     ]
@@ -410,12 +407,6 @@ function GWLanguage() {
                     name: "string3",
                     rules: [
                         { when: /`(?:[^`\\]|\\.)*`/, tag: ["T_STRING"] }
-                    ]
-                },
-                charclass: {
-                    name: "charclass",
-                    rules: [
-                        { when: /\[(?:[^\]\\]|\\.)+\]/, tag: ["T_CHARCLASS"] }
                     ]
                 },
                 regex: {
@@ -529,7 +520,7 @@ function GWLanguage() {
                 comment: {
                     name: "comment",
                     rules: [
-                        { when: /\/\/[\n]*/, tag: ["T_COMMENT"] }
+                        { when: /\/\/[^\n]*/, tag: ["T_COMMENT"] }
                     ]
                 },
                 commentmulti: {

@@ -21,19 +21,79 @@ To run input using your compiled js:
 ```
 
 ## Grammar Syntax
-Currently all of Nearley's syntax is supported. You can find more info at [https://nearley.js.org/docs/grammar](https://nearley.js.org/docs/grammar).
-In addition to that Grammar Well supports an additional post processor tokens `${  }` this is to differentiate between Nearley's postprocessor signature and Grammar Well's.
+The gwell file is broken into multiple sections
 
-Example
+### Grammar
+
+Example:
 ```
-expression -> number "+" number ${ function ({data, reference, dot, name , reject}) { return data[0] + data[2]; } }
+grammar: {
+    json -> _ (object | array) _ : {{ $1[0] }}
+
+    object -> "{" _ "}" : {{ {} }}
+        | "{" _ pair (_ "," _ pair)* _ "}" : ${ extractObject }
+
+    array -> "[" _ "]" : {{ [] }}
+        | "[" _ value (_ "," _ value)* _ "]" : ${ extractArray }
+
+    value : {{ $0 }} ->
+        object
+        | array
+        | number
+        | string
+        | "true" : {{ true }}
+        | "false" : {{ false }}
+        | "null" : {{ null }}
+
+    number -> $number : {{ parseFloat($0.value) }}
+
+    string -> $string : {{ JSON.parse($0.value) }}
+
+    pair -> key:k _ ":" _ value:v : {{ [$k, $v] }}
+
+    key -> string : {{ $0 }}
+
+    _ -> $space? : {{ null }}
+}
+```
+A production rule consists of a non-terminal word on the left the `->` arrow and a set of expressions on the right, followed by an optional postprocessor seperated by `:` and wrapped in either `${ }` or `{{ }}`.
+Take for example the Production Rule `key -> string : {{ $0 }}`
+**`key`** is the left hand Non Terminal
+**`->`** separates the left hand from the right hand
+**`string`** is a Non Terminal
+**` : `** separates the post processor, note that the space before the colon is required. 
+**`{{ $0 }}`** is a templated post processor which will be transformed to `({ data }) => data[0]` at compile time.
+
+
+### Templated Post Processor
+Template Post Processors, identified by `{{ }}` help reduce boilerplate as well as grant the ability to use Indexed References and Alias References. 
+
+Example: Indexed Reference
+```
+key -> string : {{ $0 }}
+       ^        <------>
+
+...will generate the post processor function:
+
+({ data }) => data[0]
 ```
 
-## Benchmarks
-|            |            Nearley |       Grammar Well |            Results |
-|------------|--------------------|--------------------|--------------------|
-| Calculator | 14078 (±2.06 x 91) | 12715 (±2.09 x 89) |            -10.17% |
-|       Tosh |  2393 (±2.96 x 89) |  2233 (±2.81 x 87) |             -6.92% |
-|       JSON |   111 (±2.99 x 73) |    80 (±4.76 x 61) |            -32.46% |
-|        Lua |  1629 (±3.06 x 89) |  1638 (±2.63 x 88) |             +0.55% |
-|        CSV |   423 (±2.47 x 86) |   434 (±2.72 x 86) |             +2.57% |
+
+Example: Alias Reference
+
+```
+pair -> key:k _ ":" _ value:v : {{ [$k, $v] }}
+            ^               ^   <------------>
+
+...will generate the post processor function:
+
+({ data }) => [data[0], data[4]]
+```
+
+### Literal Post Processor 
+Literal Post Processors, identified by `${ }` allow you to write raw JavaScript for the post processor.
+
+
+
+### Word
+Words are limited to the regex expression `/[a-z_][a-zA-Z\d_]/` 

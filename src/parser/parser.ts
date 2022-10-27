@@ -1,13 +1,15 @@
 import { CharacterLexer } from "../lexers/character-lexer";
 import { StatefulLexer } from "../lexers/stateful-lexer";
-import { TokenQueue } from "../lexers/token-queue";
+import { TokenBuffer } from "../lexers/token-buffer";
 import { GrammarRule, GrammarRuleSymbol, LanguageDefinition, LexerToken, ParserAlgorithm } from "../typings";
 import { CYK } from "./algorithms/cyk";
 import { Earley } from "./algorithms/earley";
+import { LR } from "./algorithms/lr";
 
 const ParserRegistry: { [key: string]: ParserAlgorithm } = {
     earley: Earley,
-    cyk: CYK
+    cyk: CYK,
+    lr0: LR
 }
 
 export function Parse(language: LanguageDefinition, input: string, options?: ParserOptions) {
@@ -31,11 +33,11 @@ export class Parser {
     private getTokenQueue() {
         const { lexer } = this.language;
         if (!lexer) {
-            return new TokenQueue(new CharacterLexer());
+            return new TokenBuffer(new CharacterLexer());
         } else if ("feed" in lexer && typeof lexer.feed == 'function') {
-            return new TokenQueue(lexer);
+            return new TokenBuffer(lexer);
         } else if ('states' in lexer) {
-            return new TokenQueue(new StatefulLexer(lexer));
+            return new TokenBuffer(new StatefulLexer(lexer));
         }
     }
 

@@ -1,10 +1,10 @@
 import { Dictionary, GrammarRule, LanguageDefinition } from "../../typings";
-import { TokenQueue } from "../../lexers/token-queue";
+import { TokenBuffer } from "../../lexers/token-buffer";
 export interface EarleyParserOptions {
     keepHistory?: boolean;
 }
 export declare function Earley(language: LanguageDefinition & {
-    tokens: TokenQueue;
+    tokens: TokenBuffer;
 }, options?: EarleyParserOptions): {
     results: any[];
     info: {

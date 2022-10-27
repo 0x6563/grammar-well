@@ -1,7 +1,7 @@
-import { TokenQueue } from "../../lexers/token-queue";
+import { TokenBuffer } from "../../lexers/token-buffer";
 import { GrammarRule, LanguageDefinition, LexerToken } from "../../typings";
 export declare function CYK(language: LanguageDefinition & {
-    tokens: TokenQueue;
+    tokens: TokenBuffer;
 }, options?: {}): {
     results: any[];
 };

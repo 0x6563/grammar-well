@@ -17,7 +17,7 @@ lexer: {{
         - import: ws, l_colon
         - when: "{{" tag: "L_TEMPLATEL" set: grammar_inner
     grammar_inner ->
-        - import: comment, js, js_template, ws, regex, charclass, l_qmark, l_plus, l_star, kv, l_colon, l_comma, l_pipe, l_parenl, l_parenr, l_arrow, l_dsign, l_dash
+        - import: comment, js, js_template, ws, regex, l_qmark, l_plus, l_star, kv, l_colon, l_comma, l_pipe, l_parenl, l_parenr, l_arrow, l_dsign, l_dash
         - when: "}}" tag: "L_TEMPLATER" pop: 1
     lexer ->
         - import: ws, l_colon
@@ -50,10 +50,10 @@ lexer: {{
     kv ->
         - import: string, ws, word, l_colon, integer
     jsignore ->
-        - when: /"(?:[^"\\]|\\.)*"/ tag: "T_JSBODY"
-        - when: /'(?:[^'\\]|\\.)*'/ tag: "T_JSBODY"
+        - when: /"(?:[^"\\\r\n]|\\.)*"/ tag: "T_JSBODY"
+        - when: /'(?:[^'\\\r\n]|\\.)*'/ tag: "T_JSBODY"
         - when: /`(?:[^`\\]|\\.)*`/ tag: "T_JSBODY"
-        - when: /\/(?:[^\/\\]|\\.)+\/[gmiyu]*/ tag: "T_JSBODY"
+        - when: /\/(?:[^\/\\\r\n]|\\.)+\/[gmiyu]*/ tag: "T_JSBODY"
         - when: /\/\/[^\n]*/ tag: "T_JSBODY"
         - when: /\/\*.*\*\// tag: "T_JSBODY"
     string ->
@@ -62,8 +62,6 @@ lexer: {{
         - when: /'(?:[^'\\\r\n]|\\.)*'/ tag: "T_STRING"
     string3 ->
         - when: /`(?:[^`\\]|\\.)*`/ tag: "T_STRING"
-    charclass ->
-        - when: /\[(?:[^\]\\]|\\.)+\]/ tag: "T_CHARCLASS"
     regex ->
         - when: /\/(?:[^\/\\\r\n]|\\.)+\// tag: "T_REGEX"
     integer ->
@@ -101,7 +99,7 @@ lexer: {{
     l_dash ->
         - when: "-" tag: "L_DASH"
     comment ->
-        - when: /\/\/[\n]*/ tag: "T_COMMENT"
+        - when: /\/\/[^\n]*/ tag: "T_COMMENT"
     commentmulti ->
         - when: /\/\*.*\*\// tag: "T_COMMENT"
 
@@ -209,7 +207,7 @@ grammar: {{
         | T_STRING "i"? : {{ { literal: $0, insensitive: !!$1 } }}
         | L_DSIGN T_WORD : {{ { token: $1} }}
         | L_DSIGN T_STRING : {{ { token: $1} }}
-        | T_CHARCLASS : {{ { regex: $0 } }}
+        | T_REGEX : {{ $0 }}
         | L_PARENL _ expression_list _ L_PARENR : {{ { subexpression: $2 } }}
         | T_JS : {{ $0 }}
 
@@ -273,9 +271,8 @@ grammar: {{
     T_GRAMMAR_TEMPLATE -> $L_TEMPLATEL _ $T_JSBODY* _ $L_TEMPLATER : {{ { template: $2.map(v=>v.value).join('').trim() } }}
     T_STRING -> $T_STRING : {{ JSON.parse($0.value) }}
     T_WORD -> $T_WORD : {{ $0.value }}
-    T_REGEX -> $T_REGEX [gmiuy]* : {{ { regex: $0.value.slice(1,-1), flags: $1.join('') } }}
+    T_REGEX -> $T_REGEX /[gmiuy]/* : {{ { regex: $0.value.replace(/\\\\\//g,'/').slice(1,-1), flags: $1.join('') } }}
     T_COMMENT -> $T_COMMENT
-    T_CHARCLASS -> $T_CHARCLASS : {{ $0.value }}
     T_INTEGER -> $T_INTEGER : {{ $0.value }}
     T_WS -> $T_WS : {{ null }}
 }}

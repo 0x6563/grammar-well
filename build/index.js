@@ -17,6 +17,5 @@ Object.defineProperty(exports, "__esModule", { value: true });
 __exportStar(require("./compiler/compiler"), exports);
 __exportStar(require("./compiler/import-resolver"), exports);
 __exportStar(require("./parser/parser"), exports);
-__exportStar(require("./lexers/character-lexer"), exports);
-__exportStar(require("./lexers/token-queue"), exports);
+__exportStar(require("./typings"), exports);
 //# sourceMappingURL=index.js.map

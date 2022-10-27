@@ -17,7 +17,6 @@ lexer: {{
 }}
 
 grammar: {{
-
     json -> _ (object | array) _ : {{ $1[0] }}
 
     object -> "{" _ "}" : {{ {} }}
@@ -26,11 +25,11 @@ grammar: {{
     array -> "[" _ "]" : {{ [] }}
         | "[" _ value (_ "," _ value)* _ "]" : ${ extractArray }
 
-    value ->
-        object : {{ $0 }}
-        | array : {{ $0 }}
-        | number : {{ $0 }}
-        | string : {{ $0 }}
+    value : {{ $0 }} ->
+        object
+        | array
+        | number
+        | string
         | "true" : {{ true }}
         | "false" : {{ false }}
         | "null" : {{ null }}
@@ -39,7 +38,7 @@ grammar: {{
 
     string -> $string : {{ JSON.parse($0.value) }}
 
-    pair -> key _ ":" _ value : {{ [$0, $4] }}
+    pair -> key:k _ ":" _ value:v : {{ [$k, $v] }}
 
     key -> string : {{ $0 }}
 

@@ -1,5 +1,5 @@
 import { Dictionary, GrammarRule, LanguageDefinition } from "../../typings";
-import { TokenQueue } from "../../lexers/token-queue";
+import { TokenBuffer } from "../../lexers/token-buffer";
 import { TextFormatter } from "../../utility/text-format";
 import { Parser } from "../parser";
 
@@ -7,7 +7,7 @@ export interface EarleyParserOptions {
     keepHistory?: boolean;
 }
 
-export function Earley(language: LanguageDefinition & { tokens: TokenQueue }, options: EarleyParserOptions = {}) {
+export function Earley(language: LanguageDefinition & { tokens: TokenBuffer }, options: EarleyParserOptions = {}) {
     const { tokens } = language;
     const { rules, start } = language.grammar;
     const column = new Column(rules, 0);
