@@ -1,36 +1,76 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Parser = exports.Parse = void 0;
-const parser_1 = require("./algorithms/nearley/parser");
-const parser_2 = require("./algorithms/earley/parser");
+const character_lexer_1 = require("../lexers/character-lexer");
+const stateful_lexer_1 = require("../lexers/stateful-lexer");
+const token_buffer_1 = require("../lexers/token-buffer");
+const cyk_1 = require("./algorithms/cyk");
+const earley_1 = require("./algorithms/earley");
+const lr_1 = require("./algorithms/lr");
 const ParserRegistry = {
-    'nearley': parser_1.NearleyParser,
-    'earley': parser_2.EarleyParser
+    earley: earley_1.Earley,
+    cyk: cyk_1.CYK,
+    lr0: lr_1.LR
 };
-function Parse(grammar, input, options) {
-    const i = new Parser(grammar, options);
+function Parse(language, input, options) {
+    const i = new Parser(language, options);
     return i.run(input);
 }
 exports.Parse = Parse;
 class Parser {
-    constructor(grammar, options = { algorithm: 'nearley' }) {
-        this.grammar = grammar;
+    constructor(language, options = { algorithm: 'earley', parserOptions: {} }) {
+        this.language = language;
         this.options = options;
-        this.parserClass = ParserRegistry[options.algorithm];
-        this.parser = new this.parserClass(this.grammar, options.parserOptions);
-    }
-    get results() {
-        return this.parser.results;
-    }
-    feed(input) {
-        this.parser.feed(input);
-        return this.results;
     }
     run(input) {
-        const parser = new this.parserClass(this.grammar, this.options.parserOptions);
-        parser.feed(input);
-        return parser.results[0];
+        const tokenQueue = this.getTokenQueue();
+        tokenQueue.feed(input);
+        if (typeof this.options.algorithm == 'function')
+            return this.options.algorithm(Object.assign(Object.assign({}, this.language), { tokens: tokenQueue }), this.options.parserOptions);
+        return ParserRegistry[this.options.algorithm](Object.assign(Object.assign({}, this.language), { tokens: tokenQueue }), this.options.parserOptions);
+    }
+    getTokenQueue() {
+        const { lexer } = this.language;
+        if (!lexer) {
+            return new token_buffer_1.TokenBuffer(new character_lexer_1.CharacterLexer());
+        }
+        else if ("feed" in lexer && typeof lexer.feed == 'function') {
+            return new token_buffer_1.TokenBuffer(lexer);
+        }
+        else if ('states' in lexer) {
+            return new token_buffer_1.TokenBuffer(new stateful_lexer_1.StatefulLexer(lexer));
+        }
+    }
+    static SymbolMatchesToken(rule, token) {
+        var _a;
+        if (typeof rule === 'string')
+            throw 'Attempted to match token against non-terminal';
+        if (typeof rule == 'function')
+            return rule(token);
+        if (!rule)
+            return;
+        if ("test" in rule)
+            return rule.test(token.value);
+        if ("token" in rule)
+            return rule.token === token.type || ((_a = token.tag) === null || _a === void 0 ? void 0 : _a.has(rule.token));
+        if ("literal" in rule)
+            return rule.literal === token.value;
+    }
+    static SymbolIsTerminal(rule) {
+        return typeof rule != 'string';
+    }
+    static PostProcessGrammarRule(rule, data, meta) {
+        if (rule.postprocess) {
+            return rule.postprocess({
+                rule,
+                data,
+                meta,
+                reject: Parser.Reject
+            });
+        }
+        return data;
     }
 }
 exports.Parser = Parser;
+Parser.Reject = Symbol();
 //# sourceMappingURL=parser.js.map

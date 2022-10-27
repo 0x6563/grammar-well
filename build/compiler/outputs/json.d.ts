@@ -1,2 +1,2 @@
-import { GeneratorState } from "../generator";
-export declare function JSONFormatter(grammar: GeneratorState, exportName: any): string;
+import { Generator } from "../generator";
+export declare function JSONFormatter(generator: Generator, exportName: any): string;

@@ -1,47 +1,30 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ESMOutput = exports.JavascriptOutput = exports.JavascriptPostProcessors = void 0;
-const util_1 = require("./util");
-exports.JavascriptPostProcessors = {
-    "joiner": "function joiner(d) {return d.join('');}",
-    "arrconcat": "function arrconcat(d) {return [d[0]].concat(d[1]);}",
-    "arrpush": "function arrpush(d) {return d[0].concat([d[1]]);}",
-    "nuller": "function(d) {return null;}",
-    "id": "id"
-};
-function JavascriptOutput(parser, exportName) {
-    return `${Compile(parser)}
+exports.ESMOutput = exports.JavascriptOutput = void 0;
+function JavascriptOutput(generator, exportName) {
+    return `${Generate(generator, exportName)}
 
-if (typeof module !== 'undefined'&& typeof module.exports !== 'undefined') {
-   module.exports = Grammar;
+if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
+    module.exports = ${exportName};
 } else {
-   window.${exportName} = Grammar;
-}
-`;
+    window.${exportName} = ${exportName};
+}`;
 }
 exports.JavascriptOutput = JavascriptOutput;
-function ESMOutput(parser, exportName) {
-    return `${Compile(parser)}
+function ESMOutput(generator, exportName) {
+    return `${Generate(generator, exportName)}
 
-export default Grammar;
-`;
+export default ${exportName};`;
 }
 exports.ESMOutput = ESMOutput;
 ;
-function Compile(parser) {
-    return `// Generated automatically by Grammar-Well, version ${parser.version} 
+function Generate(generator, exportName) {
+    return `// Generated automatically by Grammar-Well, version ${generator.state.version} 
 // https://github.com/0x6563/grammar-well
-
-${parser.head.join('\n')}
-
-function Grammar(){
-    function id(x) { return x[0]; }
-    ${parser.body.join('\n')}
-    return {
-        lexer: ${parser.config.lexer},
-        rules: ${(0, util_1.serializeRules)(parser.rules, exports.JavascriptPostProcessors)},
-        start: ${JSON.stringify(parser.start)}
-    }
+${generator.serializeHead()}
+function ${exportName}(){
+    ${generator.serializeBody()}
+    return ${generator.serializeLanguage(1)}
 }`;
 }
 ;

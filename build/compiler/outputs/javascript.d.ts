@@ -1,9 +1,3 @@
-export declare const JavascriptPostProcessors: {
-    joiner: string;
-    arrconcat: string;
-    arrpush: string;
-    nuller: string;
-    id: string;
-};
-export declare function JavascriptOutput(parser: any, exportName: any): string;
-export declare function ESMOutput(parser: any, exportName: any): string;
+import { Generator } from "../generator";
+export declare function JavascriptOutput(generator: Generator, exportName: string): string;
+export declare function ESMOutput(generator: Generator, exportName: string): string;

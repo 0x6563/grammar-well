@@ -1,9 +1,8 @@
-import { ImportResolver, ImportResolverConstructor } from "./import-resolver";
-import { CoffeescriptOutput } from "./outputs/coffeescript";
+import { CompileOptions, GrammarBuilderContext, OutputFormat, LanguageDirective } from "../typings";
 import { ESMOutput, JavascriptOutput } from "./outputs/javascript";
 import { TypescriptFormat } from "./outputs/typescript";
-import { RuleDefinition, RuleDefinitionList } from "../typings";
 import { JSONFormatter } from "./outputs/json";
+import { Generator } from "./generator";
 declare const OutputFormats: {
     _default: typeof JavascriptOutput;
     object: (grammar: any, exportName: any) => {
@@ -15,39 +14,35 @@ declare const OutputFormats: {
     javascript: typeof JavascriptOutput;
     module: typeof ESMOutput;
     esmodule: typeof ESMOutput;
-    cs: typeof CoffeescriptOutput;
-    coffee: typeof CoffeescriptOutput;
-    coffeescript: typeof CoffeescriptOutput;
     ts: typeof TypescriptFormat;
     typescript: typeof TypescriptFormat;
 };
-export declare function Compile(rules: string | RuleDefinition | RuleDefinitionList, config?: CompileOptions): Promise<string | {
+export declare function Compile(rules: string | LanguageDirective | (LanguageDirective[]), config?: CompileOptions): Promise<string | {
     grammar: any;
     exportName: any;
 }>;
-export declare class Compiler {
-    private state;
-    private grammarBuilder;
-    constructor(config?: CompileOptions);
-    import(rule: RuleDefinition): Promise<void>;
-    import(rules: RuleDefinitionList): Promise<void>;
-    import(source: string, language: 'nearley' | 'grammar-well'): Promise<void>;
-    import(source: string | RuleDefinition | RuleDefinitionList, language?: 'nearley' | 'grammar-well'): Promise<void>;
-    export<T extends keyof typeof OutputFormats = '_default'>(format: T, name?: string): ReturnType<typeof OutputFormats[OutputFormat<T>]>;
-}
-declare type OutputFormat<T> = T extends keyof typeof OutputFormats ? T : "_default";
-export interface CompileOptions {
-    version?: string;
-    noscript?: boolean;
-    basedir?: string;
-    resolver?: ImportResolverConstructor;
-    resolverInstance?: ImportResolver;
-    exportName?: string;
-    format?: keyof typeof OutputFormats;
-    language?: 'nearley' | 'grammar-well';
-}
-export interface CompilerState {
-    alreadycompiled: Set<string>;
-    resolver: ImportResolver;
+export declare class GrammarBuilder {
+    private config;
+    private parser;
+    private context;
+    generator: Generator;
+    constructor(config?: CompileOptions, context?: GrammarBuilderContext);
+    export<T extends OutputFormat = '_default'>(format: T, name?: string): ReturnType<typeof OutputFormats[T]>;
+    import(source: string): Promise<void>;
+    import(directive: LanguageDirective): Promise<void>;
+    import(directives: LanguageDirective[]): Promise<void>;
+    private processImportDirective;
+    private processConfigDirective;
+    private processGrammarDirective;
+    private processLexerDirective;
+    private importBuiltIn;
+    private importGrammar;
+    private mergeLanguageDefinitionString;
+    private buildRules;
+    private buildRule;
+    private buildSymbol;
+    private buildCharacterRules;
+    private buildSubExpressionRules;
+    private buildRepeatRules;
 }
 export {};
