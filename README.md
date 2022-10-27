@@ -1,99 +1,288 @@
 # Grammar Well
 A cross-platform grammar compiler and interpreter. That aims to facilitate a simple way to create and evaluate custom grammars on the front-end and back-end. Formerly a TypeScript port of [Nearley](https://github.com/kach/nearley).
 
-Check out the [Live Editor](https://0x6563.github.io/grammar-well-editor/)
+# Warning
+A lot has changed and documentation needs to be written. For now here's the Grammar Well grammar file that parses Garmmar Well's syntax.
 
-## QuickStart
-
-The easiest way to generate a compiled js file is to use the `Compile` function.
-```TypeScript
-import { Compile } from 'grammar-well';
-import { writeFileSync } from 'fs';
-const config = {}; 
-const js = await Compile(grammarString, config);
-writeFileSync('./precompiledGrammar.js', js);
-```
-
-To run input using your compiled js:
-```TypeScript
-    import { Parse } from 'grammar-well';
-    const result = Parse(require('./precompiledGrammar.js'), input);
-```
-
-## Grammar Syntax
-The gwell file is broken into multiple sections
-
-### Grammar
-
-Example:
-```
-grammar: {
-    json -> _ (object | array) _ : {{ $1[0] }}
-
-    object -> "{" _ "}" : {{ {} }}
-        | "{" _ pair (_ "," _ pair)* _ "}" : ${ extractObject }
-
-    array -> "[" _ "]" : {{ [] }}
-        | "[" _ value (_ "," _ value)* _ "]" : ${ extractArray }
-
-    value : {{ $0 }} ->
-        object
-        | array
-        | number
-        | string
-        | "true" : {{ true }}
-        | "false" : {{ false }}
-        | "null" : {{ null }}
-
-    number -> $number : {{ parseFloat($0.value) }}
-
-    string -> $string : {{ JSON.parse($0.value) }}
-
-    pair -> key:k _ ":" _ value:v : {{ [$k, $v] }}
-
-    key -> string : {{ $0 }}
-
-    _ -> $space? : {{ null }}
-}
-```
-A production rule consists of a non-terminal word on the left the `->` arrow and a set of expressions on the right, followed by an optional postprocessor seperated by `:` and wrapped in either `${ }` or `{{ }}`.
-Take for example the Production Rule `key -> string : {{ $0 }}`
-**`key`** is the left hand Non Terminal
-**`->`** separates the left hand from the right hand
-**`string`** is a Non Terminal
-**` : `** separates the post processor, note that the space before the colon is required. 
-**`{{ $0 }}`** is a templated post processor which will be transformed to `({ data }) => data[0]` at compile time.
-
-
-### Templated Post Processor
-Template Post Processors, identified by `{{ }}` help reduce boilerplate as well as grant the ability to use Indexed References and Alias References. 
-
-Example: Indexed Reference
-```
-key -> string : {{ $0 }}
-       ^        <------>
-
-...will generate the post processor function:
-
-({ data }) => data[0]
-```
-
-
-Example: Alias Reference
 
 ```
-pair -> key:k _ ":" _ value:v : {{ [$k, $v] }}
-            ^               ^   <------------>
+lexer: {{
+    start: "start"
 
-...will generate the post processor function:
+    start ->
+        - import: string, js, ws, comment, l_scolon, l_star
+        - when: /lexer(?![a-zA-Z\d_])/ tag: "T_WORD" goto: lexer
+        - when: /grammar(?![a-zA-Z\d_])/ tag: "T_WORD" goto: grammar
+        - when: /config(?![a-zA-Z\d_])/ tag: "T_WORD" goto: config
+        - import: kv
+    config ->
+        - import: ws, l_colon
+        - when: "{{" tag: "L_TEMPLATEL" set: config_inner
+    config_inner ->
+        - import: comment, kv
+        - when: "}}" tag: "L_TEMPLATER" pop: 1
+    grammar ->
+        - import: ws, l_colon
+        - when: "{{" tag: "L_TEMPLATEL" set: grammar_inner
+    grammar_inner ->
+        - import: comment, js, js_template, ws, regex, l_qmark, l_plus, l_star, kv, l_colon, l_comma, l_pipe, l_parenl, l_parenr, l_arrow, l_dsign, l_dash
+        - when: "}}" tag: "L_TEMPLATER" pop: 1
+    lexer ->
+        - import: ws, l_colon
+        - when: "{{" tag: "L_TEMPLATEL" set: lexer_inner
+    lexer_inner ->
+        - import: ws, comment, regex, l_comma, l_arrow, l_dash, kv, js
+        - when: "}}" tag: "L_TEMPLATER" pop: 1
+    js ->
+        - when: "${" tag: "L_JSL" goto: js_wrap
+    js_wrap ->
+        default: "T_JSBODY"
+        unmatched: "T_JSBODY"
+        - import: jsignore
+        - when: "{" tag: "T_JSBODY" goto: js_literal
+        - when: "}" tag: "L_JSR" pop: 1
+    js_literal ->
+        default: "T_JSBODY"
+        unmatched: "T_JSBODY"
+        - import: jsignore
+        - when: "{" tag: "T_JSBODY" goto: js_literal
+        - when: "}" tag: "T_JSBODY" pop: 1
+    js_template ->
+        - when: "{{" tag: "L_TEMPLATEL" goto: js_template_inner
+    js_template_inner ->
+        default: "T_JSBODY"
+        unmatched: "T_JSBODY"
+        - import: jsignore
+        - when: "{" tag: "T_JSBODY" goto: js_literal
+        - when: "}}" tag: "L_TEMPLATER" pop: 1
+    kv ->
+        - import: string, ws, word, l_colon, integer
+    jsignore ->
+        - when: /"(?:[^"\\\r\n]|\\.)*"/ tag: "T_JSBODY"
+        - when: /'(?:[^'\\\r\n]|\\.)*'/ tag: "T_JSBODY"
+        - when: /`(?:[^`\\]|\\.)*`/ tag: "T_JSBODY"
+        - when: /\/(?:[^\/\\\r\n]|\\.)+\/[gmiyu]*/ tag: "T_JSBODY"
+        - when: /\/\/[^\n]*/ tag: "T_JSBODY"
+        - when: /\/\*.*\*\// tag: "T_JSBODY"
+    string ->
+        - when: /"(?:[^"\\\r\n]|\\.)*"/ tag: "T_STRING"
+    string2 ->
+        - when: /'(?:[^'\\\r\n]|\\.)*'/ tag: "T_STRING"
+    string3 ->
+        - when: /`(?:[^`\\]|\\.)*`/ tag: "T_STRING"
+    regex ->
+        - when: /\/(?:[^\/\\\r\n]|\\.)+\// tag: "T_REGEX"
+    integer ->
+        - when: /\d+/ tag: "T_INTEGER"
+    word ->
+        - when: /[a-zA-Z_][a-zA-Z_\d]*/ tag: "T_WORD"
+    ws ->
+        - when: /\s+/ tag: "T_WS"
+    l_colon ->
+        - when: ":" tag: "L_COLON"
+    l_scolon ->
+        - when: ";" tag: "L_SCOLON"
+    l_qmark ->
+        - when: "?" tag: "L_QMARK"
+    l_plus ->
+        - when: "+" tag: "L_PLUS"
+    l_star ->
+        - when: "*" tag: "L_STAR"
+    l_comma ->
+        - when: "," tag: "L_COMMA"
+    l_pipe ->
+        - when: "|" tag: "L_PIPE"
+    l_parenl ->
+        - when: "(" tag: "L_PARENL"
+    l_parenr ->
+        - when: ")" tag: "L_PARENR"
+    l_templatel ->
+        - when: "{{" tag: "L_TEMPLATEL"
+    l_templater ->
+        - when: "}}" tag: "L_TEMPLATER"
+    l_arrow ->
+        - when: "->" tag: "L_ARROW"
+    l_dsign ->
+        - when: "$" tag: "L_DSIGN"
+    l_dash ->
+        - when: "-" tag: "L_DASH"
+    comment ->
+        - when: /\/\/[^\n]*/ tag: "T_COMMENT"
+    commentmulti ->
+        - when: /\/\*.*\*\// tag: "T_COMMENT"
 
-({ data }) => [data[0], data[4]]
+}}
+
+grammar: {{
+
+    main ->
+        _ section_list _ : {{ $1 }}
+
+    section_list ->
+        section : {{ [$0] }}
+        | section T_WS section_list : {{ [$0].concat($2) }}
+
+    section ->
+        K_CONFIG _ L_COLON _ L_TEMPLATEL _ kv_list _ L_TEMPLATER : {{ { config: Object.assign(...$4) } }}
+        | K_IMPORT _ L_STAR _ K_FROM __ T_WORD:import _ L_SCOLON : {{ { import: $import } }}
+        | K_IMPORT _ L_STAR _ K_FROM __ T_STRING:import _ L_SCOLON : {{ { import: $import, path: true } }}
+        | K_LEXER _ L_COLON _ L_TEMPLATEL _ lexer:lexer _ L_TEMPLATER : {{ { lexer: Object.assign(...$lexer) } }}
+        | K_GRAMMAR _ L_COLON _ L_TEMPLATEL _ grammar:grammar _ L_TEMPLATER : {{ { grammar: $grammar } }}
+        | K_BODY _ L_COLON _ T_JS:js : {{ { body: $js } }}
+        | K_BODY _ L_COLON _ T_STRING:js : {{ { body: $js, path: true } }}
+        | K_HEAD _ L_COLON _ T_JS:js : {{ { head: $js } }}
+        | K_HEAD _ L_COLON _ T_STRING:js : {{ { head: $js, path: true } }}
+
+    lexer ->
+        kv_list _ state_list : {{ $0.concat({ states: $2 }) }}
+        | state_list : {{ [{ states: $0 }] }}
+
+    state_list ->
+        state : {{ data }}
+        | state _ state_list : {{ [$0].concat($2) }}
+
+    state ->
+        state_declare _ state_definition : {{ Object.assign({ name: $0 }, $2) }}
+
+    state_declare ->
+        T_WORD _ L_ARROW : {{ $0 }}
+
+    state_definition ->
+        kv_list _ token_list : {{ Object.assign(...$0, { rules: $2 }) }}
+        | token_list : {{ { rules: $0 } }}
+
+    token_list ->
+        token : {{ data }}
+        | token _ token_list : {{ [$0].concat($2) }}
+
+    token ->
+        L_DASH _ K_IMPORT _ L_COLON _ word_list : {{ { import: $6 } }}
+        | L_DASH _ token_definition_list : {{ Object.assign(...$2) }}
+
+    token_definition_list ->
+        token_definition : {{ data }}
+        | token_definition _ token_definition_list : {{ [$0].concat($2) }}
+
+    token_definition ->
+        K_TAG _ L_COLON _ string_list : {{ { tag: $4 } }}
+        | K_WHEN _ L_COLON _ T_STRING : {{ { when: $4 } }}
+        | K_WHEN _ L_COLON _ T_REGEX : {{ { when: $4 } }}
+        | K_POP : {{ { pop: 1 } }}
+        | K_POP _ L_COLON _ T_INTEGER : {{ { pop: parseInt($4) } }}
+        | K_POP _ L_COLON _ K_ALL : {{ { pop: "all" } }}
+        | K_INSET : {{ { inset: 1 } }}
+        | K_INSET _ L_COLON _ T_INTEGER : {{ { inset: parseInt($4) } }}
+        | K_SET _ L_COLON _ T_WORD : {{ { set: $4 } }}
+        | K_GOTO _ L_COLON _ T_WORD : {{ { goto: $4 } }}
+        | K_TYPE _ L_COLON _ T_STRING : {{ { type: $4 } }}
+
+    grammar ->
+        kv_list _ grammar_rule_list : {{ { config: Object.assign(...$0), rules: $2 } }}
+        | grammar_rule_list : {{ { rules: $0 } }}
+
+    grammar_rule_list ->
+        grammar_rule : {{ [$0] }}
+        | grammar_rule _ grammar_rule_list : {{ [$0].concat($2) }}
+
+    grammar_rule ->
+        T_WORD _ L_ARROW _ expression_list : {{ { name: $0, expressions: $4 } }}
+        | T_WORD  __ L_COLON _ T_JS:js _ L_ARROW _ expression_list:expressions : {{ { name: $0, expressions: $expressions, postprocess: $js } }}
+        | T_WORD  __ L_COLON _ T_GRAMMAR_TEMPLATE:template _ L_ARROW _ expression_list:expressions : {{ { name: $0, expressions: $expressions, postprocess: $template } }}
+
+    expression_list ->
+        expression
+        | expression_list _ L_PIPE _ expression : {{ $0.concat([$4]) }}
+
+    expression ->
+        expression_symbol_list : {{ { symbols: $0 } }}
+        | expression_symbol_list __ L_COLON _ T_JS:js : {{ { symbols: $0, postprocess: $js } }}
+        | expression_symbol_list __ L_COLON _ T_GRAMMAR_TEMPLATE:template : {{ { symbols: $0, postprocess: $template } }}
+
+    expression_symbol_list ->
+        expression_symbol
+        | expression_symbol_list T_WS expression_symbol : {{ $0.concat([$2]) }}
+
+    
+    expression_symbol ->
+        expression_symbol_match : {{ $0 }}
+        | expression_symbol_match L_COLON T_WORD : {{ { ...$0,  alias: $2 } }}
+        | expression_symbol_match expression_repeater : {{ { expression: $0, repeat: $1 } }}
+        | expression_symbol_match expression_repeater L_COLON T_WORD : {{ { expression: $0, repeat: $1, alias: $4 } }}
+
+
+    expression_symbol_match ->
+        T_WORD : {{ { rule: $0 } }}
+        | T_STRING "i"? : {{ { literal: $0, insensitive: !!$1 } }}
+        | L_DSIGN T_WORD : {{ { token: $1} }}
+        | L_DSIGN T_STRING : {{ { token: $1} }}
+        | T_REGEX : {{ $0 }}
+        | L_PARENL _ expression_list _ L_PARENR : {{ { subexpression: $2 } }}
+        | T_JS : {{ $0 }}
+
+    expression_repeater : {{ $0[0].value }} ->
+        L_QMARK
+        | L_PLUS
+        | L_STAR
+
+    kv_list ->
+        kv : {{ data }}
+        | kv _ kv_list : {{ [$0].concat($2) }}
+
+    kv ->
+        T_WORD _ L_COLON _ ( T_WORD| T_STRING| T_INTEGER | T_JS | T_GRAMMAR_TEMPLATE) : {{ { [$0]: $4[0] } }}
+
+    string_list ->
+        T_STRING : {{ [$0] }}
+        | T_STRING _ L_COMMA _ string_list : {{ [$0].concat($4) }}
+
+    word_list ->
+        T_WORD : {{ [$0] }}
+        | T_WORD _ L_COMMA _ word_list : {{ [$0].concat($4) }}
+
+    _ ->
+        T_WS? : {{ null }}
+    __ ->
+        T_WS+ : {{ null }}
+
+    L_COLON -> $L_COLON
+    L_SCOLON -> $L_SCOLON
+    L_QMARK -> $L_QMARK
+    L_PLUS -> $L_PLUS
+    L_STAR -> $L_STAR
+    L_COMMA -> $L_COMMA
+    L_PIPE -> $L_PIPE
+    L_PARENL -> $L_PARENL
+    L_PARENR -> $L_PARENR
+    L_TEMPLATEL -> $L_TEMPLATEL
+    L_TEMPLATER -> $L_TEMPLATER
+    L_ARROW -> $L_ARROW
+    L_DSIGN -> $L_DSIGN
+    L_DASH -> $L_DASH
+
+    K_ALL -> "all"
+    K_TAG -> "tag"
+    K_FROM -> "from"
+    K_TYPE -> "type"
+    K_WHEN -> "when"
+    K_POP -> "pop"
+    K_INSET -> "inset"
+    K_SET -> "set"
+    K_GOTO -> "goto"
+    K_CONFIG -> "config"
+    K_LEXER -> "lexer"
+    K_GRAMMAR -> "grammar"
+    K_IMPORT -> "import"
+    K_BODY -> "body"
+    K_HEAD -> "head"
+
+    T_JS -> $L_JSL $T_JSBODY* $L_JSR : {{ { js: $1.map(v=>v.value).join('') } }}
+    T_GRAMMAR_TEMPLATE -> $L_TEMPLATEL _ $T_JSBODY* _ $L_TEMPLATER : {{ { template: $2.map(v=>v.value).join('').trim() } }}
+    T_STRING -> $T_STRING : {{ JSON.parse($0.value) }}
+    T_WORD -> $T_WORD : {{ $0.value }}
+    T_REGEX -> $T_REGEX /[gmiuy]/* : {{ { regex: $0.value.replace(/\\\\\//g,'/').slice(1,-1), flags: $1.join('') } }}
+    T_COMMENT -> $T_COMMENT
+    T_INTEGER -> $T_INTEGER : {{ $0.value }}
+    T_WS -> $T_WS : {{ null }}
+}}
+
 ```
-
-### Literal Post Processor 
-Literal Post Processors, identified by `${ }` allow you to write raw JavaScript for the post processor.
-
-
-
-### Word
-Words are limited to the regex expression `/[a-z_][a-zA-Z\d_]/` 
