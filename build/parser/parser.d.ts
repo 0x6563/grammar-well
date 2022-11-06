@@ -8,15 +8,16 @@ export declare function Parse(language: LanguageDefinition, input: string, optio
 export declare class Parser {
     private language;
     private options;
-    static Reject: symbol;
     constructor(language: LanguageDefinition, options?: ParserOptions);
     run(input: string): {
         results: any[];
     };
     private getTokenQueue;
-    static SymbolMatchesToken(rule: GrammarRuleSymbol, token: LexerToken): boolean;
-    static SymbolIsTerminal(rule: GrammarRuleSymbol): boolean;
-    static PostProcessGrammarRule(rule: GrammarRule, data: any, meta?: any): any;
+}
+export declare abstract class ParserUtility {
+    static SymbolMatchesToken(symbol: GrammarRuleSymbol, token: LexerToken): boolean;
+    static SymbolIsTerminal(symbol: GrammarRuleSymbol): boolean;
+    static PostProcess(rule: GrammarRule, data: any, meta?: any): any;
 }
 interface ParserOptions {
     algorithm: (keyof typeof ParserRegistry) | ParserAlgorithm;

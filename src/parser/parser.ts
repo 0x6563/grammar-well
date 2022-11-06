@@ -4,12 +4,12 @@ import { TokenBuffer } from "../lexers/token-buffer";
 import { GrammarRule, GrammarRuleSymbol, LanguageDefinition, LexerToken, ParserAlgorithm } from "../typings";
 import { CYK } from "./algorithms/cyk";
 import { Earley } from "./algorithms/earley";
-import { LR } from "./algorithms/lr";
+import { LR0 } from "./algorithms/lr0";
 
 const ParserRegistry: { [key: string]: ParserAlgorithm } = {
     earley: Earley,
     cyk: CYK,
-    lr0: LR
+    lr0: LR0
 }
 
 export function Parse(language: LanguageDefinition, input: string, options?: ParserOptions) {
@@ -18,7 +18,6 @@ export function Parse(language: LanguageDefinition, input: string, options?: Par
 }
 
 export class Parser {
-    static Reject = Symbol();
 
     constructor(private language: LanguageDefinition, private options: ParserOptions = { algorithm: 'earley', parserOptions: {} }) { }
 
@@ -26,8 +25,8 @@ export class Parser {
         const tokenQueue = this.getTokenQueue();
         tokenQueue.feed(input);
         if (typeof this.options.algorithm == 'function')
-            return this.options.algorithm({ ...this.language, tokens: tokenQueue }, this.options.parserOptions);
-        return ParserRegistry[this.options.algorithm]({ ...this.language, tokens: tokenQueue }, this.options.parserOptions);
+            return this.options.algorithm({ ...this.language, tokens: tokenQueue, utility: ParserUtility }, this.options.parserOptions);
+        return ParserRegistry[this.options.algorithm]({ ...this.language, tokens: tokenQueue, utility: ParserUtility }, this.options.parserOptions);
     }
 
     private getTokenQueue() {
@@ -40,34 +39,33 @@ export class Parser {
             return new TokenBuffer(new StatefulLexer(lexer));
         }
     }
+}
 
-    static SymbolMatchesToken(rule: GrammarRuleSymbol, token: LexerToken) {
-        if (typeof rule === 'string')
+
+export abstract class ParserUtility {
+
+    static SymbolMatchesToken(symbol: GrammarRuleSymbol, token: LexerToken) {
+        if (typeof symbol === 'string')
             throw 'Attempted to match token against non-terminal';
-        if (typeof rule == 'function')
-            return rule(token);
-        if (!rule)
+        if (typeof symbol == 'function')
+            return symbol(token);
+        if (!symbol)
             return
-        if ("test" in rule)
-            return rule.test(token.value);
-        if ("token" in rule)
-            return rule.token === token.type || token.tag?.has(rule.token);
-        if ("literal" in rule)
-            return rule.literal === token.value;
+        if ("test" in symbol)
+            return symbol.test(token.value);
+        if ("token" in symbol)
+            return symbol.token === token.type || token.tag?.has(symbol.token);
+        if ("literal" in symbol)
+            return symbol.literal === token.value;
     }
 
-    static SymbolIsTerminal(rule: GrammarRuleSymbol) {
-        return typeof rule != 'string';
+    static SymbolIsTerminal(symbol: GrammarRuleSymbol) {
+        return typeof symbol != 'string';
     }
 
-    static PostProcessGrammarRule(rule: GrammarRule, data: any, meta?: any) {
+    static PostProcess(rule: GrammarRule, data: any, meta?: any) {
         if (rule.postprocess) {
-            return rule.postprocess({
-                rule,
-                data,
-                meta,
-                reject: Parser.Reject
-            });
+            return rule.postprocess({ rule, data, meta });
         }
         return data;
     }

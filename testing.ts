@@ -3,7 +3,7 @@ import { AsyncRun, BuildTest } from './tests/system/testbed';
 (async () => {
     const options: any = {};
     const grammar = Read('./tests/samples/grammars/lr.gwell');
-    const input = "{}{}{}}";
+    const input = "aabb";
     options.algorithm = 'lr0';
     const execution = await AsyncRun(() => BuildTest(grammar, input, options));
     console.log(execution);

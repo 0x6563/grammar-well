@@ -1,7 +1,7 @@
 import { Dictionary, GrammarRule, LanguageDefinition } from "../../typings";
 import { TokenBuffer } from "../../lexers/token-buffer";
 import { TextFormatter } from "../../utility/text-format";
-import { Parser } from "../parser";
+import { ParserUtility } from "../parser";
 
 export interface EarleyParserOptions {
     keepHistory?: boolean;
@@ -37,7 +37,7 @@ export function Earley(language: LanguageDefinition & { tokens: TokenBuffer }, o
         for (let w = scannable.length; w--;) {
             const state = scannable[w];
             const symbol = state.rule.symbols[state.dot];
-            if (Parser.SymbolMatchesToken(symbol, token)) {
+            if (ParserUtility.SymbolMatchesToken(symbol, token)) {
                 const next = state.nextState({ data, token, isToken: true, reference: current - 1 });
                 nextColumn.states.push(next);
             }
@@ -53,7 +53,7 @@ export function Earley(language: LanguageDefinition & { tokens: TokenBuffer }, o
     const results = [];
     const { states } = table[table.length - 1];
     for (const { rule: { name, symbols }, dot, reference, data } of states) {
-        if (name === start && dot === symbols.length && reference == 0 && data !== Parser.Reject) {
+        if (name === start && dot === symbols.length && reference == 0) {
             results.push(data);
         }
     }
@@ -80,18 +80,16 @@ class Column {
         while (state = this.states[w++]) { // nb. we push() during iteration
             if (state.isComplete) {
                 state.finish();
-                if (state.data !== Parser.Reject) {
-                    const { wantedBy } = state;
-                    for (let i = wantedBy.length; i--;) { // this line is hot
-                        this.complete(wantedBy[i], state);
-                    }
+                const { wantedBy } = state;
+                for (let i = wantedBy.length; i--;) { // this line is hot
+                    this.complete(wantedBy[i], state);
+                }
 
-                    // special-case nullables
-                    if (state.reference === this.index) {
-                        const { name } = state.rule;
-                        this.completed[name] = this.completed[name] || [];
-                        this.completed[name].push(state);
-                    }
+                // special-case nullables
+                if (state.reference === this.index) {
+                    const { name } = state.rule;
+                    this.completed[name] = this.completed[name] || [];
+                    this.completed[name].push(state);
                 }
             } else {
                 const exp = state.rule.symbols[state.dot];
@@ -170,7 +168,7 @@ class State {
 
 
     finish() {
-        this.data = Parser.PostProcessGrammarRule(this.rule, this.data, { reference: this.reference, dot: this.dot });
+        this.data = ParserUtility.PostProcess(this.rule, this.data, { reference: this.reference, dot: this.dot });
     }
 
     protected build() {

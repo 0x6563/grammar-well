@@ -9,7 +9,7 @@ function CYK(language, options = {}) {
     for (const name in grammar.rules) {
         for (const rule of grammar.rules[name]) {
             const { symbols } = rule;
-            if (parser_1.Parser.SymbolIsTerminal(symbols[0])) {
+            if (parser_1.ParserUtility.SymbolIsTerminal(symbols[0])) {
                 terminals.push(rule);
             }
             else {
@@ -23,7 +23,7 @@ function CYK(language, options = {}) {
         currentTokenIndex++;
         chart.resize(currentTokenIndex + 2, currentTokenIndex + 2);
         for (const rule of terminals) {
-            if (parser_1.Parser.SymbolMatchesToken(rule.symbols[0], token)) {
+            if (parser_1.ParserUtility.SymbolMatchesToken(rule.symbols[0], token)) {
                 chart.get(currentTokenIndex, currentTokenIndex).set(rule.name, { rule, token });
             }
         }
@@ -50,9 +50,9 @@ function GetValue(ref) {
     if (!ref)
         return;
     if ('token' in ref) {
-        return parser_1.Parser.PostProcessGrammarRule(ref.rule, [ref.token]);
+        return parser_1.ParserUtility.PostProcess(ref.rule, [ref.token]);
     }
-    return parser_1.Parser.PostProcessGrammarRule(ref.rule, [GetValue(ref.left), GetValue(ref.right)]);
+    return parser_1.ParserUtility.PostProcess(ref.rule, [GetValue(ref.left), GetValue(ref.right)]);
 }
 class Matrix {
     constructor(x, y, initial) {
