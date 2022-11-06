@@ -1,4 +1,5 @@
 import { TokenBuffer } from "./lexers/token-buffer";
+import { ParserUtility } from "./parser/parser";
 export interface Dictionary<T> {
     [key: string]: T;
 }
@@ -29,7 +30,6 @@ interface PostProcessorPayload {
     data: any[];
     rule: GrammarRule;
     meta: any;
-    reject: Symbol;
 }
 export declare type JavascriptDirective = {
     body: GrammarTypeJS;
@@ -97,6 +97,7 @@ export declare type GrammarTypeJS = {
 };
 export declare type ParserAlgorithm = ((language: LanguageDefinition & {
     tokens: TokenBuffer;
+    utility: ParserUtility;
 }, options?: any) => {
     results: any[];
     info?: any;

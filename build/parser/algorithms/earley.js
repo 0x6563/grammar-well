@@ -27,7 +27,7 @@ function Earley(language, options = {}) {
         for (let w = scannable.length; w--;) {
             const state = scannable[w];
             const symbol = state.rule.symbols[state.dot];
-            if (parser_1.Parser.SymbolMatchesToken(symbol, token)) {
+            if (parser_1.ParserUtility.SymbolMatchesToken(symbol, token)) {
                 const next = state.nextState({ data, token, isToken: true, reference: current - 1 });
                 nextColumn.states.push(next);
             }
@@ -40,7 +40,7 @@ function Earley(language, options = {}) {
     const results = [];
     const { states } = table[table.length - 1];
     for (const { rule: { name, symbols }, dot, reference, data } of states) {
-        if (name === start && dot === symbols.length && reference == 0 && data !== parser_1.Parser.Reject) {
+        if (name === start && dot === symbols.length && reference == 0) {
             results.push(data);
         }
     }
@@ -62,16 +62,14 @@ class Column {
         while (state = this.states[w++]) {
             if (state.isComplete) {
                 state.finish();
-                if (state.data !== parser_1.Parser.Reject) {
-                    const { wantedBy } = state;
-                    for (let i = wantedBy.length; i--;) {
-                        this.complete(wantedBy[i], state);
-                    }
-                    if (state.reference === this.index) {
-                        const { name } = state.rule;
-                        this.completed[name] = this.completed[name] || [];
-                        this.completed[name].push(state);
-                    }
+                const { wantedBy } = state;
+                for (let i = wantedBy.length; i--;) {
+                    this.complete(wantedBy[i], state);
+                }
+                if (state.reference === this.index) {
+                    const { name } = state.rule;
+                    this.completed[name] = this.completed[name] || [];
+                    this.completed[name].push(state);
                 }
             }
             else {
@@ -135,7 +133,7 @@ class State {
         return state;
     }
     finish() {
-        this.data = parser_1.Parser.PostProcessGrammarRule(this.rule, this.data, { reference: this.reference, dot: this.dot });
+        this.data = parser_1.ParserUtility.PostProcess(this.rule, this.data, { reference: this.reference, dot: this.dot });
     }
     build() {
         const children = [];

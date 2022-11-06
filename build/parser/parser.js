@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Parser = exports.Parse = void 0;
+exports.ParserUtility = exports.Parser = exports.Parse = void 0;
 const character_lexer_1 = require("../lexers/character-lexer");
 const stateful_lexer_1 = require("../lexers/stateful-lexer");
 const token_buffer_1 = require("../lexers/token-buffer");
@@ -26,8 +26,8 @@ class Parser {
         const tokenQueue = this.getTokenQueue();
         tokenQueue.feed(input);
         if (typeof this.options.algorithm == 'function')
-            return this.options.algorithm(Object.assign(Object.assign({}, this.language), { tokens: tokenQueue }), this.options.parserOptions);
-        return ParserRegistry[this.options.algorithm](Object.assign(Object.assign({}, this.language), { tokens: tokenQueue }), this.options.parserOptions);
+            return this.options.algorithm(Object.assign(Object.assign({}, this.language), { tokens: tokenQueue, utility: ParserUtility }), this.options.parserOptions);
+        return ParserRegistry[this.options.algorithm](Object.assign(Object.assign({}, this.language), { tokens: tokenQueue, utility: ParserUtility }), this.options.parserOptions);
     }
     getTokenQueue() {
         const { lexer } = this.language;
@@ -41,36 +41,33 @@ class Parser {
             return new token_buffer_1.TokenBuffer(new stateful_lexer_1.StatefulLexer(lexer));
         }
     }
-    static SymbolMatchesToken(rule, token) {
+}
+exports.Parser = Parser;
+class ParserUtility {
+    static SymbolMatchesToken(symbol, token) {
         var _a;
-        if (typeof rule === 'string')
+        if (typeof symbol === 'string')
             throw 'Attempted to match token against non-terminal';
-        if (typeof rule == 'function')
-            return rule(token);
-        if (!rule)
+        if (typeof symbol == 'function')
+            return symbol(token);
+        if (!symbol)
             return;
-        if ("test" in rule)
-            return rule.test(token.value);
-        if ("token" in rule)
-            return rule.token === token.type || ((_a = token.tag) === null || _a === void 0 ? void 0 : _a.has(rule.token));
-        if ("literal" in rule)
-            return rule.literal === token.value;
+        if ("test" in symbol)
+            return symbol.test(token.value);
+        if ("token" in symbol)
+            return symbol.token === token.type || ((_a = token.tag) === null || _a === void 0 ? void 0 : _a.has(symbol.token));
+        if ("literal" in symbol)
+            return symbol.literal === token.value;
     }
-    static SymbolIsTerminal(rule) {
-        return typeof rule != 'string';
+    static SymbolIsTerminal(symbol) {
+        return typeof symbol != 'string';
     }
-    static PostProcessGrammarRule(rule, data, meta) {
+    static PostProcess(rule, data, meta) {
         if (rule.postprocess) {
-            return rule.postprocess({
-                rule,
-                data,
-                meta,
-                reject: Parser.Reject
-            });
+            return rule.postprocess({ rule, data, meta });
         }
         return data;
     }
 }
-exports.Parser = Parser;
-Parser.Reject = Symbol();
+exports.ParserUtility = ParserUtility;
 //# sourceMappingURL=parser.js.map

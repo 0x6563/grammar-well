@@ -92,7 +92,6 @@ interface PostProcessorPayload {
     reference: number;
     dot: number;
     name: string;
-    reject: Symbol;
 }
 
 function ${exportName}(): LanguageDefinition {

@@ -1,6 +1,6 @@
 import { TokenBuffer } from "../../lexers/token-buffer";
 import { GrammarRule, GrammarRuleSymbol, LanguageDefinition, LexerToken } from "../../typings";
-import { Parser } from "../parser";
+import { ParserUtility } from "../parser";
 
 export function CYK(language: LanguageDefinition & { tokens: TokenBuffer }, options = {}) {
     const { grammar, tokens } = language;
@@ -11,7 +11,7 @@ export function CYK(language: LanguageDefinition & { tokens: TokenBuffer }, opti
     for (const name in grammar.rules) {
         for (const rule of grammar.rules[name]) {
             const { symbols } = rule;
-            if (Parser.SymbolIsTerminal(symbols[0])) {
+            if (ParserUtility.SymbolIsTerminal(symbols[0])) {
                 terminals.push(rule);
             } else {
                 nonTerminals.push(rule);
@@ -25,7 +25,7 @@ export function CYK(language: LanguageDefinition & { tokens: TokenBuffer }, opti
         currentTokenIndex++;
         chart.resize(currentTokenIndex + 2, currentTokenIndex + 2);
         for (const rule of terminals) {
-            if (Parser.SymbolMatchesToken(rule.symbols[0], token)) {
+            if (ParserUtility.SymbolMatchesToken(rule.symbols[0], token)) {
                 chart.get(currentTokenIndex, currentTokenIndex).set(rule.name, { rule, token })
             }
         }
@@ -56,9 +56,9 @@ function GetValue(ref: Terminal | NonTerminal) {
     if (!ref)
         return;
     if ('token' in ref) {
-        return Parser.PostProcessGrammarRule(ref.rule, [ref.token]);
+        return ParserUtility.PostProcess(ref.rule, [ref.token]);
     }
-    return Parser.PostProcessGrammarRule(ref.rule, [GetValue(ref.left), GetValue(ref.right)])
+    return ParserUtility.PostProcess(ref.rule, [GetValue(ref.left), GetValue(ref.right)])
 }
 
 export interface NonTerminal {

@@ -9,7 +9,7 @@ function LR(language, options = {}) {
     for (const name in grammar.rules) {
         for (const rule of grammar.rules[name]) {
             const { symbols } = rule;
-            if (parser_1.Parser.SymbolIsTerminal(symbols[0])) {
+            if (parser_1.ParserUtility.SymbolIsTerminal(symbols[0])) {
                 terminals.push(rule);
             }
             else {
@@ -18,7 +18,6 @@ function LR(language, options = {}) {
         }
     }
     const table = new ParsingTable(grammar);
-    // console.log(table);
     return { results: [] };
 }
 exports.LR = LR;
@@ -35,7 +34,6 @@ class ParsingTable {
         while (item = this.queue.shift()) {
             this.addRule(item);
         }
-        // console.log(JSON.stringify(this.states, null, 2));
     }
     addRule(rule) {
         if (this.ruleIds.map.has(rule))
@@ -43,7 +41,7 @@ class ParsingTable {
         for (let i = 0; i <= rule.symbols.length; i++) {
             this.getStateId(rule, i);
             const symbol = rule.symbols[i];
-            if (symbol && !parser_1.Parser.SymbolIsTerminal(symbol)) {
+            if (symbol && !parser_1.ParserUtility.SymbolIsTerminal(symbol)) {
                 const subs = this.grammar.rules[symbol];
                 this.queue.push(...this.grammar.rules[symbol]);
             }
