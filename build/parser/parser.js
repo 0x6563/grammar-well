@@ -6,11 +6,11 @@ const stateful_lexer_1 = require("../lexers/stateful-lexer");
 const token_buffer_1 = require("../lexers/token-buffer");
 const cyk_1 = require("./algorithms/cyk");
 const earley_1 = require("./algorithms/earley");
-const lr_1 = require("./algorithms/lr");
+const lr0_1 = require("./algorithms/lr0");
 const ParserRegistry = {
     earley: earley_1.Earley,
     cyk: cyk_1.CYK,
-    lr0: lr_1.LR
+    lr0: lr0_1.LR0
 };
 function Parse(language, input, options) {
     const i = new Parser(language, options);

@@ -4,7 +4,7 @@ import { TokenBuffer } from "../lexers/token-buffer";
 import { GrammarRule, GrammarRuleSymbol, LanguageDefinition, LexerToken, ParserAlgorithm } from "../typings";
 import { CYK } from "./algorithms/cyk";
 import { Earley } from "./algorithms/earley";
-import { LR0 } from "./algorithms/lr";
+import { LR0 } from "./algorithms/lr0";
 
 const ParserRegistry: { [key: string]: ParserAlgorithm } = {
     earley: Earley,
