@@ -59,7 +59,7 @@ export abstract class ParserUtility {
             return symbol.literal === token.value;
     }
 
-    static SymbolIsTerminal(symbol: GrammarRuleSymbol) {
+    static SymbolIsTerminal<T extends GrammarRuleSymbol>(symbol: T) {
         return typeof symbol != 'string';
     }
 
