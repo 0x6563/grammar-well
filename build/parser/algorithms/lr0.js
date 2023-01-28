@@ -8,20 +8,20 @@ function LR0(language, options = {}) {
     const collection = new CanonicalCollection(grammar);
     const stack = new LRStack();
     const s = collection.states.get('0.0');
-    stack.append(s.rule.name);
+    stack.add(null);
     stack.shift(s);
     let token;
     while (token = tokens.next()) {
         for (const [symbol, state] of stack.current.state.actions) {
             if (parser_1.ParserUtility.SymbolMatchesToken(symbol, token)) {
-                stack.append(symbol);
+                stack.add(symbol);
                 stack.shift(collection.states.get(state));
                 stack.current.value = token;
                 break;
             }
         }
         while ((_a = stack.current.state) === null || _a === void 0 ? void 0 : _a.isFinal) {
-            const rule = collection.rules.getItem(stack.current.state.reduce);
+            const rule = stack.current.state.reduce;
             stack.reduce(rule);
             stack.current.value = parser_1.ParserUtility.PostProcess(rule, stack.current.children.map(v => v.value));
             const s = stack.previous.state.goto.get(rule.name);
@@ -31,11 +31,6 @@ function LR0(language, options = {}) {
     return { results: [stack.current.value] };
 }
 exports.LR0 = LR0;
-class Node {
-    constructor() {
-        this.children = [];
-    }
-}
 class LRStack {
     constructor() {
         this.stack = [];
@@ -50,7 +45,7 @@ class LRStack {
         this.current.state = state;
     }
     reduce(rule) {
-        const n = new Node();
+        const n = new LRStackItem();
         const l = rule.symbols.length;
         n.children = this.stack.splice(l * -1, l);
         n.children.forEach(v => delete v.state);
@@ -58,9 +53,14 @@ class LRStack {
         n.symbol = rule.name;
         this.stack.push(n);
     }
-    append(symbol) {
-        this.stack.push(new Node());
+    add(symbol) {
+        this.stack.push(new LRStackItem());
         this.current.symbol = symbol;
+    }
+}
+class LRStackItem {
+    constructor() {
+        this.children = [];
     }
 }
 class CanonicalCollection {
@@ -72,70 +72,113 @@ class CanonicalCollection {
         const augmented = { name: augment, symbols: [grammar.start] };
         grammar['rules'][augment] = [augmented];
         this.rules.getId(augmented);
-        this.addState(grammar['rules'][augment][0], 0);
-        this.linkStates('0.0', new Set());
+        this.addState([{ rule: grammar['rules'][augment][0], dot: 0 }]);
     }
-    addState(rule, dot) {
-        const id = this.getStateId(rule, dot);
+    addState(seed) {
+        const id = this.getStateId(seed);
         if (this.states.has(id))
-            return;
-        const state = new State(this.grammar, rule, dot);
+            return this.states.get(id);
+        const state = new State(this, seed);
         this.states.set(id, state);
-        if (!state.isFinal)
-            for (let i = 0; i < state.items.length; i++) {
-                const item = state.items[i];
-                this.addState(item.rule, item.dot + 1);
-            }
+        for (const q in state.queue) {
+            this.addState(state.queue[q]);
+        }
+        state.queue = {};
     }
-    getStateId(rule, dot) {
+    getRuleId(rule, dot) {
         return this.rules.getId(rule) + '.' + dot;
     }
-    linkStates(id, completed) {
-        completed.add(id);
-        const state = this.states.get(id);
-        if (!state.isFinal) {
-            for (let i = 0; i < state.items.length; i++) {
-                const item = state.items[i];
-                const symbol = item.rule.symbols[item.dot];
-                const itemStateId = this.getStateId(item.rule, item.dot + 1);
-                if (parser_1.ParserUtility.SymbolIsTerminal(symbol) && typeof symbol != 'symbol') {
-                    state.actions.set(symbol, itemStateId);
-                }
-                else {
-                    state.goto.set(symbol, itemStateId);
-                }
-                if (!completed.has(itemStateId))
-                    this.linkStates(itemStateId, completed);
-            }
-        }
-        else {
-            state.reduce = this.rules.getId(state.rule);
-        }
+    getStateId(seed) {
+        return Array.from(new Set(seed)).map(v => this.getRuleId(v.rule, v.dot)).sort().join();
     }
 }
 class State {
-    constructor(grammar, rule, dot) {
-        this.rule = rule;
-        this.items = [];
+    constructor(context, items) {
+        this.context = context;
         this.isFinal = false;
+        this.outputs = {
+            nonTerminals: {},
+            other: new Map(),
+            literalI: {},
+            literalS: {},
+            token: {},
+        };
+        this.queue = {};
         this.actions = new Map();
         this.goto = new Map();
-        if (rule.symbols.length == dot)
-            this.isFinal = true;
-        this.addClosure(grammar, rule, dot);
-    }
-    addClosure(grammar, rule, dot, visited = new Set()) {
-        const symbol = rule.symbols[dot];
-        if (visited.has(symbol))
-            return;
-        visited.add(symbol);
-        this.items.push({ rule, dot });
-        if (!parser_1.ParserUtility.SymbolIsTerminal(symbol)) {
-            grammar
-                .rules[symbol]
-                .forEach(v => this.addClosure(grammar, v, 0, visited));
+        const visited = new Set();
+        for (const item of items) {
+            this.closure(item.rule, item.dot, visited);
+        }
+        if (this.isFinal) {
+            if (items.length == 1 && visited.size < 1) {
+                this.reduce = items[0].rule;
+            }
+            else {
+                throw 'Conflict Detected';
+            }
+        }
+        for (const k in this.outputs.nonTerminals) {
+            const v = this.outputs.nonTerminals[k];
+            const stateId = this.context.getStateId(v);
+            this.queue[stateId] = v;
+            this.goto.set(k, stateId);
+        }
+        for (const k in this.outputs.token) {
+            const v = this.outputs.token[k];
+            this.addAction({ token: k }, v);
+        }
+        for (const k in this.outputs.literalI) {
+            const v = this.outputs.literalI[k];
+            this.addAction({ literal: k, insensitive: true }, v);
+        }
+        for (const k in this.outputs.literalS) {
+            const v = this.outputs.literalS[k];
+            this.addAction({ literal: k, insensitive: false }, v);
+        }
+        for (const [k, v] of this.outputs.other) {
+            this.addAction(k, v);
         }
     }
+    addAction(symbol, seed) {
+        const stateId = this.context.getStateId(seed);
+        this.queue[stateId] = seed;
+        this.actions.set(symbol, stateId);
+    }
+    closure(rule, dot, visited) {
+        const isFinal = rule.symbols.length == dot;
+        this.isFinal = isFinal || this.isFinal;
+        const { [dot]: symbol } = rule.symbols;
+        if (isFinal || visited.has(symbol))
+            return;
+        visited.add(symbol);
+        const stateItem = { rule, dot: dot + 1 };
+        if (parser_1.ParserUtility.SymbolIsTerminal(symbol)) {
+            const s = symbol;
+            if ('literal' in s) {
+                InitAppendArray(s.insensitive ? this.outputs.literalI : this.outputs.literalS, s.literal, stateItem);
+            }
+            else if ('token' in s) {
+                InitAppendArray(this.outputs.token, s.token, stateItem);
+            }
+            else {
+                if (!this.outputs.other.has(s)) {
+                    this.outputs.other.set(s, []);
+                }
+                this.outputs.other.get(s).push(stateItem);
+            }
+        }
+        else {
+            InitAppendArray(this.outputs.nonTerminals, symbol, stateItem);
+            for (const rule of this.context.grammar.rules[symbol]) {
+                this.closure(rule, 0, visited);
+            }
+        }
+    }
+}
+function InitAppendArray(obj, key, item) {
+    obj[key] = obj[key] || [];
+    obj[key].push(item);
 }
 class IdMap {
     constructor() {
