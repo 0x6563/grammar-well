@@ -12,7 +12,7 @@ export interface CompileOptions {
     exportName?: string;
     format?: OutputFormat;
 }
-export declare type OutputFormat = '_default' | 'object' | 'json' | 'js' | 'javascript' | 'module' | 'esmodule' | 'ts' | 'typescript';
+export type OutputFormat = '_default' | 'object' | 'json' | 'js' | 'javascript' | 'module' | 'esmodule' | 'ts' | 'typescript';
 export interface GrammarBuilderContext {
     alreadyCompiled: Set<string>;
     resolver: ImportResolver;
@@ -25,13 +25,13 @@ export interface ImportResolver {
 export interface ImportResolverConstructor {
     new (basePath: string): ImportResolver;
 }
-export declare type PostProcessor = (payload: PostProcessorPayload) => any;
+export type PostProcessor = (payload: PostProcessorPayload) => any;
 interface PostProcessorPayload {
     data: any[];
     rule: GrammarRule;
     meta: any;
 }
-export declare type JavascriptDirective = {
+export type JavascriptDirective = {
     body: GrammarTypeJS;
 } | {
     head: GrammarTypeJS;
@@ -64,7 +64,7 @@ export interface GrammarBuilderExpression {
     symbols: GrammarBuilderSymbol[];
     postprocess?: GrammarTypeJS | GrammarTypeBuiltIn | GrammarTypeTemplate;
 }
-export declare type GrammarBuilderSymbol = GrammarTypeRule | GrammarTypeRegex | GrammarTypeToken | GrammarTypeLiteral | GrammarBuilderSymbolRepeat | GrammarBuilderSymbolSubexpression;
+export type GrammarBuilderSymbol = GrammarTypeRule | GrammarTypeRegex | GrammarTypeToken | GrammarTypeLiteral | GrammarBuilderSymbolRepeat | GrammarBuilderSymbolSubexpression;
 export interface GrammarBuilderSymbolSubexpression {
     subexpression: GrammarBuilderExpression[];
 }
@@ -86,36 +86,36 @@ export interface GrammarTypeLiteral {
     literal: string;
     insensitive?: boolean;
 }
-export declare type GrammarTypeBuiltIn = {
+export type GrammarTypeBuiltIn = {
     builtin: string;
 };
-export declare type GrammarTypeTemplate = {
+export type GrammarTypeTemplate = {
     template: string;
 };
-export declare type GrammarTypeJS = {
+export type GrammarTypeJS = {
     js: string;
 };
-export declare type ParserAlgorithm = ((language: LanguageDefinition & {
+export type ParserAlgorithm = ((language: LanguageDefinition & {
     tokens: TokenBuffer;
     utility: ParserUtility;
 }, options?: any) => {
     results: any[];
     info?: any;
 });
-export declare type LanguageDirective = (JavascriptDirective | ImportDirective | ConfigDirective | GrammarDirective | LexerDirective);
-declare type GrammarRuleSymbolFunction = (data: LexerToken) => boolean;
+export type LanguageDirective = (JavascriptDirective | ImportDirective | ConfigDirective | GrammarDirective | LexerDirective);
+type GrammarRuleSymbolFunction = (data: LexerToken) => boolean;
 export interface GrammarRule {
     name: string;
     symbols: GrammarRuleSymbol[];
     postprocess?: PostProcessor;
 }
-export declare type GrammarRuleSymbol = string | RegExp | GrammarTypeLiteral | GrammarTypeToken | GrammarRuleSymbolFunction;
+export type GrammarRuleSymbol = string | RegExp | GrammarTypeLiteral | GrammarTypeToken | GrammarRuleSymbolFunction;
 export interface GeneratorGrammarRule {
     name: string;
     symbols: GeneratorGrammarSymbol[];
     postprocess?: GrammarTypeTemplate | GrammarTypeBuiltIn | GrammarTypeJS;
 }
-export declare type GeneratorGrammarSymbol = {
+export type GeneratorGrammarSymbol = {
     alias?: string;
 } & (GrammarTypeRule | GrammarTypeRegex | GrammarTypeLiteral | GrammarTypeToken | GrammarTypeJS);
 export interface LanguageDefinition {

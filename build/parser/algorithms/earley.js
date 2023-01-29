@@ -27,7 +27,7 @@ function Earley(language, options = {}) {
         for (let w = scannable.length; w--;) {
             const state = scannable[w];
             const symbol = state.rule.symbols[state.dot];
-            if (parser_1.ParserUtility.SymbolMatchesToken(symbol, token)) {
+            if (parser_1.ParserUtility.TokenMatchesSymbol(token, symbol)) {
                 const next = state.nextState({ data, token, isToken: true, reference: current - 1 });
                 nextColumn.states.push(next);
             }
@@ -48,13 +48,16 @@ function Earley(language, options = {}) {
 }
 exports.Earley = Earley;
 class Column {
+    rules;
+    index;
+    data;
+    states = [];
+    wants = Object.create(null);
+    scannable = [];
+    completed = Object.create(null);
     constructor(rules, index) {
         this.rules = rules;
         this.index = index;
-        this.states = [];
-        this.wants = Object.create(null);
-        this.scannable = [];
-        this.completed = Object.create(null);
     }
     process() {
         let w = 0;
@@ -106,7 +109,7 @@ class Column {
             const nextSymbol = state.rule.symbols[state.dot];
             return nextSymbol && typeof nextSymbol !== "string";
         })
-            .map(v => (Object.assign(Object.assign({}, v.rule), { index: v.dot })));
+            .map(v => ({ ...v.rule, index: v.dot }));
     }
     complete(left, right) {
         const copy = left.nextState(right);
@@ -114,12 +117,19 @@ class Column {
     }
 }
 class State {
+    rule;
+    dot;
+    reference;
+    wantedBy;
+    isComplete;
+    data = [];
+    left;
+    right;
     constructor(rule, dot, reference, wantedBy) {
         this.rule = rule;
         this.dot = dot;
         this.reference = reference;
         this.wantedBy = wantedBy;
-        this.data = [];
         this.isComplete = this.dot === rule.symbols.length;
     }
     nextState(child) {

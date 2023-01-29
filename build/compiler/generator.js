@@ -8,20 +8,19 @@ const PostProcessors = {
     "first": "({data}) => data[0]"
 };
 class Generator {
-    constructor() {
-        this.state = {
-            grammar: {
-                start: '',
-                rules: {},
-                uuids: {}
-            },
-            lexer: null,
-            head: [],
-            body: [],
-            config: {},
-            version: 'unknown',
-        };
-    }
+    state = {
+        grammar: {
+            start: '',
+            rules: {},
+            uuids: {}
+        },
+        lexer: null,
+        head: [],
+        body: [],
+        config: {},
+        version: 'unknown',
+    };
+    constructor() { }
     serializeHead() {
         if (this.state.config.noscript)
             return '';

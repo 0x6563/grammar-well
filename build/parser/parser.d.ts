@@ -14,8 +14,8 @@ export declare class Parser {
     };
     private getTokenQueue;
 }
-export declare abstract class ParserUtility {
-    static SymbolMatchesToken(symbol: GrammarRuleSymbol, token: LexerToken): boolean;
+export declare class ParserUtility {
+    static TokenMatchesSymbol(token: LexerToken, symbol: GrammarRuleSymbol): boolean;
     static SymbolIsTerminal<T extends GrammarRuleSymbol>(symbol: T): boolean;
     static PostProcess(rule: GrammarRule, data: any, meta?: any): any;
 }

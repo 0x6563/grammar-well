@@ -94,7 +94,7 @@ function GWLanguage() {
                 ],
                 expression_symbol: [
                     { name: "expression_symbol", symbols: ["expression_symbol_match"], postprocess: ({ data }) => { return data[0]; } },
-                    { name: "expression_symbol", symbols: ["expression_symbol_match", "L_COLON", "T_WORD"], postprocess: ({ data }) => { return Object.assign(Object.assign({}, data[0]), { alias: data[2] }); } },
+                    { name: "expression_symbol", symbols: ["expression_symbol_match", "L_COLON", "T_WORD"], postprocess: ({ data }) => { return { ...data[0], alias: data[2] }; } },
                     { name: "expression_symbol", symbols: ["expression_symbol_match", "expression_repeater"], postprocess: ({ data }) => { return { expression: data[0], repeat: data[1] }; } },
                     { name: "expression_symbol", symbols: ["expression_symbol_match", "expression_repeater", "L_COLON", "T_WORD"], postprocess: ({ data }) => { return { expression: data[0], repeat: data[1], alias: data[4] }; } }
                 ],
