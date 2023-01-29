@@ -37,7 +37,7 @@ export function Earley(language: LanguageDefinition & { tokens: TokenBuffer }, o
         for (let w = scannable.length; w--;) {
             const state = scannable[w];
             const symbol = state.rule.symbols[state.dot];
-            if (ParserUtility.SymbolMatchesToken(symbol, token)) {
+            if (ParserUtility.TokenMatchesSymbol(token, symbol)) {
                 const next = state.nextState({ data, token, isToken: true, reference: current - 1 });
                 nextColumn.states.push(next);
             }

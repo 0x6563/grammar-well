@@ -103,9 +103,9 @@ CYK:
     grammarSource: grammars/cyk.gwell
     input: ABC
     result: [A, [B, C]]
-LR0:
-  - title: LR0
-    algorithm: lr0
+LR:
+  - title: LR
+    algorithm: lr
     grammarSource: grammars/lr.gwell
     input: abc
     result: [a, [b, c]]
