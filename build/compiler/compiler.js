@@ -55,7 +55,6 @@ class GrammarBuilder {
         }
         throw new Error("No such preprocessor: " + output);
     }
-    ;
     async import(directives) {
         if (typeof directives == 'string') {
             await this.mergeLanguageDefinitionString(directives);

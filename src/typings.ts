@@ -155,7 +155,7 @@ export interface Lexer {
 
 export interface LexerToken {
     type?: string | undefined;
-    tag?: Set<String>;
+    tag?: Set<string>;
     value: string;
     offset: number;
     line: number;

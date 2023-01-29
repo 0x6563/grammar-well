@@ -4,7 +4,7 @@ import { CanonicalCollection } from "../../utility/lr";
 export declare function LR(language: LanguageDefinition & {
     tokens: TokenBuffer;
     canonical?: CanonicalCollection;
-}, options?: {}): {
+}, _options?: {}): {
     results: any[];
     canonical: CanonicalCollection;
 };

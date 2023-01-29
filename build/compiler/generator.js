@@ -20,7 +20,6 @@ class Generator {
         config: {},
         version: 'unknown',
     };
-    constructor() { }
     serializeHead() {
         if (this.state.config.noscript)
             return '';

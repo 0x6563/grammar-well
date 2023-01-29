@@ -102,4 +102,4 @@ function ${exportName}(): LanguageDefinition {
 export default ${exportName};
 
 `;
-};
+}

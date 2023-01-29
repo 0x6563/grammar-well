@@ -1,4 +1,4 @@
-import { CompileOptions, GrammarBuilderContext, OutputFormat, LanguageDirective, ConfigDirective, GrammarBuilderSymbolRepeat, GrammarBuilderExpression, GeneratorGrammarRule, GrammarDirective, ImportDirective, LexerDirective, GrammarBuilderSymbolSubexpression, GrammarTypeLiteral, GeneratorGrammarSymbol, GrammarBuilderSymbol, LexerStateDefinition, GrammarBuilderRule } from "../typings";
+import { CompileOptions, GrammarBuilderContext, OutputFormat, LanguageDirective, ConfigDirective, GrammarBuilderSymbolRepeat, GrammarBuilderExpression, GeneratorGrammarRule, GrammarDirective, ImportDirective, LexerDirective, GrammarBuilderSymbolSubexpression, GrammarTypeLiteral, GeneratorGrammarSymbol, GrammarBuilderSymbol, GrammarBuilderRule } from "../typings";
 
 import { Parser } from "../parser/parser";
 import { FileSystemResolver } from "./import-resolver";
@@ -58,7 +58,7 @@ export class GrammarBuilder {
             return OutputFormats[output](this.generator, name);
         }
         throw new Error("No such preprocessor: " + output)
-    };
+    }
 
     async import(source: string): Promise<void>
     async import(directive: LanguageDirective): Promise<void>

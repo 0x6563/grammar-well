@@ -3,7 +3,7 @@ import { LanguageDefinition } from "../../typings";
 import { CanonicalCollection, LRStack } from "../../utility/lr";
 import { ParserUtility } from "../parser";
 
-export function LR(language: LanguageDefinition & { tokens: TokenBuffer, canonical?: CanonicalCollection }, options = {}) {
+export function LR(language: LanguageDefinition & { tokens: TokenBuffer, canonical?: CanonicalCollection }, _options = {}) {
     const { grammar, tokens, canonical } = language;
     const collection = canonical || new CanonicalCollection(grammar);
     const stack = new LRStack();
@@ -12,6 +12,7 @@ export function LR(language: LanguageDefinition & { tokens: TokenBuffer, canonic
     stack.shift(s);
     let token;
 
+    // eslint-disable-next-line no-cond-assign
     while (token = tokens.next()) {
         for (const [symbol, state] of stack.current.state.actions) {
             if (ParserUtility.TokenMatchesSymbol(token, symbol)) {

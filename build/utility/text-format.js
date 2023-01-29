@@ -77,7 +77,6 @@ class TextFormatter {
         if (typeof withCursorAt !== "undefined") {
             symbolSequence += " ● " + rule.symbols.slice(withCursorAt).map(v => TextFormatter.GrammarRuleSymbol(v, true, true)).join(' ');
         }
-        ;
         return rule.name + " → " + symbolSequence;
     }
 }

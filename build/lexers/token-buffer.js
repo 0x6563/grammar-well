@@ -46,21 +46,17 @@ class TokenBuffer {
         }
     }
     next() {
-        try {
-            if (this.$historyIndex + 1 >= this.history.length) {
-                this.lexerNext();
-            }
-            if (this.$historyIndex + 1 < this.history.length) {
-                return this.history[++this.$historyIndex];
-            }
+        if (this.$historyIndex + 1 >= this.history.length) {
+            this.lexerNext();
         }
-        catch (error) {
-            throw error;
+        if (this.$historyIndex + 1 < this.history.length) {
+            return this.history[++this.$historyIndex];
         }
     }
     peek(offset) {
         offset += this.$historyIndex;
-        while ((offset >= this.history.length) && this.lexerNext()) { }
+        while ((offset >= this.history.length) && this.lexerNext()) {
+        }
         if (offset >= 0 && offset < this.history.length)
             return this.history[offset];
     }

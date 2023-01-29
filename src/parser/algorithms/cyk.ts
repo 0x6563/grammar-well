@@ -3,7 +3,7 @@ import { GrammarRule, GrammarRuleSymbol, LanguageDefinition, LexerToken } from "
 import { Matrix } from "../../utility/general";
 import { ParserUtility } from "../parser";
 
-export function CYK(language: LanguageDefinition & { tokens: TokenBuffer }, options = {}) {
+export function CYK(language: LanguageDefinition & { tokens: TokenBuffer }, _options = {}) {
     const { grammar, tokens } = language;
 
     const terminals: GrammarRule[] = [];

@@ -170,7 +170,7 @@ class RegexLib {
         return o instanceof RegExp;
     }
     static Escape(s) {
-        return s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+        return s.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
     }
     static HasGroups(s) {
         return (new RegExp('|' + s)).exec('').length > 1;

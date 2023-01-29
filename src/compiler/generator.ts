@@ -22,8 +22,6 @@ export class Generator {
         version: 'unknown',
     }
 
-    constructor() { }
-
     serializeHead() {
         if (this.state.config.noscript)
             return '';

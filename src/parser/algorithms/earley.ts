@@ -77,6 +77,8 @@ class Column {
     process() {
         let w = 0;
         let state: State;
+
+        // eslint-disable-next-line no-cond-assign
         while (state = this.states[w++]) { // nb. we push() during iteration
             if (state.isComplete) {
                 state.finish();
@@ -173,6 +175,7 @@ class State {
 
     protected build() {
         const children = [];
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
         let node: State = this;
         do {
             children[node.dot - 1] = node.right.data;

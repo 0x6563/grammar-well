@@ -19,6 +19,7 @@ class Collection {
     decode(id) {
         return this.items[typeof id == 'string' ? parseInt(id) : id];
     }
+    resolve(_) { }
     addCategorized(category, key, ref) {
         if (!(key in this.categorized[category])) {
             this.categorized[category][key] = this.items.length;
@@ -33,7 +34,6 @@ class Collection {
         }
         return this.uncategorized.get(ref);
     }
-    resolve(_) { }
 }
 exports.Collection = Collection;
 class SymbolCollection extends Collection {

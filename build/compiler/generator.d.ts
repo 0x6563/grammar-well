@@ -1,7 +1,6 @@
 import { GeneratorState, GeneratorGrammarRule, LexerStateDefinition } from "../typings";
 export declare class Generator {
     state: GeneratorState;
-    constructor();
     serializeHead(): string;
     serializeBody(): string;
     serializeLanguage(depth?: number): string;

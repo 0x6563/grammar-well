@@ -185,7 +185,7 @@ class RegexLib {
         return o instanceof RegExp
     }
     static Escape(s: string) {
-        return s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')
+        return s.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')
     }
 
     static HasGroups(s: string) {

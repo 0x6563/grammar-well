@@ -2,7 +2,7 @@ import { TokenBuffer } from "../../lexers/token-buffer";
 import { GrammarRule, LanguageDefinition, LexerToken } from "../../typings";
 export declare function CYK(language: LanguageDefinition & {
     tokens: TokenBuffer;
-}, options?: {}): {
+}, _options?: {}): {
     results: any[];
 };
 export interface NonTerminal {

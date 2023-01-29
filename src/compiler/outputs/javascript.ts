@@ -14,7 +14,7 @@ export function ESMOutput(generator: Generator, exportName: string) {
     return `${Generate(generator, exportName)}
 
 export default ${exportName};`;
-};
+}
 
 function Generate(generator: Generator, exportName: string) {
     return `// Generated automatically by Grammar-Well, version ${generator.state.version} 
@@ -24,4 +24,4 @@ function ${exportName}(){
     ${generator.serializeBody()}
     return ${generator.serializeLanguage(1)}
 }`;
-};
+}

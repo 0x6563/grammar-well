@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.CYK = void 0;
 const general_1 = require("../../utility/general");
 const parser_1 = require("../parser");
-function CYK(language, options = {}) {
+function CYK(language, _options = {}) {
     const { grammar, tokens } = language;
     const terminals = [];
     const nonTerminals = [];

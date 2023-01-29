@@ -17,7 +17,6 @@ function ESMOutput(generator, exportName) {
 export default ${exportName};`;
 }
 exports.ESMOutput = ESMOutput;
-;
 function Generate(generator, exportName) {
     return `// Generated automatically by Grammar-Well, version ${generator.state.version} 
 // https://github.com/0x6563/grammar-well
@@ -27,5 +26,4 @@ function ${exportName}(){
     return ${generator.serializeLanguage(1)}
 }`;
 }
-;
 //# sourceMappingURL=javascript.js.map

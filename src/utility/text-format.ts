@@ -36,6 +36,7 @@ export class TextFormatter {
         let lines = 0;
         const { line, column, offset } = lexer;
 
+        // eslint-disable-next-line no-cond-assign
         while (token = lexer.peek(--i)) {
             if (token.value == '\n') {
                 lines++;
@@ -77,7 +78,7 @@ export class TextFormatter {
         let symbolSequence = rule.symbols.slice(0, withCursorAt).map(v => TextFormatter.GrammarRuleSymbol(v, true, true)).join(' ');
         if (typeof withCursorAt !== "undefined") {
             symbolSequence += " ● " + rule.symbols.slice(withCursorAt).map(v => TextFormatter.GrammarRuleSymbol(v, true, true)).join(' ');
-        };
+        }
         return rule.name + " → " + symbolSequence;
     }
 }

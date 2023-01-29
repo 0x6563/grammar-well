@@ -6,12 +6,12 @@ export declare class Collection<T> {
     constructor(ref?: T[]);
     encode(ref: T): number;
     decode(id: number | string): T;
-    private addCategorized;
-    private addUncategorized;
     resolve(_: T): {
         category: keyof Collection<T>['categorized'];
         key: string;
     } | void;
+    private addCategorized;
+    private addUncategorized;
 }
 export declare class SymbolCollection extends Collection<GrammarRuleSymbol> {
     categorized: {

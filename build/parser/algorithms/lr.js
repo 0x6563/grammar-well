@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.LR = void 0;
 const lr_1 = require("../../utility/lr");
 const parser_1 = require("../parser");
-function LR(language, options = {}) {
+function LR(language, _options = {}) {
     const { grammar, tokens, canonical } = language;
     const collection = canonical || new lr_1.CanonicalCollection(grammar);
     const stack = new lr_1.LRStack();

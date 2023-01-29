@@ -5,5 +5,4 @@ function JSONFormatter(generator, exportName) {
     return JSON.stringify({ state: generator.state, exportName });
 }
 exports.JSONFormatter = JSONFormatter;
-;
 //# sourceMappingURL=json.js.map

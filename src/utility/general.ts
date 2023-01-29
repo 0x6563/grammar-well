@@ -23,6 +23,9 @@ export class Collection<T> {
         return this.items[typeof id == 'string' ? parseInt(id) : id];
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
+    resolve(_: T): { category: keyof Collection<T>['categorized'], key: string } | void { }
+
     private addCategorized(category: keyof Collection<T>['categorized'], key: string, ref: T): number {
         if (!(key in this.categorized[category])) {
             this.categorized[category][key] = this.items.length;
@@ -39,7 +42,6 @@ export class Collection<T> {
         return this.uncategorized.get(ref);
     }
 
-    resolve(_: T): { category: keyof Collection<T>['categorized'], key: string } | void { }
 }
 
 export class SymbolCollection extends Collection<GrammarRuleSymbol>{
@@ -68,7 +70,6 @@ export class SymbolCollection extends Collection<GrammarRuleSymbol>{
         }
     }
 }
-
 
 export class Matrix<T> {
     private $x = 0;

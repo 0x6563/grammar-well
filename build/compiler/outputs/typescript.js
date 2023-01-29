@@ -105,5 +105,4 @@ export default ${exportName};
 `;
 }
 exports.TypescriptFormat = TypescriptFormat;
-;
 //# sourceMappingURL=typescript.js.map
