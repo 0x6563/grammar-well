@@ -1,0 +1,8 @@
+.gitignore
+.github
+tests
+.nyc_output
+tsconfig.json
+readme.md
+.nycrc
+coverage

@@ -5,10 +5,9 @@ import { Collection, SymbolCollection } from "./general";
 export class CanonicalCollection {
     rules: Collection<GrammarRule> = new Collection();
     states: { [key: string]: State } = Object.create(null)
-    symbols: SymbolCollection;
-    
-    constructor(public grammar: LanguageGrammar & { symbols?: SymbolCollection }) {
-        this.symbols = grammar.symbols || new SymbolCollection();
+    symbols: SymbolCollection = new SymbolCollection();
+
+    constructor(public grammar: LanguageGrammar) {
         const augmented = { name: Symbol() as unknown as string, symbols: [grammar.start] }
         grammar.rules[augmented.name] = [augmented];
         this.addState([{ rule: augmented, dot: 0 }]);

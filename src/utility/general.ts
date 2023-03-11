@@ -4,7 +4,7 @@ import { Dictionary, GrammarRuleSymbol } from "../typings";
 export class Collection<T> {
     categorized: Dictionary<Dictionary<number>> = {};
     private uncategorized = new Map<T, number>();
-    private items: T[] = [];
+    items: T[] = [];
 
     constructor(ref: T[] = []) {
         for (const s of ref) {
@@ -21,6 +21,17 @@ export class Collection<T> {
 
     decode(id: number | string): T {
         return this.items[typeof id == 'string' ? parseInt(id) : id];
+    }
+
+    has(ref: T) {
+        const c = this.resolve(ref);
+        if (c)
+            return (c.key in this.categorized[c.category])
+        return this.uncategorized.has(ref);
+    }
+
+    redirect(source: T, target: T) {
+        this.items[this.encode(source)] = target;
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
@@ -63,7 +74,7 @@ export class SymbolCollection extends Collection<GrammarRuleSymbol>{
             return { category: 'literalS', key: symbol.literal }
         } else if ('token' in symbol) {
             return { category: 'token', key: symbol.token }
-        } else if ('test' in symbol) {
+        } else if (symbol instanceof RegExp) {
             return { category: 'regex', key: symbol.toString() }
         } else if (typeof symbol == 'function') {
             return { category: 'function', key: symbol.toString() }
@@ -116,5 +127,49 @@ export class Matrix<T> {
         return Array.from({ length }, (typeof initial == 'function' ? initial : () => initial) as any);
     }
 }
+
+export function Flatten(obj: any[] | { [key: string]: any }): FlatObject {
+    const collection = new Collection();
+    function Traverse(ref: any) {
+        if (collection.has(ref)) {
+            return collection.encode(ref)
+        }
+        if (Array.isArray(ref)) {
+            collection.redirect(ref, ref.map(v => Traverse(v)));
+        } else if (typeof ref === 'object') {
+            const o = {};
+            for (const k in ref) {
+                o[k] = Traverse(ref[k])
+            }
+            collection.redirect(ref, o);
+        } else if (typeof ref === 'function') {
+            return collection.encode(ref.toString());
+        }
+        return collection.encode(ref);
+    }
+    Traverse(obj);
+    return collection.items as any;
+}
+
+export function Unflatten(items: FlatObject) {
+    const visited = new Set();
+    function Traverse(id: number) {
+        if (visited.has(id)) {
+            return items[id];
+        }
+        visited.add(id);
+        if (Array.isArray(items[id])) {
+            return (items[id] as any[]).map(v => Traverse(id));
+        } else if (typeof items[id] === 'object') {
+            for (const k in items[id] as { [key: string]: any }) {
+                items[id][k] = Traverse(id[k])
+            }
+        }
+        return items[id];
+    }
+    return Traverse(0);
+}
+
+type FlatObject = (boolean | number | string | (number[]) | { [key: string]: number })[];
 
 type GetCallbackOrValue<T> = T extends (...args: any) => any ? ReturnType<T> : T;

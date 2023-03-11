@@ -12,3 +12,4 @@ test/grammars/whitespace.js
 npm-debug.log
 sandbox/
 .nyc_output
+coverage
