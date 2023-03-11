@@ -1,6 +1,109 @@
 # Grammar Well
 A cross-platform grammar compiler and interpreter. That aims to facilitate a simple way to create and evaluate custom grammars on the front-end and back-end. Formerly a TypeScript port of [Nearley](https://github.com/kach/nearley).
 
+# Quick Start
+### Install
+`npm i grammar-well`
+
+### Example
+
+```Javascript
+import { Compile, Parse } from 'grammar-well';
+
+async function GrammarWellRunner(source, input) {
+    function Evalr(source) {
+        const module = { exports: null };
+        eval(source);
+        return module.exports;
+    }
+    const compiled = await Compile(source, { exportName: 'grammar' });
+    return Parse(Evalr(compiled)(), input, { algorithm: 'earley' });
+}
+
+
+const source = `lexer: {{
+    start: "json"
+
+    json ->
+        - when: /\s+/ tag: "space"
+        - when: /-?(?:[0-9]|[1-9][0-9]+)(?:\.[0-9]+)?(?:[eE][-+]?[0-9]+)?\b/ tag: "number"
+        - when: /"(?:\\["bfnrt\/\\]|\\u[a-fA-F0-9]{4}|[^"\\])*"/ tag: "string"
+        - when: "{" tag: "{"
+        - when: "}" tag: "}"
+        - when: "[" tag: "["
+        - when: "]" tag: "]"
+        - when: "," tag: ","
+        - when: ":" tag: ":"
+        - when: "true" tag: "true"
+        - when: "false" tag: "false"
+        - when: "null" tag: "null"
+}}
+
+grammar: {{
+    json -> _ (object | array) _ : {{ $1[0] }}
+
+    object -> "{" _ "}" : {{ {} }}
+        | "{" _ pair (_ "," _ pair)* _ "}" : \${ extractObject }
+
+    array -> "[" _ "]" : {{ [] }}
+        | "[" _ value (_ "," _ value)* _ "]" : \${ extractArray }
+
+    value : {{ $0 }} ->
+        object
+        | array
+        | number
+        | string
+        | "true" : {{ true }}
+        | "false" : {{ false }}
+        | "null" : {{ null }}
+
+    number -> $number : {{ parseFloat($0.value) }}
+
+    string -> $string : {{ JSON.parse($0.value) }}
+
+    pair -> key:k _ ":" _ value:v : {{ [$k, $v] }}
+
+    key -> string : {{ $0 }}
+
+    _ -> $space? : {{ null }}
+}}
+
+head: \${
+
+function extractPair(kv, output) {
+    if(kv[0]) { output[kv[0]] = kv[1]; }
+}
+
+function extractObject({data}) {
+    let output = {};
+
+    extractPair(data[2], output);
+
+    for (let i in data[3]) {
+        extractPair(data[3][i][3], output);
+    }
+
+    return output;
+}
+
+function extractArray({data}) {
+    let output = [data[2]];
+
+    for (let i in data[3]) {
+        output.push(data[3][i][3]);
+    }
+
+    return output;
+}
+}
+`
+
+const input = `{"a":"string","b":true,"c":2}`
+
+
+console.log(await GrammarWellRunner(source, input))
+```
+
 # Warning
 A lot has changed and documentation needs to be written. For now here's the Grammar Well grammar file that parses Garmmar Well's syntax.
 
