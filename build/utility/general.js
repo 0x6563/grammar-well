@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Matrix = exports.SymbolCollection = exports.Collection = void 0;
+exports.Unflatten = exports.Flatten = exports.Matrix = exports.SymbolCollection = exports.Collection = void 0;
 class Collection {
     categorized = {};
     uncategorized = new Map();
@@ -18,6 +18,15 @@ class Collection {
     }
     decode(id) {
         return this.items[typeof id == 'string' ? parseInt(id) : id];
+    }
+    has(ref) {
+        const c = this.resolve(ref);
+        if (c)
+            return (c.key in this.categorized[c.category]);
+        return this.uncategorized.has(ref);
+    }
+    redirect(source, target) {
+        this.items[this.encode(source)] = target;
     }
     resolve(_) { }
     addCategorized(category, key, ref) {
@@ -57,7 +66,7 @@ class SymbolCollection extends Collection {
         else if ('token' in symbol) {
             return { category: 'token', key: symbol.token };
         }
-        else if ('test' in symbol) {
+        else if (symbol instanceof RegExp) {
             return { category: 'regex', key: symbol.toString() };
         }
         else if (typeof symbol == 'function') {
@@ -109,4 +118,49 @@ class Matrix {
     }
 }
 exports.Matrix = Matrix;
+function Flatten(obj) {
+    const collection = new Collection();
+    function Traverse(ref) {
+        if (collection.has(ref)) {
+            return collection.encode(ref);
+        }
+        if (Array.isArray(ref)) {
+            collection.redirect(ref, ref.map(v => Traverse(v)));
+        }
+        else if (typeof ref === 'object') {
+            const o = {};
+            for (const k in ref) {
+                o[k] = Traverse(ref[k]);
+            }
+            collection.redirect(ref, o);
+        }
+        else if (typeof ref === 'function') {
+            return collection.encode(ref.toString());
+        }
+        return collection.encode(ref);
+    }
+    Traverse(obj);
+    return collection.items;
+}
+exports.Flatten = Flatten;
+function Unflatten(items) {
+    const visited = new Set();
+    function Traverse(id) {
+        if (visited.has(id)) {
+            return items[id];
+        }
+        visited.add(id);
+        if (Array.isArray(items[id])) {
+            return items[id].map(v => Traverse(id));
+        }
+        else if (typeof items[id] === 'object') {
+            for (const k in items[id]) {
+                items[id][k] = Traverse(id[k]);
+            }
+        }
+        return items[id];
+    }
+    return Traverse(0);
+}
+exports.Unflatten = Unflatten;
 //# sourceMappingURL=general.js.map

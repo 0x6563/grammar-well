@@ -2,10 +2,12 @@ import { Dictionary, GrammarRuleSymbol } from "../typings";
 export declare class Collection<T> {
     categorized: Dictionary<Dictionary<number>>;
     private uncategorized;
-    private items;
+    items: T[];
     constructor(ref?: T[]);
     encode(ref: T): number;
     decode(id: number | string): T;
+    has(ref: T): boolean;
+    redirect(source: T, target: T): void;
     resolve(_: T): {
         category: keyof Collection<T>['categorized'];
         key: string;
@@ -42,5 +44,12 @@ export declare class Matrix<T> {
     resize(x: number, y: number): void;
     static Array<T>(length: any, initial?: T | ((...args: any) => T)): GetCallbackOrValue<T>[];
 }
+export declare function Flatten(obj: any[] | {
+    [key: string]: any;
+}): FlatObject;
+export declare function Unflatten(items: FlatObject): any;
+type FlatObject = (boolean | number | string | (number[]) | {
+    [key: string]: number;
+})[];
 type GetCallbackOrValue<T> = T extends (...args: any) => any ? ReturnType<T> : T;
 export {};

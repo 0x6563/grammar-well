@@ -1,17 +1,13 @@
 import { Dictionary, GrammarRule, GrammarRuleSymbol, LanguageDefinition } from "../typings";
 import { Collection, SymbolCollection } from "./general";
 export declare class CanonicalCollection {
-    grammar: LanguageGrammar & {
-        symbols?: SymbolCollection;
-    };
+    grammar: LanguageGrammar;
     rules: Collection<GrammarRule>;
     states: {
         [key: string]: State;
     };
     symbols: SymbolCollection;
-    constructor(grammar: LanguageGrammar & {
-        symbols?: SymbolCollection;
-    });
+    constructor(grammar: LanguageGrammar);
     addState(seed: StateItem[]): State;
     encodeRule(rule: GrammarRule, dot: number): string;
     encodeStateItems(seed: StateItem[]): string;

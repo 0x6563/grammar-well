@@ -7,10 +7,9 @@ class CanonicalCollection {
     grammar;
     rules = new general_1.Collection();
     states = Object.create(null);
-    symbols;
+    symbols = new general_1.SymbolCollection();
     constructor(grammar) {
         this.grammar = grammar;
-        this.symbols = grammar.symbols || new general_1.SymbolCollection();
         const augmented = { name: Symbol(), symbols: [grammar.start] };
         grammar.rules[augmented.name] = [augmented];
         this.addState([{ rule: augmented, dot: 0 }]);

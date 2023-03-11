@@ -10,9 +10,9 @@ export interface CompileOptions {
     resolver?: ImportResolverConstructor;
     resolverInstance?: ImportResolver;
     exportName?: string;
-    format?: OutputFormat;
+    template?: TemplateFormat;
 }
-export type OutputFormat = '_default' | 'object' | 'json' | 'js' | 'javascript' | 'module' | 'esmodule' | 'ts' | 'typescript';
+export type TemplateFormat = '_default' | 'object' | 'json' | 'js' | 'javascript' | 'module' | 'esmodule' | 'esm' | 'ts' | 'typescript';
 export interface GrammarBuilderContext {
     alreadyCompiled: Set<string>;
     resolver: ImportResolver;

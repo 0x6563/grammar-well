@@ -16,7 +16,7 @@ const BuiltInRegistry = {
     string,
     whitespace,
 };
-const OutputFormats = {
+const TemplateFormats = {
     _default: javascript_1.JavascriptOutput,
     object: (grammar, exportName) => ({ grammar, exportName }),
     json: json_1.JSONFormatter,
@@ -24,13 +24,14 @@ const OutputFormats = {
     javascript: javascript_1.JavascriptOutput,
     module: javascript_1.ESMOutput,
     esmodule: javascript_1.ESMOutput,
+    esm: javascript_1.ESMOutput,
     ts: typescript_1.TypescriptFormat,
     typescript: typescript_1.TypescriptFormat
 };
 async function Compile(rules, config = {}) {
     const builder = new GrammarBuilder(config);
     await builder.import(rules);
-    return builder.export(config.format);
+    return builder.export(config.template);
 }
 exports.Compile = Compile;
 class GrammarBuilder {
@@ -50,8 +51,8 @@ class GrammarBuilder {
     export(format, name = 'GWLanguage') {
         const grammar = this.generator.state;
         const output = format || grammar.config.preprocessor || '_default';
-        if (OutputFormats[output]) {
-            return OutputFormats[output](this.generator, name);
+        if (TemplateFormats[output]) {
+            return TemplateFormats[output](this.generator, name);
         }
         throw new Error("No such preprocessor: " + output);
     }
