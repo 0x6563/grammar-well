@@ -173,6 +173,7 @@ class Generator {
                 type: JSON.stringify(rule.type),
                 tag: JSON.stringify(rule.tag),
                 pop: JSON.stringify(rule.pop),
+                highlight: JSON.stringify(rule.highlight),
                 set: JSON.stringify(rule.set),
                 inset: JSON.stringify(rule.inset),
                 goto: JSON.stringify(rule.goto),

@@ -56,8 +56,9 @@ interface LexerStateMatchRule {
     when: string | RegExp
     type?: string;
     pop?: number | 'all';
+    highlight?: string;
     inset?: number;
-    goto?: string;
+    goto?: string; 
     set?: string;
 }
 

@@ -60,6 +60,7 @@ function GWLanguage() {
                     { name: "token_definition", symbols: ["K_POP"], postprocess: ({ data }) => { return { pop: 1 }; } },
                     { name: "token_definition", symbols: ["K_POP", "_", "L_COLON", "_", "T_INTEGER"], postprocess: ({ data }) => { return { pop: parseInt(data[4]) }; } },
                     { name: "token_definition", symbols: ["K_POP", "_", "L_COLON", "_", "K_ALL"], postprocess: ({ data }) => { return { pop: "all" }; } },
+                    { name: "token_definition", symbols: ["K_HIGHLIGHT", "_", "L_COLON", "_", "T_STRING"], postprocess: ({ data }) => { return { highlight: data[4] }; } },
                     { name: "token_definition", symbols: ["K_INSET"], postprocess: ({ data }) => { return { inset: 1 }; } },
                     { name: "token_definition", symbols: ["K_INSET", "_", "L_COLON", "_", "T_INTEGER"], postprocess: ({ data }) => { return { inset: parseInt(data[4]) }; } },
                     { name: "token_definition", symbols: ["K_SET", "_", "L_COLON", "_", "T_WORD"], postprocess: ({ data }) => { return { set: data[4] }; } },
@@ -212,6 +213,9 @@ function GWLanguage() {
                 K_POP: [
                     { name: "K_POP", symbols: [{ literal: "pop" }] }
                 ],
+                K_HIGHLIGHT: [
+                    { name: "K_HIGHLIGHT", symbols: [{ literal: "highlight" }] }
+                ],
                 K_INSET: [
                     { name: "K_INSET", symbols: [{ literal: "inset" }] }
                 ],
@@ -284,9 +288,9 @@ function GWLanguage() {
                     name: "start",
                     rules: [
                         { import: ["string", "js", "ws", "comment", "l_scolon", "l_star"] },
-                        { when: /lexer(?![a-zA-Z\d_])/, tag: ["T_WORD"], goto: "lexer" },
-                        { when: /grammar(?![a-zA-Z\d_])/, tag: ["T_WORD"], goto: "grammar" },
-                        { when: /config(?![a-zA-Z\d_])/, tag: ["T_WORD"], goto: "config" },
+                        { when: /lexer(?![a-zA-Z\d_])/, tag: ["T_WORD"], highlight: "type", goto: "lexer" },
+                        { when: /grammar(?![a-zA-Z\d_])/, tag: ["T_WORD"], highlight: "type", goto: "grammar" },
+                        { when: /config(?![a-zA-Z\d_])/, tag: ["T_WORD"], highlight: "type", goto: "config" },
                         { import: ["kv"] }
                     ]
                 },
@@ -394,31 +398,31 @@ function GWLanguage() {
                 string: {
                     name: "string",
                     rules: [
-                        { when: /"(?:[^"\\\r\n]|\\.)*"/, tag: ["T_STRING"] }
+                        { when: /"(?:[^"\\\r\n]|\\.)*"/, tag: ["T_STRING"], highlight: "string" }
                     ]
                 },
                 string2: {
                     name: "string2",
                     rules: [
-                        { when: /'(?:[^'\\\r\n]|\\.)*'/, tag: ["T_STRING"] }
+                        { when: /'(?:[^'\\\r\n]|\\.)*'/, tag: ["T_STRING"], highlight: "string" }
                     ]
                 },
                 string3: {
                     name: "string3",
                     rules: [
-                        { when: /`(?:[^`\\]|\\.)*`/, tag: ["T_STRING"] }
+                        { when: /`(?:[^`\\]|\\.)*`/, tag: ["T_STRING"], highlight: "string" }
                     ]
                 },
                 regex: {
                     name: "regex",
                     rules: [
-                        { when: /\/(?:[^\/\\\r\n]|\\.)+\//, tag: ["T_REGEX"] }
+                        { when: /\/(?:[^\/\\\r\n]|\\.)+\//, tag: ["T_REGEX"], highlight: "regexp" }
                     ]
                 },
                 integer: {
                     name: "integer",
                     rules: [
-                        { when: /\d+/, tag: ["T_INTEGER"] }
+                        { when: /\d+/, tag: ["T_INTEGER"], highlight: "number" }
                     ]
                 },
                 word: {
@@ -436,7 +440,7 @@ function GWLanguage() {
                 l_colon: {
                     name: "l_colon",
                     rules: [
-                        { when: ":", tag: ["L_COLON"] }
+                        { when: ":", tag: ["L_COLON"], highlight: "keyword" }
                     ]
                 },
                 l_scolon: {
@@ -472,7 +476,7 @@ function GWLanguage() {
                 l_pipe: {
                     name: "l_pipe",
                     rules: [
-                        { when: "|", tag: ["L_PIPE"] }
+                        { when: "|", tag: ["L_PIPE"], highlight: "keyword" }
                     ]
                 },
                 l_parenl: {
@@ -502,7 +506,7 @@ function GWLanguage() {
                 l_arrow: {
                     name: "l_arrow",
                     rules: [
-                        { when: "->", tag: ["L_ARROW"] }
+                        { when: "->", tag: ["L_ARROW"], highlight: "keyword" }
                     ]
                 },
                 l_dsign: {
@@ -520,13 +524,13 @@ function GWLanguage() {
                 comment: {
                     name: "comment",
                     rules: [
-                        { when: /\/\/[^\n]*/, tag: ["T_COMMENT"] }
+                        { when: /\/\/[^\n]*/, tag: ["T_COMMENT"], highlight: "comment" }
                     ]
                 },
                 commentmulti: {
                     name: "commentmulti",
                     rules: [
-                        { when: /\/\*.*\*\//, tag: ["T_COMMENT"] }
+                        { when: /\/\*.*\*\//, tag: ["T_COMMENT"], highlight: "comment" }
                     ]
                 }
             }

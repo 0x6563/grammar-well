@@ -160,6 +160,14 @@ declare function GWLanguage(): {
                 postprocess: ({ data }: {
                     data: any;
                 }) => {
+                    highlight: any;
+                };
+            } | {
+                name: string;
+                symbols: string[];
+                postprocess: ({ data }: {
+                    data: any;
+                }) => {
                     inset: number;
                 };
             } | {
@@ -460,6 +468,12 @@ declare function GWLanguage(): {
                     literal: string;
                 }[];
             }[];
+            K_HIGHLIGHT: {
+                name: string;
+                symbols: {
+                    literal: string;
+                }[];
+            }[];
             K_INSET: {
                 name: string;
                 symbols: {
@@ -638,10 +652,12 @@ declare function GWLanguage(): {
                     import: string[];
                     when?: undefined;
                     tag?: undefined;
+                    highlight?: undefined;
                     goto?: undefined;
                 } | {
                     when: RegExp;
                     tag: string[];
+                    highlight: string;
                     goto: string;
                     import?: undefined;
                 })[];
@@ -836,6 +852,7 @@ declare function GWLanguage(): {
                 rules: {
                     when: RegExp;
                     tag: string[];
+                    highlight: string;
                 }[];
             };
             string2: {
@@ -843,6 +860,7 @@ declare function GWLanguage(): {
                 rules: {
                     when: RegExp;
                     tag: string[];
+                    highlight: string;
                 }[];
             };
             string3: {
@@ -850,6 +868,7 @@ declare function GWLanguage(): {
                 rules: {
                     when: RegExp;
                     tag: string[];
+                    highlight: string;
                 }[];
             };
             regex: {
@@ -857,6 +876,7 @@ declare function GWLanguage(): {
                 rules: {
                     when: RegExp;
                     tag: string[];
+                    highlight: string;
                 }[];
             };
             integer: {
@@ -864,6 +884,7 @@ declare function GWLanguage(): {
                 rules: {
                     when: RegExp;
                     tag: string[];
+                    highlight: string;
                 }[];
             };
             word: {
@@ -885,6 +906,7 @@ declare function GWLanguage(): {
                 rules: {
                     when: string;
                     tag: string[];
+                    highlight: string;
                 }[];
             };
             l_scolon: {
@@ -927,6 +949,7 @@ declare function GWLanguage(): {
                 rules: {
                     when: string;
                     tag: string[];
+                    highlight: string;
                 }[];
             };
             l_parenl: {
@@ -962,6 +985,7 @@ declare function GWLanguage(): {
                 rules: {
                     when: string;
                     tag: string[];
+                    highlight: string;
                 }[];
             };
             l_dsign: {
@@ -983,6 +1007,7 @@ declare function GWLanguage(): {
                 rules: {
                     when: RegExp;
                     tag: string[];
+                    highlight: string;
                 }[];
             };
             commentmulti: {
@@ -990,6 +1015,7 @@ declare function GWLanguage(): {
                 rules: {
                     when: RegExp;
                     tag: string[];
+                    highlight: string;
                 }[];
             };
         };
