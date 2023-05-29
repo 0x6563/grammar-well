@@ -273,7 +273,7 @@ grammar: {{
     T_GRAMMAR_TEMPLATE -> $L_TEMPLATEL _ $T_JSBODY* _ $L_TEMPLATER : {{ { template: $2.map(v=>v.value).join('').trim() } }}
     T_STRING -> $T_STRING : {{ JSON.parse($0.value) }}
     T_WORD -> $T_WORD : {{ $0.value }}
-    T_REGEX -> $T_REGEX /[gmiuy]/* : {{ { regex: $0.value.replace(/\\\\\//g,'/').slice(1,-1), flags: $1.join('') } }}
+    T_REGEX -> $T_REGEX /[gmiuy]/* : {{ { regex: $0.value.replace(/\\\\\//g,'/').slice(1,-1), flags: $1.map(v=>v.value).join('').trim() } }}
     T_COMMENT -> $T_COMMENT
     T_INTEGER -> $T_INTEGER : {{ $0.value }}
     T_WS -> $T_WS : {{ null }}
