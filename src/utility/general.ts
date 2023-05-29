@@ -3,7 +3,7 @@ import { Dictionary, GrammarRuleSymbol } from "../typings";
 
 export class Collection<T> {
     categorized: Dictionary<Dictionary<number>> = {};
-    private uncategorized = new Map<T, number>();
+    uncategorized = new Map<T, number>();
     items: T[] = [];
 
     constructor(ref: T[] = []) {
@@ -128,26 +128,33 @@ export class Matrix<T> {
     }
 }
 
+
 export function Flatten(obj: any[] | { [key: string]: any }): FlatObject {
     const collection = new Collection();
-    function Traverse(ref: any) {
-        if (collection.has(ref)) {
-            return collection.encode(ref)
+    const $null = Symbol();
+    function Traverse(src: any) {
+        if (src == null) {
+            src = $null;
         }
-        if (Array.isArray(ref)) {
-            collection.redirect(ref, ref.map(v => Traverse(v)));
-        } else if (typeof ref === 'object') {
+        if (collection.has(src)) {
+            return collection.encode(src)
+        }
+        collection.encode(src);
+        if (Array.isArray(src)) {
+            collection.redirect(src, src.map(v => Traverse(v)));
+        } else if (typeof src === 'object') {
             const o = {};
-            for (const k in ref) {
-                o[k] = Traverse(ref[k])
+            for (const k in src) {
+                o[k] = Traverse(src[k])
             }
-            collection.redirect(ref, o);
-        } else if (typeof ref === 'function') {
-            return collection.encode(ref.toString());
+            collection.redirect(src, o);
+        } else if (typeof src === 'function') {
+            return collection.redirect(src, src.toString());
         }
-        return collection.encode(ref);
+        return collection.encode(src);
     }
     Traverse(obj);
+    collection.redirect($null, null);
     return collection.items as any;
 }
 
@@ -158,14 +165,19 @@ export function Unflatten(items: FlatObject) {
             return items[id];
         }
         visited.add(id);
-        if (Array.isArray(items[id])) {
-            return (items[id] as any[]).map(v => Traverse(id));
-        } else if (typeof items[id] === 'object') {
-            for (const k in items[id] as { [key: string]: any }) {
-                items[id][k] = Traverse(id[k])
+        const obj: any = items[id];
+        if (Array.isArray(obj)) {
+            for (let i = 0; i < obj.length; i++) {
+                const ii = obj[i];
+                obj[i] = Traverse(ii);
+
+            }
+        } else if (typeof obj === 'object') {
+            for (const k in obj as { [key: string]: any }) {
+                obj[k] = Traverse(obj[k])
             }
         }
-        return items[id];
+        return obj;
     }
     return Traverse(0);
 }

@@ -1,7 +1,7 @@
 import { Dictionary, GrammarRuleSymbol } from "../typings";
 export declare class Collection<T> {
     categorized: Dictionary<Dictionary<number>>;
-    private uncategorized;
+    uncategorized: Map<T, number>;
     items: T[];
     constructor(ref?: T[]);
     encode(ref: T): number;

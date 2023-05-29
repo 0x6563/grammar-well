@@ -120,26 +120,32 @@ class Matrix {
 exports.Matrix = Matrix;
 function Flatten(obj) {
     const collection = new Collection();
-    function Traverse(ref) {
-        if (collection.has(ref)) {
-            return collection.encode(ref);
+    const $null = Symbol();
+    function Traverse(src) {
+        if (src == null) {
+            src = $null;
         }
-        if (Array.isArray(ref)) {
-            collection.redirect(ref, ref.map(v => Traverse(v)));
+        if (collection.has(src)) {
+            return collection.encode(src);
         }
-        else if (typeof ref === 'object') {
+        collection.encode(src);
+        if (Array.isArray(src)) {
+            collection.redirect(src, src.map(v => Traverse(v)));
+        }
+        else if (typeof src === 'object') {
             const o = {};
-            for (const k in ref) {
-                o[k] = Traverse(ref[k]);
+            for (const k in src) {
+                o[k] = Traverse(src[k]);
             }
-            collection.redirect(ref, o);
+            collection.redirect(src, o);
         }
-        else if (typeof ref === 'function') {
-            return collection.encode(ref.toString());
+        else if (typeof src === 'function') {
+            return collection.redirect(src, src.toString());
         }
-        return collection.encode(ref);
+        return collection.encode(src);
     }
     Traverse(obj);
+    collection.redirect($null, null);
     return collection.items;
 }
 exports.Flatten = Flatten;
@@ -150,15 +156,19 @@ function Unflatten(items) {
             return items[id];
         }
         visited.add(id);
-        if (Array.isArray(items[id])) {
-            return items[id].map(v => Traverse(id));
-        }
-        else if (typeof items[id] === 'object') {
-            for (const k in items[id]) {
-                items[id][k] = Traverse(id[k]);
+        const obj = items[id];
+        if (Array.isArray(obj)) {
+            for (let i = 0; i < obj.length; i++) {
+                const ii = obj[i];
+                obj[i] = Traverse(ii);
             }
         }
-        return items[id];
+        else if (typeof obj === 'object') {
+            for (const k in obj) {
+                obj[k] = Traverse(obj[k]);
+            }
+        }
+        return obj;
     }
     return Traverse(0);
 }
