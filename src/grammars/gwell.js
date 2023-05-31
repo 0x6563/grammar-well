@@ -141,16 +141,28 @@ function GWLanguage(){
                     { name: "word_list", symbols: [ "T_WORD" ], postprocess: ({data}) => { return [data[0]]; } },
                     { name: "word_list", symbols: [ "T_WORD", "_", "L_COMMA", "_", "word_list" ], postprocess: ({data}) => { return [data[0]].concat(data[4]); } }
                 ],
-                _$RPT01x1: [
-                    { name: "_$RPT01x1", symbols: [ "T_WS" ], postprocess: ({data}) => data[0] },
-                    { name: "_$RPT01x1", symbols: [ ], postprocess: () => null }
+                _$RPT0Nx1: [
+                    { name: "_$RPT0Nx1", symbols: [ ] },
+                    { name: "_$RPT0Nx1", symbols: [ "_$RPT0Nx1", "_$RPT0Nx1$SUBx1" ], postprocess: ({data}) => data[0].concat([data[1]]) }
+                ],
+                _$RPT0Nx1$SUBx1: [
+                    { name: "_$RPT0Nx1$SUBx1", symbols: [ "T_WS" ] },
+                    { name: "_$RPT0Nx1$SUBx1", symbols: [ "T_COMMENT" ] }
                 ],
                 _: [
-                    { name: "_", symbols: [ "_$RPT01x1" ], postprocess: ({data}) => { return null; } }
+                    { name: "_", symbols: [ "_$RPT0Nx1" ], postprocess: ({data}) => { return null; } }
+                ],
+                __$RPT1Nx1$SUBx1: [
+                    { name: "__$RPT1Nx1$SUBx1", symbols: [ "T_WS" ] },
+                    { name: "__$RPT1Nx1$SUBx1", symbols: [ "T_COMMENT" ] }
                 ],
                 __$RPT1Nx1: [
-                    { name: "__$RPT1Nx1", symbols: [ "T_WS" ] },
-                    { name: "__$RPT1Nx1", symbols: [ "__$RPT1Nx1", "T_WS" ], postprocess: ({data}) => data[0].concat([data[1]]) }
+                    { name: "__$RPT1Nx1", symbols: [ "__$RPT1Nx1$SUBx1" ] },
+                    { name: "__$RPT1Nx1", symbols: [ "__$RPT1Nx1", "__$RPT1Nx1$SUBx2" ], postprocess: ({data}) => data[0].concat([data[1]]) }
+                ],
+                __$RPT1Nx1$SUBx2: [
+                    { name: "__$RPT1Nx1$SUBx2", symbols: [ "T_WS" ] },
+                    { name: "__$RPT1Nx1$SUBx2", symbols: [ "T_COMMENT" ] }
                 ],
                 __: [
                     { name: "__", symbols: [ "__$RPT1Nx1" ], postprocess: ({data}) => { return null; } }

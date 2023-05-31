@@ -316,12 +316,20 @@ declare function GWLanguage(): {
                     data: any;
                 }) => any[];
             }[];
-            _$RPT01x1: {
+            _$RPT0Nx1: ({
+                name: string;
+                symbols: any[];
+                postprocess?: undefined;
+            } | {
                 name: string;
                 symbols: string[];
                 postprocess: ({ data }: {
                     data: any;
                 }) => any;
+            })[];
+            _$RPT0Nx1$SUBx1: {
+                name: string;
+                symbols: string[];
             }[];
             _: {
                 name: string;
@@ -329,6 +337,10 @@ declare function GWLanguage(): {
                 postprocess: ({ data }: {
                     data: any;
                 }) => any;
+            }[];
+            __$RPT1Nx1$SUBx1: {
+                name: string;
+                symbols: string[];
             }[];
             __$RPT1Nx1: ({
                 name: string;
@@ -341,6 +353,10 @@ declare function GWLanguage(): {
                     data: any;
                 }) => any;
             })[];
+            __$RPT1Nx1$SUBx2: {
+                name: string;
+                symbols: string[];
+            }[];
             __: {
                 name: string;
                 symbols: string[];

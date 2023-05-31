@@ -233,9 +233,10 @@ grammar: {{
         | T_WORD _ L_COMMA _ word_list : {{ [$0].concat($4) }}
 
     _ ->
-        T_WS? : {{ null }}
+        ( T_WS | T_COMMENT )* : {{ null }} 
+
     __ ->
-        T_WS+ : {{ null }}
+        ( T_WS | T_COMMENT )+ : {{ null }}
 
     L_COLON -> $L_COLON
     L_SCOLON -> $L_SCOLON
@@ -266,7 +267,7 @@ grammar: {{
     K_LEXER -> "lexer"
     K_GRAMMAR -> "grammar"
     K_IMPORT -> "import"
-    K_BODY -> "body"
+    K_BODY -> "body" 
     K_HEAD -> "head"
 
     T_JS -> $L_JSL $T_JSBODY* $L_JSR : {{ { js: $1.map(v=>v.value).join('') } }}
