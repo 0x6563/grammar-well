@@ -12,8 +12,9 @@ export class Generator {
     state: GeneratorState = {
         grammar: {
             start: '',
+            config: {},
             rules: {},
-            uuids: {}
+            uuids: {},
         },
         lexer: null,
         head: [],
@@ -45,6 +46,8 @@ export class Generator {
         // TODO: Resolve Conflicting Rules and UUIDS
         Object.assign(this.state.grammar.rules, state.grammar.rules);
         this.state.grammar.start = state.grammar.start || this.state.grammar.start;
+        this.state.grammar.config.postprocessorDefault = state.grammar.config.postprocessorDefault || this.state.grammar.config.postprocessorDefault;
+        this.state.grammar.config.postprocessorOverride = state.grammar.config.postprocessorOverride || this.state.grammar.config.postprocessorOverride;
 
         if (state.lexer) {
             if (this.state.lexer) {
@@ -130,6 +133,7 @@ export class Generator {
     }
 
     private serializePostProcess(postprocess: GeneratorGrammarRule['postprocess'], alias: Dictionary<number>) {
+        postprocess = this.state.grammar.config.postprocessorOverride || postprocess || this.state.grammar.config.postprocessorDefault;
         if (!postprocess)
             return null;
         if ('builtin' in postprocess)

@@ -97,6 +97,7 @@ class GrammarBuilder {
     processGrammarDirective(directive) {
         if (directive.grammar.config) {
             this.generator.state.grammar.start = directive.grammar.config.start || this.generator.state.grammar.start;
+            Object.assign(this.generator.state.grammar.config, directive.grammar.config);
         }
         for (const rule of directive.grammar.rules) {
             this.buildRules(rule.name, rule.expressions, rule);

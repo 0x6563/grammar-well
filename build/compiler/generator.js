@@ -11,8 +11,9 @@ class Generator {
     state = {
         grammar: {
             start: '',
+            config: {},
             rules: {},
-            uuids: {}
+            uuids: {},
         },
         lexer: null,
         head: [],
@@ -39,6 +40,8 @@ class Generator {
     merge(state) {
         Object.assign(this.state.grammar.rules, state.grammar.rules);
         this.state.grammar.start = state.grammar.start || this.state.grammar.start;
+        this.state.grammar.config.postprocessorDefault = state.grammar.config.postprocessorDefault || this.state.grammar.config.postprocessorDefault;
+        this.state.grammar.config.postprocessorOverride = state.grammar.config.postprocessorOverride || this.state.grammar.config.postprocessorOverride;
         if (state.lexer) {
             if (this.state.lexer) {
                 Object.assign(this.state.lexer.states, state.lexer.states);
@@ -122,6 +125,7 @@ class Generator {
         }, -1);
     }
     serializePostProcess(postprocess, alias) {
+        postprocess = this.state.grammar.config.postprocessorOverride || postprocess || this.state.grammar.config.postprocessorDefault;
         if (!postprocess)
             return null;
         if ('builtin' in postprocess)

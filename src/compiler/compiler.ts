@@ -102,6 +102,9 @@ export class GrammarBuilder {
     private processGrammarDirective(directive: GrammarDirective) {
         if (directive.grammar.config) {
             this.generator.state.grammar.start = directive.grammar.config.start || this.generator.state.grammar.start;
+            Object.assign(this.generator.state.grammar.config, directive.grammar.config);
+            // this.generator.state.grammar.postprocessDefault =  directive.grammar.config.postprocessDefault || this.generator.state.grammar.postprocessDefault;
+            // this.generator.state.grammar.postprocessOverride =  directive.grammar.config.postprocessOverride || this.generator.state.grammar.postprocessOverride;
         }
 
         for (const rule of directive.grammar.rules) {

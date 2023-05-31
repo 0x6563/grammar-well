@@ -216,6 +216,10 @@ export interface GeneratorState {
     lexer?: LexerConfig;
     grammar: {
         start: string;
+        config: {
+            postprocessorDefault?: GrammarTypeJS | GrammarTypeTemplate;
+            postprocessorOverride?: GrammarTypeJS | GrammarTypeTemplate;
+        }
         rules: Dictionary<GeneratorGrammarRule[]>,
         uuids: { [key: string]: number }
     }
