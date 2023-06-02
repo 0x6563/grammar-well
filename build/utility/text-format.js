@@ -11,12 +11,12 @@ class TextFormatter {
             lines.push('End of input was expected.');
         }
         else {
-            lines.push('Instead, I was expecting to see one of the following:\n');
+            lines.push('Instead one of the following:\n');
             for (const ex of expected) {
                 const nextSymbol = ex.symbols[ex.index];
                 const symbolDisplay = TextFormatter.GrammarRuleSymbol(nextSymbol, false, true);
-                lines.push('A ' + symbolDisplay + ' based on:');
-                lines.push(TextFormatter.GrammarRule(ex, ex.index));
+                lines.push(symbolDisplay + ' based on:');
+                lines.push(`\t` + TextFormatter.GrammarRule(ex, ex.index));
             }
             lines.push("");
             return lines.join("\n");
