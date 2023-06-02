@@ -114,9 +114,9 @@ lexer: {{
 
     start ->
         - import: string, js, ws, comment, l_scolon, l_star
-        - when: /lexer(?![a-zA-Z\d_])/ tag: "T_WORD" goto: lexer
-        - when: /grammar(?![a-zA-Z\d_])/ tag: "T_WORD" goto: grammar
-        - when: /config(?![a-zA-Z\d_])/ tag: "T_WORD" goto: config
+        - when: /lexer(?![a-zA-Z\d_])/ tag: "T_WORD" goto: lexer highlight: "type"
+        - when: /grammar(?![a-zA-Z\d_])/ tag: "T_WORD" goto: grammar highlight: "type"
+        - when: /config(?![a-zA-Z\d_])/ tag: "T_WORD" goto: config highlight: "type"
         - import: kv
     config ->
         - import: ws, l_colon
@@ -168,21 +168,21 @@ lexer: {{
         - when: /\/\/[^\n]*/ tag: "T_JSBODY"
         - when: /\/\*.*\*\// tag: "T_JSBODY"
     string ->
-        - when: /"(?:[^"\\\r\n]|\\.)*"/ tag: "T_STRING"
+        - when: /"(?:[^"\\\r\n]|\\.)*"/ tag: "T_STRING" highlight: "string"
     string2 ->
-        - when: /'(?:[^'\\\r\n]|\\.)*'/ tag: "T_STRING"
+        - when: /'(?:[^'\\\r\n]|\\.)*'/ tag: "T_STRING" highlight: "string"
     string3 ->
-        - when: /`(?:[^`\\]|\\.)*`/ tag: "T_STRING"
+        - when: /`(?:[^`\\]|\\.)*`/ tag: "T_STRING" highlight: "string"
     regex ->
-        - when: /\/(?:[^\/\\\r\n]|\\.)+\// tag: "T_REGEX"
+        - when: /\/(?:[^\/\\\r\n]|\\.)+\// tag: "T_REGEX" highlight: "regexp"
     integer ->
-        - when: /\d+/ tag: "T_INTEGER"
+        - when: /\d+/ tag: "T_INTEGER" highlight: "number"
     word ->
         - when: /[a-zA-Z_][a-zA-Z_\d]*/ tag: "T_WORD"
     ws ->
         - when: /\s+/ tag: "T_WS"
     l_colon ->
-        - when: ":" tag: "L_COLON"
+        - when: ":" tag: "L_COLON" highlight: "keyword"
     l_scolon ->
         - when: ";" tag: "L_SCOLON"
     l_qmark ->
@@ -194,7 +194,7 @@ lexer: {{
     l_comma ->
         - when: "," tag: "L_COMMA"
     l_pipe ->
-        - when: "|" tag: "L_PIPE"
+        - when: "|" tag: "L_PIPE" highlight: "keyword"
     l_parenl ->
         - when: "(" tag: "L_PARENL"
     l_parenr ->
@@ -204,15 +204,15 @@ lexer: {{
     l_templater ->
         - when: "}}" tag: "L_TEMPLATER"
     l_arrow ->
-        - when: "->" tag: "L_ARROW"
+        - when: "->" tag: "L_ARROW" highlight: "keyword"
     l_dsign ->
         - when: "$" tag: "L_DSIGN"
     l_dash ->
         - when: "-" tag: "L_DASH"
     comment ->
-        - when: /\/\/[^\n]*/ tag: "T_COMMENT"
+        - when: /\/\/[^\n]*/ tag: "T_COMMENT" highlight: "comment"
     commentmulti ->
-        - when: /\/\*.*\*\// tag: "T_COMMENT"
+        - when: /\/\*.*\*\// tag: "T_COMMENT" highlight: "comment"
 
 }}
 
@@ -273,6 +273,7 @@ grammar: {{
         | K_POP : {{ { pop: 1 } }}
         | K_POP _ L_COLON _ T_INTEGER : {{ { pop: parseInt($4) } }}
         | K_POP _ L_COLON _ K_ALL : {{ { pop: "all" } }}
+        | K_HIGHLIGHT _ L_COLON _ T_STRING : {{ { highlight: $4 } }}
         | K_INSET : {{ { inset: 1 } }}
         | K_INSET _ L_COLON _ T_INTEGER : {{ { inset: parseInt($4) } }}
         | K_SET _ L_COLON _ T_WORD : {{ { set: $4 } }}
@@ -343,9 +344,10 @@ grammar: {{
         | T_WORD _ L_COMMA _ word_list : {{ [$0].concat($4) }}
 
     _ ->
-        T_WS? : {{ null }}
+        ( T_WS | T_COMMENT )* : {{ null }} 
+
     __ ->
-        T_WS+ : {{ null }}
+        ( T_WS | T_COMMENT )+ : {{ null }}
 
     L_COLON -> $L_COLON
     L_SCOLON -> $L_SCOLON
@@ -368,6 +370,7 @@ grammar: {{
     K_TYPE -> "type"
     K_WHEN -> "when"
     K_POP -> "pop"
+    K_HIGHLIGHT -> "highlight"
     K_INSET -> "inset"
     K_SET -> "set"
     K_GOTO -> "goto"
@@ -375,14 +378,14 @@ grammar: {{
     K_LEXER -> "lexer"
     K_GRAMMAR -> "grammar"
     K_IMPORT -> "import"
-    K_BODY -> "body"
+    K_BODY -> "body" 
     K_HEAD -> "head"
 
     T_JS -> $L_JSL $T_JSBODY* $L_JSR : {{ { js: $1.map(v=>v.value).join('') } }}
     T_GRAMMAR_TEMPLATE -> $L_TEMPLATEL _ $T_JSBODY* _ $L_TEMPLATER : {{ { template: $2.map(v=>v.value).join('').trim() } }}
     T_STRING -> $T_STRING : {{ JSON.parse($0.value) }}
     T_WORD -> $T_WORD : {{ $0.value }}
-    T_REGEX -> $T_REGEX /[gmiuy]/* : {{ { regex: $0.value.replace(/\\\\\//g,'/').slice(1,-1), flags: $1.join('') } }}
+    T_REGEX -> $T_REGEX /[gmiuy]/* : {{ { regex: $0.value.replace(/\\\\\//g,'/').slice(1,-1), flags: $1.map(v=>v.value).join('').trim() } }}
     T_COMMENT -> $T_COMMENT
     T_INTEGER -> $T_INTEGER : {{ $0.value }}
     T_WS -> $T_WS : {{ null }}
