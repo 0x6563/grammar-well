@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Unflatten = exports.Flatten = exports.Matrix = exports.SymbolCollection = exports.Collection = void 0;
+exports.Unflatten = exports.Flatten = exports.Matrix = exports.GeneratorSymbolCollection = exports.Collection = void 0;
 class Collection {
     categorized = {};
     uncategorized = new Map();
@@ -45,14 +45,13 @@ class Collection {
     }
 }
 exports.Collection = Collection;
-class SymbolCollection extends Collection {
+class GeneratorSymbolCollection extends Collection {
     categorized = {
         nonTerminal: {},
         literalI: {},
         literalS: {},
         token: {},
-        regex: {},
-        function: {},
+        regex: {}
     };
     resolve(symbol) {
         if (typeof symbol == 'string') {
@@ -66,15 +65,12 @@ class SymbolCollection extends Collection {
         else if ('token' in symbol) {
             return { category: 'token', key: symbol.token };
         }
-        else if (symbol instanceof RegExp) {
-            return { category: 'regex', key: symbol.toString() };
-        }
-        else if (typeof symbol == 'function') {
-            return { category: 'function', key: symbol.toString() };
+        else if ('regex' in symbol) {
+            return { category: 'regex', key: symbol.flags + ':' + symbol.regex };
         }
     }
 }
-exports.SymbolCollection = SymbolCollection;
+exports.GeneratorSymbolCollection = GeneratorSymbolCollection;
 class Matrix {
     initial;
     $x = 0;

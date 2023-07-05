@@ -11,7 +11,7 @@ import { JSONFormatter } from "./outputs/json";
 import * as number from '../grammars/number.json';
 import * as string from '../grammars/string.json';
 import * as whitespace from '../grammars/whitespace.json';
-import { Generator } from "./generator";
+import { Generator } from "./generator/generator";
 
 const BuiltInRegistry = {
     number,
@@ -34,11 +34,12 @@ const TemplateFormats = {
 export async function Compile(rules: string | LanguageDirective | (LanguageDirective[]), config: CompileOptions = {}) {
     const builder = new GrammarBuilder(config);
     await builder.import(rules as any);
+    Object.assign(builder.generator.state.config, config.overrides);
     return builder.export(config.template);
 }
 
 export class GrammarBuilder {
-    private parser = new Parser(Language());
+    private parser = new Parser(Language() as any);
     private context: GrammarBuilderContext;
 
     generator = new Generator();

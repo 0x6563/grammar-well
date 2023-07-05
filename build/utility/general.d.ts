@@ -1,4 +1,4 @@
-import { Dictionary, GrammarRuleSymbol } from "../typings";
+import { Dictionary, GeneratorGrammarSymbol } from "../typings";
 export declare class Collection<T> {
     categorized: Dictionary<Dictionary<number>>;
     uncategorized: Map<T, number>;
@@ -15,16 +15,15 @@ export declare class Collection<T> {
     private addCategorized;
     private addUncategorized;
 }
-export declare class SymbolCollection extends Collection<GrammarRuleSymbol> {
+export declare class GeneratorSymbolCollection extends Collection<GeneratorGrammarSymbol> {
     categorized: {
         nonTerminal: {};
         literalI: {};
         literalS: {};
         token: {};
         regex: {};
-        function: {};
     };
-    resolve(symbol: GrammarRuleSymbol): {
+    resolve(symbol: GeneratorGrammarSymbol): {
         category: string;
         key: string;
     };

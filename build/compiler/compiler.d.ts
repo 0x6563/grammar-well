@@ -2,7 +2,7 @@ import { CompileOptions, GrammarBuilderContext, TemplateFormat, LanguageDirectiv
 import { ESMOutput, JavascriptOutput } from "./outputs/javascript";
 import { TypescriptFormat } from "./outputs/typescript";
 import { JSONFormatter } from "./outputs/json";
-import { Generator } from "./generator";
+import { Generator } from "./generator/generator";
 declare const TemplateFormats: {
     _default: typeof JavascriptOutput;
     object: (grammar: any, exportName: any) => {

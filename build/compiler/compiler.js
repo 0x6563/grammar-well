@@ -10,7 +10,7 @@ const json_1 = require("./outputs/json");
 const number = require("../grammars/number.json");
 const string = require("../grammars/string.json");
 const whitespace = require("../grammars/whitespace.json");
-const generator_1 = require("./generator");
+const generator_1 = require("./generator/generator");
 const BuiltInRegistry = {
     number,
     string,
@@ -31,6 +31,7 @@ const TemplateFormats = {
 async function Compile(rules, config = {}) {
     const builder = new GrammarBuilder(config);
     await builder.import(rules);
+    Object.assign(builder.generator.state.config, config.overrides);
     return builder.export(config.template);
 }
 exports.Compile = Compile;

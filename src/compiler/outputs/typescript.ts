@@ -1,4 +1,4 @@
-import { Generator } from "../generator";
+import { Generator } from "../generator/generator";
 
 export function TypescriptFormat(generator: Generator, exportName: string) {
     return `// Generated automatically by Grammar-Well, version ${generator.state.version} 

@@ -428,7 +428,7 @@ grammar: {{
         | section T_WS section_list : {{ [$0].concat($2) }}
 
     section ->
-        K_CONFIG _ L_COLON _ L_TEMPLATEL _ kv_list _ L_TEMPLATER : {{ { config: Object.assign(...$4) } }}
+        K_CONFIG _ L_COLON _ L_TEMPLATEL _ kv_list:list _ L_TEMPLATER : {{ { config: Object.assign(...$list) } }}
         | K_IMPORT _ L_STAR _ K_FROM __ T_WORD:import _ L_SCOLON : {{ { import: $import } }}
         | K_IMPORT _ L_STAR _ K_FROM __ T_STRING:import _ L_SCOLON : {{ { import: $import, path: true } }}
         | K_LEXER _ L_COLON _ L_TEMPLATEL _ lexer:lexer _ L_TEMPLATER : {{ { lexer: Object.assign(...$lexer) } }}

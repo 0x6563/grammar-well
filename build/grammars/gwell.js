@@ -13,7 +13,7 @@ function GWLanguage() {
                     { name: "section_list", symbols: ["section", "T_WS", "section_list"], postprocess: ({ data }) => { return [data[0]].concat(data[2]); } }
                 ],
                 section: [
-                    { name: "section", symbols: ["K_CONFIG", "_", "L_COLON", "_", "L_TEMPLATEL", "_", "kv_list", "_", "L_TEMPLATER"], postprocess: ({ data }) => { return { config: Object.assign(...data[4]) }; } },
+                    { name: "section", symbols: ["K_CONFIG", "_", "L_COLON", "_", "L_TEMPLATEL", "_", "kv_list", "_", "L_TEMPLATER"], postprocess: ({ data }) => { return { config: Object.assign(...data[6]) }; } },
                     { name: "section", symbols: ["K_IMPORT", "_", "L_STAR", "_", "K_FROM", "__", "T_WORD", "_", "L_SCOLON"], postprocess: ({ data }) => { return { import: data[6] }; } },
                     { name: "section", symbols: ["K_IMPORT", "_", "L_STAR", "_", "K_FROM", "__", "T_STRING", "_", "L_SCOLON"], postprocess: ({ data }) => { return { import: data[6], path: true }; } },
                     { name: "section", symbols: ["K_LEXER", "_", "L_COLON", "_", "L_TEMPLATEL", "_", "lexer", "_", "L_TEMPLATER"], postprocess: ({ data }) => { return { lexer: Object.assign(...data[6]) }; } },

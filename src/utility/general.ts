@@ -1,4 +1,4 @@
-import { Dictionary, GrammarRuleSymbol } from "../typings";
+import { Dictionary, GeneratorGrammarSymbol, GrammarRuleSymbol } from "../typings";
 
 
 export class Collection<T> {
@@ -55,17 +55,16 @@ export class Collection<T> {
 
 }
 
-export class SymbolCollection extends Collection<GrammarRuleSymbol>{
+export class GeneratorSymbolCollection extends Collection<GeneratorGrammarSymbol>{
     categorized = {
         nonTerminal: {},
         literalI: {},
         literalS: {},
         token: {},
-        regex: {},
-        function: {},
+        regex: {}
     }
 
-    resolve(symbol: GrammarRuleSymbol) {
+    resolve(symbol: GeneratorGrammarSymbol) {
         if (typeof symbol == 'string') {
             return { category: 'nonTerminal', key: symbol };
         } else if ('literal' in symbol) {
@@ -74,10 +73,8 @@ export class SymbolCollection extends Collection<GrammarRuleSymbol>{
             return { category: 'literalS', key: symbol.literal }
         } else if ('token' in symbol) {
             return { category: 'token', key: symbol.token }
-        } else if (symbol instanceof RegExp) {
-            return { category: 'regex', key: symbol.toString() }
-        } else if (typeof symbol == 'function') {
-            return { category: 'function', key: symbol.toString() }
+        } else if ('regex' in symbol) {
+            return { category: 'regex', key: symbol.flags + ':' + symbol.regex }
         }
     }
 }

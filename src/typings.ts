@@ -13,6 +13,7 @@ export interface CompileOptions {
     resolverInstance?: ImportResolver;
     exportName?: string;
     template?: TemplateFormat;
+    overrides?: Dictionary<string>;
 }
 
 export type TemplateFormat = '_default' | 'object' | 'json' | 'js' | 'javascript' | 'module' | 'esmodule' | 'esm' | 'ts' | 'typescript'
@@ -131,7 +132,7 @@ export interface GeneratorGrammarRule {
     postprocess?: GrammarTypeTemplate | GrammarTypeBuiltIn | GrammarTypeJS;
 }
 
-export type GeneratorGrammarSymbol = { alias?: string } & (GrammarTypeRule | GrammarTypeRegex | GrammarTypeLiteral | GrammarTypeToken | GrammarTypeJS);
+export type GeneratorGrammarSymbol = { alias?: string } & (GrammarTypeRule | GrammarTypeRegex | GrammarTypeLiteral | GrammarTypeToken);
 
 export interface LanguageDefinition {
     lexer?: Lexer | LexerConfig;
@@ -139,7 +140,22 @@ export interface LanguageDefinition {
         start: string;
         rules: Dictionary<GrammarRule[]>;
     }
+    lr?: {
+        k: number;
+        table: Dictionary<LRState>;
+    }
+
 }
+
+export interface LRState {
+    actions: Next[];
+    goto: { [key: string]: string };
+    reduce?: GrammarRule;
+    isFinal: boolean;
+}
+
+type Next = { symbol: GrammarRuleSymbol, next: string };
+
 
 export interface TQRestorePoint {
     historyIndex: number;

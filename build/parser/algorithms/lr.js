@@ -1,22 +1,17 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.LR = void 0;
-const lr_1 = require("../../utility/lr");
 const parser_1 = require("../parser");
 function LR(language, _options = {}) {
-    const { grammar, tokens, canonical } = language;
-    const collection = canonical || new lr_1.CanonicalCollection(grammar);
-    const stack = new lr_1.LRStack();
-    const s = collection.states['0.0'];
-    stack.add(null);
-    stack.shift(s);
+    const { lr, tokens } = language;
+    const { table } = lr;
+    const stack = new LRStack();
+    stack.push({ state: table['0.0'] });
     let token;
     while (token = tokens.next()) {
-        for (const [symbol, state] of stack.current.state.actions) {
+        for (const { symbol, next } of stack.current.state.actions) {
             if (parser_1.ParserUtility.TokenMatchesSymbol(token, symbol)) {
-                stack.add(symbol);
-                stack.shift(collection.states[state]);
-                stack.current.value = token;
+                stack.push({ symbol, state: table[next], value: token });
                 break;
             }
         }
@@ -24,11 +19,43 @@ function LR(language, _options = {}) {
             const rule = stack.current.state.reduce;
             stack.reduce(rule);
             stack.current.value = parser_1.ParserUtility.PostProcess(rule, stack.current.children.map(v => v.value));
-            const s = stack.previous.state.goto.get(rule.name);
-            stack.shift(collection.states[s]);
+            const s = stack.previous?.state.goto[rule.name];
+            stack.shift(table[s]);
         }
     }
-    return { results: [stack.current.value], canonical: collection };
+    return { results: [stack.current.value] };
 }
 exports.LR = LR;
+class LRStack {
+    stack = [];
+    get current() {
+        return this.stack[this.stack.length - 1];
+    }
+    get previous() {
+        return this.stack[this.stack.length - 2];
+    }
+    shift(state) {
+        this.current.state = state;
+    }
+    reduce(rule) {
+        const n = new LRStackItem();
+        const l = rule.symbols.length;
+        n.children = this.stack.splice(l * -1, l);
+        n.children.forEach(v => delete v.state);
+        n.rule = rule;
+        n.symbol = rule.name;
+        this.stack.push(n);
+    }
+    push(item) {
+        this.stack.push(new LRStackItem());
+        Object.assign(this.current, item);
+    }
+}
+class LRStackItem {
+    children = [];
+    state;
+    symbol;
+    rule;
+    value;
+}
 //# sourceMappingURL=lr.js.map

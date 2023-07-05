@@ -1,4 +1,4 @@
-import { Generator } from "../generator";
+import { Generator } from "../generator/generator";
 
 export function JavascriptOutput(generator: Generator, exportName: string) {
     return `${Generate(generator, exportName)}

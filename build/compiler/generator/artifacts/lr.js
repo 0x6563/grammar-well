@@ -1,25 +1,25 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.LRStack = exports.CanonicalCollection = void 0;
-const parser_1 = require("../parser/parser");
-const general_1 = require("./general");
-class CanonicalCollection {
-    grammar;
+exports.LRParseTableBuilder = void 0;
+const generator_1 = require("../generator");
+const general_1 = require("../../../utility/general");
+class LRParseTableBuilder {
+    generator;
     rules = new general_1.Collection();
-    states = Object.create(null);
-    symbols = new general_1.SymbolCollection();
-    constructor(grammar) {
-        this.grammar = grammar;
-        const augmented = { name: Symbol(), symbols: [grammar.start] };
-        grammar.rules[augmented.name] = [augmented];
+    table = Object.create(null);
+    symbols = new general_1.GeneratorSymbolCollection();
+    constructor(generator) {
+        this.generator = generator;
+        const augmented = { name: Symbol(), symbols: [{ rule: generator.state.grammar.start }] };
+        generator.state.grammar.rules[augmented.name] = [augmented];
         this.addState([{ rule: augmented, dot: 0 }]);
     }
     addState(seed) {
         const id = this.encodeStateItems(seed);
-        if (id in this.states)
-            return this.states[id];
-        const state = new State(this, seed);
-        this.states[id] = state;
+        if (id in this.table)
+            return this.table[id];
+        const state = new StateBuilder(this, seed);
+        this.table[id] = state;
         for (const q in state.queue) {
             this.addState(state.queue[q]);
         }
@@ -31,9 +31,30 @@ class CanonicalCollection {
     encodeStateItems(seed) {
         return Array.from(new Set(seed)).map(v => this.encodeRule(v.rule, v.dot)).sort().join();
     }
+    serialize(depth = 0) {
+        const map = {};
+        for (const key in this.table) {
+            map[key] = this.serializeState(this.table[key].serialize(), depth + 1);
+        }
+        return generator_1.Generator.Pretty(map, depth);
+    }
+    serializeState(state, depth = 0) {
+        return generator_1.Generator.Pretty({
+            actions: state.actions.map(v => this.serializeNext(v, depth + 1)),
+            goto: generator_1.Generator.Pretty(state.goto, depth + 1),
+            reduce: state.reduce ? this.generator.serializeGrammarRule(state.reduce) : null,
+            isFinal: state.isFinal ? 'true' : 'false'
+        }, depth);
+    }
+    serializeNext(next, depth) {
+        return generator_1.Generator.Pretty({
+            symbol: generator_1.Generator.SerializeSymbol(next.symbol),
+            next: JSON.stringify(next.next)
+        }, -1);
+    }
 }
-exports.CanonicalCollection = CanonicalCollection;
-class State {
+exports.LRParseTableBuilder = LRParseTableBuilder;
+class StateBuilder {
     collection;
     isFinal = false;
     outputs = {
@@ -51,12 +72,7 @@ class State {
             this.closure(item.rule, item.dot, visited);
         }
         if (this.isFinal) {
-            if (items.length == 1 && visited.size < 1) {
-                this.reduce = items[0].rule;
-            }
-            else {
-                throw 'Conflict Detected';
-            }
+            this.reduce = items[0].rule;
         }
         for (const k in this.outputs.goto) {
             const seed = this.outputs.goto[k];
@@ -74,57 +90,36 @@ class State {
     closure(rule, dot, visited) {
         const isFinal = rule.symbols.length == dot;
         this.isFinal = isFinal || this.isFinal;
-        const { [dot]: symbol } = rule.symbols;
+        const symbol = rule.symbols[dot];
         if (isFinal || visited.has(symbol))
             return;
         visited.add(symbol);
         const stateItem = { rule, dot: dot + 1 };
-        if (parser_1.ParserUtility.SymbolIsTerminal(symbol)) {
+        if (generator_1.Generator.SymbolIsTerminal(symbol)) {
             const id = this.collection.symbols.encode(symbol);
             this.outputs.action[id] = this.outputs.action[id] || [];
             this.outputs.action[id].push(stateItem);
         }
         else {
             const id = this.collection.symbols.encode(symbol);
+            const name = typeof symbol === 'string' ? symbol : symbol.rule;
             this.outputs.goto[id] = this.outputs.goto[id] || [];
             this.outputs.goto[id].push(stateItem);
-            for (const rule of this.collection.grammar.rules[symbol]) {
+            for (const rule of this.collection.generator.state.grammar.rules[name]) {
                 this.closure(rule, 0, visited);
             }
         }
     }
-}
-class LRStack {
-    stack = [];
-    get current() {
-        return this.stack[this.stack.length - 1];
+    serialize() {
+        const actions = [];
+        const goto = {};
+        for (const [symbol, next] of this.actions) {
+            actions.push({ symbol, next });
+        }
+        for (const [symbol, next] of this.goto) {
+            goto[typeof symbol == 'object' ? symbol.rule : symbol] = JSON.stringify(next);
+        }
+        return { actions, goto, reduce: this.reduce, isFinal: this.isFinal };
     }
-    get previous() {
-        return this.stack[this.stack.length - 2];
-    }
-    shift(state) {
-        this.current.state = state;
-    }
-    reduce(rule) {
-        const n = new LRStackItem();
-        const l = rule.symbols.length;
-        n.children = this.stack.splice(l * -1, l);
-        n.children.forEach(v => delete v.state);
-        n.rule = rule;
-        n.symbol = rule.name;
-        this.stack.push(n);
-    }
-    add(symbol) {
-        this.stack.push(new LRStackItem());
-        this.current.symbol = symbol;
-    }
-}
-exports.LRStack = LRStack;
-class LRStackItem {
-    children = [];
-    state;
-    symbol;
-    rule;
-    value;
 }
 //# sourceMappingURL=lr.js.map
