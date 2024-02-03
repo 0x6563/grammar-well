@@ -107,5 +107,5 @@ LR0:
   - title: LR0
     algorithm: lr0
     grammarSource: grammars/lr.gwell
-    input: ABC
-    result: [A, [B, C]]
+    input: abab
+    result: [[[a, b], [a, b]]]
