@@ -24,7 +24,8 @@ function Earley(language, options = {}) {
         const data = token;
         nextColumn.data = literal;
         const { scannable } = previousColumn;
-        for (let w = scannable.length; w--;) {
+        let w = scannable.length;
+        while (w--) {
             const state = scannable[w];
             const symbol = state.rule.symbols[state.dot];
             if (parser_1.ParserUtility.SymbolMatchesToken(symbol, token)) {
@@ -101,12 +102,13 @@ class Column {
         }
     }
     expects() {
-        return this.states
-            .filter((state) => {
-            const nextSymbol = state.rule.symbols[state.dot];
-            return nextSymbol && typeof nextSymbol !== "string";
-        })
-            .map(v => (Object.assign(Object.assign({}, v.rule), { index: v.dot })));
+        const result = [];
+        for (const state of this.states) {
+            if (state.rule.symbols[state.dot] && typeof state.rule.symbols[state.dot] !== 'string') {
+                result.push(Object.assign(Object.assign({}, state.rule), { index: state.dot }));
+            }
+        }
+        return result;
     }
     complete(left, right) {
         const copy = left.nextState(right);

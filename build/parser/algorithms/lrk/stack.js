@@ -1,24 +1,20 @@
-import { GrammarRule, GrammarRuleSymbol } from "../../../typings";
-import { State } from "./state";
-
-export class LRStack {
-
-    stack: LRStackItem[] = [];
-
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.LRStack = void 0;
+class LRStack {
+    constructor() {
+        this.stack = [];
+    }
     get current() {
         return this.stack[this.stack.length - 1];
     }
-
     get previous() {
         return this.stack[this.stack.length - 2];
     }
-
-
-    shift(state: State) {
+    shift(state) {
         this.current.state = state;
     }
-
-    reduce(rule: GrammarRule) {
+    reduce(rule) {
         const n = LRStack.NewItem();
         const l = rule.symbols.length;
         n.children = this.stack.splice(l * -1, l);
@@ -27,27 +23,19 @@ export class LRStack {
         n.symbol = rule.name;
         this.stack.push(n);
     }
-
-    append(symbol: GrammarRuleSymbol) {
-        this.stack.push(LRStack.NewItem())
+    append(symbol) {
+        this.stack.push(LRStack.NewItem());
         this.current.symbol = symbol;
     }
-
-    static NewItem(): LRStackItem {
+    static NewItem() {
         return {
             children: [],
             state: null,
             symbol: null,
             rule: null,
             value: null
-        }
+        };
     }
 }
-
-interface LRStackItem {
-    children: LRStackItem[];
-    state: State;
-    symbol: GrammarRuleSymbol;
-    rule: GrammarRule;
-    value: any;
-}
+exports.LRStack = LRStack;
+//# sourceMappingURL=stack.js.map

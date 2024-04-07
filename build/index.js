@@ -18,4 +18,5 @@ __exportStar(require("./compiler/compiler"), exports);
 __exportStar(require("./compiler/import-resolver"), exports);
 __exportStar(require("./parser/parser"), exports);
 __exportStar(require("./typings"), exports);
+__exportStar(require("./utility/monarch"), exports);
 //# sourceMappingURL=index.js.map
