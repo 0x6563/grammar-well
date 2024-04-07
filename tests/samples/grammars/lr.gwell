@@ -1,10 +1,5 @@
-config: {{
-    lr: "0"
-}}
-
 grammar: {{
     S -> A A : {{ [$0, $1] }}
     A -> "a" A : {{ [$0.value, $1] }}
-    A -> "b" A : {{ [$0.value, $1] }}
-    A -> "c" : {{ $0.value }}
+    A -> "b" : {{ $0.value }}
 }}

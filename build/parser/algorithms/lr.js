@@ -2,6 +2,20 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.LR = void 0;
 const parser_1 = require("../parser");
+<<<<<<< HEAD
+function LR(language, options = {}) {
+    const { grammar, tokens } = language;
+    const terminals = [];
+    const nonTerminals = [];
+    for (const name in grammar.rules) {
+        for (const rule of grammar.rules[name]) {
+            const { symbols } = rule;
+            if (parser_1.ParserUtility.SymbolIsTerminal(symbols[0])) {
+                terminals.push(rule);
+            }
+            else {
+                nonTerminals.push(rule);
+=======
 function LR(language, _options = {}) {
     const { lr, tokens } = language;
     const { table } = lr;
@@ -13,6 +27,7 @@ function LR(language, _options = {}) {
             if (parser_1.ParserUtility.TokenMatchesSymbol(token, symbol)) {
                 stack.push({ symbol, state: table[next], value: token });
                 break;
+>>>>>>> main
             }
         }
         while (stack.current.state?.isFinal) {
@@ -23,6 +38,37 @@ function LR(language, _options = {}) {
             stack.shift(table[s]);
         }
     }
+<<<<<<< HEAD
+    const table = new ParsingTable(grammar);
+    return { results: [] };
+}
+exports.LR = LR;
+class ParsingTable {
+    constructor(grammar) {
+        this.grammar = grammar;
+        this.states = [];
+        this.symbolIds = new IdMap();
+        this.ruleIds = new IdMap();
+        this.stateIds = new Map();
+        this.queue = [];
+        this.queue.push({ name: 'S\'', symbols: [grammar.start] });
+        let item;
+        while (item = this.queue.shift()) {
+            this.addRule(item);
+        }
+    }
+    addRule(rule) {
+        if (this.ruleIds.map.has(rule))
+            return;
+        for (let i = 0; i <= rule.symbols.length; i++) {
+            this.getStateId(rule, i);
+            const symbol = rule.symbols[i];
+            if (symbol && !parser_1.ParserUtility.SymbolIsTerminal(symbol)) {
+                const subs = this.grammar.rules[symbol];
+                this.queue.push(...this.grammar.rules[symbol]);
+            }
+        }
+=======
     return { results: [stack.current.value] };
 }
 exports.LR = LR;
@@ -33,6 +79,7 @@ class LRStack {
     }
     get previous() {
         return this.stack[this.stack.length - 2];
+>>>>>>> main
     }
     shift(state) {
         this.current.state = state;

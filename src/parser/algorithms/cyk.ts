@@ -26,7 +26,7 @@ export function CYK(language: LanguageDefinition & { tokens: TokenBuffer }, _opt
         currentTokenIndex++;
         chart.resize(currentTokenIndex + 2, currentTokenIndex + 2);
         for (const rule of terminals) {
-            if (ParserUtility.TokenMatchesSymbol(token, rule.symbols[0])) {
+            if (ParserUtility.SymbolMatchesToken(rule.symbols[0], token)) {
                 chart.get(currentTokenIndex, currentTokenIndex).set(rule.name, { rule, token })
             }
         }

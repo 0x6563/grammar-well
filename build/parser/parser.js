@@ -6,11 +6,11 @@ const stateful_lexer_1 = require("../lexers/stateful-lexer");
 const token_buffer_1 = require("../lexers/token-buffer");
 const cyk_1 = require("./algorithms/cyk");
 const earley_1 = require("./algorithms/earley");
-const lr_1 = require("./algorithms/lr");
+const algorithm_1 = require("./algorithms/lrk/algorithm");
 const ParserRegistry = {
     earley: earley_1.Earley,
     cyk: cyk_1.CYK,
-    lr: lr_1.LR
+    lr0: algorithm_1.LRK
 };
 function Parse(language, input, options) {
     const i = new Parser(language, options);
@@ -46,7 +46,7 @@ class Parser {
 }
 exports.Parser = Parser;
 class ParserUtility {
-    static TokenMatchesSymbol(token, symbol) {
+    static SymbolMatchesToken(symbol, token) {
         if (typeof symbol === 'string')
             throw 'Attempted to match token against non-terminal';
         if (typeof symbol == 'function')

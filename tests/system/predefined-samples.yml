@@ -105,7 +105,7 @@ CYK:
     result: [A, [B, C]]
 LR:
   - title: LR
-    algorithm: lr
+    algorithm: lr0
     grammarSource: grammars/lr.gwell
-    input: abc
-    result: [a, [b, c]]
+    input: abab
+    result: [[[a, b], [a, b]]]
