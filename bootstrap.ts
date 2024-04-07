@@ -9,8 +9,8 @@ const BaseDir = './src/grammars';
         try {
             console.log(fullpath(file))
             if (/\.gwell$/.test(file)) {
-                const json = await Compile(read(file), { format: 'json' });
-                const js = await Compile(read(file), { exportName: 'grammar', format: 'esmodule' });
+                const json = await Compile(read(file), { template: 'json' });
+                const js = await Compile(read(file), { exportName: 'grammar', template: 'esmodule', overrides: {} });
                 write(file.replace(/.gwell$/, '.json'), json);
                 write(file.replace(/.gwell$/, '.js'), js);
             }

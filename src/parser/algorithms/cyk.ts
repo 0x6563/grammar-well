@@ -1,8 +1,9 @@
 import { TokenBuffer } from "../../lexers/token-buffer";
 import { GrammarRule, GrammarRuleSymbol, LanguageDefinition, LexerToken } from "../../typings";
+import { Matrix } from "../../utility/general";
 import { ParserUtility } from "../parser";
 
-export function CYK(language: LanguageDefinition & { tokens: TokenBuffer }, options = {}) {
+export function CYK(language: LanguageDefinition & { tokens: TokenBuffer }, _options = {}) {
     const { grammar, tokens } = language;
 
     const terminals: GrammarRule[] = [];
@@ -71,51 +72,3 @@ export interface Terminal {
     rule: GrammarRule;
     token: LexerToken;
 }
-
-export class Matrix<T> {
-    private $x = 0;
-    private $y = 0;
-    get x() { return this.$x }
-    set x(x: number) { x != this.$x && this.resize(x, this.y); }
-    get y() { return this.$y }
-    set y(y: number) { y != this.$y && this.resize(this.x, y); }
-
-    matrix: GetCallbackOrValue<T>[][] = [];
-
-    constructor(x: number, y: number, private initial?: T | ((...args: any) => T)) {
-        this.resize(x, y);
-    }
-
-    get(x: number, y: number): T {
-        return this.matrix[x][y];
-    }
-
-    set(x: number, y: number, value: any) {
-        return this.matrix[x][y] = value;
-    }
-
-    resize(x: number, y: number) {
-        if (x < this.x) {
-            this.matrix.splice(x);
-            this.$x = x;
-        }
-        if (y > this.y) {
-            this.matrix.forEach(a => a.push(...Matrix.Array(y - a.length, this.initial)));
-            this.$y = y;
-        } else if (y < this.y) {
-            this.matrix.forEach(a => a.splice(y + 1));
-            this.$y = y;
-        }
-        if (x > this.x) {
-            const ext = Matrix.Array(x - this.x, () => Matrix.Array(this.y, this.initial))
-            this.matrix.push(...ext);
-            this.$x = x;
-        }
-    }
-
-    static Array<T>(length, initial?: T | ((...args: any) => T)): GetCallbackOrValue<T>[] {
-        return Array.from({ length }, (typeof initial == 'function' ? initial : () => initial) as any);
-    }
-}
-
-type GetCallbackOrValue<T> = T extends (...args: any) => any ? ReturnType<T> : T;

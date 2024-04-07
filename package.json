@@ -1,37 +1,45 @@
 {
   "name": "grammar-well",
-  "version": "1.1.0",
-  "description": "Simple, fast, powerful parser toolkit for JavaScript.",
+  "version": "1.2.0",
+  "description": "Cross-platform Parser written in TypeScript",
   "main": "build/index.js",
   "scripts": {
     "prebuild": "tsc --build --clean",
     "build": "tsc --build",
-    "bootstrap": "ts-node bootstrap.ts",
-    "testing": "ts-node testing.ts",
+    "bootstrap": "tsx bootstrap.ts",
+    "testing": "tsx testing.ts",
     "benchmark": "node tests/performance/benchmark.js",
     "test": "nyc mocha tests/**/*.spec.ts",
     "profile": "node tests/performance/profile.js"
   },
   "author": "0x6563",
-  "license": "MIT",
+  "license": "LGPL-3.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/0x6563/grammar-well.git"
   },
+  "bugs": {
+    "url": "https://github.com/0x6563/grammar-well/issues"
+  },
+  "homepage": "https://github.com/0x6563/grammar-well#readme",
   "devDependencies": {
-    "@types/chai": "^4.3.3",
-    "@types/mocha": "^9.1.1",
-    "@types/node": "^17.0.25",
-    "babel-cli": "^6.18.0",
-    "babel-preset-env": "^1.6.0",
+    "@types/chai": "^4.3.4",
+    "@types/mocha": "^10.0.1",
+    "@types/node": "^18.15.0",
+    "@typescript-eslint/eslint-plugin": "^5.54.1",
+    "@typescript-eslint/parser": "^5.54.1",
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.7.0",
     "benny": "^3.7.1",
-    "chai": "^4.3.6",
-    "expect": "^27.5.1",
-    "mocha": "^9.2.2",
+    "chai": "^4.3.7",
+    "eslint": "^8.36.0",
+    "expect": "^29.5.0",
+    "mocha": "^10.2.0",
     "nyc": "^15.1.0",
-    "ts-node": "^10.7.0",
-    "typescript": "^4.6.3",
-    "yaml": "^2.1.0"
+    "ts-node": "^10.9.1",
+    "tsx": "^3.12.3",
+    "typescript": "^4.9.5",
+    "yaml": "^2.2.1"
   },
   "keywords": [
     "parser",

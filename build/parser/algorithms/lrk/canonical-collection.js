@@ -5,11 +5,13 @@ const parser_1 = require("../../parser");
 const bimap_1 = require("./bimap");
 const closure_1 = require("./closure");
 class CanonicalCollection {
+    grammar;
+    states = new Map();
+    rules = new bimap_1.BiMap();
+    terminals = new bimap_1.BiMap();
+    closure;
     constructor(grammar) {
         this.grammar = grammar;
-        this.states = new Map();
-        this.rules = new bimap_1.BiMap();
-        this.terminals = new bimap_1.BiMap();
         const augmented = {
             name: Symbol(),
             symbols: [grammar.start]

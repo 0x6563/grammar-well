@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.LR = void 0;
 const parser_1 = require("../parser");
+<<<<<<< HEAD
 function LR(language, options = {}) {
     const { grammar, tokens } = language;
     const terminals = [];
@@ -14,9 +15,30 @@ function LR(language, options = {}) {
             }
             else {
                 nonTerminals.push(rule);
+=======
+function LR(language, _options = {}) {
+    const { lr, tokens } = language;
+    const { table } = lr;
+    const stack = new LRStack();
+    stack.push({ state: table['0.0'] });
+    let token;
+    while (token = tokens.next()) {
+        for (const { symbol, next } of stack.current.state.actions) {
+            if (parser_1.ParserUtility.TokenMatchesSymbol(token, symbol)) {
+                stack.push({ symbol, state: table[next], value: token });
+                break;
+>>>>>>> main
             }
         }
+        while (stack.current.state?.isFinal) {
+            const rule = stack.current.state.reduce;
+            stack.reduce(rule);
+            stack.current.value = parser_1.ParserUtility.PostProcess(rule, stack.current.children.map(v => v.value));
+            const s = stack.previous?.state.goto[rule.name];
+            stack.shift(table[s]);
+        }
     }
+<<<<<<< HEAD
     const table = new ParsingTable(grammar);
     return { results: [] };
 }
@@ -46,26 +68,41 @@ class ParsingTable {
                 this.queue.push(...this.grammar.rules[symbol]);
             }
         }
+=======
+    return { results: [stack.current.value] };
+}
+exports.LR = LR;
+class LRStack {
+    stack = [];
+    get current() {
+        return this.stack[this.stack.length - 1];
     }
-    getStateId(rule, dot) {
-        const composite = this.ruleIds.getId(dot === 0 ? rule.name : rule) + '.' + dot;
-        if (!this.stateIds.has(composite)) {
-            this.states.push({ rule, dot });
-            this.stateIds.set(composite, this.states.length - 1);
-        }
-        return this.stateIds.get(composite);
+    get previous() {
+        return this.stack[this.stack.length - 2];
+>>>>>>> main
+    }
+    shift(state) {
+        this.current.state = state;
+    }
+    reduce(rule) {
+        const n = new LRStackItem();
+        const l = rule.symbols.length;
+        n.children = this.stack.splice(l * -1, l);
+        n.children.forEach(v => delete v.state);
+        n.rule = rule;
+        n.symbol = rule.name;
+        this.stack.push(n);
+    }
+    push(item) {
+        this.stack.push(new LRStackItem());
+        Object.assign(this.current, item);
     }
 }
-class IdMap {
-    constructor() {
-        this.id = 0;
-        this.map = new Map();
-    }
-    getId(ref) {
-        if (!this.map.has(ref)) {
-            this.map.set(ref, this.id++);
-        }
-        return this.map.get(ref);
-    }
+class LRStackItem {
+    children = [];
+    state;
+    symbol;
+    rule;
+    value;
 }
 //# sourceMappingURL=lr.js.map

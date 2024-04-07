@@ -11,12 +11,12 @@ export class TextFormatter {
         if (expected.length === 0) {
             lines.push('End of input was expected.');
         } else {
-            lines.push('Instead, I was expecting to see one of the following:\n');
+            lines.push('Expected:');
             for (const ex of expected) {
                 const nextSymbol = ex.symbols[ex.index];
                 const symbolDisplay = TextFormatter.GrammarRuleSymbol(nextSymbol, false, true);
-                lines.push('A ' + symbolDisplay + ' based on:');
-                lines.push(TextFormatter.GrammarRule(ex, ex.index));
+                lines.push(symbolDisplay + ' based on:');
+                lines.push(`\t` + TextFormatter.GrammarRule(ex, ex.index));
             }
             lines.push("");
             return lines.join("\n");
@@ -36,6 +36,7 @@ export class TextFormatter {
         let lines = 0;
         const { line, column, offset } = lexer;
 
+        // eslint-disable-next-line no-cond-assign
         while (token = lexer.peek(--i)) {
             if (token.value == '\n') {
                 lines++;
@@ -77,7 +78,7 @@ export class TextFormatter {
         let symbolSequence = rule.symbols.slice(0, withCursorAt).map(v => TextFormatter.GrammarRuleSymbol(v, true, true)).join(' ');
         if (typeof withCursorAt !== "undefined") {
             symbolSequence += " ● " + rule.symbols.slice(withCursorAt).map(v => TextFormatter.GrammarRuleSymbol(v, true, true)).join(' ');
-        };
+        }
         return rule.name + " → " + symbolSequence;
     }
 }

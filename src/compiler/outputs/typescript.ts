@@ -1,4 +1,4 @@
-import { Generator } from "../generator";
+import { Generator } from "../generator/generator";
 
 export function TypescriptFormat(generator: Generator, exportName: string) {
     return `// Generated automatically by Grammar-Well, version ${generator.state.version} 
@@ -56,8 +56,9 @@ interface LexerStateMatchRule {
     when: string | RegExp
     type?: string;
     pop?: number | 'all';
+    highlight?: string;
     inset?: number;
-    goto?: string;
+    goto?: string; 
     set?: string;
 }
 
@@ -102,4 +103,4 @@ function ${exportName}(): LanguageDefinition {
 export default ${exportName};
 
 `;
-};
+}

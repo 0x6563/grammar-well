@@ -1,8 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Matrix = exports.CYK = void 0;
+exports.CYK = void 0;
+const general_1 = require("../../utility/general");
 const parser_1 = require("../parser");
-function CYK(language, options = {}) {
+function CYK(language, _options = {}) {
     const { grammar, tokens } = language;
     const terminals = [];
     const nonTerminals = [];
@@ -18,7 +19,7 @@ function CYK(language, options = {}) {
         }
     }
     let currentTokenIndex = -1;
-    const chart = new Matrix(0, 0, () => new Map());
+    const chart = new general_1.Matrix(0, 0, () => new Map());
     for (const token of tokens) {
         currentTokenIndex++;
         chart.resize(currentTokenIndex + 2, currentTokenIndex + 2);
@@ -54,46 +55,4 @@ function GetValue(ref) {
     }
     return parser_1.ParserUtility.PostProcess(ref.rule, [GetValue(ref.left), GetValue(ref.right)]);
 }
-class Matrix {
-    constructor(x, y, initial) {
-        this.initial = initial;
-        this.$x = 0;
-        this.$y = 0;
-        this.matrix = [];
-        this.resize(x, y);
-    }
-    get x() { return this.$x; }
-    set x(x) { x != this.$x && this.resize(x, this.y); }
-    get y() { return this.$y; }
-    set y(y) { y != this.$y && this.resize(this.x, y); }
-    get(x, y) {
-        return this.matrix[x][y];
-    }
-    set(x, y, value) {
-        return this.matrix[x][y] = value;
-    }
-    resize(x, y) {
-        if (x < this.x) {
-            this.matrix.splice(x);
-            this.$x = x;
-        }
-        if (y > this.y) {
-            this.matrix.forEach(a => a.push(...Matrix.Array(y - a.length, this.initial)));
-            this.$y = y;
-        }
-        else if (y < this.y) {
-            this.matrix.forEach(a => a.splice(y + 1));
-            this.$y = y;
-        }
-        if (x > this.x) {
-            const ext = Matrix.Array(x - this.x, () => Matrix.Array(this.y, this.initial));
-            this.matrix.push(...ext);
-            this.$x = x;
-        }
-    }
-    static Array(length, initial) {
-        return Array.from({ length }, (typeof initial == 'function' ? initial : () => initial));
-    }
-}
-exports.Matrix = Matrix;
 //# sourceMappingURL=cyk.js.map

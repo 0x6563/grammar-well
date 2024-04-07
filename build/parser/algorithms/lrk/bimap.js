@@ -2,10 +2,8 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.BiMap = void 0;
 class BiMap {
-    constructor() {
-        this.map = new Map();
-        this.items = [];
-    }
+    map = new Map();
+    items = [];
     id(ref) {
         if (!this.map.has(ref)) {
             this.map.set(ref, this.items.length);

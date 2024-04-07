@@ -2,9 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.LRStack = void 0;
 class LRStack {
-    constructor() {
-        this.stack = [];
-    }
+    stack = [];
     get current() {
         return this.stack[this.stack.length - 1];
     }

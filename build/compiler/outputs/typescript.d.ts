@@ -1,2 +1,2 @@
-import { Generator } from "../generator";
+import { Generator } from "../generator/generator";
 export declare function TypescriptFormat(generator: Generator, exportName: string): string;

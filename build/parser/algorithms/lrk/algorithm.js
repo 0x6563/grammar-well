@@ -5,7 +5,6 @@ const parser_1 = require("../../parser");
 const canonical_collection_1 = require("./canonical-collection");
 const stack_1 = require("./stack");
 function LRK(language, options = {}) {
-    var _a;
     const { grammar, tokens } = language;
     const { states, rules: rules } = new canonical_collection_1.CanonicalCollection(grammar);
     const stack = new stack_1.LRStack();
@@ -22,7 +21,7 @@ function LRK(language, options = {}) {
                 break;
             }
         }
-        while ((_a = stack.current.state) === null || _a === void 0 ? void 0 : _a.isFinal) {
+        while (stack.current.state?.isFinal) {
             const rule = rules.fetch(stack.current.state.reduce);
             stack.reduce(rule);
             stack.current.value = parser_1.ParserUtility.PostProcess(rule, stack.current.children.map(v => v.value));

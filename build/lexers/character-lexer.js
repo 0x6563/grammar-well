@@ -2,16 +2,14 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CharacterLexer = void 0;
 class CharacterLexer {
-    constructor() {
-        this.buffer = '';
-        this.$indexOffset = 0;
-        this.$index = -1;
-        this.$lineOffset = 0;
-        this.$line = 0;
-        this.column = 0;
-    }
+    buffer = '';
+    $indexOffset = 0;
+    $index = -1;
     get index() { return this.$index + this.$indexOffset; }
+    $lineOffset = 0;
+    $line = 0;
     get line() { return this.$line + this.$lineOffset; }
+    column = 0;
     next() {
         if (this.$index + 1 < this.buffer.length) {
             if (this.buffer[this.index] === '\n') {

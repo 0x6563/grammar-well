@@ -1,4 +1,4 @@
-import { CompileOptions, GrammarBuilderContext, OutputFormat, LanguageDirective, ConfigDirective, GrammarBuilderSymbolRepeat, GrammarBuilderExpression, GeneratorGrammarRule, GrammarDirective, ImportDirective, LexerDirective, GrammarBuilderSymbolSubexpression, GrammarTypeLiteral, GeneratorGrammarSymbol, GrammarBuilderSymbol, LexerStateDefinition, GrammarBuilderRule } from "../typings";
+import { CompileOptions, GrammarBuilderContext, TemplateFormat, LanguageDirective, ConfigDirective, GrammarBuilderSymbolRepeat, GrammarBuilderExpression, GeneratorGrammarRule, GrammarDirective, ImportDirective, LexerDirective, GrammarBuilderSymbolSubexpression, GrammarTypeLiteral, GeneratorGrammarSymbol, GrammarBuilderSymbol, GrammarBuilderRule } from "../typings";
 
 import { Parser } from "../parser/parser";
 import { FileSystemResolver } from "./import-resolver";
@@ -11,14 +11,14 @@ import { JSONFormatter } from "./outputs/json";
 import * as number from '../grammars/number.json';
 import * as string from '../grammars/string.json';
 import * as whitespace from '../grammars/whitespace.json';
-import { Generator } from "./generator";
+import { Generator } from "./generator/generator";
 
 const BuiltInRegistry = {
     number,
     string,
     whitespace,
 }
-const OutputFormats = {
+const TemplateFormats = {
     _default: JavascriptOutput,
     object: (grammar, exportName) => ({ grammar, exportName }),
     json: JSONFormatter,
@@ -26,6 +26,7 @@ const OutputFormats = {
     javascript: JavascriptOutput,
     module: ESMOutput,
     esmodule: ESMOutput,
+    esm: ESMOutput,
     ts: TypescriptFormat,
     typescript: TypescriptFormat
 }
@@ -33,11 +34,12 @@ const OutputFormats = {
 export async function Compile(rules: string | LanguageDirective | (LanguageDirective[]), config: CompileOptions = {}) {
     const builder = new GrammarBuilder(config);
     await builder.import(rules as any);
-    return builder.export(config.format);
+    Object.assign(builder.generator.state.config, config.overrides);
+    return builder.export(config.template);
 }
 
 export class GrammarBuilder {
-    private parser = new Parser(Language());
+    private parser = new Parser(Language() as any);
     private context: GrammarBuilderContext;
 
     generator = new Generator();
@@ -51,14 +53,14 @@ export class GrammarBuilder {
         this.generator.state.grammar.uuids = this.context.uuids;
     }
 
-    export<T extends OutputFormat = '_default'>(format: T, name: string = 'GWLanguage'): ReturnType<typeof OutputFormats[T]> {
+    export<T extends TemplateFormat = '_default'>(format: T, name: string = 'GWLanguage'): ReturnType<typeof TemplateFormats[T]> {
         const grammar = this.generator.state;
         const output = format || grammar.config.preprocessor || '_default';
-        if (OutputFormats[output]) {
-            return OutputFormats[output](this.generator, name);
+        if (TemplateFormats[output]) {
+            return TemplateFormats[output](this.generator, name);
         }
         throw new Error("No such preprocessor: " + output)
-    };
+    }
 
     async import(source: string): Promise<void>
     async import(directive: LanguageDirective): Promise<void>
@@ -101,6 +103,9 @@ export class GrammarBuilder {
     private processGrammarDirective(directive: GrammarDirective) {
         if (directive.grammar.config) {
             this.generator.state.grammar.start = directive.grammar.config.start || this.generator.state.grammar.start;
+            Object.assign(this.generator.state.grammar.config, directive.grammar.config);
+            // this.generator.state.grammar.postprocessDefault =  directive.grammar.config.postprocessDefault || this.generator.state.grammar.postprocessDefault;
+            // this.generator.state.grammar.postprocessOverride =  directive.grammar.config.postprocessOverride || this.generator.state.grammar.postprocessOverride;
         }
 
         for (const rule of directive.grammar.rules) {

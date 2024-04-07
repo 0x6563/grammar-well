@@ -1,7 +1,7 @@
-import { TokenBuffer } from "../../lexers/token-buffer";
-import { LanguageDefinition } from "../../typings";
+import type { TokenBuffer } from "../../lexers/token-buffer";
+import type { LanguageDefinition } from "../../typings";
 export declare function LR(language: LanguageDefinition & {
     tokens: TokenBuffer;
-}, options?: {}): {
+}, _options?: {}): {
     results: any[];
 };

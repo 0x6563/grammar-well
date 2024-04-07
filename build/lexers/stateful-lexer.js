@@ -2,9 +2,20 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ResolveStates = exports.StatefulLexer = void 0;
 class StatefulLexer {
+    start;
+    states = Object.create(null);
+    buffer;
+    stack;
+    index;
+    line;
+    column;
+    prefetched;
+    current;
+    unmatched;
+    rules;
+    regexp;
+    tags = new Map();
     constructor({ states, start }) {
-        this.states = Object.create(null);
-        this.tags = new Map();
         ResolveStates(states, start);
         for (const key in states) {
             this.states[key] = {
@@ -23,7 +34,7 @@ class StatefulLexer {
         this.index = 0;
         this.line = state ? state.line : 1;
         this.column = state ? state.column : 1;
-        this.prefetched = state === null || state === void 0 ? void 0 : state.prefetched;
+        this.prefetched = state?.prefetched;
         this.set(state ? state.state : this.start);
         this.stack = state && state.stack ? state.stack.slice() : [];
     }
@@ -159,7 +170,7 @@ class RegexLib {
         return o instanceof RegExp;
     }
     static Escape(s) {
-        return s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+        return s.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
     }
     static HasGroups(s) {
         return (new RegExp('|' + s)).exec('').length > 1;
@@ -277,11 +288,9 @@ function ResolveRuleImports(name, states, resolved, resolving, chain) {
     resolved.add(name);
 }
 class UniqueRules {
-    constructor() {
-        this.regexps = new Set();
-        this.strings = new Set();
-        this.rules = [];
-    }
+    regexps = new Set();
+    strings = new Set();
+    rules = [];
     push(...rules) {
         for (const rule of rules) {
             if (RegexLib.IsRegex(rule.when)) {

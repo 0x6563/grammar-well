@@ -92,7 +92,7 @@ JSON:
     inputSource: json1.json
     resultJSON: json1.json
 
-  - title: JSON 2
+  - title: JSON 
     grammarSource: grammars/json.gwell
     inputSource: json2.json
     resultJSON: json2.json
@@ -103,8 +103,8 @@ CYK:
     grammarSource: grammars/cyk.gwell
     input: ABC
     result: [A, [B, C]]
-LR0:
-  - title: LR0
+LR:
+  - title: LR
     algorithm: lr0
     grammarSource: grammars/lr.gwell
     input: abab

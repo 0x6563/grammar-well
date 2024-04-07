@@ -18,6 +18,8 @@ function Parse(language, input, options) {
 }
 exports.Parse = Parse;
 class Parser {
+    language;
+    options;
     constructor(language, options = { algorithm: 'earley', parserOptions: {} }) {
         this.language = language;
         this.options = options;
@@ -26,8 +28,8 @@ class Parser {
         const tokenQueue = this.getTokenQueue();
         tokenQueue.feed(input);
         if (typeof this.options.algorithm == 'function')
-            return this.options.algorithm(Object.assign(Object.assign({}, this.language), { tokens: tokenQueue, utility: ParserUtility }), this.options.parserOptions);
-        return ParserRegistry[this.options.algorithm](Object.assign(Object.assign({}, this.language), { tokens: tokenQueue, utility: ParserUtility }), this.options.parserOptions);
+            return this.options.algorithm({ ...this.language, tokens: tokenQueue, utility: ParserUtility }, this.options.parserOptions);
+        return ParserRegistry[this.options.algorithm]({ ...this.language, tokens: tokenQueue, utility: ParserUtility }, this.options.parserOptions);
     }
     getTokenQueue() {
         const { lexer } = this.language;
@@ -45,7 +47,6 @@ class Parser {
 exports.Parser = Parser;
 class ParserUtility {
     static SymbolMatchesToken(symbol, token) {
-        var _a;
         if (typeof symbol === 'string')
             throw 'Attempted to match token against non-terminal';
         if (typeof symbol == 'function')
@@ -55,7 +56,7 @@ class ParserUtility {
         if ("test" in symbol)
             return symbol.test(token.value);
         if ("token" in symbol)
-            return symbol.token === token.type || ((_a = token.tag) === null || _a === void 0 ? void 0 : _a.has(symbol.token));
+            return symbol.token === token.type || token.tag?.has(symbol.token);
         if ("literal" in symbol)
             return symbol.literal === token.value;
     }

@@ -1,13 +1,4 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GrammarBuilder = exports.Compile = void 0;
 const parser_1 = require("../parser/parser");
@@ -19,13 +10,13 @@ const json_1 = require("./outputs/json");
 const number = require("../grammars/number.json");
 const string = require("../grammars/string.json");
 const whitespace = require("../grammars/whitespace.json");
-const generator_1 = require("./generator");
+const generator_1 = require("./generator/generator");
 const BuiltInRegistry = {
     number,
     string,
     whitespace,
 };
-const OutputFormats = {
+const TemplateFormats = {
     _default: javascript_1.JavascriptOutput,
     object: (grammar, exportName) => ({ grammar, exportName }),
     json: json_1.JSONFormatter,
@@ -33,22 +24,24 @@ const OutputFormats = {
     javascript: javascript_1.JavascriptOutput,
     module: javascript_1.ESMOutput,
     esmodule: javascript_1.ESMOutput,
+    esm: javascript_1.ESMOutput,
     ts: typescript_1.TypescriptFormat,
     typescript: typescript_1.TypescriptFormat
 };
-function Compile(rules, config = {}) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const builder = new GrammarBuilder(config);
-        yield builder.import(rules);
-        return builder.export(config.format);
-    });
+async function Compile(rules, config = {}) {
+    const builder = new GrammarBuilder(config);
+    await builder.import(rules);
+    Object.assign(builder.generator.state.config, config.overrides);
+    return builder.export(config.template);
 }
 exports.Compile = Compile;
 class GrammarBuilder {
+    config;
+    parser = new parser_1.Parser((0, gwell_1.default)());
+    context;
+    generator = new generator_1.Generator();
     constructor(config = {}, context) {
         this.config = config;
-        this.parser = new parser_1.Parser((0, gwell_1.default)());
-        this.generator = new generator_1.Generator();
         this.context = context || {
             alreadyCompiled: new Set(),
             resolver: config.resolverInstance ? config.resolverInstance : config.resolver ? new config.resolver(config.basedir) : new import_resolver_1.FileSystemResolver(config.basedir),
@@ -59,50 +52,45 @@ class GrammarBuilder {
     export(format, name = 'GWLanguage') {
         const grammar = this.generator.state;
         const output = format || grammar.config.preprocessor || '_default';
-        if (OutputFormats[output]) {
-            return OutputFormats[output](this.generator, name);
+        if (TemplateFormats[output]) {
+            return TemplateFormats[output](this.generator, name);
         }
         throw new Error("No such preprocessor: " + output);
     }
-    ;
-    import(directives) {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (typeof directives == 'string') {
-                yield this.mergeLanguageDefinitionString(directives);
-                return;
+    async import(directives) {
+        if (typeof directives == 'string') {
+            await this.mergeLanguageDefinitionString(directives);
+            return;
+        }
+        directives = Array.isArray(directives) ? directives : [directives];
+        for (const directive of directives) {
+            if ("head" in directive) {
+                this.generator.state.head.push(directive.head.js);
             }
-            directives = Array.isArray(directives) ? directives : [directives];
-            for (const directive of directives) {
-                if ("head" in directive) {
-                    this.generator.state.head.push(directive.head.js);
-                }
-                else if ("body" in directive) {
-                    this.generator.state.body.push(directive.body.js);
-                }
-                else if ("import" in directive) {
-                    yield this.processImportDirective(directive);
-                }
-                else if ("config" in directive) {
-                    this.processConfigDirective(directive);
-                }
-                else if ("grammar" in directive) {
-                    this.processGrammarDirective(directive);
-                }
-                else if ("lexer" in directive) {
-                    this.processLexerDirective(directive);
-                }
+            else if ("body" in directive) {
+                this.generator.state.body.push(directive.body.js);
             }
-        });
+            else if ("import" in directive) {
+                await this.processImportDirective(directive);
+            }
+            else if ("config" in directive) {
+                this.processConfigDirective(directive);
+            }
+            else if ("grammar" in directive) {
+                this.processGrammarDirective(directive);
+            }
+            else if ("lexer" in directive) {
+                this.processLexerDirective(directive);
+            }
+        }
     }
-    processImportDirective(directive) {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (directive.path) {
-                yield this.importGrammar(directive.import);
-            }
-            else {
-                this.importBuiltIn(directive.import);
-            }
-        });
+    async processImportDirective(directive) {
+        if (directive.path) {
+            await this.importGrammar(directive.import);
+        }
+        else {
+            this.importBuiltIn(directive.import);
+        }
     }
     processConfigDirective(directive) {
         Object.assign(this.generator.state.config, directive.config);
@@ -110,6 +98,7 @@ class GrammarBuilder {
     processGrammarDirective(directive) {
         if (directive.grammar.config) {
             this.generator.state.grammar.start = directive.grammar.config.start || this.generator.state.grammar.start;
+            Object.assign(this.generator.state.grammar.config, directive.grammar.config);
         }
         for (const rule of directive.grammar.rules) {
             this.buildRules(rule.name, rule.expressions, rule);
@@ -137,23 +126,19 @@ class GrammarBuilder {
             this.generator.merge(BuiltInRegistry[name].state);
         }
     }
-    importGrammar(name) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const resolver = this.context.resolver;
-            const path = resolver.path(name);
-            if (!this.context.alreadyCompiled.has(path)) {
-                this.context.alreadyCompiled.add(path);
-                yield this.mergeLanguageDefinitionString(yield resolver.body(path));
-            }
-        });
+    async importGrammar(name) {
+        const resolver = this.context.resolver;
+        const path = resolver.path(name);
+        if (!this.context.alreadyCompiled.has(path)) {
+            this.context.alreadyCompiled.add(path);
+            await this.mergeLanguageDefinitionString(await resolver.body(path));
+        }
     }
-    mergeLanguageDefinitionString(body) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const builder = new GrammarBuilder(this.config, this.context);
-            yield builder.import(this.parser.run(body).results[0]);
-            this.generator.merge(builder.generator.state);
-            return;
-        });
+    async mergeLanguageDefinitionString(body) {
+        const builder = new GrammarBuilder(this.config, this.context);
+        await builder.import(this.parser.run(body).results[0]);
+        this.generator.merge(builder.generator.state);
+        return;
     }
     buildRules(name, expressions, rule) {
         for (const expression of expressions) {
@@ -167,7 +152,7 @@ class GrammarBuilder {
             if (symbol)
                 symbols.push(symbol);
         }
-        return { name, symbols, postprocess: expression.postprocess || (rule === null || rule === void 0 ? void 0 : rule.postprocess) };
+        return { name, symbols, postprocess: expression.postprocess || rule?.postprocess };
     }
     buildSymbol(name, symbol) {
         if ('repeat' in symbol) {

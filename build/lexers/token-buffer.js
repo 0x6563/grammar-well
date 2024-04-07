@@ -2,18 +2,19 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TokenBuffer = void 0;
 class TokenBuffer {
-    constructor(lexer) {
-        this.lexer = lexer;
-        this.history = [];
-        this.queued = '';
-        this.$historyIndex = -1;
-    }
-    get offset() { var _a; return ((_a = this.active) === null || _a === void 0 ? void 0 : _a.offset) || 0; }
-    get line() { var _a; return ((_a = this.active) === null || _a === void 0 ? void 0 : _a.line) || 0; }
-    get column() { var _a; return ((_a = this.active) === null || _a === void 0 ? void 0 : _a.column) || 0; }
+    lexer;
+    history = [];
+    queued = '';
+    $historyIndex = -1;
+    get offset() { return this.active?.offset || 0; }
+    get line() { return this.active?.line || 0; }
+    get column() { return this.active?.column || 0; }
     get active() { return this.history[this.$historyIndex]; }
     get state() {
         return { historyIndex: this.$historyIndex, offset: this.offset };
+    }
+    constructor(lexer) {
+        this.lexer = lexer;
     }
     reset(buffer) {
         this.lexer.feed(buffer);
@@ -45,21 +46,17 @@ class TokenBuffer {
         }
     }
     next() {
-        try {
-            if (this.$historyIndex + 1 >= this.history.length) {
-                this.lexerNext();
-            }
-            if (this.$historyIndex + 1 < this.history.length) {
-                return this.history[++this.$historyIndex];
-            }
+        if (this.$historyIndex + 1 >= this.history.length) {
+            this.lexerNext();
         }
-        catch (error) {
-            throw error;
+        if (this.$historyIndex + 1 < this.history.length) {
+            return this.history[++this.$historyIndex];
         }
     }
     peek(offset) {
         offset += this.$historyIndex;
-        while ((offset >= this.history.length) && this.lexerNext()) { }
+        while ((offset >= this.history.length) && this.lexerNext()) {
+        }
         if (offset >= 0 && offset < this.history.length)
             return this.history[offset];
     }
@@ -80,6 +77,7 @@ class TokenBuffer {
 }
 exports.TokenBuffer = TokenBuffer;
 class TokenIterator {
+    buffer;
     constructor(buffer) {
         this.buffer = buffer;
     }

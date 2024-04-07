@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ClosureBuilder = void 0;
 const parser_1 = require("../../parser");
 class ClosureBuilder {
+    grammar;
     constructor(grammar) {
         this.grammar = grammar;
     }

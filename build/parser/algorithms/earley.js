@@ -49,13 +49,16 @@ function Earley(language, options = {}) {
 }
 exports.Earley = Earley;
 class Column {
+    rules;
+    index;
+    data;
+    states = [];
+    wants = Object.create(null);
+    scannable = [];
+    completed = Object.create(null);
     constructor(rules, index) {
         this.rules = rules;
         this.index = index;
-        this.states = [];
-        this.wants = Object.create(null);
-        this.scannable = [];
-        this.completed = Object.create(null);
     }
     process() {
         let w = 0;
@@ -105,7 +108,7 @@ class Column {
         const result = [];
         for (const state of this.states) {
             if (state.rule.symbols[state.dot] && typeof state.rule.symbols[state.dot] !== 'string') {
-                result.push(Object.assign(Object.assign({}, state.rule), { index: state.dot }));
+                result.push({ ...state.rule, index: state.dot });
             }
         }
         return result;
@@ -116,12 +119,19 @@ class Column {
     }
 }
 class State {
+    rule;
+    dot;
+    reference;
+    wantedBy;
+    isComplete;
+    data = [];
+    left;
+    right;
     constructor(rule, dot, reference, wantedBy) {
         this.rule = rule;
         this.dot = dot;
         this.reference = reference;
         this.wantedBy = wantedBy;
-        this.data = [];
         this.isComplete = this.dot === rule.symbols.length;
     }
     nextState(child) {
