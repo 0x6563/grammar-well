@@ -23,11 +23,14 @@ const BaseDir = './src/compiler/builtin/';
         }
     }
     write(`../builtin.json`, JSON.stringify(registry));
-
-    const content = read('../gwell.gwell');
-    const js = await Compile(content, { exportName: 'grammar', template: 'esmodule', overrides: {} });
-    write('../gwell.js', js);
+    await Transpile('../gwell.gwell');
 })();
+
+async function Transpile(path) {
+    const content = read(path);
+    const js = await Compile(content, { exportName: 'grammar', template: 'esmodule', overrides: {} });
+    write(path.replace(/\.gwell$/, '.js'), js);
+}
 
 function read(filename) {
     return readFileSync(fullpath(filename), 'utf-8')

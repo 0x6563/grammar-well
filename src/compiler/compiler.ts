@@ -83,9 +83,9 @@ export class GrammarBuilder {
 
     private async processImportDirective(directive: ImportDirective) {
         if (directive.path) {
-            await this.importGrammar(directive.import, directive.alias);
+            await this.importGrammar(directive.import, this.alias + (directive.alias || ''));
         } else {
-            this.importBuiltIn(directive.import);
+            await this.importBuiltIn(directive.import, this.alias + (directive.alias || ''));
         }
     }
 
