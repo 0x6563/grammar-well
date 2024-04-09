@@ -40,6 +40,7 @@ export type JavascriptDirective = {
 export interface ImportDirective {
     import: string;
     path?: boolean;
+    alias?: string;
 }
 export interface ConfigDirective {
     config: Dictionary<any>;

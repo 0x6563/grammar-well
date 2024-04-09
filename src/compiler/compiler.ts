@@ -2,22 +2,15 @@ import { CompileOptions, GrammarBuilderContext, TemplateFormat, LanguageDirectiv
 
 import { Parser } from "../parser/parser";
 import { FileSystemResolver } from "./import-resolver";
-import Language from '../grammars/gwell';
+import Language from './gwell';
 
 import { ESMOutput, JavascriptOutput } from "./outputs/javascript";
 import { TypescriptFormat } from "./outputs/typescript";
 import { JSONFormatter } from "./outputs/json";
 
-import * as number from '../grammars/number.json';
-import * as string from '../grammars/string.json';
-import * as whitespace from '../grammars/whitespace.json';
 import { Generator } from "./generator/generator";
+import * as BuiltInRegistry from "./builtin.json"
 
-const BuiltInRegistry = {
-    number,
-    string,
-    whitespace,
-}
 const TemplateFormats = {
     _default: JavascriptOutput,
     object: (grammar, exportName) => ({ grammar, exportName }),
@@ -44,7 +37,7 @@ export class GrammarBuilder {
 
     generator = new Generator();
 
-    constructor(private config: CompileOptions = {}, context?: GrammarBuilderContext) {
+    constructor(private config: CompileOptions = {}, context?: GrammarBuilderContext, private alias: string = '') {
         this.context = context || {
             alreadyCompiled: new Set(),
             resolver: config.resolverInstance ? config.resolverInstance : config.resolver ? new config.resolver(config.basedir) : new FileSystemResolver(config.basedir),
@@ -90,7 +83,7 @@ export class GrammarBuilder {
 
     private async processImportDirective(directive: ImportDirective) {
         if (directive.path) {
-            await this.importGrammar(directive.import);
+            await this.importGrammar(directive.import, directive.alias);
         } else {
             this.importBuiltIn(directive.import);
         }
@@ -102,15 +95,22 @@ export class GrammarBuilder {
 
     private processGrammarDirective(directive: GrammarDirective) {
         if (directive.grammar.config) {
-            this.generator.state.grammar.start = directive.grammar.config.start || this.generator.state.grammar.start;
+            if (directive.grammar.config.start) {
+                this.generator.state.grammar.start = this.alias + directive.grammar.config.start;
+            }
+
             Object.assign(this.generator.state.grammar.config, directive.grammar.config);
             // this.generator.state.grammar.postprocessDefault =  directive.grammar.config.postprocessDefault || this.generator.state.grammar.postprocessDefault;
             // this.generator.state.grammar.postprocessOverride =  directive.grammar.config.postprocessOverride || this.generator.state.grammar.postprocessOverride;
         }
 
+        if (!this.generator.state.grammar.start && directive.grammar.rules.length) {
+            this.generator.state.grammar.start = this.alias + directive.grammar.rules[0].name;
+        }
+
         for (const rule of directive.grammar.rules) {
+            rule.name = this.alias + rule.name;
             this.buildRules(rule.name, rule.expressions, rule);
-            this.generator.state.grammar.start = this.generator.state.grammar.start || rule.name;
         }
     }
 
@@ -121,33 +121,54 @@ export class GrammarBuilder {
                 states: {}
             };
         }
-        this.generator.state.lexer.start = directive.lexer.start || this.generator.state.lexer.start || (directive.lexer.states.length ? directive.lexer.states[0].name : '');
+        if (directive.lexer.start) {
+            this.generator.state.lexer.start = this.alias + directive.lexer.start;
+        }
+
+        if (!this.generator.state.lexer.start && directive.lexer.states.length) {
+            this.generator.state.lexer.start = this.alias + directive.lexer.states[0].name
+        }
+
         for (const state of directive.lexer.states) {
+            state.name = this.alias + state.name;
+            if (this.alias) {
+                state.rules.forEach(v => {
+                    if ('import' in v) {
+                        v.import = v.import.map(v2 => this.alias + v2);
+                    }
+                    if ('set' in v) {
+                        v.set = this.alias + v.set;
+                    }
+                    if ('goto' in v) {
+                        v.goto = this.alias + v.goto;
+                    }
+                })
+            }
             this.generator.addLexerState(state);
         }
     }
 
-    private importBuiltIn(name: string) {
+    private async importBuiltIn(name: string, alias?: string) {
         name = name.toLowerCase();
         if (!this.context.alreadyCompiled.has(name)) {
             this.context.alreadyCompiled.add(name);
             if (!BuiltInRegistry[name])
                 return;
-            this.generator.merge(BuiltInRegistry[name].state);
+            await this.mergeLanguageDefinitionString(BuiltInRegistry[name], alias);
         }
     }
 
-    private async importGrammar(name) {
+    private async importGrammar(path: string, alias?: string) {
         const resolver = this.context.resolver;
-        const path = resolver.path(name);
-        if (!this.context.alreadyCompiled.has(path)) {
-            this.context.alreadyCompiled.add(path);
-            await this.mergeLanguageDefinitionString(await resolver.body(path))
+        const fullPath = resolver.path(path);
+        if (!this.context.alreadyCompiled.has(fullPath)) {
+            this.context.alreadyCompiled.add(fullPath);
+            await this.mergeLanguageDefinitionString(await resolver.body(fullPath), alias);
         }
     }
 
-    private async mergeLanguageDefinitionString(body: string) {
-        const builder = new GrammarBuilder(this.config, this.context);
+    private async mergeLanguageDefinitionString(body: string, alias: string = '') {
+        const builder = new GrammarBuilder(this.config, this.context, alias);
         await builder.import(this.parser.run(body).results[0]);
         this.generator.merge(builder.generator.state);
         return;
@@ -174,7 +195,7 @@ export class GrammarBuilder {
             return this.buildRepeatRules(name, symbol);
         }
         if ('rule' in symbol) {
-            return symbol;
+            return { ...symbol, rule: this.alias + symbol.rule };
         }
         if ('regex' in symbol) {
             return symbol;

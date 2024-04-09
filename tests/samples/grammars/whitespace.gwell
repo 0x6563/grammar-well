@@ -1,6 +1,13 @@
 import * from whitespace;
 
-grammar : {{
+lexer: {{
+   start: "root"
+   root ->
+        - import: whitespace
+        - when: /./
+}}
+
+grammar: {{
    start: "d"
 
    d -> a : {{ data }}

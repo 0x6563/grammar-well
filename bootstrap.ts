@@ -1,18 +1,20 @@
 import { readdirSync, readFileSync, writeFileSync } from "fs";
 import { resolve } from "path";
 import { Compile } from "./src";
-const BaseDir = './src/grammars';
+const BaseDir = './src/compiler/builtin/';
 
 (async () => {
     const files = readdirSync(BaseDir);
+    const registry = {};
     for (const file of files) {
         try {
-            console.log(fullpath(file))
-            if (/\.gwell$/.test(file)) {
-                const json = await Compile(read(file), { template: 'json' });
-                const js = await Compile(read(file), { exportName: 'grammar', template: 'esmodule', overrides: {} });
-                write(file.replace(/.gwell$/, '.json'), json);
-                write(file.replace(/.gwell$/, '.js'), js);
+            if (typeof file == 'string') {
+                if (/\.gwell$/.test(file)) {
+                    console.log(file);
+                    const content = read(file);
+                    const name = file.split('.')[0] as string;
+                    registry[name] = content;
+                }
             }
         } catch (error) {
             console.log(file);
@@ -20,6 +22,11 @@ const BaseDir = './src/grammars';
             throw error;
         }
     }
+    write(`../builtin.json`, JSON.stringify(registry));
+
+    const content = read('../gwell.gwell');
+    const js = await Compile(content, { exportName: 'grammar', template: 'esmodule', overrides: {} });
+    write('../gwell.js', js);
 })();
 
 function read(filename) {

@@ -24,10 +24,11 @@ export declare function Compile(rules: string | LanguageDirective | (LanguageDir
 }>;
 export declare class GrammarBuilder {
     private config;
+    private alias;
     private parser;
     private context;
     generator: Generator;
-    constructor(config?: CompileOptions, context?: GrammarBuilderContext);
+    constructor(config?: CompileOptions, context?: GrammarBuilderContext, alias?: string);
     export<T extends TemplateFormat = '_default'>(format: T, name?: string): ReturnType<typeof TemplateFormats[T]>;
     import(source: string): Promise<void>;
     import(directive: LanguageDirective): Promise<void>;

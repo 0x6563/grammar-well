@@ -47,6 +47,7 @@ export type JavascriptDirective = { body: GrammarTypeJS; } | { head: GrammarType
 export interface ImportDirective {
     import: string;
     path?: boolean;
+    alias?: string;
 }
 
 export interface ConfigDirective {

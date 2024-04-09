@@ -3,19 +3,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.GrammarBuilder = exports.Compile = void 0;
 const parser_1 = require("../parser/parser");
 const import_resolver_1 = require("./import-resolver");
-const gwell_1 = require("../grammars/gwell");
+const gwell_1 = require("./gwell");
 const javascript_1 = require("./outputs/javascript");
 const typescript_1 = require("./outputs/typescript");
 const json_1 = require("./outputs/json");
-const number = require("../grammars/number.json");
-const string = require("../grammars/string.json");
-const whitespace = require("../grammars/whitespace.json");
 const generator_1 = require("./generator/generator");
-const BuiltInRegistry = {
-    number,
-    string,
-    whitespace,
-};
+const BuiltInRegistry = require("./builtin.json");
 const TemplateFormats = {
     _default: javascript_1.JavascriptOutput,
     object: (grammar, exportName) => ({ grammar, exportName }),
@@ -37,11 +30,13 @@ async function Compile(rules, config = {}) {
 exports.Compile = Compile;
 class GrammarBuilder {
     config;
+    alias;
     parser = new parser_1.Parser((0, gwell_1.default)());
     context;
     generator = new generator_1.Generator();
-    constructor(config = {}, context) {
+    constructor(config = {}, context, alias = '') {
         this.config = config;
+        this.alias = alias;
         this.context = context || {
             alreadyCompiled: new Set(),
             resolver: config.resolverInstance ? config.resolverInstance : config.resolver ? new config.resolver(config.basedir) : new import_resolver_1.FileSystemResolver(config.basedir),
@@ -86,7 +81,7 @@ class GrammarBuilder {
     }
     async processImportDirective(directive) {
         if (directive.path) {
-            await this.importGrammar(directive.import);
+            await this.importGrammar(directive.import, directive.alias);
         }
         else {
             this.importBuiltIn(directive.import);
@@ -97,12 +92,17 @@ class GrammarBuilder {
     }
     processGrammarDirective(directive) {
         if (directive.grammar.config) {
-            this.generator.state.grammar.start = directive.grammar.config.start || this.generator.state.grammar.start;
+            if (directive.grammar.config.start) {
+                this.generator.state.grammar.start = this.alias + directive.grammar.config.start;
+            }
             Object.assign(this.generator.state.grammar.config, directive.grammar.config);
         }
+        if (!this.generator.state.grammar.start && directive.grammar.rules.length) {
+            this.generator.state.grammar.start = this.alias + directive.grammar.rules[0].name;
+        }
         for (const rule of directive.grammar.rules) {
+            rule.name = this.alias + rule.name;
             this.buildRules(rule.name, rule.expressions, rule);
-            this.generator.state.grammar.start = this.generator.state.grammar.start || rule.name;
         }
     }
     processLexerDirective(directive) {
@@ -112,30 +112,49 @@ class GrammarBuilder {
                 states: {}
             };
         }
-        this.generator.state.lexer.start = directive.lexer.start || this.generator.state.lexer.start || (directive.lexer.states.length ? directive.lexer.states[0].name : '');
+        if (directive.lexer.start) {
+            this.generator.state.lexer.start = this.alias + directive.lexer.start;
+        }
+        if (!this.generator.state.lexer.start && directive.lexer.states.length) {
+            this.generator.state.lexer.start = this.alias + directive.lexer.states[0].name;
+        }
         for (const state of directive.lexer.states) {
+            state.name = this.alias + state.name;
+            if (this.alias) {
+                state.rules.forEach(v => {
+                    if ('import' in v) {
+                        v.import = v.import.map(v2 => this.alias + v2);
+                    }
+                    if ('set' in v) {
+                        v.set = this.alias + v.set;
+                    }
+                    if ('goto' in v) {
+                        v.goto = this.alias + v.goto;
+                    }
+                });
+            }
             this.generator.addLexerState(state);
         }
     }
-    importBuiltIn(name) {
+    async importBuiltIn(name, alias) {
         name = name.toLowerCase();
         if (!this.context.alreadyCompiled.has(name)) {
             this.context.alreadyCompiled.add(name);
             if (!BuiltInRegistry[name])
                 return;
-            this.generator.merge(BuiltInRegistry[name].state);
+            await this.mergeLanguageDefinitionString(BuiltInRegistry[name], alias);
         }
     }
-    async importGrammar(name) {
+    async importGrammar(path, alias) {
         const resolver = this.context.resolver;
-        const path = resolver.path(name);
-        if (!this.context.alreadyCompiled.has(path)) {
-            this.context.alreadyCompiled.add(path);
-            await this.mergeLanguageDefinitionString(await resolver.body(path));
+        const fullPath = resolver.path(path);
+        if (!this.context.alreadyCompiled.has(fullPath)) {
+            this.context.alreadyCompiled.add(fullPath);
+            await this.mergeLanguageDefinitionString(await resolver.body(fullPath), alias);
         }
     }
-    async mergeLanguageDefinitionString(body) {
-        const builder = new GrammarBuilder(this.config, this.context);
+    async mergeLanguageDefinitionString(body, alias = '') {
+        const builder = new GrammarBuilder(this.config, this.context, alias);
         await builder.import(this.parser.run(body).results[0]);
         this.generator.merge(builder.generator.state);
         return;
@@ -159,7 +178,7 @@ class GrammarBuilder {
             return this.buildRepeatRules(name, symbol);
         }
         if ('rule' in symbol) {
-            return symbol;
+            return { ...symbol, rule: this.alias + symbol.rule };
         }
         if ('regex' in symbol) {
             return symbol;
