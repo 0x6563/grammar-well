@@ -81,10 +81,10 @@ class GrammarBuilder {
     }
     async processImportDirective(directive) {
         if (directive.path) {
-            await this.importGrammar(directive.import, directive.alias);
+            await this.importGrammar(directive.import, this.alias + (directive.alias || ''));
         }
         else {
-            this.importBuiltIn(directive.import);
+            await this.importBuiltIn(directive.import, this.alias + (directive.alias || ''));
         }
     }
     processConfigDirective(directive) {
