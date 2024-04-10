@@ -63,6 +63,8 @@ function GWLanguage() {
                     { name: "token_definition", symbols: ["K_POP", "_", "L_COLON", "_", "T_INTEGER"], postprocess: ({ data }) => { return { pop: parseInt(data[4]) }; } },
                     { name: "token_definition", symbols: ["K_POP", "_", "L_COLON", "_", "K_ALL"], postprocess: ({ data }) => { return { pop: "all" }; } },
                     { name: "token_definition", symbols: ["K_HIGHLIGHT", "_", "L_COLON", "_", "T_STRING"], postprocess: ({ data }) => { return { highlight: data[4] }; } },
+                    { name: "token_definition", symbols: ["K_EMBED", "_", "L_COLON", "_", "T_STRING"], postprocess: ({ data }) => { return { embed: data[4] }; } },
+                    { name: "token_definition", symbols: ["K_UNEMBED"], postprocess: ({ data }) => { return { unembed: true }; } },
                     { name: "token_definition", symbols: ["K_INSET"], postprocess: ({ data }) => { return { inset: 1 }; } },
                     { name: "token_definition", symbols: ["K_INSET", "_", "L_COLON", "_", "T_INTEGER"], postprocess: ({ data }) => { return { inset: parseInt(data[4]) }; } },
                     { name: "token_definition", symbols: ["K_SET", "_", "L_COLON", "_", "T_WORD"], postprocess: ({ data }) => { return { set: data[4] }; } },
@@ -229,6 +231,12 @@ function GWLanguage() {
                 ],
                 K_HIGHLIGHT: [
                     { name: "K_HIGHLIGHT", symbols: [{ literal: "highlight" }] }
+                ],
+                K_EMBED: [
+                    { name: "K_EMBED", symbols: [{ literal: "embed" }] }
+                ],
+                K_UNEMBED: [
+                    { name: "K_UNEMBED", symbols: [{ literal: "unembed" }] }
                 ],
                 K_INSET: [
                     { name: "K_INSET", symbols: [{ literal: "inset" }] }

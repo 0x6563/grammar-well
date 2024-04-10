@@ -179,6 +179,22 @@ declare function GWLanguage(): {
                 postprocess: ({ data }: {
                     data: any;
                 }) => {
+                    embed: any;
+                };
+            } | {
+                name: string;
+                symbols: string[];
+                postprocess: ({ data }: {
+                    data: any;
+                }) => {
+                    unembed: boolean;
+                };
+            } | {
+                name: string;
+                symbols: string[];
+                postprocess: ({ data }: {
+                    data: any;
+                }) => {
                     inset: number;
                 };
             } | {
@@ -496,6 +512,18 @@ declare function GWLanguage(): {
                 }[];
             }[];
             K_HIGHLIGHT: {
+                name: string;
+                symbols: {
+                    literal: string;
+                }[];
+            }[];
+            K_EMBED: {
+                name: string;
+                symbols: {
+                    literal: string;
+                }[];
+            }[];
+            K_UNEMBED: {
                 name: string;
                 symbols: {
                     literal: string;
