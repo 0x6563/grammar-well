@@ -165,6 +165,8 @@ grammar: {{
         | K_POP _ L_COLON _ T_INTEGER : {{ { pop: parseInt($4) } }}
         | K_POP _ L_COLON _ K_ALL : {{ { pop: "all" } }}
         | K_HIGHLIGHT _ L_COLON _ T_STRING : {{ { highlight: $4 } }}
+        | K_EMBED _ L_COLON _ T_STRING : {{ { embed: $4 } }}
+        | K_UNEMBED : {{ { unembed: true } }}
         | K_INSET : {{ { inset: 1 } }}
         | K_INSET _ L_COLON _ T_INTEGER : {{ { inset: parseInt($4) } }}
         | K_SET _ L_COLON _ T_WORD : {{ { set: $4 } }}
@@ -262,6 +264,8 @@ grammar: {{
     K_WHEN -> "when"
     K_POP -> "pop"
     K_HIGHLIGHT -> "highlight"
+    K_EMBED -> "embed"
+    K_UNEMBED -> "unembed"
     K_INSET -> "inset"
     K_SET -> "set"
     K_GOTO -> "goto"

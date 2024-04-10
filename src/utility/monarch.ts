@@ -11,16 +11,25 @@ export function CreateMonarchTokenizer(lexer: LexerConfig) {
                 for (const i of rule.import) {
                     tokenizer[name].push({ include: i })
                 }
-            } else if ('pop' in rule) {
-                tokenizer[name].push([TransformWhen(rule.when), { token: rule.highlight || 'source', next: '@pop' }])
-            } else if ('goto' in rule) {
-                tokenizer[name].push([TransformWhen(rule.when), { token: rule.highlight || 'source', next: '@' + rule.goto }])
-            } else if ('set' in rule) {
-                tokenizer[name].push([TransformWhen(rule.when), { token: rule.highlight || 'source', switchTo: '@' + rule.set }])
-            } else if ('inset' in rule) {
-                tokenizer[name].push([TransformWhen(rule.when), { token: rule.highlight || 'source', next: '@push' }])
-            } else if ('when' in rule) {
-                tokenizer[name].push([TransformWhen(rule.when), { token: rule.highlight || 'source' }])
+            } else {
+                const action: any = { token: rule.highlight || 'source' };
+                if ('pop' in rule) {
+                    action.next = '@pop';
+                } else if ('goto' in rule) {
+                    action.next = '@' + rule.goto;
+                } else if ('set' in rule) {
+                    action.switchTo = '@' + rule.set;
+                } else if ('inset' in rule) {
+                    action.next = '@push';
+                }
+
+                if ('embed' in rule) {
+                    action.nextEmbedded = rule.embed;
+                } else if ('unembed' in rule) {
+                    action.nextEmbedded = '@pop';
+                }
+
+                tokenizer[name].push([TransformWhen(rule.when), action])
             }
         }
     }

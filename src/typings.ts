@@ -203,6 +203,8 @@ export interface LexerStateMatchRule {
     tag?: string[];
     pop?: number | 'all';
     highlight?: string;
+    embed?: string;
+    unembed?: boolean;
     inset?: number;
     goto?: string;
     set?: string;
