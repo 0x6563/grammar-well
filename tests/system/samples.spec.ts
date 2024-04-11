@@ -17,6 +17,10 @@ describe('Predefined Samples', () => {
                     const execution = await AsyncRun(() => BuildTest(grammar, input, options));
                     try {
                         if (typeof test.throw == 'boolean') {
+                            if (execution.success == test.throw) {
+                                // console.log(execution.error);
+                                // console.log(input)
+                            }
                             Expected(execution.success, !test.throw, `Expected to ${test.throw ? '' : 'not '}throw.`);
                         } else if (error) {
                             Expected(execution.error, error);

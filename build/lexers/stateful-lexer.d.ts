@@ -38,7 +38,7 @@ export declare class StatefulLexer {
     private matchNext;
     private createToken;
     private getTags;
-    private processRule;
+    private adjustStack;
     private getGroup;
 }
 export declare function ResolveStates(states: {

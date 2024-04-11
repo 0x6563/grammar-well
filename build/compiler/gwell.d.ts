@@ -511,6 +511,12 @@ declare function GWLanguage(): {
                     literal: string;
                 }[];
             }[];
+            K_BEFORE: {
+                name: string;
+                symbols: {
+                    literal: string;
+                }[];
+            }[];
             K_HIGHLIGHT: {
                 name: string;
                 symbols: {

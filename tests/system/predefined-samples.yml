@@ -3,6 +3,11 @@ General:
     grammarSource: grammars/whitespace.gwell
     input: "(x)"
     result: [[["(", null, [[[["x"]]]], null, ")"]]]
+    
+  - title: Lexer Before
+    grammarSource: grammars/lexer-before.gwell
+    input: "(a)"
+    throw: false
 
 Parentheses:
   - title: Parentheses Pass 1

@@ -60,7 +60,7 @@ export class StatefulLexer {
             throw new Error(`No matching rule for ${text}`);
         }
         const token = this.createToken(rule, text, index)
-        this.processRule(rule);
+        this.adjustStack(rule);
         return token;
     }
 
@@ -90,7 +90,7 @@ export class StatefulLexer {
 
         const { index, buffer } = this;
         let text;
-        let rule;
+        let rule: LexerStateMatchRule;
         let match;
 
         this.regexp.lastIndex = index;
@@ -105,11 +105,15 @@ export class StatefulLexer {
             text = buffer.slice(index, buffer.length);
         } else if (match.index !== index) {
             rule = this.unmatched;
-            text = buffer.slice(index, match.index)
+            text = buffer.slice(index, match.index);
             this.prefetched = match;
         } else {
-            rule = this.getGroup(match)
-            text = match[0]
+            rule = this.getGroup(match);
+            text = match[0];
+            if (rule.before) {
+                this.adjustStack(rule);
+                return this.matchNext();
+            }
         }
 
         return { index, rule, text }
@@ -146,7 +150,7 @@ export class StatefulLexer {
         return this.tags.get(tags);
     }
 
-    private processRule(rule: LexerStateMatchRule) {
+    private adjustStack(rule: LexerStateMatchRule) {
         if (rule.pop) {
             let i = rule.pop === 'all' ? this.stack.length : rule.pop;
             while (i-- > 0) {

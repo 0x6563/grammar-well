@@ -57,7 +57,7 @@ class StatefulLexer {
             throw new Error(`No matching rule for ${text}`);
         }
         const token = this.createToken(rule, text, index);
-        this.processRule(rule);
+        this.adjustStack(rule);
         return token;
     }
     set(current) {
@@ -104,6 +104,10 @@ class StatefulLexer {
         else {
             rule = this.getGroup(match);
             text = match[0];
+            if (rule.before) {
+                this.adjustStack(rule);
+                return this.matchNext();
+            }
         }
         return { index, rule, text };
     }
@@ -135,7 +139,7 @@ class StatefulLexer {
             this.tags.set(tags, new Set(tags));
         return this.tags.get(tags);
     }
-    processRule(rule) {
+    adjustStack(rule) {
         if (rule.pop) {
             let i = rule.pop === 'all' ? this.stack.length : rule.pop;
             while (i-- > 0) {

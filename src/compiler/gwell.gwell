@@ -73,7 +73,7 @@ lexer: {{
     l_colon ->
         - when: ":" tag: "L_COLON" highlight: "keyword"
     l_scolon ->
-        - when: ";" tag: "L_SCOLON"
+        - when: ";" tag: "L_SCOLON" 
     l_qmark ->
         - when: "?" tag: "L_QMARK"
     l_plus ->
@@ -161,6 +161,8 @@ grammar: {{
         K_TAG _ L_COLON _ string_list : {{ { tag: $4 } }}
         | K_WHEN _ L_COLON _ T_STRING : {{ { when: $4 } }}
         | K_WHEN _ L_COLON _ T_REGEX : {{ { when: $4 } }}
+        | K_BEFORE _ L_COLON _ T_STRING : {{ { when: $4, before:true } }}
+        | K_BEFORE _ L_COLON _ T_REGEX : {{ { when: $4, before:true } }}
         | K_POP : {{ { pop: 1 } }}
         | K_POP _ L_COLON _ T_INTEGER : {{ { pop: parseInt($4) } }}
         | K_POP _ L_COLON _ K_ALL : {{ { pop: "all" } }}
@@ -263,6 +265,7 @@ grammar: {{
     K_TYPE -> "type"
     K_WHEN -> "when"
     K_POP -> "pop"
+    K_BEFORE -> "before"
     K_HIGHLIGHT -> "highlight"
     K_EMBED -> "embed"
     K_UNEMBED -> "unembed"
