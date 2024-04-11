@@ -181,7 +181,7 @@ export interface LexerStateMatchRule {
     type?: string;
     tag?: string[];
     pop?: number | 'all';
-    before?: true;
+    before?: boolean;
     highlight?: string;
     embed?: string;
     unembed?: boolean;
