@@ -28,6 +28,10 @@ export function CreateMonarchTokenizer(lexer: LexerConfig) {
                 } else if ('unembed' in rule) {
                     action.nextEmbedded = '@pop';
                 }
+                
+                if (rule.before) {
+                    action.token = '@rematch';
+                }
 
                 tokenizer[name].push([TransformWhen(rule.when), action])
             }
