@@ -114,22 +114,27 @@ class StatefulLexer {
     createToken(rule, text, offset) {
         const token = {
             type: rule.type,
+            highlight: rule.highlight,
+            open: rule.open,
+            close: rule.close,
             tag: this.getTags(rule.tag),
             value: text,
             text: text,
             offset: offset,
             line: this.line,
+            lines: 0,
             column: this.column,
             state: this.current
         };
         for (let i = 0; i < text.length; i++) {
-            this.index++;
             this.column++;
             if (text[i] == '\n') {
-                this.line++;
+                token.lines++;
                 this.column = 1;
             }
         }
+        this.index += text.length;
+        this.line += token.lines;
         return token;
     }
     getTags(tags) {

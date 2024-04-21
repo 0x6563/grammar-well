@@ -183,6 +183,8 @@ export interface LexerStateMatchRule {
     pop?: number | 'all';
     before?: boolean;
     highlight?: string;
+    open?: string;
+    close?: string;
     embed?: string;
     unembed?: boolean;
     inset?: number;

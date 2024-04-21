@@ -2,7 +2,6 @@
   "name": "grammar-well",
   "version": "1.2.7",
   "description": "Cross-platform Parser written in TypeScript",
-  "main": "build/index.js",
   "scripts": {
     "prebuild": "tsc --build --clean",
     "build": "tsc --build",
@@ -11,6 +10,13 @@
     "benchmark": "node tests/performance/benchmark.js",
     "test": "nyc mocha tests/**/*.spec.ts",
     "profile": "node tests/performance/profile.js"
+  },
+  "exports": {
+    ".": "./build/index.js",
+    "./parser": "./build/parser/parser.js",
+    "./compiler": "./build/compiler/index.js",
+    "./lexer": "./build/lexers/stateful-lexer.js",
+    "./utility": "./build/utility/index.js"
   },
   "author": "0x6563",
   "license": "LGPL-3.0",
@@ -48,6 +54,7 @@
     "compiler",
     "compile",
     "grammar",
-    "language"
+    "language",
+    "lexer"
   ]
 }

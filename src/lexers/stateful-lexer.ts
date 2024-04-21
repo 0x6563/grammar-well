@@ -1,6 +1,6 @@
-import { CompiledStateDefinition, LexerStateMatchRule, ResolvedStateDefinition, LexerStateDefinition, LexerConfig } from "../typings";
+import { CompiledStateDefinition, LexerStateMatchRule, ResolvedStateDefinition, LexerStateDefinition, LexerConfig, Lexer } from "../typings";
 
-export class StatefulLexer {
+export class StatefulLexer implements Lexer {
     private start: string;
     private states: { [key: string]: CompiledStateDefinition } = Object.create(null);
     private buffer: string;
@@ -122,23 +122,27 @@ export class StatefulLexer {
     private createToken(rule: LexerStateMatchRule, text: string, offset: number) {
         const token = {
             type: rule.type,
+            highlight: rule.highlight,
+            open: rule.open,
+            close: rule.close,
             tag: this.getTags(rule.tag),
             value: text,
             text: text,
             offset: offset,
             line: this.line,
+            lines: 0,
             column: this.column,
             state: this.current
         }
-
         for (let i = 0; i < text.length; i++) {
-            this.index++;
             this.column++;
             if (text[i] == '\n') {
-                this.line++;
+                token.lines++;
                 this.column = 1;
             }
         }
+        this.index += text.length;
+        this.line += token.lines;
         return token;
     }
 
@@ -186,18 +190,19 @@ export class StatefulLexer {
 class RegexLib {
 
     static IsRegex(o: any) {
-        return o instanceof RegExp
+        return o instanceof RegExp;
     }
+
     static Escape(s: string) {
-        return s.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')
+        return s.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
     }
 
     static HasGroups(s: string) {
-        return (new RegExp('|' + s)).exec('').length > 1
+        return (new RegExp('|' + s)).exec('').length > 1;
     }
 
     static Capture(source: string) {
-        return '(' + source + ')'
+        return '(' + source + ')';
     }
 
     static Join(regexps: string[]) {
@@ -269,11 +274,9 @@ function CompileRegExp(state: ResolvedStateDefinition): RegExp {
 }
 
 export function ResolveStates(states: { [key: string]: LexerStateDefinition }, start: string) {
-
     const resolved = new Set<string>();
     const resolving = new Set<string>();
     const chain = new Set<string>();
-
 
     ResolveRuleImports(start, states, resolved, resolving, chain);
     for (const key in states) {
@@ -335,5 +338,4 @@ class UniqueRules {
             }
         }
     }
-
 }

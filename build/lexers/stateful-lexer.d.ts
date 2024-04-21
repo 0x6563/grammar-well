@@ -1,5 +1,5 @@
-import { LexerStateDefinition, LexerConfig } from "../typings";
-export declare class StatefulLexer {
+import { LexerStateDefinition, LexerConfig, Lexer } from "../typings";
+export declare class StatefulLexer implements Lexer {
     private start;
     private states;
     private buffer;
@@ -24,11 +24,15 @@ export declare class StatefulLexer {
     };
     next(): {
         type: string;
+        highlight: string;
+        open: string;
+        close: string;
         tag: Set<string>;
         value: string;
         text: string;
         offset: number;
         line: number;
+        lines: number;
         column: number;
         state: string;
     };

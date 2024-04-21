@@ -161,6 +161,8 @@ grammar: {{
         K_TAG _ L_COLON _ string_list : {{ { tag: $4 } }}
         | K_WHEN _ L_COLON _ T_STRING : {{ { when: $4 } }}
         | K_WHEN _ L_COLON _ T_REGEX : {{ { when: $4 } }}
+        | K_OPEN _ L_COLON _ T_STRING : {{ { open: $4 } }}
+        | K_CLOSE _ L_COLON _ T_STRING : {{ { close: $4 } }}
         | K_BEFORE _ L_COLON _ T_STRING : {{ { when: $4, before:true } }}
         | K_BEFORE _ L_COLON _ T_REGEX : {{ { when: $4, before:true } }}
         | K_POP : {{ { pop: 1 } }}
@@ -266,6 +268,8 @@ grammar: {{
     K_WHEN -> "when"
     K_POP -> "pop"
     K_BEFORE -> "before"
+    K_OPEN -> "open"
+    K_CLOSE -> "close"
     K_HIGHLIGHT -> "highlight"
     K_EMBED -> "embed"
     K_UNEMBED -> "unembed"
