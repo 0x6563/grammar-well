@@ -180,7 +180,8 @@ The first rule we see is in the example is an _import_ rule. The import rule exp
 This other rules we see in the example are _token matching_ rules. As the name implies, we declare what to match in the input stream. Below is a list of fields that are available.
 
 #### Fields
-- `when` [ _string | regex_] **required** what to match in the input stream
+- `when` [ _string | regex_] **required, exclusive with before** what to match in the input stream
+- `before` [_string | regex_] **required, exclusive with when** what to match but does not consume the input stream, should be used in conjunction with stack manipulation
 - `tag` [_comma delimited strings_] Applies tags to the matched token, these can be referenced in the grammar
 - `goto` [_word_] Moves to the defined state and adds the current state onto the stack
 - `pop` [_number|nothing_] Pops 1 or the number of states off the stack

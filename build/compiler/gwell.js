@@ -59,6 +59,8 @@ function GWLanguage() {
                     { name: "token_definition", symbols: ["K_TAG", "_", "L_COLON", "_", "string_list"], postprocess: ({ data }) => { return { tag: data[4] }; } },
                     { name: "token_definition", symbols: ["K_WHEN", "_", "L_COLON", "_", "T_STRING"], postprocess: ({ data }) => { return { when: data[4] }; } },
                     { name: "token_definition", symbols: ["K_WHEN", "_", "L_COLON", "_", "T_REGEX"], postprocess: ({ data }) => { return { when: data[4] }; } },
+                    { name: "token_definition", symbols: ["K_OPEN", "_", "L_COLON", "_", "T_STRING"], postprocess: ({ data }) => { return { open: data[4] }; } },
+                    { name: "token_definition", symbols: ["K_CLOSE", "_", "L_COLON", "_", "T_STRING"], postprocess: ({ data }) => { return { close: data[4] }; } },
                     { name: "token_definition", symbols: ["K_BEFORE", "_", "L_COLON", "_", "T_STRING"], postprocess: ({ data }) => { return { when: data[4], before: true }; } },
                     { name: "token_definition", symbols: ["K_BEFORE", "_", "L_COLON", "_", "T_REGEX"], postprocess: ({ data }) => { return { when: data[4], before: true }; } },
                     { name: "token_definition", symbols: ["K_POP"], postprocess: ({ data }) => { return { pop: 1 }; } },
@@ -233,6 +235,12 @@ function GWLanguage() {
                 ],
                 K_BEFORE: [
                     { name: "K_BEFORE", symbols: [{ literal: "before" }] }
+                ],
+                K_OPEN: [
+                    { name: "K_OPEN", symbols: [{ literal: "open" }] }
+                ],
+                K_CLOSE: [
+                    { name: "K_CLOSE", symbols: [{ literal: "close" }] }
                 ],
                 K_HIGHLIGHT: [
                     { name: "K_HIGHLIGHT", symbols: [{ literal: "highlight" }] }

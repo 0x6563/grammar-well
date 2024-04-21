@@ -155,6 +155,22 @@ declare function GWLanguage(): {
                 postprocess: ({ data }: {
                     data: any;
                 }) => {
+                    open: any;
+                };
+            } | {
+                name: string;
+                symbols: string[];
+                postprocess: ({ data }: {
+                    data: any;
+                }) => {
+                    close: any;
+                };
+            } | {
+                name: string;
+                symbols: string[];
+                postprocess: ({ data }: {
+                    data: any;
+                }) => {
                     pop: number;
                 };
             } | {
@@ -512,6 +528,18 @@ declare function GWLanguage(): {
                 }[];
             }[];
             K_BEFORE: {
+                name: string;
+                symbols: {
+                    literal: string;
+                }[];
+            }[];
+            K_OPEN: {
+                name: string;
+                symbols: {
+                    literal: string;
+                }[];
+            }[];
+            K_CLOSE: {
                 name: string;
                 symbols: {
                     literal: string;

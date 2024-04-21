@@ -9,6 +9,11 @@ General:
     input: "(a)"
     throw: false
 
+  - title: Lexer Bracket
+    grammarSource: grammars/lexer-bracket.gwell
+    input: "{}"
+    throw: false
+
 Parentheses:
   - title: Parentheses Pass 1
     grammarSource: grammars/parentheses.gwell
