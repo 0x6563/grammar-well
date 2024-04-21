@@ -154,6 +154,8 @@ export class Generator {
                 tag: JSON.stringify(rule.tag),
                 pop: JSON.stringify(rule.pop),
                 before: JSON.stringify(rule.before),
+                open: JSON.stringify(rule.open),
+                close: JSON.stringify(rule.close),
                 highlight: JSON.stringify(rule.highlight),
                 set: JSON.stringify(rule.set),
                 inset: JSON.stringify(rule.inset),
