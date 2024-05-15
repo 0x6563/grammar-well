@@ -1,7 +1,7 @@
 import { readdirSync, readFileSync, writeFileSync } from "fs";
 import { resolve } from "path";
-import { Compile } from "./src";
-const BaseDir = './src/compiler/builtin/';
+import { Generate } from "./src";
+const BaseDir = './src/generator/builtin/';
 
 (async () => {
     const files = readdirSync(BaseDir);
@@ -22,13 +22,13 @@ const BaseDir = './src/compiler/builtin/';
             throw error;
         }
     }
-    write(`../builtin.json`, JSON.stringify(registry));
+    write(`./registry.json`, JSON.stringify(registry));
     await Transpile('../gwell.gwell');
 })();
 
 async function Transpile(path) {
     const content = read(path);
-    const js = await Compile(content, { exportName: 'grammar', template: 'esmodule', overrides: {} });
+    const js = await Generate(content, { exportName: 'grammar', template: 'esmodule', overrides: {} });
     write(path.replace(/\.gwell$/, '.js'), js);
 }
 

@@ -1,5 +1,5 @@
-export * from './compiler/compiler';
-export * from './compiler/import-resolver';
+export * from './generator/generator';
+export * from './generator/import-resolver';
 export * from './parser/parser';
 export * from './typings'
 export { StatefulLexer } from './lexers/stateful-lexer';

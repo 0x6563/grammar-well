@@ -1,0 +1,31 @@
+import { GeneratorOptions, GeneratorContext, TemplateFormat, LanguageDirective } from "../typings";
+import { JavaScriptGenerator } from "./stringify/javascript";
+import { ExportsRegistry } from "./stringify/exports/registry";
+import { GeneratorState } from "./state";
+export declare function Generate(rules: string | LanguageDirective | (LanguageDirective[]), config?: GeneratorOptions): Promise<string>;
+export declare class Generator {
+    private config;
+    private alias;
+    private parser;
+    private context;
+    state: GeneratorState;
+    generator: JavaScriptGenerator;
+    constructor(config?: GeneratorOptions, context?: GeneratorContext, alias?: string);
+    import(source: string): Promise<void>;
+    import(directive: LanguageDirective): Promise<void>;
+    import(directives: LanguageDirective[]): Promise<void>;
+    export<T extends TemplateFormat = '_default'>(format: any, name?: string): ReturnType<typeof ExportsRegistry[T]>;
+    private processImportDirective;
+    private processConfigDirective;
+    private processLexerDirective;
+    private processGrammarDirective;
+    private importBuiltIn;
+    private importGrammar;
+    private mergeLanguageDefinitionString;
+    private buildRules;
+    private buildRule;
+    private buildSymbol;
+    private buildCharacterRules;
+    private buildSubExpressionRules;
+    private buildRepeatRules;
+}

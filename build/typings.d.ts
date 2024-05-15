@@ -3,19 +3,18 @@ import { ParserUtility } from "./parser/parser";
 export interface Dictionary<T> {
     [key: string]: T;
 }
-export interface CompileOptions {
+export interface GeneratorOptions {
     version?: string;
     noscript?: boolean;
     basedir?: string;
-    resolver?: ImportResolverConstructor;
-    resolverInstance?: ImportResolver;
+    resolver?: ImportResolverConstructor | ImportResolver;
     exportName?: string;
     template?: TemplateFormat;
     overrides?: Dictionary<string>;
 }
 export type TemplateFormat = '_default' | 'object' | 'json' | 'js' | 'javascript' | 'module' | 'esmodule' | 'esm' | 'ts' | 'typescript';
-export interface GrammarBuilderContext {
-    alreadyCompiled: Set<string>;
+export interface GeneratorContext {
+    imported: Set<string>;
     resolver: ImportResolver;
     uuids: Dictionary<number>;
 }
@@ -48,7 +47,7 @@ export interface ConfigDirective {
 export interface GrammarDirective {
     grammar: {
         config?: Dictionary<any>;
-        rules: GrammarBuilderRule[];
+        rules: GeneratorRule[];
     };
 }
 export interface LexerDirective {
@@ -57,21 +56,21 @@ export interface LexerDirective {
         states: LexerStateDefinition[];
     };
 }
-export interface GrammarBuilderRule {
+export interface GeneratorRule {
     name: string;
-    expressions: GrammarBuilderExpression[];
+    expressions: GeneratorExpression[];
     postprocess?: GrammarTypeJS | GrammarTypeBuiltIn | GrammarTypeTemplate;
 }
-export interface GrammarBuilderExpression {
-    symbols: GrammarBuilderSymbol[];
+export interface GeneratorExpression {
+    symbols: GeneratorSymbol[];
     postprocess?: GrammarTypeJS | GrammarTypeBuiltIn | GrammarTypeTemplate;
 }
-export type GrammarBuilderSymbol = GrammarTypeRule | GrammarTypeRegex | GrammarTypeToken | GrammarTypeLiteral | GrammarBuilderSymbolRepeat | GrammarBuilderSymbolSubexpression;
-export interface GrammarBuilderSymbolSubexpression {
-    subexpression: GrammarBuilderExpression[];
+export type GeneratorSymbol = GrammarTypeRule | GrammarTypeRegex | GrammarTypeToken | GrammarTypeLiteral | GeneratorSymbolRepeat | GeneratorSymbolSubexpression;
+export interface GeneratorSymbolSubexpression {
+    subexpression: GeneratorExpression[];
 }
-export interface GrammarBuilderSymbolRepeat {
-    expression: GrammarBuilderSymbol;
+export interface GeneratorSymbolRepeat {
+    expression: GeneratorSymbol;
     repeat: "+" | "*" | "?";
 }
 export interface GrammarTypeRule {
@@ -204,23 +203,5 @@ export interface CompiledStateDefinition {
 export interface LexerConfig {
     start?: string;
     states: Dictionary<LexerStateDefinition>;
-}
-export interface GeneratorState {
-    version: string;
-    config: Dictionary<string>;
-    head: string[];
-    body: string[];
-    lexer?: LexerConfig;
-    grammar: {
-        start: string;
-        config: {
-            postprocessorDefault?: GrammarTypeJS | GrammarTypeTemplate;
-            postprocessorOverride?: GrammarTypeJS | GrammarTypeTemplate;
-        };
-        rules: Dictionary<GeneratorGrammarRule[]>;
-        uuids: {
-            [key: string]: number;
-        };
-    };
 }
 export {};

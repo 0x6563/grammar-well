@@ -1,7 +1,7 @@
 import { expect } from "chai";
 import { readFileSync } from 'fs';
 import { join } from 'path';
-import { Compile, Parse, Parser } from '../../src';
+import { Generate, Parse, Parser } from '../../src';
 
 export function Expected(actual: any, expected: any, message?: string) {
     if (expected instanceof RegExp) {
@@ -45,7 +45,7 @@ export function GetFile(path: string) {
 }
 
 export async function Build(grammar): Promise<any> {
-    const compiled = await Compile(grammar, { exportName: 'grammar' }) as string;
+    const compiled = await Generate(grammar, { exportName: 'grammar' }) as string;
     return Evalr(compiled);
 }
 
@@ -55,7 +55,7 @@ export async function BuildTest(grammar, input, options) {
 
 
 export async function GrammarWellRunner(source) {
-    const compiled = await Compile(source, { exportName: 'grammar' });
+    const compiled = await Generate(source, { exportName: 'grammar' });
     const parser = new Parser(Evalr(compiled)(), { algorithm: 'earley' });
     return (input) => parser.run(input);
 }

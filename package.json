@@ -14,7 +14,7 @@
   "exports": {
     ".": "./build/index.js",
     "./parser": "./build/parser/parser.js",
-    "./compiler": "./build/compiler/index.js",
+    "./generator": "./build/generator/index.js",
     "./lexer": "./build/lexers/stateful-lexer.js",
     "./utility": "./build/utility/index.js"
   },
