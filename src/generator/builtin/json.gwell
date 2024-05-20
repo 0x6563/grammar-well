@@ -1,51 +1,57 @@
 import * from whitespace;
 
-lexer: {{
+lexer {
     start: "json"
 
-    json ->
-        - import: whitespace
-        - when: /-?(?:[0-9]|[1-9][0-9]+)(?:\.[0-9]+)?(?:[eE][-+]?[0-9]+)?\b/ tag: "number"
-        - when: /"(?:\\["bfnrt\/\\]|\\u[a-fA-F0-9]{4}|[^"\\])*"/ tag: "string"
-        - when: "{" tag: "{"
-        - when: "}" tag: "}"
-        - when: "[" tag: "["
-        - when: "]" tag: "]"
-        - when: "," tag: ","
-        - when: ":" tag: ":"
-        - when: "true" tag: "true"
-        - when: "false" tag: "false"
-        - when: "null" tag: "null"
-}}
+    [json]
+        - import whitespace
+        - when /-?(?:[0-9]|[1-9][0-9]+)(?:\.[0-9]+)?(?:[eE][-+]?[0-9]+)?\b/ tag "number"
+        - when /"(?:\\["bfnrt\/\\]|\\u[a-fA-F0-9]{4}|[^"\\])*"/ tag "string"
+        - when "{" tag "{"
+        - when "}" tag "}"
+        - when "[" tag "["
+        - when "]" tag "]"
+        - when "," tag ","
+        - when ":" tag ":"
+        - when "true" tag "true"
+        - when "false" tag "false"
+        - when "null" tag "null"
+}
 
-grammar: {{
-    json -> _ (object | array) _ : {{ $1[0] }}
+grammar {
+    [json]
+        | _ (object | array) _ => ( $1[0] )
 
-    object -> "{" _ "}" : {{ {} }}
-        | "{" _ pair (_ "," _ pair)* _ "}" : ${ extractObject }
+    [object]
+        | "{" _ "}" => ( {} )
+        | "{" _ pair (_ "," _ pair)* _ "}" => ( extractObject({data}) )
 
-    array -> "[" _ "]" : {{ [] }}
-        | "[" _ value (_ "," _ value)* _ "]" : ${ extractArray }
+    [array] "[" _ "]" => ( [] )
+        | "[" _ value (_ "," _ value)* _ "]" => ( extractArray({data}) )
 
-    value : {{ $0 }} ->
-        object
-        | array
-        | number
-        | string
-        | "true" : {{ true }}
-        | "false" : {{ false }}
-        | "null" : {{ null }}
+    [value]
+        | object => ( $0 )
+        | array => ( $0 )
+        | number => ( $0 )
+        | string => ( $0 )
+        | "true" => ( true )
+        | "false" => ( false )
+        | "null" => ( null )
 
-    number -> $number : {{ parseFloat($0.value) }}
+    [number]
+        $number => ( parseFloat($0.value) )
 
-    string -> $string : {{ JSON.parse($0.value) }}
+    [string]
+        $string => ( JSON.parse($0.value) )
 
-    pair -> key:k _ ":" _ value:v : {{ [$k, $v] }}
+    [pair]
+        key:k _ ":" _ value:v => ( [$k, $v] )
 
-    key -> string : {{ $0 }}
-}}
+    [key]
+        string => ( $0 )
+}
 
-head: ${
+head {
     function extractPair(kv, output) {
         if(kv[0]) { output[kv[0]] = kv[1]; }
     }

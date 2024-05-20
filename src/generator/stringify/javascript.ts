@@ -1,4 +1,4 @@
-import { Dictionary, GeneratorGrammarRule, GeneratorGrammarSymbol, LexerConfig, LexerStateDefinition } from "../../typings";
+import { Dictionary, GeneratorGrammarRule, GeneratorGrammarSymbol, LexerConfig, LexerStateDefinition, LexerStateMatchRule } from "../../typings";
 import { LRParseTableBuilder } from "../artifacts/lr";
 import { BasicGrammarTable } from "../artifacts/basic";
 import { GeneratorState } from "../state";
@@ -105,8 +105,8 @@ export class JavaScriptGenerator {
             const state = this.state.lexer.states[key];
             map[state.name] = CommonGenerator.JSON({
                 name: JSON.stringify(state.name),
-                default: state.default ? JSON.stringify(state.default) : null,
-                unmatched: state.unmatched ? JSON.stringify(state.unmatched) : null,
+                default: state.default ? this.lexerConfigStateRule(state.default) : null,
+                unmatched: state.unmatched ? this.lexerConfigStateRule(state.unmatched) : null,
                 rules: this.lexerConfigStateRules(state.rules, depth + 2)
             }, depth + 1);
         }
@@ -117,21 +117,26 @@ export class JavaScriptGenerator {
         const ary = rules.map(rule => {
             if ('import' in rule)
                 return CommonGenerator.JSON({ import: JSON.stringify(rule.import) }, -1)
-            return CommonGenerator.JSON({
-                when: CommonGenerator.SerializeSymbol(rule.when as any),
-                type: JSON.stringify(rule.type),
-                tag: JSON.stringify(rule.tag),
-                pop: JSON.stringify(rule.pop),
-                before: JSON.stringify(rule.before),
-                open: JSON.stringify(rule.open),
-                close: JSON.stringify(rule.close),
-                highlight: JSON.stringify(rule.highlight),
-                set: JSON.stringify(rule.set),
-                inset: JSON.stringify(rule.inset),
-                goto: JSON.stringify(rule.goto),
-            }, -1);
+            return this.lexerConfigStateRule(rule)
         });
         return CommonGenerator.JSON(ary, depth);
     }
 
+    private lexerConfigStateRule(rule: LexerStateMatchRule) {
+        return CommonGenerator.JSON({
+            when: rule.when ? CommonGenerator.SerializeSymbol(rule.when as any) : null,
+            before: JSON.stringify(rule.before),
+
+            type: JSON.stringify(rule.type),
+            tag: JSON.stringify(rule.tag),
+            open: JSON.stringify(rule.open),
+            close: JSON.stringify(rule.close),
+            highlight: JSON.stringify(rule.highlight),
+
+            pop: JSON.stringify(rule.pop),
+            set: JSON.stringify(rule.set),
+            inset: JSON.stringify(rule.inset),
+            goto: JSON.stringify(rule.goto),
+        }, -1);
+    }
 }

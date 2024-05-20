@@ -105,16 +105,34 @@ export class Generator {
 
         for (const state of directive.lexer.states) {
             state.name = this.alias + state.name;
-            if (this.alias) {
-                state.rules.forEach(v => {
-                    if ('import' in v) {
-                        v.import = v.import.map(v2 => this.alias + v2);
+
+            if (state.default && state.unmatched) {
+                state.unmatched.type = typeof state.unmatched.type != 'undefined' ? state.unmatched.type : state.default?.type;
+                state.unmatched.tag = typeof state.unmatched.tag != 'undefined' ? state.unmatched.tag : state.default?.tag;
+                state.unmatched.open = typeof state.unmatched.open != 'undefined' ? state.unmatched.open : state.default?.open;
+                state.unmatched.close = typeof state.unmatched.close != 'undefined' ? state.unmatched.close : state.default?.close;
+                state.unmatched.highlight = typeof state.unmatched.highlight != 'undefined' ? state.unmatched.highlight : state.default?.highlight;
+            }
+
+            if (this.alias || state.default) {
+                state.rules.forEach(rule => {
+                    if (this.alias) {
+                        if ('import' in rule) {
+                            rule.import = rule.import.map(v2 => this.alias + v2);
+                        }
+                        if ('set' in rule) {
+                            rule.set = this.alias + rule.set;
+                        }
+                        if ('goto' in rule) {
+                            rule.goto = this.alias + rule.goto;
+                        }
                     }
-                    if ('set' in v) {
-                        v.set = this.alias + v.set;
-                    }
-                    if ('goto' in v) {
-                        v.goto = this.alias + v.goto;
+                    if (state.default && !('import' in rule)) {
+                        rule.type = typeof rule.type != 'undefined' ? rule.type : state.default?.type;
+                        rule.tag = typeof rule.tag != 'undefined' ? rule.tag : state.default?.tag;
+                        rule.open = typeof rule.open != 'undefined' ? rule.open : state.default?.open;
+                        rule.close = typeof rule.close != 'undefined' ? rule.close : state.default?.close;
+                        rule.highlight = typeof rule.highlight != 'undefined' ? rule.highlight : state.default?.highlight;
                     }
                 })
             }

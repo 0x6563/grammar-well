@@ -15,17 +15,17 @@ function GWLanguage(){
                     { name: "section_list", symbols: [ "section", "T_WS", "section_list" ], postprocess: ({data}) => { return [data[0]].concat(data[2]); } }
                 ],
                 section: [
-                    { name: "section", symbols: [ "K_CONFIG", "_", "L_COLON", "_", "L_TEMPLATEL", "_", "kv_list", "_", "L_TEMPLATER" ], postprocess: ({data}) => { return { config: Object.assign(...data[6]) }; } },
+                    { name: "section", symbols: [ "K_CONFIG", "_", "CBRACKET_L", "_", "kv_list", "_", "CBRACKET_R" ], postprocess: ({data}) => { return { config: Object.assign(...data[4]) }; } },
                     { name: "section", symbols: [ "K_IMPORT", "_", "L_STAR", "_", "K_FROM", "__", "T_WORD", "_", "L_SCOLON" ], postprocess: ({data}) => { return { import: data[6] }; } },
                     { name: "section", symbols: [ "K_IMPORT", "_", "L_STAR", "_", "K_FROM", "__", "T_STRING", "_", "L_SCOLON" ], postprocess: ({data}) => { return { import: data[6], path: true }; } },
                     { name: "section", symbols: [ "K_IMPORT", "_", "L_STAR", "_", { literal: "as" }, "_", "T_WORD", "_", "K_FROM", "__", "T_WORD", "_", "L_SCOLON" ], postprocess: ({data}) => { return { import: data[10], alias: data[6]}; } },
                     { name: "section", symbols: [ "K_IMPORT", "_", "L_STAR", "_", { literal: "as" }, "_", "T_WORD", "_", "K_FROM", "__", "T_STRING", "_", "L_SCOLON" ], postprocess: ({data}) => { return { import: data[10], path: true, alias: data[6]}; } },
-                    { name: "section", symbols: [ "K_LEXER", "_", "L_COLON", "_", "L_TEMPLATEL", "_", "lexer", "_", "L_TEMPLATER" ], postprocess: ({data}) => { return { lexer: Object.assign(...data[6]) }; } },
-                    { name: "section", symbols: [ "K_GRAMMAR", "_", "L_COLON", "_", "L_TEMPLATEL", "_", "grammar", "_", "L_TEMPLATER" ], postprocess: ({data}) => { return { grammar: data[6] }; } },
-                    { name: "section", symbols: [ "K_BODY", "_", "L_COLON", "_", "T_JS" ], postprocess: ({data}) => { return { body: data[4] }; } },
-                    { name: "section", symbols: [ "K_BODY", "_", "L_COLON", "_", "T_STRING" ], postprocess: ({data}) => { return { body: data[4], path: true }; } },
-                    { name: "section", symbols: [ "K_HEAD", "_", "L_COLON", "_", "T_JS" ], postprocess: ({data}) => { return { head: data[4] }; } },
-                    { name: "section", symbols: [ "K_HEAD", "_", "L_COLON", "_", "T_STRING" ], postprocess: ({data}) => { return { head: data[4], path: true }; } }
+                    { name: "section", symbols: [ "K_LEXER", "_", "CBRACKET_L", "_", "lexer", "_", "CBRACKET_R" ], postprocess: ({data}) => { return { lexer: Object.assign(...data[4]) }; } },
+                    { name: "section", symbols: [ "K_GRAMMAR", "_", "CBRACKET_L", "_", "grammar", "_", "CBRACKET_R" ], postprocess: ({data}) => { return { grammar: data[4] }; } },
+                    { name: "section", symbols: [ "K_BODY", "_", "T_JS" ], postprocess: ({data}) => { return { body: data[2] }; } },
+                    { name: "section", symbols: [ "K_BODY", "_", "T_STRING" ], postprocess: ({data}) => { return { body: data[2], path: true }; } },
+                    { name: "section", symbols: [ "K_HEAD", "_", "T_JS" ], postprocess: ({data}) => { return { head: data[2] }; } },
+                    { name: "section", symbols: [ "K_HEAD", "_", "T_STRING" ], postprocess: ({data}) => { return { head: data[2], path: true }; } }
                 ],
                 lexer: [
                     { name: "lexer", symbols: [ "kv_list", "_", "state_list" ], postprocess: ({data}) => { return data[0].concat({ states: data[2] }); } },
@@ -36,21 +36,26 @@ function GWLanguage(){
                     { name: "state_list", symbols: [ "state", "_", "state_list" ], postprocess: ({data}) => { return [data[0]].concat(data[2]); } }
                 ],
                 state: [
-                    { name: "state", symbols: [ "state_declare", "_", "state_definition" ], postprocess: ({data}) => { return Object.assign({ name: data[0] }, data[2]); } }
-                ],
-                state_declare: [
-                    { name: "state_declare", symbols: [ "T_WORD", "_", "L_ARROW" ], postprocess: ({data}) => { return data[0]; } }
+                    { name: "state", symbols: [ "T_SECTWORD", "_", "state_definition" ], postprocess: ({data}) => { return Object.assign({ name: data[0] }, data[2]); } }
                 ],
                 state_definition: [
-                    { name: "state_definition", symbols: [ "kv_list", "_", "token_list" ], postprocess: ({data}) => { return Object.assign(...data[0], { rules: data[2] }); } },
-                    { name: "state_definition", symbols: [ "token_list" ], postprocess: ({data}) => { return { rules: data[0] }; } }
+                    { name: "state_definition", symbols: [ "state_config_list", "_", "token_list" ], postprocess: ({data}) => { return Object.assign(data[0], { rules: data[2] }); } },
+                    { name: "state_definition", symbols: [ "token_list" ], postprocess: ({data}) => { return { rules: data[0] }; } },
+                    { name: "state_definition", symbols: [ { literal: "sections" }, "_", { literal: "{" }, "_", "state_list", "_", { literal: "}" } ], postprocess: ({data}) => { return { sections: data[4]}; } }
+                ],
+                state_config_list: [
+                    { name: "state_config_list", symbols: [ "state_config" ], postprocess: ({data}) => { return data[0]; } },
+                    { name: "state_config_list", symbols: [ "state_config", "_", "state_config_list" ], postprocess: ({data}) => { return Object.assign(data[0], data[2]); } }
+                ],
+                state_config: [
+                    { name: "state_config", symbols: [ "T_WORD", "_", { literal: ":" }, "_", "token_definition_list", "_", { literal: ";" } ], postprocess: ({data}) => { return {[data[0]]: Object.assign(...data[4]) }; } }
                 ],
                 token_list: [
                     { name: "token_list", symbols: [ "token" ], postprocess: ({data}) => { return data; } },
                     { name: "token_list", symbols: [ "token", "_", "token_list" ], postprocess: ({data}) => { return [data[0]].concat(data[2]); } }
                 ],
                 token: [
-                    { name: "token", symbols: [ "L_DASH", "_", "K_IMPORT", "_", "L_COLON", "_", "word_list" ], postprocess: ({data}) => { return { import: data[6] }; } },
+                    { name: "token", symbols: [ "L_DASH", "_", "K_IMPORT", "_", "word_list" ], postprocess: ({data}) => { return { import: data[4] }; } },
                     { name: "token", symbols: [ "L_DASH", "_", "token_definition_list" ], postprocess: ({data}) => { return Object.assign(...data[2]); } }
                 ],
                 token_definition_list: [
@@ -58,24 +63,24 @@ function GWLanguage(){
                     { name: "token_definition_list", symbols: [ "token_definition", "_", "token_definition_list" ], postprocess: ({data}) => { return [data[0]].concat(data[2]); } }
                 ],
                 token_definition: [
-                    { name: "token_definition", symbols: [ "K_TAG", "_", "L_COLON", "_", "string_list" ], postprocess: ({data}) => { return { tag: data[4] }; } },
-                    { name: "token_definition", symbols: [ "K_WHEN", "_", "L_COLON", "_", "T_STRING" ], postprocess: ({data}) => { return { when: data[4] }; } },
-                    { name: "token_definition", symbols: [ "K_WHEN", "_", "L_COLON", "_", "T_REGEX" ], postprocess: ({data}) => { return { when: data[4] }; } },
-                    { name: "token_definition", symbols: [ "K_OPEN", "_", "L_COLON", "_", "T_STRING" ], postprocess: ({data}) => { return { open: data[4] }; } },
-                    { name: "token_definition", symbols: [ "K_CLOSE", "_", "L_COLON", "_", "T_STRING" ], postprocess: ({data}) => { return { close: data[4] }; } },
-                    { name: "token_definition", symbols: [ "K_BEFORE", "_", "L_COLON", "_", "T_STRING" ], postprocess: ({data}) => { return { when: data[4], before:true }; } },
-                    { name: "token_definition", symbols: [ "K_BEFORE", "_", "L_COLON", "_", "T_REGEX" ], postprocess: ({data}) => { return { when: data[4], before:true }; } },
+                    { name: "token_definition", symbols: [ "K_TAG", "_", "string_list" ], postprocess: ({data}) => { return { tag: data[2] }; } },
+                    { name: "token_definition", symbols: [ "K_WHEN", "_", "T_STRING" ], postprocess: ({data}) => { return { when: data[2] }; } },
+                    { name: "token_definition", symbols: [ "K_WHEN", "_", "T_REGEX" ], postprocess: ({data}) => { return { when: data[2] }; } },
+                    { name: "token_definition", symbols: [ "K_OPEN", "_", "T_STRING" ], postprocess: ({data}) => { return { open: data[2] }; } },
+                    { name: "token_definition", symbols: [ "K_CLOSE", "_", "T_STRING" ], postprocess: ({data}) => { return { close: data[2] }; } },
+                    { name: "token_definition", symbols: [ "K_BEFORE", "_", "T_STRING" ], postprocess: ({data}) => { return { when: data[2], before: true }; } },
+                    { name: "token_definition", symbols: [ "K_BEFORE", "_", "T_REGEX" ], postprocess: ({data}) => { return { when: data[2], before: true }; } },
                     { name: "token_definition", symbols: [ "K_POP" ], postprocess: ({data}) => { return { pop: 1 }; } },
-                    { name: "token_definition", symbols: [ "K_POP", "_", "L_COLON", "_", "T_INTEGER" ], postprocess: ({data}) => { return { pop: parseInt(data[4]) }; } },
-                    { name: "token_definition", symbols: [ "K_POP", "_", "L_COLON", "_", "K_ALL" ], postprocess: ({data}) => { return { pop: "all" }; } },
-                    { name: "token_definition", symbols: [ "K_HIGHLIGHT", "_", "L_COLON", "_", "T_STRING" ], postprocess: ({data}) => { return { highlight: data[4] }; } },
-                    { name: "token_definition", symbols: [ "K_EMBED", "_", "L_COLON", "_", "T_STRING" ], postprocess: ({data}) => { return { embed: data[4] }; } },
+                    { name: "token_definition", symbols: [ "K_POP", "_", "T_INTEGER" ], postprocess: ({data}) => { return { pop: parseInt(data[2]) }; } },
+                    { name: "token_definition", symbols: [ "K_POP", "_", "K_ALL" ], postprocess: ({data}) => { return { pop: "all" }; } },
+                    { name: "token_definition", symbols: [ "K_HIGHLIGHT", "_", "T_STRING" ], postprocess: ({data}) => { return { highlight: data[2] }; } },
+                    { name: "token_definition", symbols: [ "K_EMBED", "_", "T_STRING" ], postprocess: ({data}) => { return { embed: data[2] }; } },
                     { name: "token_definition", symbols: [ "K_UNEMBED" ], postprocess: ({data}) => { return { unembed: true }; } },
                     { name: "token_definition", symbols: [ "K_INSET" ], postprocess: ({data}) => { return { inset: 1 }; } },
-                    { name: "token_definition", symbols: [ "K_INSET", "_", "L_COLON", "_", "T_INTEGER" ], postprocess: ({data}) => { return { inset: parseInt(data[4]) }; } },
-                    { name: "token_definition", symbols: [ "K_SET", "_", "L_COLON", "_", "T_WORD" ], postprocess: ({data}) => { return { set: data[4] }; } },
-                    { name: "token_definition", symbols: [ "K_GOTO", "_", "L_COLON", "_", "T_WORD" ], postprocess: ({data}) => { return { goto: data[4] }; } },
-                    { name: "token_definition", symbols: [ "K_TYPE", "_", "L_COLON", "_", "T_STRING" ], postprocess: ({data}) => { return { type: data[4] }; } }
+                    { name: "token_definition", symbols: [ "K_INSET", "_", "T_INTEGER" ], postprocess: ({data}) => { return { inset: parseInt(data[2]) }; } },
+                    { name: "token_definition", symbols: [ "K_SET", "_", "T_WORD" ], postprocess: ({data}) => { return { set: data[2] }; } },
+                    { name: "token_definition", symbols: [ "K_GOTO", "_", "T_WORD" ], postprocess: ({data}) => { return { goto: data[2] }; } },
+                    { name: "token_definition", symbols: [ "K_TYPE", "_", "T_STRING" ], postprocess: ({data}) => { return { type: data[2] }; } }
                 ],
                 grammar: [
                     { name: "grammar", symbols: [ "kv_list", "_", "grammar_rule_list" ], postprocess: ({data}) => { return { config: Object.assign(...data[0]), rules: data[2] }; } },
@@ -86,18 +91,20 @@ function GWLanguage(){
                     { name: "grammar_rule_list", symbols: [ "grammar_rule", "_", "grammar_rule_list" ], postprocess: ({data}) => { return [data[0]].concat(data[2]); } }
                 ],
                 grammar_rule: [
-                    { name: "grammar_rule", symbols: [ "T_WORD", "_", "L_ARROW", "_", "expression_list" ], postprocess: ({data}) => { return { name: data[0], expressions: data[4] }; } },
-                    { name: "grammar_rule", symbols: [ "T_WORD", "__", "L_COLON", "_", "T_JS", "_", "L_ARROW", "_", "expression_list" ], postprocess: ({data}) => { return { name: data[0], expressions: data[8], postprocess: data[4] }; } },
-                    { name: "grammar_rule", symbols: [ "T_WORD", "__", "L_COLON", "_", "T_GRAMMAR_TEMPLATE", "_", "L_ARROW", "_", "expression_list" ], postprocess: ({data}) => { return { name: data[0], expressions: data[8], postprocess: data[4] }; } }
+                    { name: "grammar_rule", symbols: [ "grammar_rule_name", "_", "expression_list" ], postprocess: ({data}) => { return { name: data[0], expressions: data[2] }; } },
+                    { name: "grammar_rule", symbols: [ "grammar_rule_name", "__", "T_GRAMMAR_TEMPLATE", "_", "expression_list" ], postprocess: ({data}) => { return { name: data[0], expressions: data[4], postprocess: data[2] }; } }
+                ],
+                grammar_rule_name: [
+                    { name: "grammar_rule_name", symbols: [ "T_SECTWORD" ], postprocess: ({data}) => { return data[0]; } }
                 ],
                 expression_list: [
-                    { name: "expression_list", symbols: [ "expression" ] },
+                    { name: "expression_list", symbols: [ "expression" ], postprocess: ({data}) => { return [data[0]]; } },
+                    { name: "expression_list", symbols: [ "L_PIPE", "_", "expression" ], postprocess: ({data}) => { return [data[2]]; } },
                     { name: "expression_list", symbols: [ "expression_list", "_", "L_PIPE", "_", "expression" ], postprocess: ({data}) => { return data[0].concat([data[4]]); } }
                 ],
                 expression: [
                     { name: "expression", symbols: [ "expression_symbol_list" ], postprocess: ({data}) => { return { symbols: data[0] }; } },
-                    { name: "expression", symbols: [ "expression_symbol_list", "__", "L_COLON", "_", "T_JS" ], postprocess: ({data}) => { return { symbols: data[0], postprocess: data[4] }; } },
-                    { name: "expression", symbols: [ "expression_symbol_list", "__", "L_COLON", "_", "T_GRAMMAR_TEMPLATE" ], postprocess: ({data}) => { return { symbols: data[0], postprocess: data[4] }; } }
+                    { name: "expression", symbols: [ "expression_symbol_list", "_", "T_GRAMMAR_TEMPLATE" ], postprocess: ({data}) => { return { symbols: data[0], postprocess: data[2] }; } }
                 ],
                 expression_symbol_list: [
                     { name: "expression_symbol_list", symbols: [ "expression_symbol" ] },
@@ -115,8 +122,7 @@ function GWLanguage(){
                     { name: "expression_symbol_match", symbols: [ "L_DSIGN", "T_WORD" ], postprocess: ({data}) => { return { token: data[1]}; } },
                     { name: "expression_symbol_match", symbols: [ "L_DSIGN", "T_STRING" ], postprocess: ({data}) => { return { token: data[1]}; } },
                     { name: "expression_symbol_match", symbols: [ "T_REGEX" ], postprocess: ({data}) => { return data[0]; } },
-                    { name: "expression_symbol_match", symbols: [ "L_PARENL", "_", "expression_list", "_", "L_PARENR" ], postprocess: ({data}) => { return { subexpression: data[2] }; } },
-                    { name: "expression_symbol_match", symbols: [ "T_JS" ], postprocess: ({data}) => { return data[0]; } }
+                    { name: "expression_symbol_match", symbols: [ "L_PARENL", "_", "expression_list", "_", "L_PARENR" ], postprocess: ({data}) => { return { subexpression: data[2] }; } }
                 ],
                 expression_symbol_match$RPT01x1: [
                     { name: "expression_symbol_match$RPT01x1", symbols: [ { literal: "i" } ], postprocess: ({data}) => data[0] },
@@ -139,7 +145,7 @@ function GWLanguage(){
                     { name: "kv$SUBx1", symbols: [ "T_GRAMMAR_TEMPLATE" ] }
                 ],
                 kv: [
-                    { name: "kv", symbols: [ "T_WORD", "_", "L_COLON", "_", "kv$SUBx1" ], postprocess: ({data}) => { return { [data[0]]: data[4][0] }; } }
+                    { name: "kv", symbols: [ "T_WORD", "_", { literal: ":" }, "_", "kv$SUBx1" ], postprocess: ({data}) => { return { [data[0]]: data[4][0] }; } }
                 ],
                 string_list: [
                     { name: "string_list", symbols: [ "T_STRING" ], postprocess: ({data}) => { return [data[0]]; } },
@@ -202,11 +208,17 @@ function GWLanguage(){
                 L_PARENR: [
                     { name: "L_PARENR", symbols: [ { token: "L_PARENR" } ] }
                 ],
-                L_TEMPLATEL: [
-                    { name: "L_TEMPLATEL", symbols: [ { token: "L_TEMPLATEL" } ] }
+                CBRACKET_L: [
+                    { name: "CBRACKET_L", symbols: [ { token: "CBRACKET_L" } ] }
                 ],
-                L_TEMPLATER: [
-                    { name: "L_TEMPLATER", symbols: [ { token: "L_TEMPLATER" } ] }
+                CBRACKET_R: [
+                    { name: "CBRACKET_R", symbols: [ { token: "CBRACKET_R" } ] }
+                ],
+                DCBRACKET_L: [
+                    { name: "DCBRACKET_L", symbols: [ { token: "DCBRACKET_L" } ] }
+                ],
+                DCBRACKET_R: [
+                    { name: "DCBRACKET_R", symbols: [ { token: "DCBRACKET_R" } ] }
                 ],
                 L_ARROW: [
                     { name: "L_ARROW", symbols: [ { token: "L_ARROW" } ] }
@@ -285,20 +297,23 @@ function GWLanguage(){
                     { name: "T_JS$RPT0Nx1", symbols: [ "T_JS$RPT0Nx1", { token: "T_JSBODY" } ], postprocess: ({data}) => data[0].concat([data[1]]) }
                 ],
                 T_JS: [
-                    { name: "T_JS", symbols: [ { token: "L_JSL" }, "T_JS$RPT0Nx1", { token: "L_JSR" } ], postprocess: ({data}) => { return { js: data[1].map(v=>v.value).join('') }; } }
+                    { name: "T_JS", symbols: [ { literal: "{" }, "T_JS$RPT0Nx1", { literal: "}" } ], postprocess: ({data}) => { return { js: data[1].map(v=>v.value).join('') }; } }
                 ],
                 T_GRAMMAR_TEMPLATE$RPT0Nx1: [
                     { name: "T_GRAMMAR_TEMPLATE$RPT0Nx1", symbols: [ ] },
                     { name: "T_GRAMMAR_TEMPLATE$RPT0Nx1", symbols: [ "T_GRAMMAR_TEMPLATE$RPT0Nx1", { token: "T_JSBODY" } ], postprocess: ({data}) => data[0].concat([data[1]]) }
                 ],
                 T_GRAMMAR_TEMPLATE: [
-                    { name: "T_GRAMMAR_TEMPLATE", symbols: [ { token: "L_TEMPLATEL" }, "_", "T_GRAMMAR_TEMPLATE$RPT0Nx1", "_", { token: "L_TEMPLATER" } ], postprocess: ({data}) => { return { template: data[2].map(v=>v.value).join('').trim() }; } }
+                    { name: "T_GRAMMAR_TEMPLATE", symbols: [ { literal: "=>" }, "_", { literal: "(" }, "T_GRAMMAR_TEMPLATE$RPT0Nx1", { literal: ")" } ], postprocess: ({data}) => { return { template: data[3].map(v=>v.value).join('').trim() }; } }
                 ],
                 T_STRING: [
                     { name: "T_STRING", symbols: [ { token: "T_STRING" } ], postprocess: ({data}) => { return JSON.parse(data[0].value); } }
                 ],
                 T_WORD: [
                     { name: "T_WORD", symbols: [ { token: "T_WORD" } ], postprocess: ({data}) => { return data[0].value; } }
+                ],
+                T_SECTWORD: [
+                    { name: "T_SECTWORD", symbols: [ { token: "T_SECTWORD" } ], postprocess: ({data}) => { return data[0].value.substring(1, data[0].value.length-1).trim(); } }
                 ],
                 T_REGEX$RPT0Nx1: [
                     { name: "T_REGEX$RPT0Nx1", symbols: [ ] },
@@ -324,101 +339,101 @@ function GWLanguage(){
                 start: {
                     name: "start",
                     rules: [
-                        { import: ["string","js","ws","comment","l_scolon","l_star"] },
-                        { when: /lexer(?![a-zA-Z\d_])/, tag: ["T_WORD"], highlight: "type", goto: "lexer" },
-                        { when: /grammar(?![a-zA-Z\d_])/, tag: ["T_WORD"], highlight: "type", goto: "grammar" },
-                        { when: /config(?![a-zA-Z\d_])/, tag: ["T_WORD"], highlight: "type", goto: "config" },
+                        { import: ["string","ws","comment","l_star"] },
+                        { when: /head(?![a-zA-Z\d_])/, tag: ["T_WORD"], highlight: "tag", goto: "js_body" },
+                        { when: /body(?![a-zA-Z\d_])/, tag: ["T_WORD"], highlight: "tag", goto: "js_body" },
+                        { when: /lexer(?![a-zA-Z\d_])/, tag: ["T_WORD"], highlight: "tag", goto: "lexer" },
+                        { when: /grammar(?![a-zA-Z\d_])/, tag: ["T_WORD"], highlight: "tag", goto: "grammar" },
+                        { when: /config(?![a-zA-Z\d_])/, tag: ["T_WORD"], highlight: "tag", goto: "config" },
                         { import: ["kv"] }
                     ]
                 },
                 config: {
                     name: "config",
                     rules: [
-                        { import: ["ws","l_colon"] },
-                        { when: "{{", tag: ["L_TEMPLATEL"], open: "template", set: "config_inner" }
+                        { import: ["ws"] },
+                        { when: "{", tag: ["CBRACKET_L"], set: "config_inner" }
                     ]
                 },
                 config_inner: {
                     name: "config_inner",
                     rules: [
                         { import: ["comment","kv"] },
-                        { when: "}}", tag: ["L_TEMPLATER"], pop: 1, close: "template" }
+                        { when: "}", tag: ["CBRACKET_R"], pop: 1 }
                     ]
                 },
                 grammar: {
                     name: "grammar",
                     rules: [
-                        { import: ["ws","l_colon"] },
-                        { when: "{{", tag: ["L_TEMPLATEL"], open: "template", set: "grammar_inner" }
+                        { import: ["ws"] },
+                        { when: "{", tag: ["CBRACKET_L"], set: "grammar_inner" }
                     ]
                 },
                 grammar_inner: {
                     name: "grammar_inner",
                     rules: [
-                        { import: ["comment","js","js_template","ws","regex","l_qmark","l_plus","l_star","kv","l_colon","l_comma","l_pipe","l_parenl","l_parenr","l_arrow","l_dsign","l_dash"] },
-                        { when: "}}", tag: ["L_TEMPLATER"], pop: 1, close: "template" }
+                        { import: ["comment","section_word","js_template","ws","regex","l_qmark","l_plus","l_star","kv","l_colon","l_comma","l_pipe","l_parenl","l_parenr","l_arrow","l_dsign","l_dash"] },
+                        { when: "}", tag: ["CBRACKET_R"], pop: 1 }
                     ]
                 },
                 lexer: {
                     name: "lexer",
                     rules: [
-                        { import: ["ws","l_colon"] },
-                        { when: "{{", tag: ["L_TEMPLATEL"], open: "template", highlight: "bracket", set: "lexer_inner" }
+                        { import: ["ws"] },
+                        { when: "{", tag: ["CBRACKET_L"], highlight: "bracket", set: "lexer_inner" }
                     ]
                 },
                 lexer_inner: {
                     name: "lexer_inner",
                     rules: [
-                        { import: ["ws","comment","regex","l_comma","l_arrow","l_dash","kv","js"] },
-                        { when: "}}", tag: ["L_TEMPLATER"], pop: 1, close: "template" }
+                        { import: ["ws","comment","section_word","regex","l_comma","l_arrow","l_dash","kv","l_colon"] },
+                        { when: "{", tag: ["CBRACKET_L"], goto: "lexer_sections" },
+                        { when: "}", tag: ["CBRACKET_R"], pop: 1 }
                     ]
                 },
-                js: {
-                    name: "js",
+                lexer_sections: {
+                    name: "lexer_sections",
                     rules: [
-                        { when: "${", tag: ["L_JSL"], open: "jsbracket", goto: "js_wrap" }
+                        { import: ["ws","comment","section_word","regex","l_comma","l_arrow","l_dash","kv"] },
+                        { when: "}", tag: ["CBRACKET_R"], pop: 1 }
                     ]
                 },
-                js_wrap: {
-                    name: "js_wrap",
-                    default: "T_JSBODY",
-                    unmatched: "T_JSBODY",
+                js_body: {
+                    name: "js_body",
                     rules: [
-                        { import: ["jsignore"] },
-                        { when: "{", tag: ["T_JSBODY"], open: "jsbracket", goto: "js_literal" },
-                        { when: "}", tag: ["L_JSR"], pop: 1, close: "jsbracket" }
+                        { import: ["ws"] },
+                        { when: "{", tag: ["T_JSBODY"], set: "js_literal" }
                     ]
                 },
                 js_literal: {
                     name: "js_literal",
-                    default: "T_JSBODY",
-                    unmatched: "T_JSBODY",
+                    default: { tag: ["T_JSBODY"] },
+                    unmatched: { tag: ["T_JSBODY"] },
                     rules: [
                         { import: ["jsignore"] },
-                        { when: "{", tag: ["T_JSBODY"], open: "jsbracket", goto: "js_literal" },
-                        { when: "}", tag: ["T_JSBODY"], pop: 1, close: "jsbracket" }
+                        { when: "{", tag: ["T_JSBODY"], highlight: "annotation", goto: "js_literal" },
+                        { when: "}", tag: ["T_JSBODY"], highlight: "annotation", pop: 1 },
+                        { when: "(", tag: ["T_JSBODY"], highlight: "annotation", goto: "js_literal" },
+                        { when: ")", tag: ["T_JSBODY"], highlight: "annotation", pop: 1 }
                     ]
                 },
                 js_template: {
                     name: "js_template",
                     rules: [
-                        { when: "{{", tag: ["L_TEMPLATEL"], open: "template", goto: "js_template_inner" }
+                        { when: "=>", highlight: "annotation", goto: "js_template_inner" }
                     ]
                 },
                 js_template_inner: {
                     name: "js_template_inner",
-                    default: "T_JSBODY",
-                    unmatched: "T_JSBODY",
                     rules: [
-                        { import: ["jsignore"] },
-                        { when: "{", tag: ["T_JSBODY"], open: "jsbracket", goto: "js_literal" },
-                        { when: "}}", tag: ["L_TEMPLATER"], pop: 1, close: "template" }
+                        { import: ["ws"] },
+                        { when: "(", highlight: "annotation", set: "js_literal" }
                     ]
                 },
                 kv: {
                     name: "kv",
                     rules: [
-                        { import: ["string","ws","word","l_colon","integer"] }
+                        { import: ["string","ws","word","l_colon","integer","l_scolon"] }
                     ]
                 },
                 jsignore: {
@@ -466,6 +481,12 @@ function GWLanguage(){
                     name: "word",
                     rules: [
                         { when: /[a-zA-Z_][a-zA-Z_\d]*/, tag: ["T_WORD"] }
+                    ]
+                },
+                section_word: {
+                    name: "section_word",
+                    rules: [
+                        { when: /\[\s*[a-zA-Z_][a-zA-Z_\d]*\s*\]/, tag: ["T_SECTWORD"], highlight: "type.identifier" }
                     ]
                 },
                 ws: {
@@ -526,6 +547,30 @@ function GWLanguage(){
                     name: "l_parenr",
                     rules: [
                         { when: ")", tag: ["L_PARENR"] }
+                    ]
+                },
+                l_cbracketl: {
+                    name: "l_cbracketl",
+                    rules: [
+                        { when: "{", tag: ["CBRACKET_L"] }
+                    ]
+                },
+                l_cbracketr: {
+                    name: "l_cbracketr",
+                    rules: [
+                        { when: "}", tag: ["CBRACKET_R"] }
+                    ]
+                },
+                l_squarel: {
+                    name: "l_squarel",
+                    rules: [
+                        { when: "[", tag: ["L_SQUAREL"], highlight: "variable" }
+                    ]
+                },
+                l_squarer: {
+                    name: "l_squarer",
+                    rules: [
+                        { when: "]", tag: ["L_SQUARER"], highlight: "variable" }
                     ]
                 },
                 l_arrow: {

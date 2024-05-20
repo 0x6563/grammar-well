@@ -21,7 +21,7 @@ export class StatefulLexer implements Lexer {
             this.states[key] = {
                 regexp: CompileRegExp(states[key] as ResolvedStateDefinition),
                 rules: states[key].rules as LexerStateMatchRule[],
-                unmatched: states[key].unmatched ? { type: states[key].unmatched } as LexerStateMatchRule : null
+                unmatched: states[key].unmatched
             };
         }
         this.start = start;

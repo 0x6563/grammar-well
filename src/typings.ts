@@ -187,8 +187,8 @@ export interface LexerStatus {
 
 export interface LexerStateDefinition {
     name: string;
-    unmatched?: string;
-    default?: string;
+    unmatched?: LexerStateMatchRule;
+    default?: LexerStateMatchRule;
     rules: (LexerStateImportRule | LexerStateMatchRule)[];
 }
 
@@ -214,7 +214,7 @@ export interface LexerStateMatchRule {
 
 export interface ResolvedStateDefinition {
     name: string;
-    unmatched?: string;
+    unmatched?: LexerStateMatchRule;
     rules: LexerStateMatchRule[];
 }
 

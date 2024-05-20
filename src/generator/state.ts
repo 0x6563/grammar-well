@@ -54,8 +54,8 @@ export class GeneratorState {
     addLexerState(state: LexerStateDefinition) {
         this.lexer.states[state.name] = this.lexer.states[state.name] || { name: state.name, rules: [] }
         const target = this.lexer.states[state.name];
-        target.default = typeof state.default == 'string' ? state.default : target.default;
-        target.unmatched = typeof state.unmatched == 'string' ? state.unmatched : target.unmatched;
+        target.default = typeof state.default != "undefined" ? state.default : target.default;
+        target.unmatched = typeof state.unmatched != "undefined" ? state.unmatched : target.unmatched;
         target.rules.push(...state.rules);
     }
 
