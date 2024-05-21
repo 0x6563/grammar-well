@@ -1,6 +1,5 @@
-head : ${
-
-    function extractPair(kv, output) {
+head {
+function extractPair(kv, output) {
         if(kv[0]) { output[kv[0]] = kv[1]; }
     }
 
@@ -27,49 +26,60 @@ head : ${
     }
 }
 
-lexer: {{
-    start: "json"
+lexer {
+	start: "json"
 
-    json ->
-        - when: /\s+/ tag: "space"
-        - when: /-?(?:[0-9]|[1-9][0-9]+)(?:\.[0-9]+)?(?:[eE][-+]?[0-9]+)?\b/ tag: "number"
-        - when: /"(?:\\["bfnrt\/\\]|\\u[a-fA-F0-9]{4}|[^"\\])*"/ tag: "string"
-        - when: "{" tag: "{"
-        - when: "}" tag: "}"
-        - when: "[" tag: "["
-        - when: "]" tag: "]"
-        - when: "," tag: ","
-        - when: ":" tag: ":"
-        - when: "true" tag: "true"
-        - when: "false" tag: "false"
-        - when: "null" tag: "null"
-}}
+	[json]
+		- when /\s+/ tag "space"
+		- when /-?(?:[0-9]|[1-9][0-9]+)(?:\.[0-9]+)?(?:[eE][-+]?[0-9]+)?\b/ tag "number"
+		- when /"(?:\\["bfnrt\/\\]|\\u[a-fA-F0-9]{4}|[^"\\])*"/ tag "string"
+		- when "{" tag "{"
+		- when "}" tag "}"
+		- when "[" tag "["
+		- when "]" tag "]"
+		- when "," tag ","
+		- when ":" tag ":"
+		- when "true" tag "true"
+		- when "false" tag "false"
+		- when "null" tag "null"
 
-grammar: {{
-    json -> _ (object | array) _ : {{ $1[0] }}
+}
 
-    object -> "{" _ "}" : {{ {} }}
-        | "{" _ pair (_ "," _ pair)* _ "}" : ${ extractObject }
+grammar {
 
-    array -> "[" _ "]" : {{ [] }}
-        | "[" _ value (_ "," _ value)* _ "]" : ${ extractArray }
+	[json]
+		| _ (object | array) _ => ( $1[0] )
 
-    value : {{ $0 }} ->
-        object
-        | array
-        | number
-        | string
-        | "true" : {{ true }}
-        | "false" : {{ false }}
-        | "null" : {{ null }}
+	[object]
+		| "{" _ "}" => ( {} )
+		| "{" _ pair (_ "," _ pair)* _ "}" => ${  extractObject  }
 
-    number -> $number : {{ parseFloat($0.value) }}
+	[array]
+		| "[" _ "]" => ( [] )
+		| "[" _ value (_ "," _ value)* _ "]" => ${  extractArray  }
 
-    string -> $string : {{ JSON.parse($0.value) }}
+	[value] => ( $0 )
+		| object
+		| array
+		| number
+		| string
+		| "true" => ( true )
+		| "false" => ( false )
+		| "null" => ( null )
 
-    pair -> key:k _ ":" _ value:v : {{ [$k, $v] }}
+	[number]
+		| $number => ( parseFloat($0.value) )
 
-    key -> string : {{ $0 }}
+	[string]
+		| $string => ( JSON.parse($0.value) )
 
-    _ -> $space? : {{ null }}
-}}
+	[pair]
+		| key:k _ ":" _ value:v => ( [$k, $v] )
+
+	[key]
+		| string => ( $0 )
+
+	[_]
+		| $space? => ( null )
+
+}

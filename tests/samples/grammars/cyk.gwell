@@ -1,19 +1,31 @@
-lexer : {{
+lexer {
+	start: "start"
 
-    start: "start"
+	[start]
+		- when /[A-Za-z\d]/ tag "char"
 
-    start ->
-        default: word
-        unmatched: word
-        - when: /[A-Za-z\d]/ tag: "char"
+}
 
-}}
+grammar {
 
-grammar: {{
-    S -> A B | B C
-    A -> "A" : {{ $0.value }}
-    B -> b1 C | b2 C
-    b1 -> "B" : {{ $0.value }}
-    b2 -> "b" : {{ $0.value }}
-    C -> "C" : {{ $0.value }}
-}}
+	[S]
+		| A B
+		| B C
+
+	[A]
+		| "A" => ( $0.value )
+
+	[B]
+		| b1 C
+		| b2 C
+
+	[b1]
+		| "B" => ( $0.value )
+
+	[b2]
+		| "b" => ( $0.value )
+
+	[C]
+		| "C" => ( $0.value )
+
+}

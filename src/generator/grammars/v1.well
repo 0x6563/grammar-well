@@ -152,10 +152,10 @@ grammar {
 
 	[section]
 		| K_CONFIG _ L_COLON _ L_TEMPLATEL _ kv_list:list _ L_TEMPLATER => ( { config: Object.assign(...$list) } )
-		| K_IMPORT _ L_STAR _ K_FROM __ T_WORD:import _ L_SCOLON => ( { import $import } )
-		| K_IMPORT _ L_STAR _ K_FROM __ T_STRING:import _ L_SCOLON => ( { import $import, path: true } )
-		| K_IMPORT _ L_STAR _ "as" _ T_WORD:alias _ K_FROM __ T_WORD:import _ L_SCOLON => ( { import $import, alias: $alias} )
-		| K_IMPORT _ L_STAR _ "as" _ T_WORD:alias _ K_FROM __ T_STRING:import _ L_SCOLON => ( { import $import, path: true, alias: $alias} )
+		| K_IMPORT _ L_STAR _ K_FROM __ T_WORD:import _ L_SCOLON => ( { import: $import } )
+		| K_IMPORT _ L_STAR _ K_FROM __ T_STRING:import _ L_SCOLON => ( { import: $import, path: true } )
+		| K_IMPORT _ L_STAR _ "as" _ T_WORD:alias _ K_FROM __ T_WORD:import _ L_SCOLON => ( { import: $import, alias: $alias} )
+		| K_IMPORT _ L_STAR _ "as" _ T_WORD:alias _ K_FROM __ T_STRING:import _ L_SCOLON => ( { import: $import, path: true, alias: $alias} )
 		| K_LEXER _ L_COLON _ L_TEMPLATEL _ lexer:lexer _ L_TEMPLATER => ( { lexer: Object.assign(...$lexer) } )
 		| K_GRAMMAR _ L_COLON _ L_TEMPLATEL _ grammar:grammar _ L_TEMPLATER => ( { grammar: $grammar } )
 		| K_BODY _ L_COLON _ T_JS:js => ( { body: $js } )
@@ -178,15 +178,25 @@ grammar {
 		| T_WORD _ L_ARROW => ( $0 )
 
 	[state_definition]
-		| kv_list _ token_list => ( Object.assign(...$0, { rules: $2 }) )
+		| state_definition_kv_list _ token_list => ( Object.assign(...$0, { rules: $2 }) )
 		| token_list => ( { rules: $0 } )
+
+	[state_definition_kv_list]
+		| state_definition_kv => ( data )
+		| state_definition_kv _ state_definition_kv_list => ( [$0].concat($2) )
+
+	[state_definition_kv] => ( { tag: $4 } )
+		| "default" _ ":" _ T_WORD
+		| "unmatched" _ ":" _ T_WORD
+		| "unmatched" _ ":" _ T_STRING
+		| "unmatched" _ ":" _ T_STRING
 
 	[token_list]
 		| token => ( data )
 		| token _ token_list => ( [$0].concat($2) )
 
 	[token]
-		| L_DASH _ K_IMPORT _ L_COLON _ word_list => ( { import $6 } )
+		| L_DASH _ K_IMPORT _ L_COLON _ word_list => ( { import: $6 } )
 		| L_DASH _ token_definition_list => ( Object.assign(...$2) )
 
 	[token_definition_list]
@@ -201,13 +211,13 @@ grammar {
 		| K_CLOSE _ L_COLON _ T_STRING => ( { close: $4 } )
 		| K_BEFORE _ L_COLON _ T_STRING => ( { when: $4, before:true } )
 		| K_BEFORE _ L_COLON _ T_REGEX => ( { when: $4, before:true } )
-		| K_POP => ( { pop 1 } )
+		| K_POP => ( { pop: 1 } )
 		| K_POP _ L_COLON _ T_INTEGER => ( { pop: parseInt($4) } )
 		| K_POP _ L_COLON _ K_ALL => ( { pop: "all" } )
-		| K_HIGHLIGHT _ L_COLON _ T_STRING => ( { highlight $4 } )
+		| K_HIGHLIGHT _ L_COLON _ T_STRING => ( { highlight: $4 } )
 		| K_EMBED _ L_COLON _ T_STRING => ( { embed: $4 } )
 		| K_UNEMBED => ( { unembed: true } )
-		| K_INSET => ( { inset 1 } )
+		| K_INSET => ( { inset: 1 } )
 		| K_INSET _ L_COLON _ T_INTEGER => ( { inset: parseInt($4) } )
 		| K_SET _ L_COLON _ T_WORD => ( { set: $4 } )
 		| K_GOTO _ L_COLON _ T_WORD => ( { goto: $4 } )
@@ -389,7 +399,7 @@ grammar {
 		| $L_JSL $T_JSBODY* $L_JSR => ( { js: $1.map(v=>v.value).join('') } )
 
 	[T_GRAMMAR_TEMPLATE]
-		| $L_TEMPLATEL _ $T_JSBODY* _ $L_TEMPLATER => ( { template: $2.map(v=>v.value).join('').trim() } )
+		| $L_TEMPLATEL _ $T_JSBODY* _ $L_TEMPLATER => ( { template: '(' + $2.map(v=>v.value).join('').trim() + ')' } )
 
 	[T_STRING]
 		| $T_STRING => ( JSON.parse($0.value) )

@@ -16,10 +16,10 @@ function GWLanguage(){
                 ],
                 section: [
                     { name: "section", symbols: [ "K_CONFIG", "_", "L_COLON", "_", "L_TEMPLATEL", "_", "kv_list", "_", "L_TEMPLATER" ], postprocess: ({data}) => { return ({ config: Object.assign(...data[6]) }); } },
-                    { name: "section", symbols: [ "K_IMPORT", "_", "L_STAR", "_", "K_FROM", "__", "T_WORD", "_", "L_SCOLON" ], postprocess: ({data}) => { return ({ import data[6] }); } },
-                    { name: "section", symbols: [ "K_IMPORT", "_", "L_STAR", "_", "K_FROM", "__", "T_STRING", "_", "L_SCOLON" ], postprocess: ({data}) => { return ({ import data[6], path: true }); } },
-                    { name: "section", symbols: [ "K_IMPORT", "_", "L_STAR", "_", { literal: "as" }, "_", "T_WORD", "_", "K_FROM", "__", "T_WORD", "_", "L_SCOLON" ], postprocess: ({data}) => { return ({ import data[10], alias: data[6]}); } },
-                    { name: "section", symbols: [ "K_IMPORT", "_", "L_STAR", "_", { literal: "as" }, "_", "T_WORD", "_", "K_FROM", "__", "T_STRING", "_", "L_SCOLON" ], postprocess: ({data}) => { return ({ import data[10], path: true, alias: data[6]}); } },
+                    { name: "section", symbols: [ "K_IMPORT", "_", "L_STAR", "_", "K_FROM", "__", "T_WORD", "_", "L_SCOLON" ], postprocess: ({data}) => { return ({ import: data[6] }); } },
+                    { name: "section", symbols: [ "K_IMPORT", "_", "L_STAR", "_", "K_FROM", "__", "T_STRING", "_", "L_SCOLON" ], postprocess: ({data}) => { return ({ import: data[6], path: true }); } },
+                    { name: "section", symbols: [ "K_IMPORT", "_", "L_STAR", "_", { literal: "as" }, "_", "T_WORD", "_", "K_FROM", "__", "T_WORD", "_", "L_SCOLON" ], postprocess: ({data}) => { return ({ import: data[10], alias: data[6]}); } },
+                    { name: "section", symbols: [ "K_IMPORT", "_", "L_STAR", "_", { literal: "as" }, "_", "T_WORD", "_", "K_FROM", "__", "T_STRING", "_", "L_SCOLON" ], postprocess: ({data}) => { return ({ import: data[10], path: true, alias: data[6]}); } },
                     { name: "section", symbols: [ "K_LEXER", "_", "L_COLON", "_", "L_TEMPLATEL", "_", "lexer", "_", "L_TEMPLATER" ], postprocess: ({data}) => { return ({ lexer: Object.assign(...data[6]) }); } },
                     { name: "section", symbols: [ "K_GRAMMAR", "_", "L_COLON", "_", "L_TEMPLATEL", "_", "grammar", "_", "L_TEMPLATER" ], postprocess: ({data}) => { return ({ grammar: data[6] }); } },
                     { name: "section", symbols: [ "K_BODY", "_", "L_COLON", "_", "T_JS" ], postprocess: ({data}) => { return ({ body: data[4] }); } },
@@ -42,15 +42,25 @@ function GWLanguage(){
                     { name: "state_declare", symbols: [ "T_WORD", "_", "L_ARROW" ], postprocess: ({data}) => { return (data[0]); } }
                 ],
                 state_definition: [
-                    { name: "state_definition", symbols: [ "kv_list", "_", "token_list" ], postprocess: ({data}) => { return (Object.assign(...data[0], { rules: data[2] })); } },
+                    { name: "state_definition", symbols: [ "state_definition_kv_list", "_", "token_list" ], postprocess: ({data}) => { return (Object.assign(...data[0], { rules: data[2] })); } },
                     { name: "state_definition", symbols: [ "token_list" ], postprocess: ({data}) => { return ({ rules: data[0] }); } }
+                ],
+                state_definition_kv_list: [
+                    { name: "state_definition_kv_list", symbols: [ "state_definition_kv" ], postprocess: ({data}) => { return (data); } },
+                    { name: "state_definition_kv_list", symbols: [ "state_definition_kv", "_", "state_definition_kv_list" ], postprocess: ({data}) => { return ([data[0]].concat(data[2])); } }
+                ],
+                state_definition_kv: [
+                    { name: "state_definition_kv", symbols: [ { literal: "default" }, "_", { literal: ":" }, "_", "T_WORD" ], postprocess: ({data}) => { return ({ tag: data[4] }); } },
+                    { name: "state_definition_kv", symbols: [ { literal: "unmatched" }, "_", { literal: ":" }, "_", "T_WORD" ], postprocess: ({data}) => { return ({ tag: data[4] }); } },
+                    { name: "state_definition_kv", symbols: [ { literal: "unmatched" }, "_", { literal: ":" }, "_", "T_STRING" ], postprocess: ({data}) => { return ({ tag: data[4] }); } },
+                    { name: "state_definition_kv", symbols: [ { literal: "unmatched" }, "_", { literal: ":" }, "_", "T_STRING" ], postprocess: ({data}) => { return ({ tag: data[4] }); } }
                 ],
                 token_list: [
                     { name: "token_list", symbols: [ "token" ], postprocess: ({data}) => { return (data); } },
                     { name: "token_list", symbols: [ "token", "_", "token_list" ], postprocess: ({data}) => { return ([data[0]].concat(data[2])); } }
                 ],
                 token: [
-                    { name: "token", symbols: [ "L_DASH", "_", "K_IMPORT", "_", "L_COLON", "_", "word_list" ], postprocess: ({data}) => { return ({ import data[6] }); } },
+                    { name: "token", symbols: [ "L_DASH", "_", "K_IMPORT", "_", "L_COLON", "_", "word_list" ], postprocess: ({data}) => { return ({ import: data[6] }); } },
                     { name: "token", symbols: [ "L_DASH", "_", "token_definition_list" ], postprocess: ({data}) => { return (Object.assign(...data[2])); } }
                 ],
                 token_definition_list: [
@@ -65,13 +75,13 @@ function GWLanguage(){
                     { name: "token_definition", symbols: [ "K_CLOSE", "_", "L_COLON", "_", "T_STRING" ], postprocess: ({data}) => { return ({ close: data[4] }); } },
                     { name: "token_definition", symbols: [ "K_BEFORE", "_", "L_COLON", "_", "T_STRING" ], postprocess: ({data}) => { return ({ when: data[4], before:true }); } },
                     { name: "token_definition", symbols: [ "K_BEFORE", "_", "L_COLON", "_", "T_REGEX" ], postprocess: ({data}) => { return ({ when: data[4], before:true }); } },
-                    { name: "token_definition", symbols: [ "K_POP" ], postprocess: ({data}) => { return ({ pop 1 }); } },
+                    { name: "token_definition", symbols: [ "K_POP" ], postprocess: ({data}) => { return ({ pop: 1 }); } },
                     { name: "token_definition", symbols: [ "K_POP", "_", "L_COLON", "_", "T_INTEGER" ], postprocess: ({data}) => { return ({ pop: parseInt(data[4]) }); } },
                     { name: "token_definition", symbols: [ "K_POP", "_", "L_COLON", "_", "K_ALL" ], postprocess: ({data}) => { return ({ pop: "all" }); } },
-                    { name: "token_definition", symbols: [ "K_HIGHLIGHT", "_", "L_COLON", "_", "T_STRING" ], postprocess: ({data}) => { return ({ highlight data[4] }); } },
+                    { name: "token_definition", symbols: [ "K_HIGHLIGHT", "_", "L_COLON", "_", "T_STRING" ], postprocess: ({data}) => { return ({ highlight: data[4] }); } },
                     { name: "token_definition", symbols: [ "K_EMBED", "_", "L_COLON", "_", "T_STRING" ], postprocess: ({data}) => { return ({ embed: data[4] }); } },
                     { name: "token_definition", symbols: [ "K_UNEMBED" ], postprocess: ({data}) => { return ({ unembed: true }); } },
-                    { name: "token_definition", symbols: [ "K_INSET" ], postprocess: ({data}) => { return ({ inset 1 }); } },
+                    { name: "token_definition", symbols: [ "K_INSET" ], postprocess: ({data}) => { return ({ inset: 1 }); } },
                     { name: "token_definition", symbols: [ "K_INSET", "_", "L_COLON", "_", "T_INTEGER" ], postprocess: ({data}) => { return ({ inset: parseInt(data[4]) }); } },
                     { name: "token_definition", symbols: [ "K_SET", "_", "L_COLON", "_", "T_WORD" ], postprocess: ({data}) => { return ({ set: data[4] }); } },
                     { name: "token_definition", symbols: [ "K_GOTO", "_", "L_COLON", "_", "T_WORD" ], postprocess: ({data}) => { return ({ goto: data[4] }); } },
@@ -292,7 +302,7 @@ function GWLanguage(){
                     { name: "T_GRAMMAR_TEMPLATE$RPT0Nx1", symbols: [ "T_GRAMMAR_TEMPLATE$RPT0Nx1", { token: "T_JSBODY" } ], postprocess: ({data}) => data[0].concat([data[1]]) }
                 ],
                 T_GRAMMAR_TEMPLATE: [
-                    { name: "T_GRAMMAR_TEMPLATE", symbols: [ { token: "L_TEMPLATEL" }, "_", "T_GRAMMAR_TEMPLATE$RPT0Nx1", "_", { token: "L_TEMPLATER" } ], postprocess: ({data}) => { return ({ template: data[2].map(v=>v.value).join('').trim() }); } }
+                    { name: "T_GRAMMAR_TEMPLATE", symbols: [ { token: "L_TEMPLATEL" }, "_", "T_GRAMMAR_TEMPLATE$RPT0Nx1", "_", { token: "L_TEMPLATER" } ], postprocess: ({data}) => { return ({ template: '(' + data[2].map(v=>v.value).join('').trim() + ')' }); } }
                 ],
                 T_STRING: [
                     { name: "T_STRING", symbols: [ { token: "T_STRING" } ], postprocess: ({data}) => { return (JSON.parse(data[0].value)); } }
