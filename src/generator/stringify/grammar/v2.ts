@@ -48,7 +48,7 @@ export class V2GrammarString {
             body += ` ${this.formatPostProcess(rule.postprocess)}`;
         }
         for (const exp of rule.expressions) {
-            body += '\n' + this.indent(2, '| ') + this.formatSymbols(exp.symbols);
+            body += '\n' + this.indent(2, '| ') + this.formatSymbols(exp.symbols as any);
             if (exp.postprocess) {
                 body += ` ${this.formatPostProcess(exp.postprocess)}`;
             }
@@ -91,10 +91,12 @@ export class V2GrammarString {
         //     return postProcess;
         // }
         if ('js' in postProcess) {
-            return `\${${postProcess.js}}`;
+            return `=> \${ ${postProcess.js} }`;
         }
         if ('template' in postProcess) {
-            return `=> ( ${postProcess.template} )`;
+            const prefix = postProcess.template.slice(0, 1);
+            const suffix = postProcess.template.slice(-1);
+            return `=> ${prefix} ${postProcess.template.slice(1, -1).trim()} ${suffix}`;
         }
     }
 

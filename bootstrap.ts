@@ -27,6 +27,8 @@ const parser = new Parser(Language() as any);
     }
     write(`./registry.json`, JSON.stringify(registry));
     write('../grammars/v2.well', format(read('../grammars/v2.well')));
+    write('../grammars/v1.well', format(read('../grammars/v1.well')));
+    await Transpile('../grammars/v1.well');
     await Transpile('../grammars/v2.well');
 })();
 

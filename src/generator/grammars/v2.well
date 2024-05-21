@@ -58,6 +58,9 @@ lexer {
 	[js_template_inner]
 		- import ws
 		- when "(" highlight "annotation" set js_literal
+		- when "{" highlight "annotation" set js_literal
+		- when "[" highlight "annotation" set js_literal
+		- when "${" highlight "annotation" set js_literal
 
 	[kv]
 		- import string, ws, word, l_colon, integer, l_scolon
@@ -237,7 +240,7 @@ grammar {
 
 	[grammar_rule]
 		| grammar_rule_name _ expression_list => ( { name: $0, expressions: $2 } )
-		| grammar_rule_name __ T_GRAMMAR_TEMPLATE:template _ expression_list:expressions => ( { name: $0, expressions: $expressions, postprocess: $template } )
+		| grammar_rule_name __ POSTPROCESSOR:template _ expression_list:expressions => ( { name: $0, expressions: $expressions, postprocess: $template } )
 
 	[grammar_rule_name]
 		| T_SECTWORD => ( $0 )
@@ -249,7 +252,7 @@ grammar {
 
 	[expression]
 		| expression_symbol_list => ( { symbols: $0 } )
-		| expression_symbol_list _ T_GRAMMAR_TEMPLATE:template => ( { symbols: $0, postprocess: $template } )
+		| expression_symbol_list _ POSTPROCESSOR:template => ( { symbols: $0, postprocess: $template } )
 
 	[expression_symbol_list]
 		| expression_symbol
@@ -279,7 +282,7 @@ grammar {
 		| kv _ kv_list => ( [$0].concat($2) )
 
 	[kv]
-		| T_WORD _ ":" _ (T_WORD | T_STRING | T_INTEGER | T_JS | T_GRAMMAR_TEMPLATE) => ( { [$0]: $4[0] } )
+		| T_WORD _ ":" _ (T_WORD | T_STRING | T_INTEGER | T_JS) => ( { [$0]: $4[0] } )
 
 	[string_list]
 		| T_STRING => ( [$0] )
@@ -409,8 +412,11 @@ grammar {
 	[T_JS]
 		| "{" $T_JSBODY* "}" => ( { js: $1.map(v=>v.value).join('') } )
 
-	[T_GRAMMAR_TEMPLATE]
-		| "=>" _ "(" $T_JSBODY* ")" => ( { template: $3.map(v=>v.value).join('').trim() } )
+	[POSTPROCESSOR] => ( { template: $2.value + $3.map(v=>v.value).join('').trim() + $4.value} )
+		| "=>" _ "(" $T_JSBODY* ")"
+		| "=>" _ "{" $T_JSBODY* "}"
+		| "=>" _ "[" $T_JSBODY* "]"
+		| "=>" _ "${" $T_JSBODY* "}" => ( { js: $3.map(v=>v.value).join('').trim() } )
 
 	[T_STRING]
 		| $T_STRING => ( JSON.parse($0.value) )
