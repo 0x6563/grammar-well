@@ -441,10 +441,10 @@ function GWLanguage(){
                     name: "js_template_inner",
                     rules: [
                         { import: ["ws"] },
+                        { when: "${", highlight: "annotation", set: "js_literal" },
                         { when: "(", highlight: "annotation", set: "js_literal" },
                         { when: "{", highlight: "annotation", set: "js_literal" },
-                        { when: "[", highlight: "annotation", set: "js_literal" },
-                        { when: "${", highlight: "annotation", set: "js_literal" }
+                        { when: "[", highlight: "annotation", set: "js_literal" }
                     ]
                 },
                 kv: {

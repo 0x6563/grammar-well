@@ -57,10 +57,10 @@ lexer {
 
 	[js_template_inner]
 		- import ws
+		- when "${" highlight "annotation" set js_literal
 		- when "(" highlight "annotation" set js_literal
 		- when "{" highlight "annotation" set js_literal
 		- when "[" highlight "annotation" set js_literal
-		- when "${" highlight "annotation" set js_literal
 
 	[kv]
 		- import string, ws, word, l_colon, integer, l_scolon
