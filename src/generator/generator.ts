@@ -2,7 +2,7 @@ import { GeneratorOptions, GeneratorContext, TemplateFormat, LanguageDirective, 
 
 import { Parser } from "../parser/parser";
 import { FileSystemResolver } from "./import-resolver";
-import Language from './gwell';
+import Language from './grammars/v2';
 
 import { JavaScriptGenerator } from "./stringify/javascript";
 import * as BuiltInRegistry from "./builtin/registry.json"
