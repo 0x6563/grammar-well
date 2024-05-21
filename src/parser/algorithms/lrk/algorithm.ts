@@ -1,10 +1,10 @@
 import { TokenBuffer } from "../../../lexers/token-buffer";
-import { LanguageDefinition } from "../../../typings";
+import { RuntimeLanguageDefinition } from "../../../typings";
 import { ParserUtility } from "../../parser";
 import { CanonicalCollection } from "./canonical-collection";
 import { LRStack } from "./stack";
 
-export function LRK(language: LanguageDefinition & { tokens: TokenBuffer }, options = {}) {
+export function LRK(language: RuntimeLanguageDefinition & { tokens: TokenBuffer }, options = {}) {
     const { grammar, tokens } = language;
     const { states, rules: rules } = new CanonicalCollection(grammar);
     const stack = new LRStack();

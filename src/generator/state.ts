@@ -1,13 +1,13 @@
-import { Dictionary, GeneratorGrammarRule, GeneratorGrammarSymbol, GrammarTypeJS, GrammarTypeTemplate, ImportDirective, LexerConfig, LexerStateDefinition } from "../typings";
+import { Dictionary, GeneratorGrammarProductionRule, ASTLexerState, GeneratorLexerConfig, ASTJavaScriptLiteral, ASTJavaScriptBuiltin } from "../typings";
 
 export class GeneratorState {
     grammar: {
         start: string;
         config: {
-            postprocessorDefault?: GrammarTypeJS | GrammarTypeTemplate;
-            postprocessorOverride?: GrammarTypeJS | GrammarTypeTemplate;
+            postprocessorDefault?: ASTJavaScriptLiteral | ASTJavaScriptBuiltin;
+            postprocessorOverride?: ASTJavaScriptLiteral | ASTJavaScriptBuiltin;
         }
-        rules: Dictionary<GeneratorGrammarRule[]>,
+        rules: Dictionary<GeneratorGrammarProductionRule[]>,
         uuids: { [key: string]: number }
     } = {
             start: '',
@@ -15,7 +15,7 @@ export class GeneratorState {
             rules: {},
             uuids: {},
         }
-    lexer: LexerConfig | undefined;
+    lexer: GeneratorLexerConfig | undefined;
 
     head: string[] = [];
     body: string[] = [];
@@ -46,12 +46,12 @@ export class GeneratorState {
         return name + 'x' + this.grammar.uuids[name];
     }
 
-    addGrammarRule(rule: GeneratorGrammarRule) {
+    addGrammarRule(rule: GeneratorGrammarProductionRule) {
         this.grammar.rules[rule.name] = this.grammar.rules[rule.name] || [];
         this.grammar.rules[rule.name].push(rule);
     }
 
-    addLexerState(state: LexerStateDefinition) {
+    addLexerState(state: ASTLexerState) {
         this.lexer.states[state.name] = this.lexer.states[state.name] || { name: state.name, rules: [] }
         const target = this.lexer.states[state.name];
         target.default = typeof state.default != "undefined" ? state.default : target.default;

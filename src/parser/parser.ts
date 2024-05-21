@@ -1,7 +1,7 @@
 import { CharacterLexer } from "../lexers/character-lexer";
 import { StatefulLexer } from "../lexers/stateful-lexer";
 import { TokenBuffer } from "../lexers/token-buffer";
-import { GrammarRule, GrammarRuleSymbol, LanguageDefinition, LexerToken, ParserAlgorithm } from "../typings";
+import { RuntimeGrammarProductionRule, RuntimeGrammarRuleSymbol, RuntimeLanguageDefinition, RuntimeLexerToken, ParserAlgorithm } from "../typings";
 import { CYK } from "./algorithms/cyk";
 import { Earley } from "./algorithms/earley";
 import { LRK } from "./algorithms/lrk/algorithm";
@@ -12,14 +12,14 @@ const ParserRegistry: { [key: string]: ParserAlgorithm } = {
     lr0: LRK
 }
 
-export function Parse(language: LanguageDefinition, input: string, options?: ParserOptions) {
+export function Parse(language: RuntimeLanguageDefinition, input: string, options?: ParserOptions) {
     const i = new Parser(language, options);
     return i.run(input);
 }
 
 export class Parser {
 
-    constructor(private language: LanguageDefinition, private options: ParserOptions = { algorithm: 'earley', parserOptions: {} }) { }
+    constructor(private language: RuntimeLanguageDefinition, private options: ParserOptions = { algorithm: 'earley', parserOptions: {} }) { }
 
     run(input: string): { results: any[] } {
         const tokenQueue = this.getTokenQueue();
@@ -44,7 +44,7 @@ export class Parser {
 
 export abstract class ParserUtility {
 
-    static SymbolMatchesToken(symbol: GrammarRuleSymbol, token: LexerToken) {
+    static SymbolMatchesToken(symbol: RuntimeGrammarRuleSymbol, token: RuntimeLexerToken) {
         if (typeof symbol === 'string')
             throw 'Attempted to match token against non-terminal';
         if (typeof symbol == 'function')
@@ -59,11 +59,11 @@ export abstract class ParserUtility {
             return symbol.literal === token.value;
     }
 
-    static SymbolIsTerminal(symbol: GrammarRuleSymbol) {
+    static SymbolIsTerminal(symbol: RuntimeGrammarRuleSymbol) {
         return typeof symbol != 'string';
     }
 
-    static PostProcess(rule: GrammarRule, data: any, meta?: any) {
+    static PostProcess(rule: RuntimeGrammarProductionRule, data: any, meta?: any) {
         if (rule.postprocess) {
             return rule.postprocess({ rule, data, meta });
         }

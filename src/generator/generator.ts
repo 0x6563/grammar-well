@@ -1,4 +1,4 @@
-import { GeneratorOptions, GeneratorContext, TemplateFormat, LanguageDirective, ConfigDirective, GeneratorSymbolRepeat, GeneratorExpression, GeneratorGrammarRule, GrammarDirective, ImportDirective, LexerDirective, GeneratorSymbolSubexpression, GrammarTypeLiteral, GeneratorGrammarSymbol, GeneratorSymbol, GeneratorRule, ImportResolver } from "../typings";
+import { GeneratorOptions, GeneratorContext, TemplateFormat, ASTDirectives, ASTConfig, ASTGrammarSymbolRepeat, ASTGrammarProductionRule, GeneratorGrammarProductionRule, ASTGrammar, ASTImport, ASTLexer, ASTGrammarSymbolGroup, ASTGrammarSymbolLiteral, GeneratorGrammarSymbol, ASTGrammarSymbol, ASTGrammarProduction, ImportResolver } from "../typings";
 
 import { Parser } from "../parser/parser";
 import { FileSystemResolver } from "./import-resolver";
@@ -9,7 +9,7 @@ import * as BuiltInRegistry from "./builtin/registry.json"
 import { ExportsRegistry } from "./stringify/exports/registry";
 import { GeneratorState } from "./state";
 
-export async function Generate(rules: string | LanguageDirective | (LanguageDirective[]), config: GeneratorOptions = {}) {
+export async function Generate(rules: string | ASTDirectives | (ASTDirectives[]), config: GeneratorOptions = {}) {
     const builder = new Generator(config);
     await builder.import(rules as any);
     Object.assign(builder.state.config, config.overrides);
@@ -42,9 +42,9 @@ export class Generator {
     }
 
     async import(source: string): Promise<void>
-    async import(directive: LanguageDirective): Promise<void>
-    async import(directives: LanguageDirective[]): Promise<void>
-    async import(directives: string | LanguageDirective | (LanguageDirective[])): Promise<void> {
+    async import(directive: ASTDirectives): Promise<void>
+    async import(directives: ASTDirectives[]): Promise<void>
+    async import(directives: string | ASTDirectives | (ASTDirectives[])): Promise<void> {
         if (typeof directives == 'string') {
             await this.mergeLanguageDefinitionString(directives);
             return;
@@ -76,7 +76,7 @@ export class Generator {
         throw new Error("No such preprocessor: " + output)
     }
 
-    private async processImportDirective(directive: ImportDirective) {
+    private async processImportDirective(directive: ASTImport) {
         if (directive.path) {
             await this.importGrammar(directive.import, this.alias + (directive.alias || ''));
         } else {
@@ -84,11 +84,11 @@ export class Generator {
         }
     }
 
-    private processConfigDirective(directive: ConfigDirective) {
+    private processConfigDirective(directive: ASTConfig) {
         Object.assign(this.state.config, directive.config);
     }
 
-    private processLexerDirective(directive: LexerDirective) {
+    private processLexerDirective(directive: ASTLexer) {
         if (!this.state.lexer) {
             this.state.lexer = {
                 start: '',
@@ -140,7 +140,7 @@ export class Generator {
         }
     }
 
-    private processGrammarDirective(directive: GrammarDirective) {
+    private processGrammarDirective(directive: ASTGrammar) {
         if (directive.grammar.config) {
             if (directive.grammar.config.start) {
                 this.state.grammar.start = this.alias + directive.grammar.config.start;
@@ -185,13 +185,13 @@ export class Generator {
         return;
     }
 
-    private buildRules(name: string, expressions: GeneratorExpression[], rule?: GeneratorRule) {
+    private buildRules(name: string, expressions: ASTGrammarProductionRule[], rule?: ASTGrammarProduction) {
         for (const expression of expressions) {
             this.state.addGrammarRule(this.buildRule(name, expression, rule));
         }
     }
 
-    private buildRule(name: string, expression: GeneratorExpression, rule?: GeneratorRule): GeneratorGrammarRule {
+    private buildRule(name: string, expression: ASTGrammarProductionRule, rule?: ASTGrammarProduction): GeneratorGrammarProductionRule {
         const symbols: GeneratorGrammarSymbol[] = [];
         for (let i = 0; i < expression.symbols.length; i++) {
             const symbol = this.buildSymbol(name, expression.symbols[i]);
@@ -201,7 +201,7 @@ export class Generator {
         return { name, symbols, postprocess: expression.postprocess || rule?.postprocess };
     }
 
-    private buildSymbol(name: string, symbol: GeneratorSymbol): GeneratorGrammarSymbol {
+    private buildSymbol(name: string, symbol: ASTGrammarSymbol): GeneratorGrammarSymbol {
         if ('repeat' in symbol) {
             return this.buildRepeatRules(name, symbol);
         }
@@ -228,7 +228,7 @@ export class Generator {
         }
     }
 
-    private buildCharacterRules(name: string, symbol: GrammarTypeLiteral) {
+    private buildCharacterRules(name: string, symbol: ASTGrammarSymbolLiteral) {
         const id = this.state.grammarUUID(name + "$STR");
         this.buildRules(id, [
             {
@@ -245,16 +245,16 @@ export class Generator {
         return { rule: id };
     }
 
-    private buildSubExpressionRules(name: string, symbol: GeneratorSymbolSubexpression) {
+    private buildSubExpressionRules(name: string, symbol: ASTGrammarSymbolGroup) {
         const id = this.state.grammarUUID(name + "$SUB");
         this.buildRules(id, symbol.subexpression);
         return { rule: id };
     }
 
-    private buildRepeatRules(name: string, symbol: GeneratorSymbolRepeat) {
+    private buildRepeatRules(name: string, symbol: ASTGrammarSymbolRepeat) {
         let id: string;
-        const expr1: GeneratorExpression = { symbols: [] };
-        const expr2: GeneratorExpression = { symbols: [] };
+        const expr1: ASTGrammarProductionRule = { symbols: [] };
+        const expr2: ASTGrammarProductionRule = { symbols: [] };
         if (symbol.repeat == '+') {
             id = this.state.grammarUUID(name + "$RPT1N");
             expr1.symbols = [symbol.expression];

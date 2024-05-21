@@ -1,6 +1,6 @@
-import { LexerConfig } from "../typings";
+import { RuntimeLexerConfig } from "../typings";
 
-export function CreateMonarchTokenizer(lexer: LexerConfig) {
+export function CreateMonarchTokenizer(lexer: RuntimeLexerConfig) {
     const tokenizer: any = {}; // languages.IMonarchLanguage['tokenizer']
     const { start, states } = lexer;
     for (const key in states) {

@@ -1,11 +1,11 @@
 import { JavaScriptGenerator } from "../stringify/javascript";
-import { Dictionary, GeneratorGrammarRule, GeneratorGrammarSymbol, GrammarTypeRule } from "../../typings";
+import { Dictionary, GeneratorGrammarProductionRule, GeneratorGrammarSymbol, ASTGrammarSymbolNonTerminal } from "../../typings";
 import { Collection, GeneratorSymbolCollection } from "../../utility/general";
 import { CommonGenerator } from "../stringify/common";
 
 
 export class LRParseTableBuilder {
-    rules: Collection<GeneratorGrammarRule> = new Collection();
+    rules: Collection<GeneratorGrammarProductionRule> = new Collection();
     table: Dictionary<StateBuilder> = Object.create(null)
     symbols: GeneratorSymbolCollection = new GeneratorSymbolCollection();
 
@@ -28,7 +28,7 @@ export class LRParseTableBuilder {
         state.queue = {};
     }
 
-    encodeRule(rule: GeneratorGrammarRule, dot: number) {
+    encodeRule(rule: GeneratorGrammarProductionRule, dot: number) {
         return this.rules.encode(rule) + '.' + dot;
     }
 
@@ -72,7 +72,7 @@ class StateBuilder {
     queue: { [key: string]: StateItem[] } = {};
     actions: Map<GeneratorGrammarSymbol, string> = new Map();
     goto: Map<GeneratorGrammarSymbol, string> = new Map();
-    reduce?: GeneratorGrammarRule;
+    reduce?: GeneratorGrammarProductionRule;
 
     constructor(private collection: LRParseTableBuilder, items: StateItem[]) {
         const visited = new Set<GeneratorGrammarSymbol>();
@@ -99,7 +99,7 @@ class StateBuilder {
         }
     }
 
-    private closure(rule: GeneratorGrammarRule, dot: number, visited: Set<GeneratorGrammarSymbol>) {
+    private closure(rule: GeneratorGrammarProductionRule, dot: number, visited: Set<GeneratorGrammarSymbol>) {
         const isFinal = rule.symbols.length == dot;
         this.isFinal = isFinal || this.isFinal;
         const symbol = rule.symbols[dot];
@@ -116,7 +116,7 @@ class StateBuilder {
             this.outputs.action[id].push(stateItem);
         } else {
             const id = this.collection.symbols.encode(symbol);
-            const name = typeof symbol === 'string' ? symbol : (symbol as GrammarTypeRule).rule;
+            const name = typeof symbol === 'string' ? symbol : (symbol as ASTGrammarSymbolNonTerminal).rule;
             this.outputs.goto[id] = this.outputs.goto[id] || [];
             this.outputs.goto[id].push(stateItem);
             for (const rule of this.collection.generator.state.grammar.rules[name]) {
@@ -142,13 +142,13 @@ class StateBuilder {
 interface State {
     actions: Next[];
     goto: { [key: string]: string };
-    reduce: GeneratorGrammarRule;
+    reduce: GeneratorGrammarProductionRule;
     isFinal: boolean;
 }
 
 type Next = { symbol: GeneratorGrammarSymbol, next: string };
 
-type StateItem = { rule: GeneratorGrammarRule, dot: number };
+type StateItem = { rule: GeneratorGrammarProductionRule, dot: number };
 
 interface StateOut {
     action: Dictionary<StateItem[]>;

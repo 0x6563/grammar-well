@@ -1,7 +1,7 @@
-import { LanguageDefinition, GrammarRuleSymbol, Dictionary, GrammarRule } from "../typings";
+import { RuntimeLanguageDefinition, RuntimeGrammarRuleSymbol, Dictionary, RuntimeGrammarProductionRule } from "../typings";
 
 
-export function LintGrammarSymbols(language: LanguageDefinition): GrammarRuleSymbol[] {
+export function LintGrammarSymbols(language: RuntimeLanguageDefinition): RuntimeGrammarRuleSymbol[] {
     const unused = new Set<string>();
     const { rules, start } = language.grammar;
     for (const rule in rules) {
@@ -10,7 +10,7 @@ export function LintGrammarSymbols(language: LanguageDefinition): GrammarRuleSym
     TraverseRule(start, rules, unused);
     return Array.from(unused);
 }
-function TraverseRule(name: string, rules: Dictionary<GrammarRule[]>, unvisited: Set<string>) {
+function TraverseRule(name: string, rules: Dictionary<RuntimeGrammarProductionRule[]>, unvisited: Set<string>) {
     if (!unvisited.has(name)) {
         return;
     }

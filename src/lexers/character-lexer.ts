@@ -1,6 +1,6 @@
-import { Lexer } from "../typings";
+import { RuntimeLexer } from "../typings";
 
-export class CharacterLexer implements Lexer {
+export class CharacterLexer implements RuntimeLexer {
     private buffer: string | any[] = '';
 
     private $indexOffset = 0;

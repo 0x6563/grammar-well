@@ -1,4 +1,4 @@
-import { Dictionary, GeneratorGrammarSymbol, GrammarRuleSymbol } from "../typings";
+import { Dictionary, GeneratorGrammarSymbol, RuntimeGrammarRuleSymbol } from "../typings";
 
 
 export class Collection<T> {

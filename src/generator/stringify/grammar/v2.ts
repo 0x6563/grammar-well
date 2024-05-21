@@ -1,8 +1,8 @@
-import { ConfigDirective, GeneratorGrammarSymbol, GeneratorRule, GeneratorSymbol, GrammarDirective, ImportDirective, LanguageDirective, LexerDirective, LexerStateImportRule, LexerStateMatchRule } from "../../../typings";
+import { ASTConfig, GeneratorGrammarSymbol, ASTGrammarProduction, ASTGrammarSymbol, ASTGrammar, ASTImport, ASTDirectives, ASTLexer, ASTLexerStateImportRule, ASTLexerStateMatchRule, ASTLexerStateNonMatchRule } from "../../../typings";
 
 export class V2GrammarString {
     source: string = '';
-    append(directives: LanguageDirective | (LanguageDirective[])) {
+    append(directives: ASTDirectives | (ASTDirectives[])) {
         directives = Array.isArray(directives) ? directives : [directives];
         for (const directive of directives) {
             if ("head" in directive) {
@@ -21,15 +21,15 @@ export class V2GrammarString {
         }
     }
 
-    appendImportDirective(directive: ImportDirective) {
+    appendImportDirective(directive: ASTImport) {
         this.source += `import * from ${directive.path ? JSON.stringify(directive.import) : directive.import};\n`;
     }
 
-    appendConfigDirective(directive: ConfigDirective) {
+    appendConfigDirective(directive: ASTConfig) {
         this.appendSection('config', this.formatKV(directive.config, 1));
     }
 
-    appendGrammarDirective(directive: GrammarDirective) {
+    appendGrammarDirective(directive: ASTGrammar) {
         let body = '';
         if (directive.grammar.config) {
             body += this.formatKV(directive.grammar.config, 1);
@@ -42,7 +42,7 @@ export class V2GrammarString {
         this.appendSection('grammar', body);
     }
 
-    formatGrammarRule(rule: GeneratorRule) {
+    formatGrammarRule(rule: ASTGrammarProduction) {
         let body = '\n' + this.indent(1, `[${rule.name}]`);
         if (rule.postprocess) {
             body += ` ${this.formatPostProcess(rule.postprocess)}`;
@@ -61,7 +61,7 @@ export class V2GrammarString {
         return exp.map(v => this.formatSymbol(v) + (v.alias ? ":" + v.alias : '')).join(' ');
     }
 
-    formatSymbol(exp: GeneratorSymbol | GeneratorGrammarSymbol | string) {
+    formatSymbol(exp: ASTGrammarSymbol | GeneratorGrammarSymbol | string) {
         if (typeof exp == 'string') {
             return JSON.stringify(exp);
         }
@@ -85,7 +85,7 @@ export class V2GrammarString {
         }
     }
 
-    formatPostProcess(postProcess: GeneratorRule['postprocess']) {
+    formatPostProcess(postProcess: ASTGrammarProduction['postprocess']) {
 
         // if ('builtin' in postProcess) {
         //     return postProcess;
@@ -100,7 +100,7 @@ export class V2GrammarString {
         }
     }
 
-    appendLexerDirective(directive: LexerDirective) {
+    appendLexerDirective(directive: ASTLexer) {
         let body = '';
         if (directive.lexer.start) {
             body += this.formatKV({ start: directive.lexer.start }, 1);
@@ -123,14 +123,14 @@ export class V2GrammarString {
         this.appendSection('lexer', body);
     }
 
-    formatLexerStateRule(rule: LexerStateImportRule | LexerStateMatchRule) {
+    formatLexerStateRule(rule: ASTLexerStateMatchRule | ASTLexerStateNonMatchRule | ASTLexerStateImportRule) {
         if ('import' in rule) {
             return 'import ' + rule.import.join(', ')
         } else {
             let body = '';
             if (rule.before) {
-                body += 'before ' + this.formatSymbol(rule.when as any)
-            } else if (rule.when) {
+                body += 'before ' + this.formatSymbol((rule as ASTLexerStateMatchRule).when)
+            } else if ('when' in rule) {
                 body += 'when ' + this.formatSymbol(rule.when as any)
             }
             if (typeof rule.type != 'undefined') {

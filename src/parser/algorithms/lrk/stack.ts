@@ -1,4 +1,4 @@
-import { GrammarRule, GrammarRuleSymbol } from "../../../typings";
+import { RuntimeGrammarProductionRule, RuntimeGrammarRuleSymbol } from "../../../typings";
 import { State } from "./state";
 
 export class LRStack {
@@ -18,7 +18,7 @@ export class LRStack {
         this.current.state = state;
     }
 
-    reduce(rule: GrammarRule) {
+    reduce(rule: RuntimeGrammarProductionRule) {
         const n = LRStack.NewItem();
         const l = rule.symbols.length;
         n.children = this.stack.splice(l * -1, l);
@@ -28,7 +28,7 @@ export class LRStack {
         this.stack.push(n);
     }
 
-    append(symbol: GrammarRuleSymbol) {
+    append(symbol: RuntimeGrammarRuleSymbol) {
         this.stack.push(LRStack.NewItem())
         this.current.symbol = symbol;
     }
@@ -47,7 +47,7 @@ export class LRStack {
 interface LRStackItem {
     children: LRStackItem[];
     state: State;
-    symbol: GrammarRuleSymbol;
-    rule: GrammarRule;
+    symbol: RuntimeGrammarRuleSymbol;
+    rule: RuntimeGrammarProductionRule;
     value: any;
 }

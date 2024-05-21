@@ -1,5 +1,5 @@
-import { LexerStateDefinition, LexerConfig, Lexer } from "../typings";
-export declare class StatefulLexer implements Lexer {
+import { RuntimeLexerState, RuntimeLexerConfig, RuntimeLexer } from "../typings";
+export declare class StatefulLexer implements RuntimeLexer {
     private start;
     private states;
     private buffer;
@@ -13,7 +13,7 @@ export declare class StatefulLexer implements Lexer {
     private rules;
     private regexp;
     private tags;
-    constructor({ states, start }: LexerConfig);
+    constructor({ states, start }: RuntimeLexerConfig);
     feed(data?: string, state?: ReturnType<StatefulLexer['state']>): void;
     state(): {
         line: number;
@@ -46,7 +46,7 @@ export declare class StatefulLexer implements Lexer {
     private getGroup;
 }
 export declare function ResolveStates(states: {
-    [key: string]: LexerStateDefinition;
+    [key: string]: RuntimeLexerState;
 }, start: string): {
-    [key: string]: LexerStateDefinition;
+    [key: string]: RuntimeLexerState;
 };

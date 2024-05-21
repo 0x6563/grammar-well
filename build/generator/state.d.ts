@@ -1,38 +1,38 @@
-import { Dictionary, GeneratorGrammarRule, GrammarTypeJS, GrammarTypeTemplate, LexerConfig, LexerStateDefinition } from "../typings";
+import { Dictionary, GeneratorGrammarProductionRule, ASTLexerState, GeneratorLexerConfig, ASTJavaScriptLiteral, ASTJavaScriptBuiltin } from "../typings";
 export declare class GeneratorState {
     grammar: {
         start: string;
         config: {
-            postprocessorDefault?: GrammarTypeJS | GrammarTypeTemplate;
-            postprocessorOverride?: GrammarTypeJS | GrammarTypeTemplate;
+            postprocessorDefault?: ASTJavaScriptLiteral | ASTJavaScriptBuiltin;
+            postprocessorOverride?: ASTJavaScriptLiteral | ASTJavaScriptBuiltin;
         };
-        rules: Dictionary<GeneratorGrammarRule[]>;
+        rules: Dictionary<GeneratorGrammarProductionRule[]>;
         uuids: {
             [key: string]: number;
         };
     };
-    lexer: LexerConfig | undefined;
+    lexer: GeneratorLexerConfig | undefined;
     head: string[];
     body: string[];
     config: Dictionary<string>;
     version: string;
     merge(state: GeneratorState): void;
     grammarUUID(name: string): string;
-    addGrammarRule(rule: GeneratorGrammarRule): void;
-    addLexerState(state: LexerStateDefinition): void;
+    addGrammarRule(rule: GeneratorGrammarProductionRule): void;
+    addLexerState(state: ASTLexerState): void;
     export(): {
         grammar: {
             start: string;
             config: {
-                postprocessorDefault?: GrammarTypeJS | GrammarTypeTemplate;
-                postprocessorOverride?: GrammarTypeJS | GrammarTypeTemplate;
+                postprocessorDefault?: ASTJavaScriptLiteral | ASTJavaScriptBuiltin;
+                postprocessorOverride?: ASTJavaScriptLiteral | ASTJavaScriptBuiltin;
             };
-            rules: Dictionary<GeneratorGrammarRule[]>;
+            rules: Dictionary<GeneratorGrammarProductionRule[]>;
             uuids: {
                 [key: string]: number;
             };
         };
-        lexer: LexerConfig;
+        lexer: GeneratorLexerConfig;
         head: string[];
         body: string[];
         config: Dictionary<string>;

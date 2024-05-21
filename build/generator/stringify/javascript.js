@@ -93,8 +93,8 @@ class JavaScriptGenerator {
             const state = this.state.lexer.states[key];
             map[state.name] = common_1.CommonGenerator.JSON({
                 name: JSON.stringify(state.name),
-                default: state.default ? JSON.stringify(state.default) : null,
-                unmatched: state.unmatched ? JSON.stringify(state.unmatched) : null,
+                default: state.default ? this.lexerConfigStateRule(state.default) : null,
+                unmatched: state.unmatched ? this.lexerConfigStateRule(state.unmatched) : null,
                 rules: this.lexerConfigStateRules(state.rules, depth + 2)
             }, depth + 1);
         }
@@ -104,21 +104,24 @@ class JavaScriptGenerator {
         const ary = rules.map(rule => {
             if ('import' in rule)
                 return common_1.CommonGenerator.JSON({ import: JSON.stringify(rule.import) }, -1);
-            return common_1.CommonGenerator.JSON({
-                when: common_1.CommonGenerator.SerializeSymbol(rule.when),
-                type: JSON.stringify(rule.type),
-                tag: JSON.stringify(rule.tag),
-                pop: JSON.stringify(rule.pop),
-                before: JSON.stringify(rule.before),
-                open: JSON.stringify(rule.open),
-                close: JSON.stringify(rule.close),
-                highlight: JSON.stringify(rule.highlight),
-                set: JSON.stringify(rule.set),
-                inset: JSON.stringify(rule.inset),
-                goto: JSON.stringify(rule.goto),
-            }, -1);
+            return this.lexerConfigStateRule(rule);
         });
         return common_1.CommonGenerator.JSON(ary, depth);
+    }
+    lexerConfigStateRule(rule) {
+        return common_1.CommonGenerator.JSON({
+            when: 'when' in rule ? common_1.CommonGenerator.SerializeSymbol(rule.when) : null,
+            before: JSON.stringify(rule.before),
+            type: JSON.stringify(rule.type),
+            tag: JSON.stringify(rule.tag),
+            open: JSON.stringify(rule.open),
+            close: JSON.stringify(rule.close),
+            highlight: JSON.stringify(rule.highlight),
+            pop: JSON.stringify(rule.pop),
+            set: JSON.stringify(rule.set),
+            inset: JSON.stringify(rule.inset),
+            goto: JSON.stringify(rule.goto),
+        }, -1);
     }
 }
 exports.JavaScriptGenerator = JavaScriptGenerator;

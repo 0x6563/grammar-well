@@ -21,7 +21,7 @@ class StatefulLexer {
             this.states[key] = {
                 regexp: CompileRegExp(states[key]),
                 rules: states[key].rules,
-                unmatched: states[key].unmatched ? { type: states[key].unmatched } : null
+                unmatched: states[key].unmatched
             };
         }
         this.start = start;

@@ -1,4 +1,4 @@
-import { Dictionary, GrammarRule, LanguageDefinition } from "../../typings";
+import { Dictionary, RuntimeGrammarProductionRule, RuntimeLanguageDefinition } from "../../typings";
 import { TokenBuffer } from "../../lexers/token-buffer";
 import { TextFormatter } from "../../utility/text-format";
 import { ParserUtility } from "../parser";
@@ -7,7 +7,7 @@ export interface EarleyParserOptions {
     keepHistory?: boolean;
 }
 
-export function Earley(language: LanguageDefinition & { tokens: TokenBuffer }, options: EarleyParserOptions = {}) {
+export function Earley(language: RuntimeLanguageDefinition & { tokens: TokenBuffer }, options: EarleyParserOptions = {}) {
     const { tokens } = language;
     const { rules, start } = language.grammar;
     const column = new Column(rules, 0);
@@ -70,7 +70,7 @@ class Column {
     completed: Dictionary<State[]> = Object.create(null);  // states that are nullable
 
     constructor(
-        private rules: Dictionary<GrammarRule[]>,
+        private rules: Dictionary<RuntimeGrammarProductionRule[]>,
         public index: number
     ) { }
 
@@ -127,8 +127,8 @@ class Column {
         }
     }
 
-    expects(): GrammarRule[] {
-        const result: GrammarRule[] = [];
+    expects(): RuntimeGrammarProductionRule[] {
+        const result: RuntimeGrammarProductionRule[] = [];
         for (const state of this.states) {
             if (state.rule.symbols[state.dot] && typeof state.rule.symbols[state.dot] !== 'string') {
                 result.push({ ...state.rule, index: state.dot } as any)
@@ -149,7 +149,7 @@ class State {
     left: State;
     right: State | StateToken;
     constructor(
-        public rule: GrammarRule,
+        public rule: RuntimeGrammarProductionRule,
         public dot: number,
         public reference: number,
         public wantedBy: State[]

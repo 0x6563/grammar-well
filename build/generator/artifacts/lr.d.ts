@@ -1,14 +1,14 @@
 import { JavaScriptGenerator } from "../stringify/javascript";
-import { Dictionary, GeneratorGrammarRule, GeneratorGrammarSymbol } from "../../typings";
+import { Dictionary, GeneratorGrammarProductionRule, GeneratorGrammarSymbol } from "../../typings";
 import { Collection, GeneratorSymbolCollection } from "../../utility/general";
 export declare class LRParseTableBuilder {
     generator: JavaScriptGenerator;
-    rules: Collection<GeneratorGrammarRule>;
+    rules: Collection<GeneratorGrammarProductionRule>;
     table: Dictionary<StateBuilder>;
     symbols: GeneratorSymbolCollection;
     constructor(generator: JavaScriptGenerator);
     addState(seed: StateItem[]): StateBuilder;
-    encodeRule(rule: GeneratorGrammarRule, dot: number): string;
+    encodeRule(rule: GeneratorGrammarProductionRule, dot: number): string;
     encodeStateItems(seed: StateItem[]): string;
     stringify(depth?: number): string;
     stringifyState(state: State, depth?: number): string;
@@ -23,7 +23,7 @@ declare class StateBuilder {
     };
     actions: Map<GeneratorGrammarSymbol, string>;
     goto: Map<GeneratorGrammarSymbol, string>;
-    reduce?: GeneratorGrammarRule;
+    reduce?: GeneratorGrammarProductionRule;
     constructor(collection: LRParseTableBuilder, items: StateItem[]);
     private closure;
     export(): State;
@@ -33,7 +33,7 @@ interface State {
     goto: {
         [key: string]: string;
     };
-    reduce: GeneratorGrammarRule;
+    reduce: GeneratorGrammarProductionRule;
     isFinal: boolean;
 }
 type Next = {
@@ -41,7 +41,7 @@ type Next = {
     next: string;
 };
 type StateItem = {
-    rule: GeneratorGrammarRule;
+    rule: GeneratorGrammarProductionRule;
     dot: number;
 };
 interface StateOut {

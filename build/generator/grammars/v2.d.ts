@@ -98,19 +98,40 @@ declare function GWLanguage(): {
                     data: any;
                 }) => any;
             }[];
-            state_declare: {
+            state_definition: ({
+                name: string;
+                symbols: string[];
+                postprocess: ({ data }: {
+                    data: any;
+                }) => any;
+            } | {
+                name: string;
+                symbols: (string | {
+                    literal: string;
+                })[];
+                postprocess: ({ data }: {
+                    data: any;
+                }) => {
+                    sections: any;
+                };
+            })[];
+            state_config_list: {
                 name: string;
                 symbols: string[];
                 postprocess: ({ data }: {
                     data: any;
                 }) => any;
             }[];
-            state_definition: {
+            state_config: {
                 name: string;
-                symbols: string[];
+                symbols: (string | {
+                    literal: string;
+                })[];
                 postprocess: ({ data }: {
                     data: any;
-                }) => any;
+                }) => {
+                    [x: number]: any;
+                };
             }[];
             token_list: {
                 name: string;
@@ -264,17 +285,20 @@ declare function GWLanguage(): {
                     expressions: any;
                 };
             }[];
-            expression_list: ({
-                name: string;
-                symbols: string[];
-                postprocess?: undefined;
-            } | {
+            grammar_rule_name: {
                 name: string;
                 symbols: string[];
                 postprocess: ({ data }: {
                     data: any;
                 }) => any;
-            })[];
+            }[];
+            expression_list: {
+                name: string;
+                symbols: string[];
+                postprocess: ({ data }: {
+                    data: any;
+                }) => any;
+            }[];
             expression: {
                 name: string;
                 symbols: string[];
@@ -338,7 +362,9 @@ declare function GWLanguage(): {
             }[];
             kv: {
                 name: string;
-                symbols: string[];
+                symbols: (string | {
+                    literal: string;
+                })[];
                 postprocess: ({ data }: {
                     data: any;
                 }) => {
@@ -461,13 +487,25 @@ declare function GWLanguage(): {
                     token: string;
                 }[];
             }[];
-            L_TEMPLATEL: {
+            CBRACKET_L: {
                 name: string;
                 symbols: {
                     token: string;
                 }[];
             }[];
-            L_TEMPLATER: {
+            CBRACKET_R: {
+                name: string;
+                symbols: {
+                    token: string;
+                }[];
+            }[];
+            DCBRACKET_L: {
+                name: string;
+                symbols: {
+                    token: string;
+                }[];
+            }[];
+            DCBRACKET_R: {
                 name: string;
                 symbols: {
                     token: string;
@@ -633,7 +671,7 @@ declare function GWLanguage(): {
             T_JS: {
                 name: string;
                 symbols: (string | {
-                    token: string;
+                    literal: string;
                 })[];
                 postprocess: ({ data }: {
                     data: any;
@@ -641,7 +679,7 @@ declare function GWLanguage(): {
                     js: any;
                 };
             }[];
-            T_GRAMMAR_TEMPLATE$RPT0Nx1: ({
+            POSTPROCESSOR$RPT0Nx1: ({
                 name: string;
                 symbols: any[];
                 postprocess?: undefined;
@@ -654,17 +692,66 @@ declare function GWLanguage(): {
                     data: any;
                 }) => any;
             })[];
-            T_GRAMMAR_TEMPLATE: {
+            POSTPROCESSOR: ({
                 name: string;
                 symbols: (string | {
-                    token: string;
+                    literal: string;
                 })[];
                 postprocess: ({ data }: {
                     data: any;
                 }) => {
                     template: any;
                 };
-            }[];
+            } | {
+                name: string;
+                symbols: (string | {
+                    literal: string;
+                })[];
+                postprocess: ({ data }: {
+                    data: any;
+                }) => {
+                    js: any;
+                };
+            })[];
+            POSTPROCESSOR$RPT0Nx2: ({
+                name: string;
+                symbols: any[];
+                postprocess?: undefined;
+            } | {
+                name: string;
+                symbols: (string | {
+                    token: string;
+                })[];
+                postprocess: ({ data }: {
+                    data: any;
+                }) => any;
+            })[];
+            POSTPROCESSOR$RPT0Nx3: ({
+                name: string;
+                symbols: any[];
+                postprocess?: undefined;
+            } | {
+                name: string;
+                symbols: (string | {
+                    token: string;
+                })[];
+                postprocess: ({ data }: {
+                    data: any;
+                }) => any;
+            })[];
+            POSTPROCESSOR$RPT0Nx4: ({
+                name: string;
+                symbols: any[];
+                postprocess?: undefined;
+            } | {
+                name: string;
+                symbols: (string | {
+                    token: string;
+                })[];
+                postprocess: ({ data }: {
+                    data: any;
+                }) => any;
+            })[];
             T_STRING: {
                 name: string;
                 symbols: {
@@ -675,6 +762,15 @@ declare function GWLanguage(): {
                 }) => any;
             }[];
             T_WORD: {
+                name: string;
+                symbols: {
+                    token: string;
+                }[];
+                postprocess: ({ data }: {
+                    data: any;
+                }) => any;
+            }[];
+            T_SECTWORD: {
                 name: string;
                 symbols: {
                     token: string;
@@ -757,12 +853,10 @@ declare function GWLanguage(): {
                     import: string[];
                     when?: undefined;
                     tag?: undefined;
-                    open?: undefined;
                     set?: undefined;
                 } | {
                     when: string;
                     tag: string[];
-                    open: string;
                     set: string;
                     import?: undefined;
                 })[];
@@ -774,12 +868,10 @@ declare function GWLanguage(): {
                     when?: undefined;
                     tag?: undefined;
                     pop?: undefined;
-                    close?: undefined;
                 } | {
                     when: string;
                     tag: string[];
                     pop: number;
-                    close: string;
                     import?: undefined;
                 })[];
             };
@@ -789,12 +881,10 @@ declare function GWLanguage(): {
                     import: string[];
                     when?: undefined;
                     tag?: undefined;
-                    open?: undefined;
                     set?: undefined;
                 } | {
                     when: string;
                     tag: string[];
-                    open: string;
                     set: string;
                     import?: undefined;
                 })[];
@@ -806,12 +896,10 @@ declare function GWLanguage(): {
                     when?: undefined;
                     tag?: undefined;
                     pop?: undefined;
-                    close?: undefined;
                 } | {
                     when: string;
                     tag: string[];
                     pop: number;
-                    close: string;
                     import?: undefined;
                 })[];
             };
@@ -821,13 +909,11 @@ declare function GWLanguage(): {
                     import: string[];
                     when?: undefined;
                     tag?: undefined;
-                    open?: undefined;
                     highlight?: undefined;
                     set?: undefined;
                 } | {
                     when: string;
                     tag: string[];
-                    open: string;
                     highlight: string;
                     set: string;
                     import?: undefined;
@@ -839,82 +925,78 @@ declare function GWLanguage(): {
                     import: string[];
                     when?: undefined;
                     tag?: undefined;
+                    goto?: undefined;
                     pop?: undefined;
-                    close?: undefined;
+                } | {
+                    when: string;
+                    tag: string[];
+                    goto: string;
+                    import?: undefined;
+                    pop?: undefined;
                 } | {
                     when: string;
                     tag: string[];
                     pop: number;
-                    close: string;
                     import?: undefined;
+                    goto?: undefined;
                 })[];
             };
-            js: {
+            lexer_sections: {
                 name: string;
-                rules: {
-                    when: string;
-                    tag: string[];
-                    open: string;
-                    goto: string;
-                }[];
-            };
-            js_wrap: {
-                name: string;
-                default: string;
-                unmatched: string;
                 rules: ({
                     import: string[];
                     when?: undefined;
                     tag?: undefined;
-                    open?: undefined;
-                    goto?: undefined;
                     pop?: undefined;
-                    close?: undefined;
-                } | {
-                    when: string;
-                    tag: string[];
-                    open: string;
-                    goto: string;
-                    import?: undefined;
-                    pop?: undefined;
-                    close?: undefined;
                 } | {
                     when: string;
                     tag: string[];
                     pop: number;
-                    close: string;
                     import?: undefined;
-                    open?: undefined;
-                    goto?: undefined;
+                })[];
+            };
+            js_body: {
+                name: string;
+                rules: ({
+                    import: string[];
+                    when?: undefined;
+                    tag?: undefined;
+                    set?: undefined;
+                } | {
+                    when: string;
+                    tag: string[];
+                    set: string;
+                    import?: undefined;
                 })[];
             };
             js_literal: {
                 name: string;
-                default: string;
-                unmatched: string;
+                default: {
+                    tag: string[];
+                };
+                unmatched: {
+                    tag: string[];
+                };
                 rules: ({
                     import: string[];
                     when?: undefined;
                     tag?: undefined;
-                    open?: undefined;
+                    highlight?: undefined;
                     goto?: undefined;
                     pop?: undefined;
-                    close?: undefined;
                 } | {
                     when: string;
                     tag: string[];
-                    open: string;
+                    highlight: string;
                     goto: string;
                     import?: undefined;
                     pop?: undefined;
-                    close?: undefined;
                 } | {
                     when: string;
                     tag: string[];
+                    highlight: string;
                     pop: number;
-                    close: string;
                     import?: undefined;
-                    open?: undefined;
                     goto?: undefined;
                 })[];
             };
@@ -922,39 +1004,22 @@ declare function GWLanguage(): {
                 name: string;
                 rules: {
                     when: string;
-                    tag: string[];
-                    open: string;
+                    highlight: string;
                     goto: string;
                 }[];
             };
             js_template_inner: {
                 name: string;
-                default: string;
-                unmatched: string;
                 rules: ({
                     import: string[];
                     when?: undefined;
-                    tag?: undefined;
-                    open?: undefined;
-                    goto?: undefined;
-                    pop?: undefined;
-                    close?: undefined;
+                    highlight?: undefined;
+                    set?: undefined;
                 } | {
                     when: string;
-                    tag: string[];
-                    open: string;
-                    goto: string;
+                    highlight: string;
+                    set: string;
                     import?: undefined;
-                    pop?: undefined;
-                    close?: undefined;
-                } | {
-                    when: string;
-                    tag: string[];
-                    pop: number;
-                    close: string;
-                    import?: undefined;
-                    open?: undefined;
-                    goto?: undefined;
                 })[];
             };
             kv: {
@@ -1015,6 +1080,14 @@ declare function GWLanguage(): {
                 rules: {
                     when: RegExp;
                     tag: string[];
+                }[];
+            };
+            section_word: {
+                name: string;
+                rules: {
+                    when: RegExp;
+                    tag: string[];
+                    highlight: string;
                 }[];
             };
             ws: {
@@ -1087,6 +1160,36 @@ declare function GWLanguage(): {
                 rules: {
                     when: string;
                     tag: string[];
+                }[];
+            };
+            l_cbracketl: {
+                name: string;
+                rules: {
+                    when: string;
+                    tag: string[];
+                }[];
+            };
+            l_cbracketr: {
+                name: string;
+                rules: {
+                    when: string;
+                    tag: string[];
+                }[];
+            };
+            l_squarel: {
+                name: string;
+                rules: {
+                    when: string;
+                    tag: string[];
+                    highlight: string;
+                }[];
+            };
+            l_squarer: {
+                name: string;
+                rules: {
+                    when: string;
+                    tag: string[];
+                    highlight: string;
                 }[];
             };
             l_arrow: {

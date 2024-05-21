@@ -1,9 +1,9 @@
 import { TokenBuffer } from "../lexers/token-buffer";
-import { GrammarRule, GrammarRuleSymbol, LexerToken } from "../typings";
+import { RuntimeGrammarProductionRule, RuntimeGrammarRuleSymbol, RuntimeLexerToken } from "../typings";
 
 export class TextFormatter {
 
-    static UnexpectedToken(queue: TokenBuffer, expected: (GrammarRule & { index?: number })[]) {
+    static UnexpectedToken(queue: TokenBuffer, expected: (RuntimeGrammarProductionRule & { index?: number })[]) {
         const token = queue.active;
         const tokenDisplay = TextFormatter.LexerTokenShort(token);
         const lines = [];
@@ -23,7 +23,7 @@ export class TextFormatter {
         }
     }
 
-    static LexerTokenShort(token: LexerToken) {
+    static LexerTokenShort(token: RuntimeLexerToken) {
         if (token.type)
             return `[${token.type}] ${JSON.stringify(token.value)}`;
         return `${JSON.stringify(token.value)}`;
@@ -56,7 +56,7 @@ export class TextFormatter {
         return `Syntax error at index ${offset}:\n\n${string}\n`;
     }
 
-    static GrammarRuleSymbol(symbol: GrammarRuleSymbol, short?: boolean, error?: boolean) {
+    static GrammarRuleSymbol(symbol: RuntimeGrammarRuleSymbol, short?: boolean, error?: boolean) {
         if (typeof symbol === 'string') {
             return symbol;
         } else if (typeof symbol === 'function') {
@@ -74,7 +74,7 @@ export class TextFormatter {
         }
     }
 
-    static GrammarRule(rule: GrammarRule, withCursorAt?: number) {
+    static GrammarRule(rule: RuntimeGrammarProductionRule, withCursorAt?: number) {
         let symbolSequence = rule.symbols.slice(0, withCursorAt).map(v => TextFormatter.GrammarRuleSymbol(v, true, true)).join(' ');
         if (typeof withCursorAt !== "undefined") {
             symbolSequence += " ● " + rule.symbols.slice(withCursorAt).map(v => TextFormatter.GrammarRuleSymbol(v, true, true)).join(' ');

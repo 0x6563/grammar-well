@@ -1,4 +1,4 @@
-import { Dictionary, GeneratorGrammarRule, GeneratorGrammarSymbol, LexerConfig, LexerStateDefinition, LexerStateMatchRule } from "../../typings";
+import { ASTLexer, ASTLexerState, ASTLexerStateImportRule, ASTLexerStateMatchRule, ASTLexerStateNonMatchRule, Dictionary, GeneratorGrammarProductionRule, RuntimeLexerConfig } from "../../typings";
 import { LRParseTableBuilder } from "../artifacts/lr";
 import { BasicGrammarTable } from "../artifacts/basic";
 import { GeneratorState } from "../state";
@@ -46,7 +46,7 @@ export class JavaScriptGenerator {
         }, depth);
     }
 
-    postProcess(postprocess: GeneratorGrammarRule['postprocess'], alias: Dictionary<number>) {
+    postProcess(postprocess: GeneratorGrammarProductionRule['postprocess'], alias: Dictionary<number>) {
         postprocess = this.state.grammar.config.postprocessorOverride || postprocess || this.state.grammar.config.postprocessorDefault;
         if (!postprocess)
             return null;
@@ -62,7 +62,7 @@ export class JavaScriptGenerator {
             return this.templatePostProcess(postprocess.template, alias);
     }
 
-    grammarRule(rule: GeneratorGrammarRule) {
+    grammarRule(rule: GeneratorGrammarProductionRule) {
         const symbols = [];
         const alias = {};
         for (let i = 0; i < rule.symbols.length; i++) {
@@ -113,7 +113,7 @@ export class JavaScriptGenerator {
         return CommonGenerator.JSON(map, depth);
     }
 
-    private lexerConfigStateRules(rules: LexerConfig['states'][0]['rules'], depth: number) {
+    private lexerConfigStateRules(rules: (ASTLexerStateImportRule | ASTLexerStateMatchRule)[], depth: number) {
         const ary = rules.map(rule => {
             if ('import' in rule)
                 return CommonGenerator.JSON({ import: JSON.stringify(rule.import) }, -1)
@@ -122,9 +122,9 @@ export class JavaScriptGenerator {
         return CommonGenerator.JSON(ary, depth);
     }
 
-    private lexerConfigStateRule(rule: LexerStateMatchRule) {
+    private lexerConfigStateRule(rule: ASTLexerStateMatchRule | ASTLexerStateNonMatchRule) {
         return CommonGenerator.JSON({
-            when: rule.when ? CommonGenerator.SerializeSymbol(rule.when as any) : null,
+            when: 'when' in rule ? CommonGenerator.SerializeSymbol(rule.when as any) : null,
             before: JSON.stringify(rule.before),
 
             type: JSON.stringify(rule.type),

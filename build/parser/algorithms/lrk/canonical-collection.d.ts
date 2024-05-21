@@ -1,13 +1,13 @@
-import { GrammarRule, GrammarRuleSymbol, LanguageDefinition } from "../../../typings";
+import { RuntimeGrammarProductionRule, RuntimeGrammarRuleSymbol, RuntimeLanguageDefinition } from "../../../typings";
 import { BiMap } from "./bimap";
 import { State } from "./state";
 export declare class CanonicalCollection {
-    grammar: LanguageDefinition['grammar'];
+    grammar: RuntimeLanguageDefinition['grammar'];
     states: Map<string, State>;
-    rules: BiMap<GrammarRule>;
-    terminals: BiMap<GrammarRuleSymbol>;
+    rules: BiMap<RuntimeGrammarProductionRule>;
+    terminals: BiMap<RuntimeGrammarRuleSymbol>;
     private closure;
-    constructor(grammar: LanguageDefinition['grammar']);
+    constructor(grammar: RuntimeLanguageDefinition['grammar']);
     private addState;
     private linkStates;
     private getStateId;

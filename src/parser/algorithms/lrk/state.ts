@@ -1,10 +1,10 @@
-import { GrammarRule, GrammarRuleSymbol } from "../../../typings";
+import { RuntimeGrammarProductionRule, RuntimeGrammarRuleSymbol } from "../../../typings";
 
 export interface State {
-    items: { rule: GrammarRule, dot: number }[];
+    items: { rule: RuntimeGrammarProductionRule, dot: number }[];
     isFinal: boolean;
-    actions: Map<GrammarRuleSymbol, string>;
-    goto: Map<GrammarRuleSymbol, string>;
+    actions: Map<RuntimeGrammarRuleSymbol, string>;
+    goto: Map<RuntimeGrammarRuleSymbol, string>;
     reduce: number;
-    rule: GrammarRule
+    rule: RuntimeGrammarProductionRule
 }

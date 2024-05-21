@@ -1,9 +1,9 @@
-import { Dictionary, GrammarRule, LanguageDefinition } from "../../typings";
+import { Dictionary, RuntimeGrammarProductionRule, RuntimeLanguageDefinition } from "../../typings";
 import { TokenBuffer } from "../../lexers/token-buffer";
 export interface EarleyParserOptions {
     keepHistory?: boolean;
 }
-export declare function Earley(language: LanguageDefinition & {
+export declare function Earley(language: RuntimeLanguageDefinition & {
     tokens: TokenBuffer;
 }, options?: EarleyParserOptions): {
     results: any[];
@@ -19,14 +19,14 @@ declare class Column {
     wants: Dictionary<State[]>;
     scannable: State[];
     completed: Dictionary<State[]>;
-    constructor(rules: Dictionary<GrammarRule[]>, index: number);
+    constructor(rules: Dictionary<RuntimeGrammarProductionRule[]>, index: number);
     process(): void;
     predict(exp: string): void;
-    expects(): GrammarRule[];
+    expects(): RuntimeGrammarProductionRule[];
     private complete;
 }
 declare class State {
-    rule: GrammarRule;
+    rule: RuntimeGrammarProductionRule;
     dot: number;
     reference: number;
     wantedBy: State[];
@@ -34,7 +34,7 @@ declare class State {
     data: any;
     left: State;
     right: State | StateToken;
-    constructor(rule: GrammarRule, dot: number, reference: number, wantedBy: State[]);
+    constructor(rule: RuntimeGrammarProductionRule, dot: number, reference: number, wantedBy: State[]);
     nextState(child: State | StateToken): State;
     finish(): void;
     protected build(): any[];
