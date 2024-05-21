@@ -1,4 +1,4 @@
-import { ASTConfig, GeneratorGrammarSymbol, ASTGrammarProduction, ASTGrammarSymbol, ASTGrammar, ASTImport, ASTDirectives, ASTLexer, ASTLexerStateImportRule, ASTLexerStateMatchRule, ASTLexerStateNonMatchRule } from "../../../typings";
+import { ASTConfig, ASTDirectives, ASTGrammar, ASTGrammarProduction, ASTGrammarSymbol, ASTImport, ASTLexer, ASTLexerStateImportRule, ASTLexerStateMatchRule, ASTLexerStateNonMatchRule, GeneratorGrammarSymbol } from "../../../typings";
 export declare class V2GrammarString {
     source: string;
     append(directives: ASTDirectives | (ASTDirectives[])): void;

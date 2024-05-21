@@ -1,7 +1,7 @@
-import { GeneratorOptions, GeneratorContext, TemplateFormat, ASTDirectives } from "../typings";
-import { JavaScriptGenerator } from "./stringify/javascript";
-import { ExportsRegistry } from "./stringify/exports/registry";
+import { ASTDirectives, GeneratorContext, GeneratorOptions, GeneratorTemplateFormat } from "../typings";
 import { GeneratorState } from "./state";
+import { ExportsRegistry } from "./stringify/exports/registry";
+import { JavaScriptGenerator } from "./stringify/javascript";
 export declare function Generate(rules: string | ASTDirectives | (ASTDirectives[]), config?: GeneratorOptions): Promise<string>;
 export declare class Generator {
     private config;
@@ -14,7 +14,7 @@ export declare class Generator {
     import(source: string): Promise<void>;
     import(directive: ASTDirectives): Promise<void>;
     import(directives: ASTDirectives[]): Promise<void>;
-    export<T extends TemplateFormat = '_default'>(format: any, name?: string): ReturnType<typeof ExportsRegistry[T]>;
+    export<T extends GeneratorTemplateFormat = '_default'>(format: any, name?: string): ReturnType<typeof ExportsRegistry[T]>;
     private processImportDirective;
     private processConfigDirective;
     private processLexerDirective;

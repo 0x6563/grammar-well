@@ -1,6 +1,6 @@
+import { LRState } from ".";
 import { ASTGrammarSymbolLiteral, ASTGrammarSymbolToken, ASTLexerStateImportRule, ASTLexerStateMatchRule, ASTLexerStateNonMatchRule } from "./ast";
 import { Dictionary, Override } from "./common";
-import { LRState } from ".";
 export interface RuntimeLanguageDefinition {
     lexer?: RuntimeLexer | RuntimeLexerConfig;
     grammar: {

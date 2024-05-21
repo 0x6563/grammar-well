@@ -2,8 +2,8 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ExportsRegistry = void 0;
 const javascript_1 = require("./javascript");
-const typescript_1 = require("./typescript");
 const json_1 = require("./json");
+const typescript_1 = require("./typescript");
 exports.ExportsRegistry = {
     _default: javascript_1.CJSOutput,
     object: (grammar, exportName) => ({ grammar, exportName }),

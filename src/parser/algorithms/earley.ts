@@ -1,5 +1,5 @@
-import { Dictionary, RuntimeGrammarProductionRule, RuntimeLanguageDefinition } from "../../typings";
 import { TokenBuffer } from "../../lexers/token-buffer";
+import { Dictionary, RuntimeGrammarProductionRule, RuntimeLanguageDefinition } from "../../typings";
 import { TextFormatter } from "../../utility/text-format";
 import { ParserUtility } from "../parser";
 

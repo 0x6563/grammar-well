@@ -1,6 +1,6 @@
-import { JavaScriptGenerator } from "../stringify/javascript";
 import { Dictionary, GeneratorGrammarProductionRule, GeneratorGrammarSymbol } from "../../typings";
 import { Collection, GeneratorSymbolCollection } from "../../utility/general";
+import { JavaScriptGenerator } from "../stringify/javascript";
 export declare class LRParseTableBuilder {
     generator: JavaScriptGenerator;
     rules: Collection<GeneratorGrammarProductionRule>;

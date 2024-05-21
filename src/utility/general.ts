@@ -1,5 +1,4 @@
-import { Dictionary, GeneratorGrammarSymbol, RuntimeGrammarRuleSymbol } from "../typings";
-
+import { Dictionary, GeneratorGrammarSymbol } from "../typings";
 
 export class Collection<T> {
     categorized: Dictionary<Dictionary<number>> = {};

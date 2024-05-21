@@ -1,4 +1,4 @@
-import { RuntimeLexerState, RuntimeLexerConfig, RuntimeLexer } from "../typings";
+import { RuntimeLexer, RuntimeLexerConfig, RuntimeLexerState } from "../typings";
 export declare class StatefulLexer implements RuntimeLexer {
     private start;
     private states;

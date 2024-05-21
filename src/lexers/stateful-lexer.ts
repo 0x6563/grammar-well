@@ -1,4 +1,4 @@
-import { StatefulLexerStateDefinition, RuntimeLexerStateMatchRule, RuntimeLexerStateDefinition, RuntimeLexerState, RuntimeLexerConfig, RuntimeLexer, ASTLexerStateNonMatchRule } from "../typings";
+import { ASTLexerStateNonMatchRule, RuntimeLexer, RuntimeLexerConfig, RuntimeLexerState, RuntimeLexerStateDefinition, RuntimeLexerStateMatchRule, StatefulLexerStateDefinition } from "../typings";
 
 export class StatefulLexer implements RuntimeLexer {
     private start: string;

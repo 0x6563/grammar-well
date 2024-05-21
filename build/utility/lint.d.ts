@@ -1,2 +1,2 @@
-import { RuntimeLanguageDefinition, RuntimeGrammarRuleSymbol } from "../typings";
+import { RuntimeGrammarRuleSymbol, RuntimeLanguageDefinition } from "../typings";
 export declare function LintGrammarSymbols(language: RuntimeLanguageDefinition): RuntimeGrammarRuleSymbol[];

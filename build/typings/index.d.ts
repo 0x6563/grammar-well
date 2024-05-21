@@ -3,10 +3,9 @@ import { ParserUtility } from "../parser/parser";
 import { ASTLexerStateNonMatchRule } from "./ast";
 import { RuntimeGrammarProductionRule, RuntimeGrammarRuleSymbol, RuntimeLanguageDefinition, RuntimeLexerStateMatchRule } from "./runtime";
 export * from './ast';
+export * from './common';
 export * from './generator';
 export * from './runtime';
-export * from './common';
-export type TemplateFormat = '_default' | 'object' | 'json' | 'js' | 'javascript' | 'module' | 'esmodule' | 'esm' | 'ts' | 'typescript';
 export interface ImportResolver {
     path(path: string): string;
     body(path: string): Promise<string>;

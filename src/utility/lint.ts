@@ -1,5 +1,4 @@
-import { RuntimeLanguageDefinition, RuntimeGrammarRuleSymbol, Dictionary, RuntimeGrammarProductionRule } from "../typings";
-
+import { Dictionary, RuntimeGrammarProductionRule, RuntimeGrammarRuleSymbol, RuntimeLanguageDefinition } from "../typings";
 
 export function LintGrammarSymbols(language: RuntimeLanguageDefinition): RuntimeGrammarRuleSymbol[] {
     const unused = new Set<string>();
@@ -10,6 +9,7 @@ export function LintGrammarSymbols(language: RuntimeLanguageDefinition): Runtime
     TraverseRule(start, rules, unused);
     return Array.from(unused);
 }
+
 function TraverseRule(name: string, rules: Dictionary<RuntimeGrammarProductionRule[]>, unvisited: Set<string>) {
     if (!unvisited.has(name)) {
         return;

@@ -1,13 +1,13 @@
-import { GeneratorOptions, GeneratorContext, TemplateFormat, ASTDirectives, ASTConfig, ASTGrammarSymbolRepeat, ASTGrammarProductionRule, GeneratorGrammarProductionRule, ASTGrammar, ASTImport, ASTLexer, ASTGrammarSymbolGroup, ASTGrammarSymbolLiteral, GeneratorGrammarSymbol, ASTGrammarSymbol, ASTGrammarProduction, ImportResolver } from "../typings";
+import { ASTConfig, ASTDirectives, ASTGrammar, ASTGrammarProduction, ASTGrammarProductionRule, ASTGrammarSymbol, ASTGrammarSymbolGroup, ASTGrammarSymbolLiteral, ASTGrammarSymbolRepeat, ASTImport, ASTLexer, GeneratorContext, GeneratorGrammarProductionRule, GeneratorGrammarSymbol, GeneratorOptions, ImportResolver, GeneratorTemplateFormat } from "../typings";
 
 import { Parser } from "../parser/parser";
-import { FileSystemResolver } from "./import-resolver";
 import Language from './grammars/v2';
+import { FileSystemResolver } from "./import-resolver";
 
-import { JavaScriptGenerator } from "./stringify/javascript";
-import * as BuiltInRegistry from "./builtin/registry.json"
-import { ExportsRegistry } from "./stringify/exports/registry";
+import * as BuiltInRegistry from "./builtin/registry.json";
 import { GeneratorState } from "./state";
+import { ExportsRegistry } from "./stringify/exports/registry";
+import { JavaScriptGenerator } from "./stringify/javascript";
 
 export async function Generate(rules: string | ASTDirectives | (ASTDirectives[]), config: GeneratorOptions = {}) {
     const builder = new Generator(config);
@@ -67,7 +67,7 @@ export class Generator {
         }
     }
 
-    export<T extends TemplateFormat = '_default'>(format, name: string = 'GWLanguage'): ReturnType<typeof ExportsRegistry[T]> {
+    export<T extends GeneratorTemplateFormat = '_default'>(format, name: string = 'GWLanguage'): ReturnType<typeof ExportsRegistry[T]> {
         const grammar = this.state;
         const output = format || grammar.config.preprocessor || '_default';
         if (ExportsRegistry[output]) {

@@ -2,12 +2,12 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Generator = exports.Generate = void 0;
 const parser_1 = require("../parser/parser");
-const import_resolver_1 = require("./import-resolver");
 const v2_1 = require("./grammars/v2");
-const javascript_1 = require("./stringify/javascript");
+const import_resolver_1 = require("./import-resolver");
 const BuiltInRegistry = require("./builtin/registry.json");
-const registry_1 = require("./stringify/exports/registry");
 const state_1 = require("./state");
+const registry_1 = require("./stringify/exports/registry");
+const javascript_1 = require("./stringify/javascript");
 async function Generate(rules, config = {}) {
     const builder = new Generator(config);
     await builder.import(rules);

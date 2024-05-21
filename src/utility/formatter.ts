@@ -1,5 +1,5 @@
-import { V2GrammarString } from "../generator/stringify/grammar/v2";
 import v2 from '../generator/grammars/v2';
+import { V2GrammarString } from "../generator/stringify/grammar/v2";
 import { Parser } from "../parser/parser";
 
 export function Formatter(content: string) {

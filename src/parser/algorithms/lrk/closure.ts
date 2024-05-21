@@ -1,5 +1,5 @@
-import { RuntimeGrammarProductionRule, RuntimeGrammarRuleSymbol, RuntimeLanguageDefinition } from "../../../typings"
-import { ParserUtility } from "../../parser"
+import { RuntimeGrammarProductionRule, RuntimeGrammarRuleSymbol, RuntimeLanguageDefinition } from "../../../typings";
+import { ParserUtility } from "../../parser";
 
 export class ClosureBuilder {
     constructor(

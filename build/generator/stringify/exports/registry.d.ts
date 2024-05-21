@@ -1,6 +1,6 @@
-import { ESMOutput, CJSOutput } from "./javascript";
-import { TypescriptFormat } from "./typescript";
+import { CJSOutput, ESMOutput } from "./javascript";
 import { JSONFormatter } from "./json";
+import { TypescriptFormat } from "./typescript";
 export declare const ExportsRegistry: {
     _default: typeof CJSOutput;
     object: (grammar: any, exportName: any) => {

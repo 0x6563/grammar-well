@@ -1,6 +1,6 @@
-import { Dictionary } from "./common";
+import { ImportResolver, ImportResolverConstructor } from ".";
 import { ASTGrammarSymbolLiteral, ASTGrammarSymbolNonTerminal, ASTGrammarSymbolRegex, ASTGrammarSymbolToken, ASTJavaScriptBuiltin, ASTJavaScriptLiteral, ASTJavaScriptTemplate, ASTLexerState } from "./ast";
-import { ImportResolver, ImportResolverConstructor, TemplateFormat } from ".";
+import { Dictionary } from "./common";
 
 export interface GeneratorOptions {
     version?: string;
@@ -8,9 +8,11 @@ export interface GeneratorOptions {
     basedir?: string;
     resolver?: ImportResolverConstructor | ImportResolver;
     exportName?: string;
-    template?: TemplateFormat;
+    template?: GeneratorTemplateFormat;
     overrides?: Dictionary<string>;
 }
+
+export type GeneratorTemplateFormat = '_default' | 'object' | 'json' | 'js' | 'javascript' | 'module' | 'esmodule' | 'esm' | 'ts' | 'typescript'
 
 export interface GeneratorContext {
     imported: Set<string>;

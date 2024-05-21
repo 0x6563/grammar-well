@@ -1,7 +1,7 @@
-import { JavaScriptGenerator } from "../stringify/javascript";
-import { Dictionary, GeneratorGrammarProductionRule, GeneratorGrammarSymbol, ASTGrammarSymbolNonTerminal } from "../../typings";
+import { ASTGrammarSymbolNonTerminal, Dictionary, GeneratorGrammarProductionRule, GeneratorGrammarSymbol } from "../../typings";
 import { Collection, GeneratorSymbolCollection } from "../../utility/general";
 import { CommonGenerator } from "../stringify/common";
+import { JavaScriptGenerator } from "../stringify/javascript";
 
 
 export class LRParseTableBuilder {

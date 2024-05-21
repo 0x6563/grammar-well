@@ -1,4 +1,4 @@
-import { RuntimeGrammarProductionRule, RuntimeGrammarRuleSymbol, RuntimeLanguageDefinition, RuntimeLexerToken, ParserAlgorithm } from "../typings";
+import { ParserAlgorithm, RuntimeGrammarProductionRule, RuntimeGrammarRuleSymbol, RuntimeLanguageDefinition, RuntimeLexerToken } from "../typings";
 declare const ParserRegistry: {
     [key: string]: ParserAlgorithm;
 };

@@ -1,6 +1,6 @@
-import { ASTLexer, ASTLexerState, ASTLexerStateImportRule, ASTLexerStateMatchRule, ASTLexerStateNonMatchRule, Dictionary, GeneratorGrammarProductionRule, RuntimeLexerConfig } from "../../typings";
-import { LRParseTableBuilder } from "../artifacts/lr";
+import { ASTLexerStateImportRule, ASTLexerStateMatchRule, ASTLexerStateNonMatchRule, Dictionary, GeneratorGrammarProductionRule } from "../../typings";
 import { BasicGrammarTable } from "../artifacts/basic";
+import { LRParseTableBuilder } from "../artifacts/lr";
 import { GeneratorState } from "../state";
 import { CommonGenerator } from "./common";
 

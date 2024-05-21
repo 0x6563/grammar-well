@@ -17,9 +17,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.StatefulLexer = void 0;
 __exportStar(require("./generator/generator"), exports);
 __exportStar(require("./generator/import-resolver"), exports);
-__exportStar(require("./parser/parser"), exports);
-__exportStar(require("./typings"), exports);
 var stateful_lexer_1 = require("./lexers/stateful-lexer");
 Object.defineProperty(exports, "StatefulLexer", { enumerable: true, get: function () { return stateful_lexer_1.StatefulLexer; } });
+__exportStar(require("./parser/parser"), exports);
+__exportStar(require("./typings"), exports);
 __exportStar(require("./utility/monarch"), exports);
 //# sourceMappingURL=index.js.map

@@ -1,5 +1,5 @@
-import { V2GrammarString } from "../generator/stringify/grammar/v2";
 import v1 from '../generator/grammars/v1';
+import { V2GrammarString } from "../generator/stringify/grammar/v2";
 import { Parser } from "../parser/parser";
 
 export function MigrateV1toV2(content: string) {

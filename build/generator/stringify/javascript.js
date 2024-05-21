@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.JavaScriptGenerator = void 0;
-const lr_1 = require("../artifacts/lr");
 const basic_1 = require("../artifacts/basic");
+const lr_1 = require("../artifacts/lr");
 const common_1 = require("./common");
 const PostProcessors = {
     "join": "({data}) => data.join('')",
