@@ -1,27 +1,23 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.Generator = exports.Generate = void 0;
-const parser_1 = require("../parser/parser");
-const v2_1 = require("./grammars/v2");
-const import_resolver_1 = require("./import-resolver");
-const BuiltInRegistry = require("./builtin/registry.json");
-const state_1 = require("./state");
-const registry_1 = require("./stringify/exports/registry");
-const javascript_1 = require("./stringify/javascript");
-async function Generate(rules, config = {}) {
+import { Parser } from "../parser/parser";
+import Language from './grammars/v2';
+import { DefaultImportResolver } from "./import-resolvers/default";
+import * as BuiltInRegistry from "./builtin/registry.json";
+import { GeneratorState } from "./state";
+import { ExportsRegistry } from "./stringify/exports/registry";
+import { JavaScriptGenerator } from "./stringify/javascript";
+export async function Generate(rules, config = {}) {
     const builder = new Generator(config);
     await builder.import(rules);
     Object.assign(builder.state.config, config.overrides);
     return builder.export(config.template);
 }
-exports.Generate = Generate;
-class Generator {
+export class Generator {
     config;
     alias;
-    parser = new parser_1.Parser((0, v2_1.default)());
+    parser = new Parser(Language());
     context;
-    state = new state_1.GeneratorState();
-    generator = new javascript_1.JavaScriptGenerator(this.state);
+    state = new GeneratorState();
+    generator = new JavaScriptGenerator(this.state);
     constructor(config = {}, context, alias = '') {
         this.config = config;
         this.alias = alias;
@@ -37,7 +33,7 @@ class Generator {
             this.context.resolver = config.resolver;
         }
         else {
-            this.context.resolver == new import_resolver_1.FileSystemResolver(config.basedir);
+            this.context.resolver == new DefaultImportResolver(config.basedir);
         }
         this.state.grammar.uuids = this.context.uuids;
     }
@@ -71,8 +67,8 @@ class Generator {
     export(format, name = 'GWLanguage') {
         const grammar = this.state;
         const output = format || grammar.config.preprocessor || '_default';
-        if (registry_1.ExportsRegistry[output]) {
-            return registry_1.ExportsRegistry[output](this.generator, name);
+        if (ExportsRegistry[output]) {
+            return ExportsRegistry[output](this.generator, name);
         }
         throw new Error("No such preprocessor: " + output);
     }
@@ -258,5 +254,4 @@ class Generator {
         return { rule: id };
     }
 }
-exports.Generator = Generator;
 //# sourceMappingURL=generator.js.map

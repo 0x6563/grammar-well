@@ -1,5 +1,3 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 function GWLanguage() {
     return {
         grammar: {
@@ -313,7 +311,7 @@ function GWLanguage() {
                     { name: "T_REGEX$RPT0Nx1", symbols: ["T_REGEX$RPT0Nx1", /[gmiuy]/], postprocess: ({ data }) => data[0].concat([data[1]]) }
                 ],
                 T_REGEX: [
-                    { name: "T_REGEX", symbols: [{ token: "T_REGEX" }, "T_REGEX$RPT0Nx1"], postprocess: ({ data }) => { return ({ regex: data[0].value.replace(/\\\\\//g, '/').slice(1, -1), flags: data[1].map(v => v.value).join('').trim() }); } }
+                    { name: "T_REGEX", symbols: [{ token: "T_REGEX" }, "T_REGEX$RPT0Nx1"], postprocess: ({ data }) => { return ({ regex: data[0].value.slice(1, -1), flags: data[1].map(v => v.value).join('').trim() }); } }
                 ],
                 T_COMMENT: [
                     { name: "T_COMMENT", symbols: [{ token: "T_COMMENT" }] }
@@ -582,5 +580,5 @@ function GWLanguage() {
         }
     };
 }
-exports.default = GWLanguage;
+export default GWLanguage;
 //# sourceMappingURL=v1.js.map

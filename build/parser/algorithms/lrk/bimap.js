@@ -1,7 +1,4 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.BiMap = void 0;
-class BiMap {
+export class BiMap {
     map = new Map();
     items = [];
     id(ref) {
@@ -15,5 +12,4 @@ class BiMap {
         return this.items[index];
     }
 }
-exports.BiMap = BiMap;
 //# sourceMappingURL=bimap.js.map

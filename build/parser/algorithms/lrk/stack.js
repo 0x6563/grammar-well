@@ -1,7 +1,4 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.LRStack = void 0;
-class LRStack {
+export class LRStack {
     stack = [];
     get current() {
         return this.stack[this.stack.length - 1];
@@ -35,5 +32,4 @@ class LRStack {
         };
     }
 }
-exports.LRStack = LRStack;
 //# sourceMappingURL=stack.js.map

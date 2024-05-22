@@ -1,7 +1,4 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.ResolveStates = exports.StatefulLexer = void 0;
-class StatefulLexer {
+export class StatefulLexer {
     start;
     states = Object.create(null);
     buffer;
@@ -173,7 +170,6 @@ class StatefulLexer {
         throw new Error('Cannot find token type for matched text');
     }
 }
-exports.StatefulLexer = StatefulLexer;
 class RegexLib {
     static IsRegex(o) {
         return o instanceof RegExp;
@@ -250,7 +246,7 @@ function CompileRegExp(state) {
         flags += "i";
     return new RegExp(RegexLib.Join(subexpressions), flags);
 }
-function ResolveStates(states, start) {
+export function ResolveStates(states, start) {
     const resolved = new Set();
     const resolving = new Set();
     const chain = new Set();
@@ -262,7 +258,6 @@ function ResolveStates(states, start) {
     }
     return states;
 }
-exports.ResolveStates = ResolveStates;
 function ResolveRuleImports(name, states, resolved, resolving, chain) {
     if (chain.has(name))
         throw new Error(`Can not resolve circular import of ${name}`);

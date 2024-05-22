@@ -1,9 +1,6 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.Earley = void 0;
-const text_format_1 = require("../../utility/text-format");
-const parser_1 = require("../parser");
-function Earley(language, options = {}) {
+import { TextFormatter } from "../../utility/text-format";
+import { ParserUtility } from "../parser";
+export function Earley(language, options = {}) {
     const { tokens } = language;
     const { rules, start } = language.grammar;
     const column = new Column(rules, 0);
@@ -28,14 +25,14 @@ function Earley(language, options = {}) {
         while (w--) {
             const state = scannable[w];
             const symbol = state.rule.symbols[state.dot];
-            if (parser_1.ParserUtility.SymbolMatchesToken(symbol, token)) {
+            if (ParserUtility.SymbolMatchesToken(symbol, token)) {
                 const next = state.nextState({ data, token, isToken: true, reference: current - 1 });
                 nextColumn.states.push(next);
             }
         }
         nextColumn.process();
         if (nextColumn.states.length === 0) {
-            throw text_format_1.TextFormatter.UnexpectedToken(tokens, previousColumn.expects());
+            throw TextFormatter.UnexpectedToken(tokens, previousColumn.expects());
         }
     }
     const results = [];
@@ -47,7 +44,6 @@ function Earley(language, options = {}) {
     }
     return { results, info: { table } };
 }
-exports.Earley = Earley;
 class Column {
     rules;
     index;
@@ -145,7 +141,7 @@ class State {
         return state;
     }
     finish() {
-        this.data = parser_1.ParserUtility.PostProcess(this.rule, this.data, { reference: this.reference, dot: this.dot });
+        this.data = ParserUtility.PostProcess(this.rule, this.data, { reference: this.reference, dot: this.dot });
     }
     build() {
         const children = [];

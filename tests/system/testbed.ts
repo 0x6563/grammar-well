@@ -1,15 +1,15 @@
-import { expect } from "chai";
 import { readFileSync } from 'fs';
+import assert from "node:assert";
 import { join } from 'path';
 import { Generate, Parse, Parser } from '../../src';
 
 export function Expected(actual: any, expected: any, message?: string) {
     if (expected instanceof RegExp) {
-        expect(actual).matches(expected, message);
+        return assert.match(actual, expected, message);
     } else if (typeof expected == 'object') {
-        expect(actual).deep.equals(expected, message);
+        return assert.deepEqual(actual, expected, message);
     } else {
-        expect(actual).equals(expected, message);
+        return assert.equal(actual, expected, message);
     }
 }
 
@@ -41,7 +41,7 @@ export function GetValue(test, prefix) {
 }
 
 export function GetFile(path: string) {
-    return readFileSync(join(__dirname, path), 'utf8')
+    return readFileSync(join( import.meta.dirname, path), 'utf8')
 }
 
 export async function Build(grammar): Promise<any> {

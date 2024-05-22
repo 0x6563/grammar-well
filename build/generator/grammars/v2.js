@@ -1,5 +1,3 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 function GWLanguage() {
     return {
         grammar: {
@@ -622,5 +620,5 @@ function GWLanguage() {
         }
     };
 }
-exports.default = GWLanguage;
+export default GWLanguage;
 //# sourceMappingURL=v2.js.map

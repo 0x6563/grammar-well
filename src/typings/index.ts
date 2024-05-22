@@ -7,7 +7,6 @@ export * from './common';
 export * from './generator';
 export * from './runtime';
 
-
 export interface ImportResolver {
     path(path: string): string;
     body(path: string): Promise<string>;

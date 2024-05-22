@@ -1,7 +1,4 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.V2GrammarString = void 0;
-class V2GrammarString {
+export class V2GrammarString {
     source = '';
     append(directives) {
         directives = Array.isArray(directives) ? directives : [directives];
@@ -183,5 +180,4 @@ class V2GrammarString {
         return `\t`.repeat(depth) + content;
     }
 }
-exports.V2GrammarString = V2GrammarString;
 //# sourceMappingURL=v2.js.map

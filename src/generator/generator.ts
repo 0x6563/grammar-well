@@ -2,7 +2,7 @@ import { ASTConfig, ASTDirectives, ASTGrammar, ASTGrammarProduction, ASTGrammarP
 
 import { Parser } from "../parser/parser";
 import Language from './grammars/v2';
-import { FileSystemResolver } from "./import-resolver";
+import { DefaultImportResolver } from "./import-resolvers/default";
 
 import * as BuiltInRegistry from "./builtin/registry.json";
 import { GeneratorState } from "./state";
@@ -26,7 +26,7 @@ export class Generator {
     constructor(private config: GeneratorOptions = {}, context?: GeneratorContext, private alias: string = '') {
         this.context = context || {
             imported: new Set(),
-            resolver: undefined as FileSystemResolver,
+            resolver: undefined as ImportResolver,
             uuids: {}
         }
 
@@ -35,7 +35,7 @@ export class Generator {
         } else if (config.resolver && typeof config.resolver.path == 'function' && typeof config.resolver.body == 'function') {
             this.context.resolver = config.resolver;
         } else {
-            this.context.resolver == new FileSystemResolver(config.basedir);
+            this.context.resolver == new DefaultImportResolver(config.basedir);
         }
 
         this.state.grammar.uuids = this.context.uuids;

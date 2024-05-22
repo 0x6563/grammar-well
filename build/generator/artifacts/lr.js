@@ -1,13 +1,10 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.LRParseTableBuilder = void 0;
-const general_1 = require("../../utility/general");
-const common_1 = require("../stringify/common");
-class LRParseTableBuilder {
+import { Collection, GeneratorSymbolCollection } from "../../utility/general";
+import { CommonGenerator } from "../stringify/common";
+export class LRParseTableBuilder {
     generator;
-    rules = new general_1.Collection();
+    rules = new Collection();
     table = Object.create(null);
-    symbols = new general_1.GeneratorSymbolCollection();
+    symbols = new GeneratorSymbolCollection();
     constructor(generator) {
         this.generator = generator;
         const augmented = { name: Symbol(), symbols: [{ rule: generator.state.grammar.start }] };
@@ -36,24 +33,23 @@ class LRParseTableBuilder {
         for (const key in this.table) {
             map[key] = this.stringifyState(this.table[key].export(), depth + 1);
         }
-        return common_1.CommonGenerator.JSON(map, depth);
+        return CommonGenerator.JSON(map, depth);
     }
     stringifyState(state, depth = 0) {
-        return common_1.CommonGenerator.JSON({
+        return CommonGenerator.JSON({
             actions: state.actions.map(v => this.stringifyNext(v, depth + 1)),
-            goto: common_1.CommonGenerator.JSON(state.goto, depth + 1),
+            goto: CommonGenerator.JSON(state.goto, depth + 1),
             reduce: state.reduce ? this.generator.grammarRule(state.reduce) : null,
             isFinal: state.isFinal ? 'true' : 'false'
         }, depth);
     }
     stringifyNext(next, depth) {
-        return common_1.CommonGenerator.JSON({
-            symbol: common_1.CommonGenerator.SerializeSymbol(next.symbol),
+        return CommonGenerator.JSON({
+            symbol: CommonGenerator.SerializeSymbol(next.symbol),
             next: JSON.stringify(next.next)
         }, -1);
     }
 }
-exports.LRParseTableBuilder = LRParseTableBuilder;
 class StateBuilder {
     collection;
     isFinal = false;
@@ -95,7 +91,7 @@ class StateBuilder {
             return;
         visited.add(symbol);
         const stateItem = { rule, dot: dot + 1 };
-        if (common_1.CommonGenerator.SymbolIsTerminal(symbol)) {
+        if (CommonGenerator.SymbolIsTerminal(symbol)) {
             const id = this.collection.symbols.encode(symbol);
             this.outputs.action[id] = this.outputs.action[id] || [];
             this.outputs.action[id].push(stateItem);

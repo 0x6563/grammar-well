@@ -1,7 +1,4 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.CreateMonarchTokenizer = void 0;
-function CreateMonarchTokenizer(lexer) {
+export function CreateMonarchTokenizer(lexer) {
     const tokenizer = {};
     const { start, states } = lexer;
     for (const key in states) {
@@ -42,7 +39,6 @@ function CreateMonarchTokenizer(lexer) {
     }
     return { start, tokenizer };
 }
-exports.CreateMonarchTokenizer = CreateMonarchTokenizer;
 function TransformWhen(obj) {
     return typeof obj == 'string' ? new RegExp(RegexEscape(obj)) : new RegExp(obj.regex, obj.flags);
 }

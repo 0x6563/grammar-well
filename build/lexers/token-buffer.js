@@ -1,7 +1,4 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.TokenBuffer = void 0;
-class TokenBuffer {
+export class TokenBuffer {
     lexer;
     history = [];
     queued = '';
@@ -75,7 +72,6 @@ class TokenBuffer {
         return new TokenIterator(this);
     }
 }
-exports.TokenBuffer = TokenBuffer;
 class TokenIterator {
     buffer;
     constructor(buffer) {

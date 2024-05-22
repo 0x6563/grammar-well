@@ -1,23 +1,19 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.ParserUtility = exports.Parser = exports.Parse = void 0;
-const character_lexer_1 = require("../lexers/character-lexer");
-const stateful_lexer_1 = require("../lexers/stateful-lexer");
-const token_buffer_1 = require("../lexers/token-buffer");
-const cyk_1 = require("./algorithms/cyk");
-const earley_1 = require("./algorithms/earley");
-const algorithm_1 = require("./algorithms/lrk/algorithm");
+import { CharacterLexer } from "../lexers/character-lexer";
+import { StatefulLexer } from "../lexers/stateful-lexer";
+import { TokenBuffer } from "../lexers/token-buffer";
+import { CYK } from "./algorithms/cyk";
+import { Earley } from "./algorithms/earley";
+import { LRK } from "./algorithms/lrk/algorithm";
 const ParserRegistry = {
-    earley: earley_1.Earley,
-    cyk: cyk_1.CYK,
-    lr0: algorithm_1.LRK
+    earley: Earley,
+    cyk: CYK,
+    lr0: LRK
 };
-function Parse(language, input, options) {
+export function Parse(language, input, options) {
     const i = new Parser(language, options);
     return i.run(input);
 }
-exports.Parse = Parse;
-class Parser {
+export class Parser {
     language;
     options;
     constructor(language, options = { algorithm: 'earley', parserOptions: {} }) {
@@ -34,18 +30,17 @@ class Parser {
     getTokenQueue() {
         const { lexer } = this.language;
         if (!lexer) {
-            return new token_buffer_1.TokenBuffer(new character_lexer_1.CharacterLexer());
+            return new TokenBuffer(new CharacterLexer());
         }
         else if ("feed" in lexer && typeof lexer.feed == 'function') {
-            return new token_buffer_1.TokenBuffer(lexer);
+            return new TokenBuffer(lexer);
         }
         else if ('states' in lexer) {
-            return new token_buffer_1.TokenBuffer(new stateful_lexer_1.StatefulLexer(lexer));
+            return new TokenBuffer(new StatefulLexer(lexer));
         }
     }
 }
-exports.Parser = Parser;
-class ParserUtility {
+export class ParserUtility {
     static SymbolMatchesToken(symbol, token) {
         if (typeof symbol === 'string')
             throw 'Attempted to match token against non-terminal';
@@ -70,5 +65,4 @@ class ParserUtility {
         return data;
     }
 }
-exports.ParserUtility = ParserUtility;
 //# sourceMappingURL=parser.js.map

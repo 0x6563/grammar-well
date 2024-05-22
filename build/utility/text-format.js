@@ -1,7 +1,4 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.TextFormatter = void 0;
-class TextFormatter {
+export class TextFormatter {
     static UnexpectedToken(queue, expected) {
         const token = queue.active;
         const tokenDisplay = TextFormatter.LexerTokenShort(token);
@@ -80,5 +77,4 @@ class TextFormatter {
         return rule.name + " → " + symbolSequence;
     }
 }
-exports.TextFormatter = TextFormatter;
 //# sourceMappingURL=text-format.js.map

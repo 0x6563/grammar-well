@@ -1,7 +1,4 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.GeneratorState = void 0;
-class GeneratorState {
+export class GeneratorState {
     grammar = {
         start: '',
         config: {},
@@ -57,5 +54,4 @@ class GeneratorState {
         };
     }
 }
-exports.GeneratorState = GeneratorState;
 //# sourceMappingURL=state.js.map

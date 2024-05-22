@@ -1,7 +1,4 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.Unflatten = exports.Flatten = exports.Matrix = exports.GeneratorSymbolCollection = exports.Collection = void 0;
-class Collection {
+export class Collection {
     categorized = {};
     uncategorized = new Map();
     items = [];
@@ -44,8 +41,7 @@ class Collection {
         return this.uncategorized.get(ref);
     }
 }
-exports.Collection = Collection;
-class GeneratorSymbolCollection extends Collection {
+export class GeneratorSymbolCollection extends Collection {
     categorized = {
         nonTerminal: {},
         literalI: {},
@@ -70,8 +66,7 @@ class GeneratorSymbolCollection extends Collection {
         }
     }
 }
-exports.GeneratorSymbolCollection = GeneratorSymbolCollection;
-class Matrix {
+export class Matrix {
     initial;
     $x = 0;
     $y = 0;
@@ -113,8 +108,7 @@ class Matrix {
         return Array.from({ length }, (typeof initial == 'function' ? initial : () => initial));
     }
 }
-exports.Matrix = Matrix;
-function Flatten(obj) {
+export function Flatten(obj) {
     const collection = new Collection();
     const $null = Symbol();
     function Traverse(src) {
@@ -144,8 +138,7 @@ function Flatten(obj) {
     collection.redirect($null, null);
     return collection.items;
 }
-exports.Flatten = Flatten;
-function Unflatten(items) {
+export function Unflatten(items) {
     const visited = new Set();
     function Traverse(id) {
         if (visited.has(id)) {
@@ -168,5 +161,4 @@ function Unflatten(items) {
     }
     return Traverse(0);
 }
-exports.Unflatten = Unflatten;
 //# sourceMappingURL=general.js.map
