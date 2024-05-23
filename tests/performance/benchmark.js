@@ -1,8 +1,9 @@
-const { add, cycle, complete, suite, save } = require('benny');
-const { writeFileSync, fstat, readFileSync, read } = require('fs');
-const { join } = require('path');
-const { parse } = require('yaml');
-const { GetValue, NearleyRunner, GrammarWellRunner, GetFile } = require('./testbed');
+import { add, complete, cycle, suite } from 'benny';
+import { readFileSync, writeFileSync } from 'fs';
+import { join } from 'path';
+import { parse } from 'yaml';
+import { GetFile, GetValue, GrammarWellRunner } from './testbed';
+
 const benchmarks = parse(GetFile('./samples.yml'));
 const results = [];
 for (const benchmark of benchmarks) {
@@ -10,10 +11,6 @@ for (const benchmark of benchmarks) {
   const grammar = GetValue(benchmark, 'grammar');
   const sample = GetValue(benchmark, 'input')
   results.push(suite(title,
-    add('Nearley', () => {
-      const runner = NearleyRunner(grammar);
-      return () => runner(sample);
-    }),
     add('Grammar Well', async () => {
       const runner = await GrammarWellRunner(grammar);
       return () => runner(sample);

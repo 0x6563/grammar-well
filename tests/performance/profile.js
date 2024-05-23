@@ -1,12 +1,10 @@
-const { GetFile, GrammarWellRunner, NearleyRunner } = require("./testbed");
+import { GetFile, GrammarWellRunner } from "./testbed";
 const blank = "".padEnd(100, ' ');
 const offset = 10;
 let currentLine = blank;
 
 (async () => {
 	const gw = await GrammarWellRunner(GetFile('../samples/grammars/profile.ne'));
-	const ne = await NearleyRunner(GetFile('../samples/grammars/profile.ne'));
-
 
 	function overwrite(line, text, pad) {
 		const l = line.split('');
@@ -46,13 +44,7 @@ let currentLine = blank;
 				currentLine = overwrite(currentLine, i.toString(), 0);
 			}
 			const n1 = runTest(gw, i, type);
-			const n2 = runTest(ne, i, type);
-			if (n1 == n2) {
-				currentLine = overwrite(currentLine, "+", Math.max(n1, 0) + offset);
-			} else {
-				currentLine = overwrite(currentLine, "G", Math.max(n1, 0) + offset);
-				currentLine = overwrite(currentLine, "N", Math.max(n2, 0) + offset);
-			}
+			currentLine = overwrite(currentLine, "+", Math.max(n1, 0) + offset);
 			console.log(currentLine);
 		}
 	}
