@@ -1,8 +1,8 @@
 import { readdirSync, readFileSync, writeFileSync } from "fs";
 import { resolve } from "path";
-import { Generate, Parser } from "./src";
-import { V2GrammarString } from './src/generator/stringify/grammar/v2';
-import Language from './src/generator/grammars/v2';
+import { Generate, Parser } from "../src";
+import { V2GrammarString } from '../src/generator/stringify/grammar/v2';
+import Language from '../src/generator/grammars/v2';
 const BaseDir = './src/generator/builtin/';
 const parser = new Parser(Language() as any);
 (async () => {

@@ -1,5 +1,6 @@
 .gitignore
 .github
 tests
+scripts
 tsconfig.json
 readme.md
