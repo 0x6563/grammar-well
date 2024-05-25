@@ -114,9 +114,7 @@ export class Generator {
         if ('sections' in state) {
             const states = this.buildLexerStructuredStates(name, state);
             this.state.addLexerState(this.aliasPrefix + name, { rules: [{ import: [`${name}$open`] }] });
-            for (let key in states) {
-                this.importLexerState(key, state[key]);
-            }
+            this.importLexerStates(states);
         } else {
             if (state.default && state.unmatched) {
                 state.unmatched.type = typeof state.unmatched.type != 'undefined' ? state.unmatched.type : state.default?.type;
@@ -132,9 +130,7 @@ export class Generator {
                     while (`${this.aliasPrefix}${name}$${i}` in this.state.lexer.states)
                         ++i;
                     const states = this.buildLexerStructuredStates(`${name}$${i}`, rule);
-                    for (let key in states) {
-                        this.importLexerState(key, state[key]);
-                    }
+                    this.importLexerStates(states);
                     rules.push({ import: `${name}$${i}$open` });
                     continue;
                 } else {
@@ -163,39 +159,14 @@ export class Generator {
         }
     }
 
-    private buildLexerStructuredStates(name: string, sections: ASTLexerStateStructured) {
+    private buildLexerStructuredStates(name: string, sections: ASTLexerStateStructured): ASTLexerConfig['states'] {
         const open: (ASTLexerStateMatchRule | ASTLexerStateImportRule)[] = [];
         const body: (ASTLexerStateMatchRule | ASTLexerStateImportRule | ASTLexerStateStructured)[] = [];
         const close: (ASTLexerStateMatchRule | ASTLexerStateImportRule)[] = [];
 
-        for (const r of sections.sections?.open?.rules) {
-            if ('when' in r) {
-                open.push({
-                    when: r.when,
-                    type: r.type,
-                    tag: r.tag,
-                    before: r.before,
-                    highlight: r.highlight,
-                    open: r.open,
-                    close: r.close,
-                    embed: r.embed,
-                    unembed: r.unembed,
-                    goto: `${name}$body`
-                });
-            }
-
-            if ('import' in r) {
-                open.push({
-                    import: r.import,
-                    goto: `${name}$body`
-                })
-            }
-        }
-
         for (const r of sections.sections?.body?.rules) {
             body.push(r);
         }
-        body.push({ import: [`${name}$close`] })
 
         for (const r of sections.sections?.close?.rules) {
             if ('when' in r) {
@@ -222,21 +193,59 @@ export class Generator {
             }
         }
 
-        return {
-            [`${name}$open`]: {
-                default: sections.sections.open.default,
-                rules: open
-            },
-            [`${name}$body`]: {
-                default: sections.sections.body.default,
-                unmatched: sections.sections.body.unmatched,
-                rules: body
-            },
-            [`${name}$close`]: {
-                default: sections.sections.close.default,
-                rules: close
+        if (close.length)
+            body.push({ import: [`${name}$close`] })
+
+        const target = body.length ? 'body' : 'close';
+
+        for (const r of sections.sections?.open?.rules) {
+            if ('when' in r) {
+                open.push({
+                    when: r.when,
+                    type: r.type,
+                    tag: r.tag,
+                    before: r.before,
+                    highlight: r.highlight,
+                    open: r.open,
+                    close: r.close,
+                    embed: r.embed,
+                    unembed: r.unembed,
+                    goto: `${name}$${target}`
+                });
+            }
+
+            if ('import' in r) {
+                open.push({
+                    import: r.import,
+                    goto: `${name}$${target}`
+                })
             }
         }
+
+        return [
+            {
+                name: `${name}$open`,
+                state: {
+                    default: sections.sections.open.default,
+                    rules: open
+                }
+            },
+            {
+                name: `${name}$body`,
+                state: {
+                    default: sections.sections.body.default,
+                    unmatched: sections.sections.body.unmatched,
+                    rules: body
+                }
+            },
+            {
+                name: `${name}$close`,
+                state: {
+                    default: sections.sections.close.default,
+                    rules: close
+                }
+            }
+        ]
     }
 
     private processGrammarDirective(directive: ASTGrammar) {
