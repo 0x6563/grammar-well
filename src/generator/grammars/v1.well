@@ -168,11 +168,11 @@ grammar {
 		| state_list => ( [{ states: $0 }] )
 
 	[state_list]
-		| state => ( data )
+		| state => ( [$0] )
 		| state _ state_list => ( [$0].concat($2) )
 
 	[state]
-		| state_declare _ state_definition => ( Object.assign({ name: $0 }, $2) )
+		| state_declare _ state_definition => ( { name: $0, state: $2 } )
 
 	[state_declare]
 		| T_WORD _ L_ARROW => ( $0 )

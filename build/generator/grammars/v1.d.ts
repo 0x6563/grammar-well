@@ -565,7 +565,10 @@ declare function GWLanguage(): {
                 name: string;
                 postprocess: ({ data }: {
                     data: any;
-                }) => any;
+                }) => {
+                    name: any;
+                    state: any;
+                };
                 symbols: string[];
             }[];
             state_declare: {
@@ -604,7 +607,7 @@ declare function GWLanguage(): {
                 name: string;
                 postprocess: ({ data }: {
                     data: any;
-                }) => any;
+                }) => any[];
                 symbols: string[];
             }[];
             string_list: {

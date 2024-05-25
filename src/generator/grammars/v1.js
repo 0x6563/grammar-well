@@ -262,7 +262,7 @@ function GWLanguage(){
                     { name: "section_list", postprocess: ({data}) => { return ([data[0]].concat(data[2])); }, symbols: [ "section", "T_WS", "section_list" ] }
                 ],
                 state: [
-                    { name: "state", postprocess: ({data}) => { return (Object.assign({ name: data[0] }, data[2])); }, symbols: [ "state_declare", "_", "state_definition" ] }
+                    { name: "state", postprocess: ({data}) => { return ({ name: data[0], state: data[2] }); }, symbols: [ "state_declare", "_", "state_definition" ] }
                 ],
                 state_declare: [
                     { name: "state_declare", postprocess: ({data}) => { return (data[0]); }, symbols: [ "T_WORD", "_", "L_ARROW" ] }
@@ -282,7 +282,7 @@ function GWLanguage(){
                     { name: "state_definition_kv_list", postprocess: ({data}) => { return ([data[0]].concat(data[2])); }, symbols: [ "state_definition_kv", "_", "state_definition_kv_list" ] }
                 ],
                 state_list: [
-                    { name: "state_list", postprocess: ({data}) => { return (data); }, symbols: [ "state" ] },
+                    { name: "state_list", postprocess: ({data}) => { return ([data[0]]); }, symbols: [ "state" ] },
                     { name: "state_list", postprocess: ({data}) => { return ([data[0]].concat(data[2])); }, symbols: [ "state", "_", "state_list" ] }
                 ],
                 string_list: [
