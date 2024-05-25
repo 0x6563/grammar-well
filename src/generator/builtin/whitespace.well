@@ -1,9 +1,6 @@
 lexer {
-	start: "whitespace"
-
 	[whitespace]
 		- when /\s+/ tag "whitespace"
-
 }
 
 grammar {

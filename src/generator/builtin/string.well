@@ -1,13 +1,12 @@
 lexer {
 
-	[string]
-		- import singleQuoteString, doubleQuoteString
-
-	[doubleQuoteString]
-		- when /"/ tag "dquote" highlight "string" goto doubleQuoteStringEnd
-
-	[singleQuoteString]
-		- when /'/ tag "squote" highlight "string" goto singleQuoteStringEnd
+	[singleQuoteStringEnd]
+		- when /\\[\\\/bnrft]/ tag "escaped"
+		- when /\\'/ tag "quoteEscape"
+		- when /\\u[A-Fa-f\d]{4}/ tag "escaped"
+		- when /\\./ tag "badEscape"
+		- when /[^'\\]+/ tag "string" highlight "string"
+		- when "'" tag "squote" highlight "string" pop
 
 	[doubleQuoteStringEnd]
 		- when /\\[\\\/bnrft]/ tag "escaped" highlight "constant"
@@ -17,13 +16,14 @@ lexer {
 		- when /[^"\\]+/ tag "string" highlight "string"
 		- when "\"" tag "dquote" highlight "string" pop
 
-	[singleQuoteStringEnd]
-		- when /\\[\\\/bnrft]/ tag "escaped"
-		- when /\\'/ tag "quoteEscape"
-		- when /\\u[A-Fa-f\d]{4}/ tag "escaped"
-		- when /\\./ tag "badEscape"
-		- when /[^'\\]+/ tag "string" highlight "string"
-		- when "'" tag "squote" highlight "string" pop
+	[singleQuoteString]
+		- when /'/ tag "squote" highlight "string" goto singleQuoteStringEnd
+
+	[doubleQuoteString]
+		- when /"/ tag "dquote" highlight "string" goto doubleQuoteStringEnd
+
+	[string]
+		- import singleQuoteString, doubleQuoteString
 
 }
 
