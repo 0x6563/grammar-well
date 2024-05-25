@@ -33,7 +33,9 @@ export interface ASTLexer {
 }
 export interface ASTLexerConfig {
     start?: string;
-    states: ASTLexerState[];
+    states: {
+        [key: string]: (ASTLexerState | ASTLexerStateStructured);
+    };
 }
 export interface ASTGrammarProduction {
     name: string;
@@ -71,25 +73,38 @@ export interface ASTGrammarSymbolLiteral {
 }
 export type ASTDirectives = (ASTJavaScriptSection | ASTImport | ASTConfig | ASTGrammar | ASTLexer);
 export interface ASTLexerState {
-    name: string;
     unmatched?: ASTLexerStateNonMatchRule;
     default?: ASTLexerStateMatchRule;
-    rules: (ASTLexerStateImportRule | ASTLexerStateMatchRule)[];
+    rules: (ASTLexerStateImportRule | ASTLexerStateMatchRule | ASTLexerAnonymousStateStructured)[];
+}
+export interface ASTLexerStateStructured {
+    sections: {
+        [key: string]: ASTLexerState;
+    };
+}
+export interface ASTLexerAnonymousStateStructured {
+    sections: {
+        [key: string]: ASTLexerState;
+    };
 }
 export interface ASTLexerStateImportRule {
     import: string[];
+    pop?: number | 'all';
+    inset?: number;
+    goto?: string;
+    set?: string;
 }
 export interface ASTLexerStateMatchRule {
     when: string | ASTGrammarSymbolRegex;
     type?: string;
     tag?: string[];
-    pop?: number | 'all';
     before?: boolean;
     highlight?: string;
     open?: string;
     close?: string;
     embed?: string;
     unembed?: boolean;
+    pop?: number | 'all';
     inset?: number;
     goto?: string;
     set?: string;
@@ -97,13 +112,13 @@ export interface ASTLexerStateMatchRule {
 export interface ASTLexerStateNonMatchRule {
     type?: string;
     tag?: string[];
-    pop?: number | 'all';
     before?: undefined;
     highlight?: string;
     open?: string;
     close?: string;
     embed?: string;
     unembed?: boolean;
+    pop?: number | 'all';
     inset?: number;
     goto?: string;
     set?: string;

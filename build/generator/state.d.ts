@@ -1,4 +1,4 @@
-import { ASTJavaScriptBuiltin, ASTJavaScriptLiteral, ASTLexerState, Dictionary, GeneratorGrammarProductionRule, GeneratorLexerConfig } from "../typings";
+import { ASTJavaScriptBuiltin, ASTJavaScriptLiteral, Dictionary, GeneratorGrammarProductionRule, GeneratorLexerConfig, GeneratorLexerState } from "../typings";
 export declare class GeneratorState {
     grammar: {
         start: string;
@@ -19,7 +19,7 @@ export declare class GeneratorState {
     merge(state: GeneratorState): void;
     grammarUUID(name: string): string;
     addGrammarRule(rule: GeneratorGrammarProductionRule): void;
-    addLexerState(state: ASTLexerState): void;
+    addLexerState(name: string, state?: GeneratorLexerState): void;
     export(): {
         grammar: {
             start: string;

@@ -13,14 +13,14 @@ export async function Generate(rules, config = {}) {
 }
 export class Generator {
     config;
-    alias;
+    aliasPrefix;
     parser = new Parser(Language());
     context;
     state = new GeneratorState();
     generator = new JavaScriptGenerator(this.state);
-    constructor(config = {}, context, alias = '') {
+    constructor(config = {}, context, aliasPrefix = '') {
         this.config = config;
-        this.alias = alias;
+        this.aliasPrefix = aliasPrefix;
         this.context = context || {
             imported: new Set(),
             resolver: undefined,
@@ -74,10 +74,10 @@ export class Generator {
     }
     async processImportDirective(directive) {
         if (directive.path) {
-            await this.importGrammar(directive.import, this.alias + (directive.alias || ''));
+            await this.importGrammar(directive.import, this.aliasPrefix + (directive.alias || ''));
         }
         else {
-            await this.importBuiltIn(directive.import, this.alias + (directive.alias || ''));
+            await this.importBuiltIn(directive.import, this.aliasPrefix + (directive.alias || ''));
         }
     }
     processConfigDirective(directive) {
@@ -91,13 +91,25 @@ export class Generator {
             };
         }
         if (directive.lexer.start) {
-            this.state.lexer.start = this.alias + directive.lexer.start;
+            this.state.lexer.start = this.aliasPrefix + directive.lexer.start;
         }
         if (!this.state.lexer.start && directive.lexer.states.length) {
-            this.state.lexer.start = this.alias + directive.lexer.states[0].name;
         }
-        for (const state of directive.lexer.states) {
-            state.name = this.alias + state.name;
+        this.importLexerStates(directive.lexer.states);
+    }
+    importLexerStates(states) {
+        for (let name in states) {
+            const state = states[name];
+            this.importLexerState(name, state);
+        }
+    }
+    importLexerState(name, state) {
+        if ('sections' in state) {
+            const states = this.buildLexerStructuredStates(name, state);
+            this.state.addLexerState(this.aliasPrefix + name, { rules: [{ import: [`${name}$open`] }] });
+            this.importLexerStates(states);
+        }
+        else {
             if (state.default && state.unmatched) {
                 state.unmatched.type = typeof state.unmatched.type != 'undefined' ? state.unmatched.type : state.default?.type;
                 state.unmatched.tag = typeof state.unmatched.tag != 'undefined' ? state.unmatched.tag : state.default?.tag;
@@ -105,43 +117,124 @@ export class Generator {
                 state.unmatched.close = typeof state.unmatched.close != 'undefined' ? state.unmatched.close : state.default?.close;
                 state.unmatched.highlight = typeof state.unmatched.highlight != 'undefined' ? state.unmatched.highlight : state.default?.highlight;
             }
-            if (this.alias || state.default) {
-                state.rules.forEach(rule => {
-                    if (this.alias) {
+            const rules = [];
+            for (const rule of state.rules) {
+                if ('sections' in rule) {
+                    let i = 1;
+                    while (`${this.aliasPrefix}${name}$${i}` in this.state.lexer.states)
+                        ++i;
+                    const states = this.buildLexerStructuredStates(`${name}$${i}`, rule);
+                    this.importLexerStates(states);
+                    rules.push({ import: `${name}$${i}$open` });
+                    continue;
+                }
+                else {
+                    if (this.aliasPrefix) {
                         if ('import' in rule) {
-                            rule.import = rule.import.map(v2 => this.alias + v2);
+                            rule.import = rule.import.map(v2 => this.aliasPrefix + v2);
                         }
                         if ('set' in rule) {
-                            rule.set = this.alias + rule.set;
+                            rule.set = this.aliasPrefix + rule.set;
                         }
                         if ('goto' in rule) {
-                            rule.goto = this.alias + rule.goto;
+                            rule.goto = this.aliasPrefix + rule.goto;
                         }
                     }
-                    if (state.default && !('import' in rule)) {
+                    if ('when' in rule && state.default) {
                         rule.type = typeof rule.type != 'undefined' ? rule.type : state.default?.type;
                         rule.tag = typeof rule.tag != 'undefined' ? rule.tag : state.default?.tag;
                         rule.open = typeof rule.open != 'undefined' ? rule.open : state.default?.open;
                         rule.close = typeof rule.close != 'undefined' ? rule.close : state.default?.close;
                         rule.highlight = typeof rule.highlight != 'undefined' ? rule.highlight : state.default?.highlight;
                     }
+                    rules.push(rule);
+                }
+            }
+            this.state.addLexerState(this.aliasPrefix + name, { ...state, rules });
+        }
+    }
+    buildLexerStructuredStates(name, sections) {
+        const open = [];
+        const body = [];
+        const close = [];
+        for (const r of sections.sections?.open?.rules) {
+            if ('when' in r) {
+                open.push({
+                    when: r.when,
+                    type: r.type,
+                    tag: r.tag,
+                    before: r.before,
+                    highlight: r.highlight,
+                    open: r.open,
+                    close: r.close,
+                    embed: r.embed,
+                    unembed: r.unembed,
+                    goto: `${name}$body`
                 });
             }
-            this.state.addLexerState(state);
+            if ('import' in r) {
+                open.push({
+                    import: r.import,
+                    goto: `${name}$body`
+                });
+            }
         }
+        for (const r of sections.sections?.body?.rules) {
+            body.push(r);
+        }
+        body.push({ import: [`${name}$close`] });
+        for (const r of sections.sections?.close?.rules) {
+            if ('when' in r) {
+                close.push({
+                    when: r.when,
+                    type: r.type,
+                    tag: r.tag,
+                    before: r.before,
+                    highlight: r.highlight,
+                    open: r.open,
+                    close: r.close,
+                    embed: r.embed,
+                    unembed: r.unembed,
+                    set: r.set,
+                    pop: r.set ? undefined : 1
+                });
+            }
+            if ('import' in r) {
+                close.push({
+                    import: r.import,
+                    set: r.set,
+                    pop: r.set ? undefined : 1
+                });
+            }
+        }
+        return {
+            [`${name}$open`]: {
+                default: sections.sections.open.default,
+                rules: open
+            },
+            [`${name}$body`]: {
+                default: sections.sections.body.default,
+                unmatched: sections.sections.body.unmatched,
+                rules: body
+            },
+            [`${name}$close`]: {
+                default: sections.sections.close.default,
+                rules: close
+            }
+        };
     }
     processGrammarDirective(directive) {
         if (directive.grammar.config) {
             if (directive.grammar.config.start) {
-                this.state.grammar.start = this.alias + directive.grammar.config.start;
+                this.state.grammar.start = this.aliasPrefix + directive.grammar.config.start;
             }
             Object.assign(this.state.grammar.config, directive.grammar.config);
         }
         if (!this.state.grammar.start && directive.grammar.rules.length) {
-            this.state.grammar.start = this.alias + directive.grammar.rules[0].name;
+            this.state.grammar.start = this.aliasPrefix + directive.grammar.rules[0].name;
         }
         for (const rule of directive.grammar.rules) {
-            rule.name = this.alias + rule.name;
+            rule.name = this.aliasPrefix + rule.name;
             this.buildRules(rule.name, rule.expressions, rule);
         }
     }
@@ -187,7 +280,7 @@ export class Generator {
             return this.buildRepeatRules(name, symbol);
         }
         if ('rule' in symbol) {
-            return { ...symbol, rule: this.alias + symbol.rule };
+            return { ...symbol, rule: this.aliasPrefix + symbol.rule };
         }
         if ('regex' in symbol) {
             return symbol;

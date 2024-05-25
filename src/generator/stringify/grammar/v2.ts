@@ -106,8 +106,12 @@ export class V2GrammarString {
             body += this.formatKV({ start: directive.lexer.start }, 1);
         }
         if (directive.lexer.states) {
-            for (const state of directive.lexer.states) {
-                body += '\n' + this.indent(1, `[${state.name}]\n`);
+            for (const name in directive.lexer.states) {
+                const state = directive.lexer.states[name];
+                if ('sections' in state) {
+                    continue;
+                }
+                body += '\n' + this.indent(1, `[${name}]\n`);
                 if (state.default) {
                     body += this.indent(2, 'default: ' + this.formatLexerStateRule(state.default) + ';\n');
                 }
@@ -115,6 +119,8 @@ export class V2GrammarString {
                     body += this.indent(2, 'unmatched: ' + this.formatLexerStateRule(state.unmatched) + ';\n');
                 }
                 for (const rule of state.rules) {
+                    if ('sections' in rule)
+                        continue;
                     body += this.indent(2, '- ' + this.formatLexerStateRule(rule) + '\n');
                 }
             }

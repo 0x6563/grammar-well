@@ -1,5 +1,5 @@
 import { ImportResolver, ImportResolverConstructor } from ".";
-import { ASTGrammarSymbolLiteral, ASTGrammarSymbolNonTerminal, ASTGrammarSymbolRegex, ASTGrammarSymbolToken, ASTJavaScriptBuiltin, ASTJavaScriptLiteral, ASTJavaScriptTemplate, ASTLexerState } from "./ast";
+import { ASTGrammarSymbolLiteral, ASTGrammarSymbolNonTerminal, ASTGrammarSymbolRegex, ASTGrammarSymbolToken, ASTJavaScriptBuiltin, ASTJavaScriptLiteral, ASTJavaScriptTemplate, ASTLexerState, ASTLexerStateImportRule, ASTLexerStateMatchRule, ASTLexerStateNonMatchRule } from "./ast";
 import { Dictionary } from "./common";
 
 export interface GeneratorOptions {
@@ -22,7 +22,12 @@ export interface GeneratorContext {
 
 export interface GeneratorLexerConfig {
     start?: string
-    states: Dictionary<ASTLexerState>;
+    states: Dictionary<GeneratorLexerState>;
+}
+
+export interface GeneratorLexerState {
+    unmatched?: ASTLexerStateNonMatchRule;
+    rules: (ASTLexerStateImportRule | ASTLexerStateMatchRule)[];
 }
 
 export interface GeneratorGrammarProductionRule {

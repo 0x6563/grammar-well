@@ -1,4 +1,4 @@
-import { GeneratorGrammarSymbol } from "../../typings";
+import { ASTGrammarSymbolLiteral, ASTGrammarSymbolNonTerminal, ASTGrammarSymbolRegex, ASTGrammarSymbolToken, GeneratorGrammarSymbol } from "../../typings";
 import { GeneratorState } from "../state";
 export declare class CommonGenerator {
     state: GeneratorState;
@@ -10,5 +10,9 @@ export declare class CommonGenerator {
     }, indent?: number): string;
     static IsVal(value: any): boolean;
     static SerializeSymbol(s: GeneratorGrammarSymbol): string;
+    static SerializeSymbolNonTerminal(s: ASTGrammarSymbolNonTerminal): string;
+    static SerializeSymbolRegex(s: ASTGrammarSymbolRegex): string;
+    static SerializeSymbolToken(s: ASTGrammarSymbolToken): string;
+    static SerializeSymbolLiteral(s: ASTGrammarSymbolLiteral): string;
     static SymbolIsTerminal(s: GeneratorGrammarSymbol): boolean;
 }

@@ -25,7 +25,8 @@ export class CommonGenerator {
         let r = `{`;
         let seperator = '';
         const prefix = CommonGenerator.SmartIndent(indent);
-        for (const k in obj) {
+        const keys = Object.keys(obj).sort();
+        for (const k of keys) {
             const v = obj[k];
             if (CommonGenerator.IsVal(v)) {
                 const key = /[a-z_][a-z\d_$]*/i.test(k) ? k : JSON.stringify(k);
@@ -45,20 +46,32 @@ export class CommonGenerator {
             return JSON.stringify(s);
         }
         else if ('rule' in s) {
-            return JSON.stringify(s.rule);
+            return CommonGenerator.SerializeSymbolNonTerminal(s);
         }
         else if ('regex' in s) {
-            return `/${s.regex}/${s.flags || ''}`;
+            return CommonGenerator.SerializeSymbolRegex(s);
         }
         else if ('token' in s) {
-            return `{ token: ${JSON.stringify(s.token)} }`;
+            return CommonGenerator.SerializeSymbolToken(s);
         }
         else if ('literal' in s) {
-            return `{ literal: ${JSON.stringify(s.literal)} }`;
+            return CommonGenerator.SerializeSymbolLiteral(s);
         }
         else {
             return JSON.stringify(s);
         }
+    }
+    static SerializeSymbolNonTerminal(s) {
+        return JSON.stringify(s.rule);
+    }
+    static SerializeSymbolRegex(s) {
+        return `/${s.regex}/${s.flags || ''}`;
+    }
+    static SerializeSymbolToken(s) {
+        return `{ token: ${JSON.stringify(s.token)} }`;
+    }
+    static SerializeSymbolLiteral(s) {
+        return `{ literal: ${JSON.stringify(s.literal)} }`;
     }
     static SymbolIsTerminal(s) {
         return !(typeof s === 'string' || 'rule' in s);

@@ -1,6 +1,6 @@
 import { LRState } from ".";
-import { ASTGrammarSymbolLiteral, ASTGrammarSymbolToken, ASTLexerStateImportRule, ASTLexerStateMatchRule, ASTLexerStateNonMatchRule } from "./ast";
-import { Dictionary, Override } from "./common";
+import { ASTGrammarSymbolLiteral, ASTGrammarSymbolToken, ASTLexerStateMatchRule, ASTLexerStateNonMatchRule } from "./ast";
+import { Dictionary } from "./common";
 
 export interface RuntimeLanguageDefinition {
     lexer?: RuntimeLexer | RuntimeLexerConfig;
@@ -38,10 +38,9 @@ export interface RuntimeLexerConfig {
 }
 
 export interface RuntimeLexerState {
-    name: string;
     unmatched?: ASTLexerStateNonMatchRule;
-    default?: RuntimeLexerStateMatchRule;
-    rules: (ASTLexerStateImportRule | RuntimeLexerStateMatchRule)[];
+    rules: ASTLexerStateMatchRule[];
+    regex: RegExp;
 }
 
 export interface RuntimeLexer {
@@ -58,12 +57,4 @@ export interface RuntimeLexerToken {
     offset: number;
     line: number;
     column: number;
-}
-
-export type RuntimeLexerStateMatchRule = Override<ASTLexerStateMatchRule, { when: string | RegExp }>;
-
-export interface RuntimeLexerStateDefinition {
-    name: string;
-    unmatched?: ASTLexerStateNonMatchRule;
-    rules: RuntimeLexerStateMatchRule[];
-}
+} 

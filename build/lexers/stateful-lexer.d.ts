@@ -1,4 +1,4 @@
-import { RuntimeLexer, RuntimeLexerConfig, RuntimeLexerState } from "../typings";
+import { RuntimeLexer, RuntimeLexerConfig } from "../typings";
 export declare class StatefulLexer implements RuntimeLexer {
     private start;
     private states;
@@ -45,8 +45,3 @@ export declare class StatefulLexer implements RuntimeLexer {
     private adjustStack;
     private getGroup;
 }
-export declare function ResolveStates(states: {
-    [key: string]: RuntimeLexerState;
-}, start: string): {
-    [key: string]: RuntimeLexerState;
-};

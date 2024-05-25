@@ -1,7 +1,7 @@
 import { TokenBuffer } from "../lexers/token-buffer";
 import { ParserUtility } from "../parser/parser";
-import { ASTLexerStateNonMatchRule } from "./ast";
-import { RuntimeGrammarProductionRule, RuntimeGrammarRuleSymbol, RuntimeLanguageDefinition, RuntimeLexerStateMatchRule } from "./runtime";
+import { ASTLexerStateMatchRule, ASTLexerStateNonMatchRule } from "./ast";
+import { RuntimeGrammarProductionRule, RuntimeGrammarRuleSymbol, RuntimeLanguageDefinition } from "./runtime";
 export * from './ast';
 export * from './common';
 export * from './generator';
@@ -32,7 +32,7 @@ export interface TQRestorePoint {
     offset: number;
 }
 export interface StatefulLexerStateDefinition {
-    regexp: RegExp;
+    regex: RegExp;
     unmatched?: ASTLexerStateNonMatchRule;
-    rules: RuntimeLexerStateMatchRule[];
+    rules: ASTLexerStateMatchRule[];
 }

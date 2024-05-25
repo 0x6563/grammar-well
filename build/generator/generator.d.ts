@@ -5,12 +5,12 @@ import { JavaScriptGenerator } from "./stringify/javascript";
 export declare function Generate(rules: string | ASTDirectives | (ASTDirectives[]), config?: GeneratorOptions): Promise<string>;
 export declare class Generator {
     private config;
-    private alias;
+    private aliasPrefix;
     private parser;
     private context;
     state: GeneratorState;
     generator: JavaScriptGenerator;
-    constructor(config?: GeneratorOptions, context?: GeneratorContext, alias?: string);
+    constructor(config?: GeneratorOptions, context?: GeneratorContext, aliasPrefix?: string);
     import(source: string): Promise<void>;
     import(directive: ASTDirectives): Promise<void>;
     import(directives: ASTDirectives[]): Promise<void>;
@@ -18,6 +18,9 @@ export declare class Generator {
     private processImportDirective;
     private processConfigDirective;
     private processLexerDirective;
+    private importLexerStates;
+    private importLexerState;
+    private buildLexerStructuredStates;
     private processGrammarDirective;
     private importBuiltIn;
     private importGrammar;

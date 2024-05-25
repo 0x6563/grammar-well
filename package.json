@@ -4,9 +4,9 @@
   "version": "1.3.3",
   "description": "Cross-platform Parser written in TypeScript",
   "scripts": {
-    "prebuild": "tsc --build --clean",
+    "prebuild": "tsc --build --clean && tsx bootstrap.ts",
     "build": "tsc --build",
-    "bootstrap": "tsx bootstrap.ts",
+    "preprebuild": "tsx bootstrap.ts",
     "testing": "tsx testing.ts",
     "benchmark": "node tests/performance/benchmark.js",
     "test": "node --test --import tsx --test-reporter ./tests/reporter.mjs  tests/**/*.spec.ts",

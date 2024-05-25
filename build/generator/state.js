@@ -36,12 +36,13 @@ export class GeneratorState {
         this.grammar.rules[rule.name] = this.grammar.rules[rule.name] || [];
         this.grammar.rules[rule.name].push(rule);
     }
-    addLexerState(state) {
-        this.lexer.states[state.name] = this.lexer.states[state.name] || { name: state.name, rules: [] };
-        const target = this.lexer.states[state.name];
-        target.default = typeof state.default != "undefined" ? state.default : target.default;
-        target.unmatched = typeof state.unmatched != "undefined" ? state.unmatched : target.unmatched;
-        target.rules.push(...state.rules);
+    addLexerState(name, state) {
+        this.lexer.states[name] = this.lexer.states[name] || { rules: [] };
+        if (state) {
+            const target = this.lexer.states[name];
+            target.unmatched = typeof state.unmatched != "undefined" ? state.unmatched : target.unmatched;
+            target.rules.push(...state.rules);
+        }
     }
     export() {
         return {

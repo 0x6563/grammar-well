@@ -1,455 +1,140 @@
 export default GWLanguage;
 declare function GWLanguage(): {
     grammar: {
-        start: string;
         rules: {
-            main: {
-                name: string;
-                symbols: string[];
-                postprocess: ({ data }: {
-                    data: any;
-                }) => any;
-            }[];
-            section_list: {
-                name: string;
-                symbols: string[];
-                postprocess: ({ data }: {
-                    data: any;
-                }) => any[];
-            }[];
-            section: ({
-                name: string;
-                symbols: string[];
-                postprocess: ({ data }: {
-                    data: any;
-                }) => {
-                    config: any;
-                };
-            } | {
-                name: string;
-                symbols: string[];
-                postprocess: ({ data }: {
-                    data: any;
-                }) => {
-                    import: any;
-                };
-            } | {
-                name: string;
-                symbols: (string | {
-                    literal: string;
-                })[];
-                postprocess: ({ data }: {
-                    data: any;
-                }) => {
-                    import: any;
-                    alias: any;
-                };
-            } | {
-                name: string;
-                symbols: string[];
-                postprocess: ({ data }: {
-                    data: any;
-                }) => {
-                    lexer: any;
-                };
-            } | {
-                name: string;
-                symbols: string[];
-                postprocess: ({ data }: {
-                    data: any;
-                }) => {
-                    grammar: any;
-                };
-            } | {
-                name: string;
-                symbols: string[];
-                postprocess: ({ data }: {
-                    data: any;
-                }) => {
-                    body: any;
-                };
-            } | {
-                name: string;
-                symbols: string[];
-                postprocess: ({ data }: {
-                    data: any;
-                }) => {
-                    head: any;
-                };
-            })[];
-            lexer: {
-                name: string;
-                symbols: string[];
-                postprocess: ({ data }: {
-                    data: any;
-                }) => any;
-            }[];
-            state_list: {
-                name: string;
-                symbols: string[];
-                postprocess: ({ data }: {
-                    data: any;
-                }) => any;
-            }[];
-            state: {
-                name: string;
-                symbols: string[];
-                postprocess: ({ data }: {
-                    data: any;
-                }) => any;
-            }[];
-            state_declare: {
-                name: string;
-                symbols: string[];
-                postprocess: ({ data }: {
-                    data: any;
-                }) => any;
-            }[];
-            state_definition: {
-                name: string;
-                symbols: string[];
-                postprocess: ({ data }: {
-                    data: any;
-                }) => any;
-            }[];
-            state_definition_kv_list: {
-                name: string;
-                symbols: string[];
-                postprocess: ({ data }: {
-                    data: any;
-                }) => any;
-            }[];
-            state_definition_kv: {
-                name: string;
-                symbols: (string | {
-                    literal: string;
-                })[];
-                postprocess: ({ data }: {
-                    data: any;
-                }) => {
-                    tag: any;
-                };
-            }[];
-            token_list: {
-                name: string;
-                symbols: string[];
-                postprocess: ({ data }: {
-                    data: any;
-                }) => any;
-            }[];
-            token: {
-                name: string;
-                symbols: string[];
-                postprocess: ({ data }: {
-                    data: any;
-                }) => any;
-            }[];
-            token_definition_list: {
-                name: string;
-                symbols: string[];
-                postprocess: ({ data }: {
-                    data: any;
-                }) => any;
-            }[];
-            token_definition: ({
-                name: string;
-                symbols: string[];
-                postprocess: ({ data }: {
-                    data: any;
-                }) => {
-                    tag: any;
-                };
-            } | {
-                name: string;
-                symbols: string[];
-                postprocess: ({ data }: {
-                    data: any;
-                }) => {
-                    when: any;
-                };
-            } | {
-                name: string;
-                symbols: string[];
-                postprocess: ({ data }: {
-                    data: any;
-                }) => {
-                    open: any;
-                };
-            } | {
-                name: string;
-                symbols: string[];
-                postprocess: ({ data }: {
-                    data: any;
-                }) => {
-                    close: any;
-                };
-            } | {
-                name: string;
-                symbols: string[];
-                postprocess: ({ data }: {
-                    data: any;
-                }) => {
-                    pop: number;
-                };
-            } | {
-                name: string;
-                symbols: string[];
-                postprocess: ({ data }: {
-                    data: any;
-                }) => {
-                    pop: string;
-                };
-            } | {
-                name: string;
-                symbols: string[];
-                postprocess: ({ data }: {
-                    data: any;
-                }) => {
-                    highlight: any;
-                };
-            } | {
-                name: string;
-                symbols: string[];
-                postprocess: ({ data }: {
-                    data: any;
-                }) => {
-                    embed: any;
-                };
-            } | {
-                name: string;
-                symbols: string[];
-                postprocess: ({ data }: {
-                    data: any;
-                }) => {
-                    unembed: boolean;
-                };
-            } | {
-                name: string;
-                symbols: string[];
-                postprocess: ({ data }: {
-                    data: any;
-                }) => {
-                    inset: number;
-                };
-            } | {
-                name: string;
-                symbols: string[];
-                postprocess: ({ data }: {
-                    data: any;
-                }) => {
-                    set: any;
-                };
-            } | {
-                name: string;
-                symbols: string[];
-                postprocess: ({ data }: {
-                    data: any;
-                }) => {
-                    goto: any;
-                };
-            } | {
-                name: string;
-                symbols: string[];
-                postprocess: ({ data }: {
-                    data: any;
-                }) => {
-                    type: any;
-                };
-            })[];
-            grammar: {
-                name: string;
-                symbols: string[];
-                postprocess: ({ data }: {
-                    data: any;
-                }) => {
-                    rules: any;
-                };
-            }[];
-            grammar_rule_list: {
-                name: string;
-                symbols: string[];
-                postprocess: ({ data }: {
-                    data: any;
-                }) => any[];
-            }[];
-            grammar_rule: {
-                name: string;
-                symbols: string[];
-                postprocess: ({ data }: {
-                    data: any;
-                }) => {
-                    name: any;
-                    expressions: any;
-                };
-            }[];
-            expression_list: ({
-                name: string;
-                symbols: string[];
-                postprocess?: undefined;
-            } | {
-                name: string;
-                symbols: string[];
-                postprocess: ({ data }: {
-                    data: any;
-                }) => any;
-            })[];
-            expression: {
-                name: string;
-                symbols: string[];
-                postprocess: ({ data }: {
-                    data: any;
-                }) => {
-                    symbols: any;
-                };
-            }[];
-            expression_symbol_list: ({
-                name: string;
-                symbols: string[];
-                postprocess?: undefined;
-            } | {
-                name: string;
-                symbols: string[];
-                postprocess: ({ data }: {
-                    data: any;
-                }) => any;
-            })[];
-            expression_symbol: {
-                name: string;
-                symbols: string[];
-                postprocess: ({ data }: {
-                    data: any;
-                }) => any;
-            }[];
-            expression_symbol_match: {
-                name: string;
-                symbols: string[];
-                postprocess: ({ data }: {
-                    data: any;
-                }) => any;
-            }[];
-            expression_symbol_match$RPT01x1: {
+            K_ALL: {
                 name: string;
                 symbols: {
                     literal: string;
                 }[];
-                postprocess: ({ data }: {
-                    data: any;
-                }) => any;
             }[];
-            expression_repeater: {
+            K_BEFORE: {
                 name: string;
-                symbols: string[];
-                postprocess: ({ data }: {
-                    data: any;
-                }) => any;
+                symbols: {
+                    literal: string;
+                }[];
             }[];
-            kv_list: {
+            K_BODY: {
                 name: string;
-                symbols: string[];
-                postprocess: ({ data }: {
-                    data: any;
-                }) => any;
+                symbols: {
+                    literal: string;
+                }[];
             }[];
-            kv$SUBx1: {
+            K_CLOSE: {
                 name: string;
-                symbols: string[];
+                symbols: {
+                    literal: string;
+                }[];
             }[];
-            kv: {
+            K_CONFIG: {
                 name: string;
-                symbols: string[];
-                postprocess: ({ data }: {
-                    data: any;
-                }) => {
-                    [x: number]: any;
-                };
+                symbols: {
+                    literal: string;
+                }[];
             }[];
-            string_list: {
+            K_EMBED: {
                 name: string;
-                symbols: string[];
-                postprocess: ({ data }: {
-                    data: any;
-                }) => any[];
+                symbols: {
+                    literal: string;
+                }[];
             }[];
-            word_list: {
+            K_FROM: {
                 name: string;
-                symbols: string[];
-                postprocess: ({ data }: {
-                    data: any;
-                }) => any[];
+                symbols: {
+                    literal: string;
+                }[];
             }[];
-            _$RPT0Nx1: ({
+            K_GOTO: {
                 name: string;
-                symbols: any[];
-                postprocess?: undefined;
-            } | {
-                name: string;
-                symbols: string[];
-                postprocess: ({ data }: {
-                    data: any;
-                }) => any;
-            })[];
-            _$RPT0Nx1$SUBx1: {
-                name: string;
-                symbols: string[];
+                symbols: {
+                    literal: string;
+                }[];
             }[];
-            _: {
+            K_GRAMMAR: {
                 name: string;
-                symbols: string[];
-                postprocess: ({ data }: {
-                    data: any;
-                }) => any;
+                symbols: {
+                    literal: string;
+                }[];
             }[];
-            __$RPT1Nx1$SUBx1: {
+            K_HEAD: {
                 name: string;
-                symbols: string[];
+                symbols: {
+                    literal: string;
+                }[];
             }[];
-            __$RPT1Nx1: ({
+            K_HIGHLIGHT: {
                 name: string;
-                symbols: string[];
-                postprocess?: undefined;
-            } | {
-                name: string;
-                symbols: string[];
-                postprocess: ({ data }: {
-                    data: any;
-                }) => any;
-            })[];
-            __$RPT1Nx1$SUBx2: {
-                name: string;
-                symbols: string[];
+                symbols: {
+                    literal: string;
+                }[];
             }[];
-            __: {
+            K_IMPORT: {
                 name: string;
-                symbols: string[];
-                postprocess: ({ data }: {
-                    data: any;
-                }) => any;
+                symbols: {
+                    literal: string;
+                }[];
+            }[];
+            K_INSET: {
+                name: string;
+                symbols: {
+                    literal: string;
+                }[];
+            }[];
+            K_LEXER: {
+                name: string;
+                symbols: {
+                    literal: string;
+                }[];
+            }[];
+            K_OPEN: {
+                name: string;
+                symbols: {
+                    literal: string;
+                }[];
+            }[];
+            K_POP: {
+                name: string;
+                symbols: {
+                    literal: string;
+                }[];
+            }[];
+            K_SET: {
+                name: string;
+                symbols: {
+                    literal: string;
+                }[];
+            }[];
+            K_TAG: {
+                name: string;
+                symbols: {
+                    literal: string;
+                }[];
+            }[];
+            K_TYPE: {
+                name: string;
+                symbols: {
+                    literal: string;
+                }[];
+            }[];
+            K_UNEMBED: {
+                name: string;
+                symbols: {
+                    literal: string;
+                }[];
+            }[];
+            K_WHEN: {
+                name: string;
+                symbols: {
+                    literal: string;
+                }[];
+            }[];
+            L_ARROW: {
+                name: string;
+                symbols: {
+                    token: string;
+                }[];
             }[];
             L_COLON: {
-                name: string;
-                symbols: {
-                    token: string;
-                }[];
-            }[];
-            L_SCOLON: {
-                name: string;
-                symbols: {
-                    token: string;
-                }[];
-            }[];
-            L_QMARK: {
-                name: string;
-                symbols: {
-                    token: string;
-                }[];
-            }[];
-            L_PLUS: {
-                name: string;
-                symbols: {
-                    token: string;
-                }[];
-            }[];
-            L_STAR: {
                 name: string;
                 symbols: {
                     token: string;
@@ -461,7 +146,13 @@ declare function GWLanguage(): {
                     token: string;
                 }[];
             }[];
-            L_PIPE: {
+            L_DASH: {
+                name: string;
+                symbols: {
+                    token: string;
+                }[];
+            }[];
+            L_DSIGN: {
                 name: string;
                 symbols: {
                     token: string;
@@ -479,6 +170,36 @@ declare function GWLanguage(): {
                     token: string;
                 }[];
             }[];
+            L_PIPE: {
+                name: string;
+                symbols: {
+                    token: string;
+                }[];
+            }[];
+            L_PLUS: {
+                name: string;
+                symbols: {
+                    token: string;
+                }[];
+            }[];
+            L_QMARK: {
+                name: string;
+                symbols: {
+                    token: string;
+                }[];
+            }[];
+            L_SCOLON: {
+                name: string;
+                symbols: {
+                    token: string;
+                }[];
+            }[];
+            L_STAR: {
+                name: string;
+                symbols: {
+                    token: string;
+                }[];
+            }[];
             L_TEMPLATEL: {
                 name: string;
                 symbols: {
@@ -491,173 +212,22 @@ declare function GWLanguage(): {
                     token: string;
                 }[];
             }[];
-            L_ARROW: {
+            T_COMMENT: {
                 name: string;
                 symbols: {
                     token: string;
                 }[];
             }[];
-            L_DSIGN: {
+            T_GRAMMAR_TEMPLATE: {
                 name: string;
-                symbols: {
-                    token: string;
-                }[];
-            }[];
-            L_DASH: {
-                name: string;
-                symbols: {
-                    token: string;
-                }[];
-            }[];
-            K_ALL: {
-                name: string;
-                symbols: {
-                    literal: string;
-                }[];
-            }[];
-            K_TAG: {
-                name: string;
-                symbols: {
-                    literal: string;
-                }[];
-            }[];
-            K_FROM: {
-                name: string;
-                symbols: {
-                    literal: string;
-                }[];
-            }[];
-            K_TYPE: {
-                name: string;
-                symbols: {
-                    literal: string;
-                }[];
-            }[];
-            K_WHEN: {
-                name: string;
-                symbols: {
-                    literal: string;
-                }[];
-            }[];
-            K_POP: {
-                name: string;
-                symbols: {
-                    literal: string;
-                }[];
-            }[];
-            K_BEFORE: {
-                name: string;
-                symbols: {
-                    literal: string;
-                }[];
-            }[];
-            K_OPEN: {
-                name: string;
-                symbols: {
-                    literal: string;
-                }[];
-            }[];
-            K_CLOSE: {
-                name: string;
-                symbols: {
-                    literal: string;
-                }[];
-            }[];
-            K_HIGHLIGHT: {
-                name: string;
-                symbols: {
-                    literal: string;
-                }[];
-            }[];
-            K_EMBED: {
-                name: string;
-                symbols: {
-                    literal: string;
-                }[];
-            }[];
-            K_UNEMBED: {
-                name: string;
-                symbols: {
-                    literal: string;
-                }[];
-            }[];
-            K_INSET: {
-                name: string;
-                symbols: {
-                    literal: string;
-                }[];
-            }[];
-            K_SET: {
-                name: string;
-                symbols: {
-                    literal: string;
-                }[];
-            }[];
-            K_GOTO: {
-                name: string;
-                symbols: {
-                    literal: string;
-                }[];
-            }[];
-            K_CONFIG: {
-                name: string;
-                symbols: {
-                    literal: string;
-                }[];
-            }[];
-            K_LEXER: {
-                name: string;
-                symbols: {
-                    literal: string;
-                }[];
-            }[];
-            K_GRAMMAR: {
-                name: string;
-                symbols: {
-                    literal: string;
-                }[];
-            }[];
-            K_IMPORT: {
-                name: string;
-                symbols: {
-                    literal: string;
-                }[];
-            }[];
-            K_BODY: {
-                name: string;
-                symbols: {
-                    literal: string;
-                }[];
-            }[];
-            K_HEAD: {
-                name: string;
-                symbols: {
-                    literal: string;
-                }[];
-            }[];
-            T_JS$RPT0Nx1: ({
-                name: string;
-                symbols: any[];
-                postprocess?: undefined;
-            } | {
-                name: string;
-                symbols: (string | {
-                    token: string;
-                })[];
-                postprocess: ({ data }: {
-                    data: any;
-                }) => any;
-            })[];
-            T_JS: {
-                name: string;
-                symbols: (string | {
-                    token: string;
-                })[];
                 postprocess: ({ data }: {
                     data: any;
                 }) => {
-                    js: any;
+                    template: string;
                 };
+                symbols: (string | {
+                    token: string;
+                })[];
             }[];
             T_GRAMMAR_TEMPLATE$RPT0Nx1: ({
                 name: string;
@@ -665,41 +235,57 @@ declare function GWLanguage(): {
                 postprocess?: undefined;
             } | {
                 name: string;
-                symbols: (string | {
-                    token: string;
-                })[];
                 postprocess: ({ data }: {
                     data: any;
                 }) => any;
-            })[];
-            T_GRAMMAR_TEMPLATE: {
-                name: string;
                 symbols: (string | {
                     token: string;
                 })[];
+            })[];
+            T_INTEGER: {
+                name: string;
+                postprocess: ({ data }: {
+                    data: any;
+                }) => any;
+                symbols: {
+                    token: string;
+                }[];
+            }[];
+            T_JS: {
+                name: string;
                 postprocess: ({ data }: {
                     data: any;
                 }) => {
-                    template: string;
+                    js: any;
                 };
-            }[];
-            T_STRING: {
-                name: string;
-                symbols: {
+                symbols: (string | {
                     token: string;
-                }[];
+                })[];
+            }[];
+            T_JS$RPT0Nx1: ({
+                name: string;
+                symbols: any[];
+                postprocess?: undefined;
+            } | {
+                name: string;
                 postprocess: ({ data }: {
                     data: any;
                 }) => any;
-            }[];
-            T_WORD: {
-                name: string;
-                symbols: {
+                symbols: (string | {
                     token: string;
-                }[];
+                })[];
+            })[];
+            T_REGEX: {
+                name: string;
                 postprocess: ({ data }: {
                     data: any;
-                }) => any;
+                }) => {
+                    regex: any;
+                    flags: any;
+                };
+                symbols: (string | {
+                    token: string;
+                })[];
             }[];
             T_REGEX$RPT0Nx1: ({
                 name: string;
@@ -707,434 +293,897 @@ declare function GWLanguage(): {
                 postprocess?: undefined;
             } | {
                 name: string;
+                postprocess: ({ data }: {
+                    data: any;
+                }) => any;
                 symbols: (string | RegExp)[];
-                postprocess: ({ data }: {
-                    data: any;
-                }) => any;
             })[];
-            T_REGEX: {
+            T_STRING: {
                 name: string;
-                symbols: (string | {
-                    token: string;
-                })[];
-                postprocess: ({ data }: {
-                    data: any;
-                }) => {
-                    regex: any;
-                    flags: any;
-                };
-            }[];
-            T_COMMENT: {
-                name: string;
-                symbols: {
-                    token: string;
-                }[];
-            }[];
-            T_INTEGER: {
-                name: string;
-                symbols: {
-                    token: string;
-                }[];
                 postprocess: ({ data }: {
                     data: any;
                 }) => any;
+                symbols: {
+                    token: string;
+                }[];
+            }[];
+            T_WORD: {
+                name: string;
+                postprocess: ({ data }: {
+                    data: any;
+                }) => any;
+                symbols: {
+                    token: string;
+                }[];
             }[];
             T_WS: {
                 name: string;
-                symbols: {
-                    token: string;
-                }[];
                 postprocess: ({ data }: {
                     data: any;
                 }) => any;
+                symbols: {
+                    token: string;
+                }[];
+            }[];
+            _: {
+                name: string;
+                postprocess: ({ data }: {
+                    data: any;
+                }) => any;
+                symbols: string[];
+            }[];
+            _$RPT0Nx1: ({
+                name: string;
+                symbols: any[];
+                postprocess?: undefined;
+            } | {
+                name: string;
+                postprocess: ({ data }: {
+                    data: any;
+                }) => any;
+                symbols: string[];
+            })[];
+            _$RPT0Nx1$SUBx1: {
+                name: string;
+                symbols: string[];
+            }[];
+            __: {
+                name: string;
+                postprocess: ({ data }: {
+                    data: any;
+                }) => any;
+                symbols: string[];
+            }[];
+            __$RPT1Nx1: ({
+                name: string;
+                symbols: string[];
+                postprocess?: undefined;
+            } | {
+                name: string;
+                postprocess: ({ data }: {
+                    data: any;
+                }) => any;
+                symbols: string[];
+            })[];
+            __$RPT1Nx1$SUBx1: {
+                name: string;
+                symbols: string[];
+            }[];
+            __$RPT1Nx1$SUBx2: {
+                name: string;
+                symbols: string[];
+            }[];
+            expression: {
+                name: string;
+                postprocess: ({ data }: {
+                    data: any;
+                }) => {
+                    symbols: any;
+                };
+                symbols: string[];
+            }[];
+            expression_list: ({
+                name: string;
+                symbols: string[];
+                postprocess?: undefined;
+            } | {
+                name: string;
+                postprocess: ({ data }: {
+                    data: any;
+                }) => any;
+                symbols: string[];
+            })[];
+            expression_repeater: {
+                name: string;
+                postprocess: ({ data }: {
+                    data: any;
+                }) => any;
+                symbols: string[];
+            }[];
+            expression_symbol: {
+                name: string;
+                postprocess: ({ data }: {
+                    data: any;
+                }) => any;
+                symbols: string[];
+            }[];
+            expression_symbol_list: ({
+                name: string;
+                symbols: string[];
+                postprocess?: undefined;
+            } | {
+                name: string;
+                postprocess: ({ data }: {
+                    data: any;
+                }) => any;
+                symbols: string[];
+            })[];
+            expression_symbol_match: {
+                name: string;
+                postprocess: ({ data }: {
+                    data: any;
+                }) => any;
+                symbols: string[];
+            }[];
+            expression_symbol_match$RPT01x1: {
+                name: string;
+                postprocess: ({ data }: {
+                    data: any;
+                }) => any;
+                symbols: {
+                    literal: string;
+                }[];
+            }[];
+            grammar: {
+                name: string;
+                postprocess: ({ data }: {
+                    data: any;
+                }) => {
+                    rules: any;
+                };
+                symbols: string[];
+            }[];
+            grammar_rule: {
+                name: string;
+                postprocess: ({ data }: {
+                    data: any;
+                }) => {
+                    name: any;
+                    expressions: any;
+                };
+                symbols: string[];
+            }[];
+            grammar_rule_list: {
+                name: string;
+                postprocess: ({ data }: {
+                    data: any;
+                }) => any[];
+                symbols: string[];
+            }[];
+            kv: {
+                name: string;
+                postprocess: ({ data }: {
+                    data: any;
+                }) => {
+                    [x: number]: any;
+                };
+                symbols: string[];
+            }[];
+            kv$SUBx1: {
+                name: string;
+                symbols: string[];
+            }[];
+            kv_list: {
+                name: string;
+                postprocess: ({ data }: {
+                    data: any;
+                }) => any;
+                symbols: string[];
+            }[];
+            lexer: {
+                name: string;
+                postprocess: ({ data }: {
+                    data: any;
+                }) => any;
+                symbols: string[];
+            }[];
+            main: {
+                name: string;
+                postprocess: ({ data }: {
+                    data: any;
+                }) => any;
+                symbols: string[];
+            }[];
+            section: ({
+                name: string;
+                postprocess: ({ data }: {
+                    data: any;
+                }) => {
+                    config: any;
+                };
+                symbols: string[];
+            } | {
+                name: string;
+                postprocess: ({ data }: {
+                    data: any;
+                }) => {
+                    import: any;
+                };
+                symbols: string[];
+            } | {
+                name: string;
+                postprocess: ({ data }: {
+                    data: any;
+                }) => {
+                    import: any;
+                    alias: any;
+                };
+                symbols: (string | {
+                    literal: string;
+                })[];
+            } | {
+                name: string;
+                postprocess: ({ data }: {
+                    data: any;
+                }) => {
+                    lexer: any;
+                };
+                symbols: string[];
+            } | {
+                name: string;
+                postprocess: ({ data }: {
+                    data: any;
+                }) => {
+                    grammar: any;
+                };
+                symbols: string[];
+            } | {
+                name: string;
+                postprocess: ({ data }: {
+                    data: any;
+                }) => {
+                    body: any;
+                };
+                symbols: string[];
+            } | {
+                name: string;
+                postprocess: ({ data }: {
+                    data: any;
+                }) => {
+                    head: any;
+                };
+                symbols: string[];
+            })[];
+            section_list: {
+                name: string;
+                postprocess: ({ data }: {
+                    data: any;
+                }) => any[];
+                symbols: string[];
+            }[];
+            state: {
+                name: string;
+                postprocess: ({ data }: {
+                    data: any;
+                }) => any;
+                symbols: string[];
+            }[];
+            state_declare: {
+                name: string;
+                postprocess: ({ data }: {
+                    data: any;
+                }) => any;
+                symbols: string[];
+            }[];
+            state_definition: {
+                name: string;
+                postprocess: ({ data }: {
+                    data: any;
+                }) => any;
+                symbols: string[];
+            }[];
+            state_definition_kv: {
+                name: string;
+                postprocess: ({ data }: {
+                    data: any;
+                }) => {
+                    tag: any;
+                };
+                symbols: (string | {
+                    literal: string;
+                })[];
+            }[];
+            state_definition_kv_list: {
+                name: string;
+                postprocess: ({ data }: {
+                    data: any;
+                }) => any;
+                symbols: string[];
+            }[];
+            state_list: {
+                name: string;
+                postprocess: ({ data }: {
+                    data: any;
+                }) => any;
+                symbols: string[];
+            }[];
+            string_list: {
+                name: string;
+                postprocess: ({ data }: {
+                    data: any;
+                }) => any[];
+                symbols: string[];
+            }[];
+            token: {
+                name: string;
+                postprocess: ({ data }: {
+                    data: any;
+                }) => any;
+                symbols: string[];
+            }[];
+            token_definition: ({
+                name: string;
+                postprocess: ({ data }: {
+                    data: any;
+                }) => {
+                    tag: any;
+                };
+                symbols: string[];
+            } | {
+                name: string;
+                postprocess: ({ data }: {
+                    data: any;
+                }) => {
+                    when: any;
+                };
+                symbols: string[];
+            } | {
+                name: string;
+                postprocess: ({ data }: {
+                    data: any;
+                }) => {
+                    open: any;
+                };
+                symbols: string[];
+            } | {
+                name: string;
+                postprocess: ({ data }: {
+                    data: any;
+                }) => {
+                    close: any;
+                };
+                symbols: string[];
+            } | {
+                name: string;
+                postprocess: ({ data }: {
+                    data: any;
+                }) => {
+                    pop: number;
+                };
+                symbols: string[];
+            } | {
+                name: string;
+                postprocess: ({ data }: {
+                    data: any;
+                }) => {
+                    pop: string;
+                };
+                symbols: string[];
+            } | {
+                name: string;
+                postprocess: ({ data }: {
+                    data: any;
+                }) => {
+                    highlight: any;
+                };
+                symbols: string[];
+            } | {
+                name: string;
+                postprocess: ({ data }: {
+                    data: any;
+                }) => {
+                    embed: any;
+                };
+                symbols: string[];
+            } | {
+                name: string;
+                postprocess: ({ data }: {
+                    data: any;
+                }) => {
+                    unembed: boolean;
+                };
+                symbols: string[];
+            } | {
+                name: string;
+                postprocess: ({ data }: {
+                    data: any;
+                }) => {
+                    inset: number;
+                };
+                symbols: string[];
+            } | {
+                name: string;
+                postprocess: ({ data }: {
+                    data: any;
+                }) => {
+                    set: any;
+                };
+                symbols: string[];
+            } | {
+                name: string;
+                postprocess: ({ data }: {
+                    data: any;
+                }) => {
+                    goto: any;
+                };
+                symbols: string[];
+            } | {
+                name: string;
+                postprocess: ({ data }: {
+                    data: any;
+                }) => {
+                    type: any;
+                };
+                symbols: string[];
+            })[];
+            token_definition_list: {
+                name: string;
+                postprocess: ({ data }: {
+                    data: any;
+                }) => any;
+                symbols: string[];
+            }[];
+            token_list: {
+                name: string;
+                postprocess: ({ data }: {
+                    data: any;
+                }) => any;
+                symbols: string[];
+            }[];
+            word_list: {
+                name: string;
+                postprocess: ({ data }: {
+                    data: any;
+                }) => any[];
+                symbols: string[];
             }[];
         };
+        start: string;
     };
     lexer: {
         start: string;
         states: {
-            start: {
-                name: string;
-                rules: ({
-                    import: string[];
-                    when?: undefined;
-                    tag?: undefined;
-                    highlight?: undefined;
-                    goto?: undefined;
-                } | {
-                    when: RegExp;
-                    tag: string[];
+            comment: {
+                regex: RegExp;
+                rules: {
                     highlight: string;
-                    goto: string;
-                    import?: undefined;
-                })[];
+                    tag: string[];
+                    when: RegExp;
+                }[];
             };
             config: {
-                name: string;
+                regex: RegExp;
                 rules: ({
-                    import: string[];
-                    when?: undefined;
-                    tag?: undefined;
+                    tag: string[];
+                    when: RegExp;
+                    highlight?: undefined;
                     set?: undefined;
                 } | {
-                    when: string;
+                    highlight: string;
                     tag: string[];
+                    when: string;
+                    set?: undefined;
+                } | {
                     set: string;
-                    import?: undefined;
+                    tag: string[];
+                    when: string;
+                    highlight?: undefined;
                 })[];
             };
             config_inner: {
-                name: string;
+                regex: RegExp;
                 rules: ({
-                    import: string[];
-                    when?: undefined;
-                    tag?: undefined;
+                    highlight: string;
+                    tag: string[];
+                    when: RegExp;
                     pop?: undefined;
                 } | {
-                    when: string;
                     tag: string[];
+                    when: RegExp;
+                    highlight?: undefined;
+                    pop?: undefined;
+                } | {
+                    highlight: string;
+                    tag: string[];
+                    when: string;
+                    pop?: undefined;
+                } | {
                     pop: number;
-                    import?: undefined;
+                    tag: string[];
+                    when: string;
+                    highlight?: undefined;
                 })[];
             };
             grammar: {
-                name: string;
+                regex: RegExp;
                 rules: ({
-                    import: string[];
-                    when?: undefined;
-                    tag?: undefined;
+                    tag: string[];
+                    when: RegExp;
+                    highlight?: undefined;
                     set?: undefined;
                 } | {
-                    when: string;
+                    highlight: string;
                     tag: string[];
+                    when: string;
+                    set?: undefined;
+                } | {
                     set: string;
-                    import?: undefined;
+                    tag: string[];
+                    when: string;
+                    highlight?: undefined;
                 })[];
             };
             grammar_inner: {
-                name: string;
+                regex: RegExp;
                 rules: ({
-                    import: string[];
-                    when?: undefined;
-                    tag?: undefined;
+                    highlight: string;
+                    tag: string[];
+                    when: RegExp;
+                    goto?: undefined;
                     pop?: undefined;
                 } | {
-                    when: string;
-                    tag: string[];
-                    pop: number;
-                    import?: undefined;
-                })[];
-            };
-            lexer: {
-                name: string;
-                rules: ({
-                    import: string[];
-                    when?: undefined;
-                    tag?: undefined;
-                    set?: undefined;
-                } | {
-                    when: string;
-                    tag: string[];
-                    set: string;
-                    import?: undefined;
-                })[];
-            };
-            lexer_inner: {
-                name: string;
-                rules: ({
-                    import: string[];
-                    when?: undefined;
-                    tag?: undefined;
-                    pop?: undefined;
-                } | {
-                    when: string;
-                    tag: string[];
-                    pop: number;
-                    import?: undefined;
-                })[];
-            };
-            js: {
-                name: string;
-                rules: {
-                    when: string;
-                    tag: string[];
                     goto: string;
+                    tag: string[];
+                    when: string;
+                    highlight?: undefined;
+                    pop?: undefined;
+                } | {
+                    tag: string[];
+                    when: RegExp;
+                    highlight?: undefined;
+                    goto?: undefined;
+                    pop?: undefined;
+                } | {
+                    tag: string[];
+                    when: string;
+                    highlight?: undefined;
+                    goto?: undefined;
+                    pop?: undefined;
+                } | {
+                    highlight: string;
+                    tag: string[];
+                    when: string;
+                    goto?: undefined;
+                    pop?: undefined;
+                } | {
+                    pop: number;
+                    tag: string[];
+                    when: string;
+                    highlight?: undefined;
+                    goto?: undefined;
+                })[];
+            };
+            integer: {
+                regex: RegExp;
+                rules: {
+                    highlight: string;
+                    tag: string[];
+                    when: RegExp;
                 }[];
             };
-            js_wrap: {
-                name: string;
-                default: {
-                    tag: string[];
-                };
-                unmatched: {
-                    tag: string[];
-                };
-                rules: ({
-                    import: string[];
-                    when?: undefined;
-                    tag?: undefined;
-                    goto?: undefined;
-                    pop?: undefined;
-                } | {
-                    when: string;
-                    tag: string[];
+            js: {
+                regex: RegExp;
+                rules: {
                     goto: string;
-                    import?: undefined;
-                    pop?: undefined;
-                } | {
-                    when: string;
                     tag: string[];
-                    pop: number;
-                    import?: undefined;
-                    goto?: undefined;
-                })[];
+                    when: string;
+                }[];
             };
             js_literal: {
-                name: string;
-                default: {
+                regex: RegExp;
+                rules: ({
                     tag: string[];
-                };
+                    when: RegExp;
+                    goto?: undefined;
+                    pop?: undefined;
+                } | {
+                    goto: string;
+                    tag: string[];
+                    when: string;
+                    pop?: undefined;
+                } | {
+                    pop: number;
+                    tag: string[];
+                    when: string;
+                    goto?: undefined;
+                })[];
                 unmatched: {
                     tag: string[];
                 };
-                rules: ({
-                    import: string[];
-                    when?: undefined;
-                    tag?: undefined;
-                    goto?: undefined;
-                    pop?: undefined;
-                } | {
-                    when: string;
-                    tag: string[];
-                    goto: string;
-                    import?: undefined;
-                    pop?: undefined;
-                } | {
-                    when: string;
-                    tag: string[];
-                    pop: number;
-                    import?: undefined;
-                    goto?: undefined;
-                })[];
             };
             js_template: {
-                name: string;
+                regex: RegExp;
                 rules: {
-                    when: string;
-                    tag: string[];
                     goto: string;
+                    tag: string[];
+                    when: string;
                 }[];
             };
             js_template_inner: {
-                name: string;
-                default: {
+                regex: RegExp;
+                rules: ({
                     tag: string[];
-                };
+                    when: RegExp;
+                    goto?: undefined;
+                    pop?: undefined;
+                } | {
+                    goto: string;
+                    tag: string[];
+                    when: string;
+                    pop?: undefined;
+                } | {
+                    pop: number;
+                    tag: string[];
+                    when: string;
+                    goto?: undefined;
+                })[];
                 unmatched: {
                     tag: string[];
                 };
+            };
+            js_wrap: {
+                regex: RegExp;
                 rules: ({
-                    import: string[];
-                    when?: undefined;
-                    tag?: undefined;
+                    tag: string[];
+                    when: RegExp;
                     goto?: undefined;
                     pop?: undefined;
                 } | {
-                    when: string;
-                    tag: string[];
                     goto: string;
-                    import?: undefined;
+                    tag: string[];
+                    when: string;
                     pop?: undefined;
                 } | {
-                    when: string;
-                    tag: string[];
                     pop: number;
-                    import?: undefined;
+                    tag: string[];
+                    when: string;
                     goto?: undefined;
                 })[];
-            };
-            kv: {
-                name: string;
-                rules: {
-                    import: string[];
-                }[];
+                unmatched: {
+                    tag: string[];
+                };
             };
             jsignore: {
-                name: string;
+                regex: RegExp;
                 rules: {
-                    when: RegExp;
                     tag: string[];
+                    when: RegExp;
                 }[];
             };
-            string: {
-                name: string;
-                rules: {
-                    when: RegExp;
-                    tag: string[];
+            kv: {
+                regex: RegExp;
+                rules: ({
                     highlight: string;
-                }[];
-            };
-            string2: {
-                name: string;
-                rules: {
-                    when: RegExp;
                     tag: string[];
+                    when: RegExp;
+                } | {
+                    tag: string[];
+                    when: RegExp;
+                    highlight?: undefined;
+                } | {
                     highlight: string;
-                }[];
-            };
-            string3: {
-                name: string;
-                rules: {
-                    when: RegExp;
                     tag: string[];
+                    when: string;
+                })[];
+            };
+            l_arrow: {
+                regex: RegExp;
+                rules: {
                     highlight: string;
-                }[];
-            };
-            regex: {
-                name: string;
-                rules: {
-                    when: RegExp;
                     tag: string[];
-                    highlight: string;
-                }[];
-            };
-            integer: {
-                name: string;
-                rules: {
-                    when: RegExp;
-                    tag: string[];
-                    highlight: string;
-                }[];
-            };
-            word: {
-                name: string;
-                rules: {
-                    when: RegExp;
-                    tag: string[];
-                }[];
-            };
-            ws: {
-                name: string;
-                rules: {
-                    when: RegExp;
-                    tag: string[];
+                    when: string;
                 }[];
             };
             l_colon: {
-                name: string;
+                regex: RegExp;
                 rules: {
-                    when: string;
-                    tag: string[];
                     highlight: string;
-                }[];
-            };
-            l_scolon: {
-                name: string;
-                rules: {
-                    when: string;
                     tag: string[];
-                }[];
-            };
-            l_qmark: {
-                name: string;
-                rules: {
                     when: string;
-                    tag: string[];
-                }[];
-            };
-            l_plus: {
-                name: string;
-                rules: {
-                    when: string;
-                    tag: string[];
-                }[];
-            };
-            l_star: {
-                name: string;
-                rules: {
-                    when: string;
-                    tag: string[];
                 }[];
             };
             l_comma: {
-                name: string;
+                regex: RegExp;
                 rules: {
-                    when: string;
                     tag: string[];
-                }[];
-            };
-            l_pipe: {
-                name: string;
-                rules: {
                     when: string;
-                    tag: string[];
-                    highlight: string;
-                }[];
-            };
-            l_parenl: {
-                name: string;
-                rules: {
-                    when: string;
-                    tag: string[];
-                }[];
-            };
-            l_parenr: {
-                name: string;
-                rules: {
-                    when: string;
-                    tag: string[];
-                }[];
-            };
-            l_templatel: {
-                name: string;
-                rules: {
-                    when: string;
-                    tag: string[];
-                }[];
-            };
-            l_templater: {
-                name: string;
-                rules: {
-                    when: string;
-                    tag: string[];
-                }[];
-            };
-            l_arrow: {
-                name: string;
-                rules: {
-                    when: string;
-                    tag: string[];
-                    highlight: string;
-                }[];
-            };
-            l_dsign: {
-                name: string;
-                rules: {
-                    when: string;
-                    tag: string[];
                 }[];
             };
             l_dash: {
-                name: string;
+                regex: RegExp;
                 rules: {
+                    tag: string[];
                     when: string;
-                    tag: string[];
                 }[];
             };
-            comment: {
-                name: string;
+            l_dsign: {
+                regex: RegExp;
                 rules: {
-                    when: RegExp;
                     tag: string[];
-                    highlight: string;
+                    when: string;
                 }[];
             };
-            commentmulti: {
-                name: string;
+            l_parenl: {
+                regex: RegExp;
                 rules: {
-                    when: RegExp;
                     tag: string[];
+                    when: string;
+                }[];
+            };
+            l_parenr: {
+                regex: RegExp;
+                rules: {
+                    tag: string[];
+                    when: string;
+                }[];
+            };
+            l_pipe: {
+                regex: RegExp;
+                rules: {
                     highlight: string;
+                    tag: string[];
+                    when: string;
+                }[];
+            };
+            l_plus: {
+                regex: RegExp;
+                rules: {
+                    tag: string[];
+                    when: string;
+                }[];
+            };
+            l_qmark: {
+                regex: RegExp;
+                rules: {
+                    tag: string[];
+                    when: string;
+                }[];
+            };
+            l_scolon: {
+                regex: RegExp;
+                rules: {
+                    tag: string[];
+                    when: string;
+                }[];
+            };
+            l_star: {
+                regex: RegExp;
+                rules: {
+                    tag: string[];
+                    when: string;
+                }[];
+            };
+            lexer: {
+                regex: RegExp;
+                rules: ({
+                    tag: string[];
+                    when: RegExp;
+                    highlight?: undefined;
+                    set?: undefined;
+                } | {
+                    highlight: string;
+                    tag: string[];
+                    when: string;
+                    set?: undefined;
+                } | {
+                    set: string;
+                    tag: string[];
+                    when: string;
+                    highlight?: undefined;
+                })[];
+            };
+            lexer_inner: {
+                regex: RegExp;
+                rules: ({
+                    tag: string[];
+                    when: RegExp;
+                    highlight?: undefined;
+                    goto?: undefined;
+                    pop?: undefined;
+                } | {
+                    highlight: string;
+                    tag: string[];
+                    when: RegExp;
+                    goto?: undefined;
+                    pop?: undefined;
+                } | {
+                    tag: string[];
+                    when: string;
+                    highlight?: undefined;
+                    goto?: undefined;
+                    pop?: undefined;
+                } | {
+                    highlight: string;
+                    tag: string[];
+                    when: string;
+                    goto?: undefined;
+                    pop?: undefined;
+                } | {
+                    goto: string;
+                    tag: string[];
+                    when: string;
+                    highlight?: undefined;
+                    pop?: undefined;
+                } | {
+                    pop: number;
+                    tag: string[];
+                    when: string;
+                    highlight?: undefined;
+                    goto?: undefined;
+                })[];
+            };
+            regex: {
+                regex: RegExp;
+                rules: {
+                    highlight: string;
+                    tag: string[];
+                    when: RegExp;
+                }[];
+            };
+            start: {
+                regex: RegExp;
+                rules: ({
+                    highlight: string;
+                    tag: string[];
+                    when: RegExp;
+                    goto?: undefined;
+                } | {
+                    goto: string;
+                    tag: string[];
+                    when: string;
+                    highlight?: undefined;
+                } | {
+                    tag: string[];
+                    when: RegExp;
+                    highlight?: undefined;
+                    goto?: undefined;
+                } | {
+                    tag: string[];
+                    when: string;
+                    highlight?: undefined;
+                    goto?: undefined;
+                } | {
+                    goto: string;
+                    highlight: string;
+                    tag: string[];
+                    when: RegExp;
+                } | {
+                    highlight: string;
+                    tag: string[];
+                    when: string;
+                    goto?: undefined;
+                })[];
+            };
+            string: {
+                regex: RegExp;
+                rules: {
+                    highlight: string;
+                    tag: string[];
+                    when: RegExp;
+                }[];
+            };
+            word: {
+                regex: RegExp;
+                rules: {
+                    tag: string[];
+                    when: RegExp;
+                }[];
+            };
+            ws: {
+                regex: RegExp;
+                rules: {
+                    tag: string[];
+                    when: RegExp;
                 }[];
             };
         };

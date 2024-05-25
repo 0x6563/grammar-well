@@ -180,11 +180,11 @@ grammar {
 		| state_list => ( [{ states: $0 }] )
 
 	[state_list]
-		| state => ( data )
-		| state _ state_list => ( [$0].concat($2) )
+		| state => ( $0 )
+		| state _ state_list => ( Object.assign($2, $0) )
 
 	[state]
-		| T_SECTWORD _ state_definition => ( Object.assign({ name: $0 }, $2) )
+		| T_SECTWORD _ state_definition => ( { [$0]: $2 } )
 
 	[state_definition]
 		| state_config_list _ token_list => ( Object.assign($0, { rules: $2 }) )
