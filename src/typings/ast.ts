@@ -36,7 +36,7 @@ export interface ASTLexer {
 }
 export interface ASTLexerConfig {
     start?: string;
-    states: { [key: string]: (ASTLexerState | ASTLexerStateStructured) };
+    states: { name: string, state: (ASTLexerState | ASTLexerStateStructured) }[];
 };
 export interface ASTGrammarProduction {
     name: string;
@@ -96,7 +96,7 @@ export interface ASTLexerAnonymousStateStructured {
 
 export interface ASTLexerStateImportRule {
     import: string[];
-    
+
     pop?: number | 'all';
     inset?: number;
     goto?: string;

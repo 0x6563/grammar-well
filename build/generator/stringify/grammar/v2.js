@@ -97,8 +97,7 @@ export class V2GrammarString {
             body += this.formatKV({ start: directive.lexer.start }, 1);
         }
         if (directive.lexer.states) {
-            for (const name in directive.lexer.states) {
-                const state = directive.lexer.states[name];
+            for (const { state, name } of directive.lexer.states) {
                 if ('sections' in state) {
                     continue;
                 }

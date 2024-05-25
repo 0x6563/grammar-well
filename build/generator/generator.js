@@ -98,16 +98,17 @@ export class Generator {
         this.importLexerStates(directive.lexer.states);
     }
     importLexerStates(states) {
-        for (let name in states) {
-            const state = states[name];
-            this.importLexerState(name, state);
+        for (let state of states) {
+            this.importLexerState(state.name, state.state);
         }
     }
     importLexerState(name, state) {
         if ('sections' in state) {
             const states = this.buildLexerStructuredStates(name, state);
             this.state.addLexerState(this.aliasPrefix + name, { rules: [{ import: [`${name}$open`] }] });
-            this.importLexerStates(states);
+            for (let key in states) {
+                this.importLexerState(key, state[key]);
+            }
         }
         else {
             if (state.default && state.unmatched) {
@@ -124,7 +125,9 @@ export class Generator {
                     while (`${this.aliasPrefix}${name}$${i}` in this.state.lexer.states)
                         ++i;
                     const states = this.buildLexerStructuredStates(`${name}$${i}`, rule);
-                    this.importLexerStates(states);
+                    for (let key in states) {
+                        this.importLexerState(key, state[key]);
+                    }
                     rules.push({ import: `${name}$${i}$open` });
                     continue;
                 }

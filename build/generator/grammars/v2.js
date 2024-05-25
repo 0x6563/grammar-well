@@ -282,7 +282,7 @@ function GWLanguage() {
                     { name: "section_list", postprocess: ({ data }) => { return ([data[0]].concat(data[2])); }, symbols: ["section", "T_WS", "section_list"] }
                 ],
                 state: [
-                    { name: "state", postprocess: ({ data }) => { return ({ [data[0]]: data[2] }); }, symbols: ["T_SECTWORD", "_", "state_definition"] }
+                    { name: "state", postprocess: ({ data }) => { return ({ name: data[0], state: data[2] }); }, symbols: ["T_SECTWORD", "_", "state_definition"] }
                 ],
                 state_config: [
                     { name: "state_config", postprocess: ({ data }) => { return ({ [data[0]]: Object.assign(...data[4]) }); }, symbols: ["T_WORD", "_", { literal: ":" }, "_", "token_definition_list", "_", { literal: ";" }] }
@@ -297,8 +297,8 @@ function GWLanguage() {
                     { name: "state_definition", postprocess: ({ data }) => { return ({ sections: data[4] }); }, symbols: [{ literal: "sections" }, "_", { literal: "{" }, "_", "state_list", "_", { literal: "}" }] }
                 ],
                 state_list: [
-                    { name: "state_list", postprocess: ({ data }) => { return (data[0]); }, symbols: ["state"] },
-                    { name: "state_list", postprocess: ({ data }) => { return (Object.assign(data[2], data[0])); }, symbols: ["state", "_", "state_list"] }
+                    { name: "state_list", postprocess: ({ data }) => { return ([data[0]]); }, symbols: ["state"] },
+                    { name: "state_list", postprocess: ({ data }) => { return ([data[0]].concat(data[2])); }, symbols: ["state", "_", "state_list"] }
                 ],
                 string_list: [
                     { name: "string_list", postprocess: ({ data }) => { return ([data[0]]); }, symbols: ["T_STRING"] },

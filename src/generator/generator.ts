@@ -1,4 +1,4 @@
-import { ASTConfig, ASTDirectives, ASTGrammar, ASTGrammarProduction, ASTGrammarProductionRule, ASTGrammarSymbol, ASTGrammarSymbolGroup, ASTGrammarSymbolLiteral, ASTGrammarSymbolRepeat, ASTImport, ASTLexer, GeneratorContext, GeneratorGrammarProductionRule, GeneratorGrammarSymbol, GeneratorOptions, ImportResolver, GeneratorTemplateFormat, ASTLexerAnonymousStateStructured, ASTLexerStateStructured, ASTLexerState, ASTLexerStateMatchRule, ASTLexerStateImportRule } from "../typings";
+import { ASTConfig, ASTDirectives, ASTGrammar, ASTGrammarProduction, ASTGrammarProductionRule, ASTGrammarSymbol, ASTGrammarSymbolGroup, ASTGrammarSymbolLiteral, ASTGrammarSymbolRepeat, ASTImport, ASTLexer, GeneratorContext, GeneratorGrammarProductionRule, GeneratorGrammarSymbol, GeneratorOptions, ImportResolver, GeneratorTemplateFormat, ASTLexerAnonymousStateStructured, ASTLexerStateStructured, ASTLexerState, ASTLexerStateMatchRule, ASTLexerStateImportRule, ASTLexerConfig } from "../typings";
 
 import { Parser } from "../parser/parser";
 import Language from './grammars/v2';
@@ -105,17 +105,18 @@ export class Generator {
         this.importLexerStates(directive.lexer.states);
     }
 
-    private importLexerStates(states: { [key: string]: ASTLexerState | ASTLexerStateStructured }) {
-        for (let name in states) {
-            const state = states[name];
-            this.importLexerState(name, state);
+    private importLexerStates(states: ASTLexerConfig['states']) {
+        for (let state of states) {
+            this.importLexerState(state.name, state.state);
         }
     }
     private importLexerState(name: string, state: ASTLexerState | ASTLexerStateStructured) {
         if ('sections' in state) {
             const states = this.buildLexerStructuredStates(name, state);
             this.state.addLexerState(this.aliasPrefix + name, { rules: [{ import: [`${name}$open`] }] });
-            this.importLexerStates(states);
+            for (let key in states) {
+                this.importLexerState(key, state[key]);
+            }
         } else {
             if (state.default && state.unmatched) {
                 state.unmatched.type = typeof state.unmatched.type != 'undefined' ? state.unmatched.type : state.default?.type;
@@ -131,7 +132,9 @@ export class Generator {
                     while (`${this.aliasPrefix}${name}$${i}` in this.state.lexer.states)
                         ++i;
                     const states = this.buildLexerStructuredStates(`${name}$${i}`, rule);
-                    this.importLexerStates(states);
+                    for (let key in states) {
+                        this.importLexerState(key, state[key]);
+                    }
                     rules.push({ import: `${name}$${i}$open` });
                     continue;
                 } else {

@@ -641,7 +641,8 @@ declare function GWLanguage(): {
                 postprocess: ({ data }: {
                     data: any;
                 }) => {
-                    [x: number]: any;
+                    name: any;
+                    state: any;
                 };
                 symbols: string[];
             }[];
@@ -684,7 +685,7 @@ declare function GWLanguage(): {
                 name: string;
                 postprocess: ({ data }: {
                     data: any;
-                }) => any;
+                }) => any[];
                 symbols: string[];
             }[];
             string_list: {

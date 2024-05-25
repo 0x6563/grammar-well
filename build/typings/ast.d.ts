@@ -34,8 +34,9 @@ export interface ASTLexer {
 export interface ASTLexerConfig {
     start?: string;
     states: {
-        [key: string]: (ASTLexerState | ASTLexerStateStructured);
-    };
+        name: string;
+        state: (ASTLexerState | ASTLexerStateStructured);
+    }[];
 }
 export interface ASTGrammarProduction {
     name: string;

@@ -1,74 +1,66 @@
 lexer {
 	start: "start"
 
-	[commentmulti]
-		- when /\/\*.*\*\// tag "T_COMMENT" highlight "comment"
+	[start]
+		- import string, js, ws, comment, l_scolon, l_star
+		- when /lexer(?![a-zA-Z\d_])/ tag "T_WORD" highlight "type" goto lexer
+		- when /grammar(?![a-zA-Z\d_])/ tag "T_WORD" highlight "type" goto grammar
+		- when /config(?![a-zA-Z\d_])/ tag "T_WORD" highlight "type" goto config
+		- import kv
 
-	[comment]
-		- when /\/\/[^\n]*/ tag "T_COMMENT" highlight "comment"
+	[config]
+		- import ws, l_colon
+		- when "{{" tag "L_TEMPLATEL" set config_inner
 
-	[l_dash]
-		- when "-" tag "L_DASH"
+	[config_inner]
+		- import comment, kv
+		- when "}}" tag "L_TEMPLATER" pop
 
-	[l_dsign]
-		- when "$" tag "L_DSIGN"
+	[grammar]
+		- import ws, l_colon
+		- when "{{" tag "L_TEMPLATEL" set grammar_inner
 
-	[l_arrow]
-		- when "->" tag "L_ARROW" highlight "keyword"
+	[grammar_inner]
+		- import comment, js, js_template, ws, regex, l_qmark, l_plus, l_star, kv, l_colon, l_comma, l_pipe, l_parenl, l_parenr, l_arrow, l_dsign, l_dash
+		- when "}}" tag "L_TEMPLATER" pop
 
-	[l_templater]
-		- when "}}" tag "L_TEMPLATER"
+	[lexer]
+		- import ws, l_colon
+		- when "{{" tag "L_TEMPLATEL" set lexer_inner
 
-	[l_templatel]
-		- when "{{" tag "L_TEMPLATEL"
+	[lexer_inner]
+		- import ws, comment, regex, l_comma, l_arrow, l_dash, kv, js
+		- when "}}" tag "L_TEMPLATER" pop
 
-	[l_parenr]
-		- when ")" tag "L_PARENR"
+	[js]
+		- when "${" tag "L_JSL" goto js_wrap
 
-	[l_parenl]
-		- when "(" tag "L_PARENL"
+	[js_wrap]
+		default: tag "T_JSBODY";
+		unmatched: tag "T_JSBODY";
+		- import jsignore
+		- when "{" tag "T_JSBODY" goto js_literal
+		- when "}" tag "L_JSR" pop
 
-	[l_pipe]
-		- when "|" tag "L_PIPE" highlight "keyword"
+	[js_literal]
+		default: tag "T_JSBODY";
+		unmatched: tag "T_JSBODY";
+		- import jsignore
+		- when "{" tag "T_JSBODY" goto js_literal
+		- when "}" tag "T_JSBODY" pop
 
-	[l_comma]
-		- when "," tag "L_COMMA"
+	[js_template]
+		- when "{{" tag "L_TEMPLATEL" goto js_template_inner
 
-	[l_star]
-		- when "*" tag "L_STAR"
+	[js_template_inner]
+		default: tag "T_JSBODY";
+		unmatched: tag "T_JSBODY";
+		- import jsignore
+		- when "{" tag "T_JSBODY" goto js_literal
+		- when "}}" tag "L_TEMPLATER" pop
 
-	[l_plus]
-		- when "+" tag "L_PLUS"
-
-	[l_qmark]
-		- when "?" tag "L_QMARK"
-
-	[l_scolon]
-		- when ";" tag "L_SCOLON"
-
-	[l_colon]
-		- when ":" tag "L_COLON" highlight "keyword"
-
-	[ws]
-		- when /\s+/ tag "T_WS"
-
-	[word]
-		- when /[a-zA-Z_][a-zA-Z_\d]*/ tag "T_WORD"
-
-	[integer]
-		- when /\d+/ tag "T_INTEGER" highlight "number"
-
-	[regex]
-		- when /\/(?:[^\/\\\r\n]|\\.)+\// tag "T_REGEX" highlight "regexp"
-
-	[string3]
-		- when /`(?:[^`\\]|\\.)*`/ tag "T_STRING" highlight "string"
-
-	[string2]
-		- when /'(?:[^'\\\r\n]|\\.)*'/ tag "T_STRING" highlight "string"
-
-	[string]
-		- when /"(?:[^"\\\r\n]|\\.)*"/ tag "T_STRING" highlight "string"
+	[kv]
+		- import string, ws, word, l_colon, integer
 
 	[jsignore]
 		- when /"(?:[^"\\\r\n]|\\.)*"/ tag "T_JSBODY"
@@ -78,66 +70,74 @@ lexer {
 		- when /\/\/[^\n]*/ tag "T_JSBODY"
 		- when /\/\*.*\*\// tag "T_JSBODY"
 
-	[kv]
-		- import string, ws, word, l_colon, integer
+	[string]
+		- when /"(?:[^"\\\r\n]|\\.)*"/ tag "T_STRING" highlight "string"
 
-	[js_template_inner]
-		default: tag "T_JSBODY";
-		unmatched: tag "T_JSBODY";
-		- import jsignore
-		- when "{" tag "T_JSBODY" goto js_literal
-		- when "}}" tag "L_TEMPLATER" pop
+	[string2]
+		- when /'(?:[^'\\\r\n]|\\.)*'/ tag "T_STRING" highlight "string"
 
-	[js_template]
-		- when "{{" tag "L_TEMPLATEL" goto js_template_inner
+	[string3]
+		- when /`(?:[^`\\]|\\.)*`/ tag "T_STRING" highlight "string"
 
-	[js_literal]
-		default: tag "T_JSBODY";
-		unmatched: tag "T_JSBODY";
-		- import jsignore
-		- when "{" tag "T_JSBODY" goto js_literal
-		- when "}" tag "T_JSBODY" pop
+	[regex]
+		- when /\/(?:[^\/\\\r\n]|\\.)+\// tag "T_REGEX" highlight "regexp"
 
-	[js_wrap]
-		default: tag "T_JSBODY";
-		unmatched: tag "T_JSBODY";
-		- import jsignore
-		- when "{" tag "T_JSBODY" goto js_literal
-		- when "}" tag "L_JSR" pop
+	[integer]
+		- when /\d+/ tag "T_INTEGER" highlight "number"
 
-	[js]
-		- when "${" tag "L_JSL" goto js_wrap
+	[word]
+		- when /[a-zA-Z_][a-zA-Z_\d]*/ tag "T_WORD"
 
-	[lexer_inner]
-		- import ws, comment, regex, l_comma, l_arrow, l_dash, kv, js
-		- when "}}" tag "L_TEMPLATER" pop
+	[ws]
+		- when /\s+/ tag "T_WS"
 
-	[lexer]
-		- import ws, l_colon
-		- when "{{" tag "L_TEMPLATEL" set lexer_inner
+	[l_colon]
+		- when ":" tag "L_COLON" highlight "keyword"
 
-	[grammar_inner]
-		- import comment, js, js_template, ws, regex, l_qmark, l_plus, l_star, kv, l_colon, l_comma, l_pipe, l_parenl, l_parenr, l_arrow, l_dsign, l_dash
-		- when "}}" tag "L_TEMPLATER" pop
+	[l_scolon]
+		- when ";" tag "L_SCOLON"
 
-	[grammar]
-		- import ws, l_colon
-		- when "{{" tag "L_TEMPLATEL" set grammar_inner
+	[l_qmark]
+		- when "?" tag "L_QMARK"
 
-	[config_inner]
-		- import comment, kv
-		- when "}}" tag "L_TEMPLATER" pop
+	[l_plus]
+		- when "+" tag "L_PLUS"
 
-	[config]
-		- import ws, l_colon
-		- when "{{" tag "L_TEMPLATEL" set config_inner
+	[l_star]
+		- when "*" tag "L_STAR"
 
-	[start]
-		- import string, js, ws, comment, l_scolon, l_star
-		- when /lexer(?![a-zA-Z\d_])/ tag "T_WORD" highlight "type" goto lexer
-		- when /grammar(?![a-zA-Z\d_])/ tag "T_WORD" highlight "type" goto grammar
-		- when /config(?![a-zA-Z\d_])/ tag "T_WORD" highlight "type" goto config
-		- import kv
+	[l_comma]
+		- when "," tag "L_COMMA"
+
+	[l_pipe]
+		- when "|" tag "L_PIPE" highlight "keyword"
+
+	[l_parenl]
+		- when "(" tag "L_PARENL"
+
+	[l_parenr]
+		- when ")" tag "L_PARENR"
+
+	[l_templatel]
+		- when "{{" tag "L_TEMPLATEL"
+
+	[l_templater]
+		- when "}}" tag "L_TEMPLATER"
+
+	[l_arrow]
+		- when "->" tag "L_ARROW" highlight "keyword"
+
+	[l_dsign]
+		- when "$" tag "L_DSIGN"
+
+	[l_dash]
+		- when "-" tag "L_DASH"
+
+	[comment]
+		- when /\/\/[^\n]*/ tag "T_COMMENT" highlight "comment"
+
+	[commentmulti]
+		- when /\/\*.*\*\// tag "T_COMMENT" highlight "comment"
 
 }
 
