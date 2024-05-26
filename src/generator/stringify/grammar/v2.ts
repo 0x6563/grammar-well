@@ -1,4 +1,4 @@
-import { ASTConfig, ASTDirectives, ASTGrammar, ASTGrammarProduction, ASTGrammarSymbol, ASTImport, ASTLexer, ASTLexerStateImportRule, ASTLexerStateMatchRule, ASTLexerStateNonMatchRule, GeneratorGrammarSymbol } from "../../../typings";
+import { ASTConfig, ASTDirectives, ASTGrammar, ASTGrammarProduction, ASTGrammarSymbol, ASTImport, ASTLexer, ASTLexerState, ASTLexerStateImportRule, ASTLexerStateMatchRule, ASTLexerStateNonMatchRule, GeneratorGrammarSymbol } from "../../../typings";
 
 export class V2GrammarString {
     source: string = '';
@@ -108,24 +108,43 @@ export class V2GrammarString {
         if (directive.lexer.states) {
             for (const { state, name } of directive.lexer.states) {
                 if ('sections' in state) {
-                    continue;
-                }
-                body += '\n' + this.indent(1, `[${name}]\n`);
-                if (state.default) {
-                    body += this.indent(2, 'default: ' + this.formatLexerStateRule(state.default) + ';\n');
-                }
-                if (state.unmatched) {
-                    body += this.indent(2, 'unmatched: ' + this.formatLexerStateRule(state.unmatched) + ';\n');
-                }
-                for (const rule of state.rules) {
-                    if ('sections' in rule)
-                        continue;
-                    body += this.indent(2, '- ' + this.formatLexerStateRule(rule) + '\n');
+                    body += '\n' + this.indent(1, `[${name}] sections {\n`);
+                    const stateOpen = state.sections.find(v => v.name == 'opener');
+                    const stateBody = state.sections.find(v => v.name == 'body');
+                    const stateClose = state.sections.find(v => v.name == 'closer');
+                    if (stateOpen) {
+                        body += this.formatLexerState('opener', stateOpen.state, 2);
+                    }
+                    if (stateBody) {
+                        body += this.formatLexerState('body', stateBody.state, 2);
+                    }
+                    if (stateClose) {
+                        body += this.formatLexerState('closer', stateClose.state, 2);
+                    }
+                    body += '\n' + this.indent(1, `}\n`);
+                } else {
+                    body += this.formatLexerState(name, state, 1)
                 }
             }
         }
 
         this.appendSection('lexer', body);
+    }
+
+    formatLexerState(name: string, state: ASTLexerState, depth: number = 0) {
+        let body = '\n' + this.indent(depth, `[${name}]\n`);
+        if (state.default) {
+            body += this.indent(depth + 1, 'default: ' + this.formatLexerStateRule(state.default) + ';\n');
+        }
+        if (state.unmatched) {
+            body += this.indent(depth + 1, 'unmatched: ' + this.formatLexerStateRule(state.unmatched) + ';\n');
+        }
+        for (const rule of state.rules) {
+            if ('sections' in rule)
+                continue;
+            body += this.indent(depth + 1, '- ' + this.formatLexerStateRule(rule) + '\n');
+        }
+        return body;
     }
 
     formatLexerStateRule(rule: ASTLexerStateMatchRule | ASTLexerStateNonMatchRule | ASTLexerStateImportRule) {

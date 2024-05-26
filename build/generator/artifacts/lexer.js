@@ -22,7 +22,6 @@ export class LexerArtifact {
         for (const key in states) {
             const state = states[key];
             map[key] = CommonGenerator.JSON({
-                default: state.default ? this.lexerConfigStateRule(state.default) : null,
                 unmatched: state.unmatched ? this.lexerConfigStateRule(state.unmatched) : null,
                 rules: this.lexerConfigStateRules(state.rules, depth + 2),
                 regex: CompileRegExp(key, state)
@@ -84,10 +83,10 @@ export class LexerArtifact {
             }
             else {
                 rules.push(rule);
-                if ("set" in rule && !this.resolving.has(rule.set)) {
+                if (rule.set && !this.resolving.has(rule.set)) {
                     this.resolveRuleImports(rule.set, new Set());
                 }
-                if ("goto" in rule && !this.resolving.has(rule.goto)) {
+                if (rule.goto && !this.resolving.has(rule.goto)) {
                     this.resolveRuleImports(rule.goto, new Set());
                 }
             }
@@ -197,7 +196,6 @@ class RegexLib {
             throw new Error('Not a pattern: ' + search);
         }
         catch (error) {
-            console.log(search);
             throw error;
         }
     }

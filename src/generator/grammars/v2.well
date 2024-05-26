@@ -6,7 +6,7 @@ lexer {
 		- when /head(?![a-zA-Z\d_])/ tag "T_WORD" highlight "tag" goto js_body
 		- when /body(?![a-zA-Z\d_])/ tag "T_WORD" highlight "tag" goto js_body
 		- when /lexer(?![a-zA-Z\d_])/ tag "T_WORD" highlight "tag" goto lexer
-		- when /grammar(?![a-zA-Z\d_])/ tag "T_WORD" highlight "tag" goto grammar
+		- import grammar
 		- when /config(?![a-zA-Z\d_])/ tag "T_WORD" highlight "tag" goto config
 		- import kv
 
@@ -18,13 +18,19 @@ lexer {
 		- import comment, kv
 		- when "}" tag "CBRACKET_R" pop
 
-	[grammar]
-		- import ws
-		- when "{" tag "CBRACKET_L" set grammar_inner
+	[grammar] sections {
 
-	[grammar_inner]
-		- import comment, section_word, js_template, ws, regex, l_qmark, l_plus, l_star, kv, l_colon, l_comma, l_pipe, l_parenl, l_parenr, l_arrow, l_dsign, l_dash
-		- when "}" tag "CBRACKET_R" pop
+		[opener]
+			- before /grammar(?![a-zA-Z\d_])\s*{/
+
+		[body]
+			- when "{" tag "CBRACKET_L"
+			- import comment, section_word, js_template, ws, regex, l_qmark, l_plus, l_star, kv, l_colon, l_comma, l_pipe, l_parenl, l_parenr, l_arrow, l_dsign, l_dash
+
+		[closer]
+			- when "}" tag "CBRACKET_R"
+
+	}
 
 	[lexer]
 		- import ws

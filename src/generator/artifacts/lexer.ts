@@ -1,4 +1,4 @@
-import { ASTGrammarSymbolRegex, ASTLexerAnonymousStateStructured, ASTLexerState, ASTLexerStateImportRule, ASTLexerStateMatchRule, ASTLexerStateNonMatchRule, Dictionary, GeneratorLexerConfig, GeneratorLexerState } from "../../typings";
+import { ASTGrammarSymbolRegex, ASTLexerState, ASTLexerStateImportRule, ASTLexerStateMatchRule, ASTLexerStateNonMatchRule, Dictionary, GeneratorLexerConfig, GeneratorLexerState } from "../../typings";
 import { CommonGenerator } from "../stringify/common";
 
 export class LexerArtifact {
@@ -20,13 +20,12 @@ export class LexerArtifact {
         }, depth);
     }
 
-    private lexerConfigStates(states: Dictionary<ASTLexerState>, depth: number) {
+    private lexerConfigStates(states: Dictionary<GeneratorLexerState>, depth: number) {
         this.resolveStates(this.lexer.start);
         const map = {};
         for (const key in states) {
             const state = states[key];
             map[key] = CommonGenerator.JSON({
-                default: state.default ? this.lexerConfigStateRule(state.default) : null,
                 unmatched: state.unmatched ? this.lexerConfigStateRule(state.unmatched) : null,
                 rules: this.lexerConfigStateRules(state.rules, depth + 2),
                 regex: CompileRegExp(key, state as unknown as any)
@@ -36,7 +35,7 @@ export class LexerArtifact {
         return CommonGenerator.JSON(map, depth);
     }
 
-    private lexerConfigStateRules(rules: (ASTLexerStateImportRule | ASTLexerStateMatchRule | ASTLexerAnonymousStateStructured)[], depth: number) {
+    private lexerConfigStateRules(rules: (ASTLexerStateImportRule | ASTLexerStateMatchRule)[], depth: number) {
         const ary = rules.map(rule => {
             if ('import' in rule)
                 return CommonGenerator.JSON({ import: JSON.stringify(rule.import) }, -1)
@@ -94,10 +93,10 @@ export class LexerArtifact {
                 }
             } else {
                 rules.push(rule);
-                if ("set" in rule && !this.resolving.has(rule.set)) {
+                if (rule.set && !this.resolving.has(rule.set)) {
                     this.resolveRuleImports(rule.set, new Set());
                 }
-                if ("goto" in rule && !this.resolving.has(rule.goto)) {
+                if (rule.goto && !this.resolving.has(rule.goto)) {
                     this.resolveRuleImports(rule.goto, new Set());
                 }
             }
@@ -221,7 +220,6 @@ class RegexLib {
             }
             throw new Error('Not a pattern: ' + search)
         } catch (error) {
-            console.log(search);
             throw error;
         }
     }

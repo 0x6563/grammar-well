@@ -885,19 +885,21 @@ declare function GWLanguage(): {
             };
             grammar: {
                 regex: RegExp;
-                rules: ({
-                    tag: string[];
+                rules: {
+                    before: boolean;
+                    goto: string;
                     when: RegExp;
-                    set?: undefined;
-                } | {
-                    set: string;
-                    tag: string[];
-                    when: string;
-                })[];
+                }[];
             };
-            grammar_inner: {
+            grammar$body: {
                 regex: RegExp;
                 rules: ({
+                    tag: string[];
+                    when: string;
+                    highlight?: undefined;
+                    goto?: undefined;
+                    pop?: undefined;
+                } | {
                     highlight: string;
                     tag: string[];
                     when: RegExp;
@@ -916,12 +918,6 @@ declare function GWLanguage(): {
                     goto?: undefined;
                     pop?: undefined;
                 } | {
-                    tag: string[];
-                    when: string;
-                    highlight?: undefined;
-                    goto?: undefined;
-                    pop?: undefined;
-                } | {
                     highlight: string;
                     tag: string[];
                     when: string;
@@ -934,6 +930,22 @@ declare function GWLanguage(): {
                     highlight?: undefined;
                     goto?: undefined;
                 })[];
+            };
+            grammar$closer: {
+                regex: RegExp;
+                rules: {
+                    pop: number;
+                    tag: string[];
+                    when: string;
+                }[];
+            };
+            grammar$opener: {
+                regex: RegExp;
+                rules: {
+                    before: boolean;
+                    goto: string;
+                    when: RegExp;
+                }[];
             };
             integer: {
                 regex: RegExp;
@@ -1222,26 +1234,37 @@ declare function GWLanguage(): {
                     tag: string[];
                     when: RegExp;
                     goto?: undefined;
+                    before?: undefined;
                 } | {
                     tag: string[];
                     when: RegExp;
                     highlight?: undefined;
                     goto?: undefined;
+                    before?: undefined;
                 } | {
                     tag: string[];
                     when: string;
                     highlight?: undefined;
                     goto?: undefined;
+                    before?: undefined;
                 } | {
                     goto: string;
                     highlight: string;
                     tag: string[];
                     when: RegExp;
+                    before?: undefined;
+                } | {
+                    before: boolean;
+                    goto: string;
+                    when: RegExp;
+                    highlight?: undefined;
+                    tag?: undefined;
                 } | {
                     highlight: string;
                     tag: string[];
                     when: string;
                     goto?: undefined;
+                    before?: undefined;
                 })[];
             };
             string: {

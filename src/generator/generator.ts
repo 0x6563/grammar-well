@@ -1,4 +1,4 @@
-import { ASTConfig, ASTDirectives, ASTGrammar, ASTGrammarProduction, ASTGrammarProductionRule, ASTGrammarSymbol, ASTGrammarSymbolGroup, ASTGrammarSymbolLiteral, ASTGrammarSymbolRepeat, ASTImport, ASTLexer, GeneratorContext, GeneratorGrammarProductionRule, GeneratorGrammarSymbol, GeneratorOptions, ImportResolver, GeneratorTemplateFormat, ASTLexerAnonymousStateStructured, ASTLexerStateStructured, ASTLexerState, ASTLexerStateMatchRule, ASTLexerStateImportRule, ASTLexerConfig } from "../typings";
+import { ASTConfig, ASTDirectives, ASTGrammar, ASTGrammarProduction, ASTGrammarProductionRule, ASTGrammarSymbol, ASTGrammarSymbolGroup, ASTGrammarSymbolLiteral, ASTGrammarSymbolRepeat, ASTImport, ASTLexer, ASTLexerConfig, ASTLexerState, ASTLexerStateImportRule, ASTLexerStateMatchRule, ASTLexerStateStructured, GeneratorContext, GeneratorGrammarProductionRule, GeneratorGrammarSymbol, GeneratorOptions, GeneratorTemplateFormat, ImportResolver } from "../typings";
 
 import { Parser } from "../parser/parser";
 import Language from './grammars/v2';
@@ -112,8 +112,8 @@ export class Generator {
     }
     private importLexerState(name: string, state: ASTLexerState | ASTLexerStateStructured) {
         if ('sections' in state) {
+            this.state.addLexerState(this.aliasPrefix + name, { rules: [{ import: [`${name}$opener`] }] });
             const states = this.buildLexerStructuredStates(name, state);
-            this.state.addLexerState(this.aliasPrefix + name, { rules: [{ import: [`${name}$open`] }] });
             this.importLexerStates(states);
         } else {
             if (state.default && state.unmatched) {
@@ -131,7 +131,7 @@ export class Generator {
                         ++i;
                     const states = this.buildLexerStructuredStates(`${name}$${i}`, rule);
                     this.importLexerStates(states);
-                    rules.push({ import: `${name}$${i}$open` });
+                    rules.push({ import: `${name}$${i}$opener` });
                     continue;
                 } else {
                     if (this.aliasPrefix) {
@@ -159,18 +159,21 @@ export class Generator {
         }
     }
 
-    private buildLexerStructuredStates(name: string, sections: ASTLexerStateStructured): ASTLexerConfig['states'] {
-        const open: (ASTLexerStateMatchRule | ASTLexerStateImportRule)[] = [];
-        const body: (ASTLexerStateMatchRule | ASTLexerStateImportRule | ASTLexerStateStructured)[] = [];
-        const close: (ASTLexerStateMatchRule | ASTLexerStateImportRule)[] = [];
+    private buildLexerStructuredStates(name: string, rule: ASTLexerStateStructured): ASTLexerConfig['states'] {
+        const openRules: (ASTLexerStateMatchRule | ASTLexerStateImportRule)[] = [];
+        const bodyRules: (ASTLexerStateMatchRule | ASTLexerStateImportRule | ASTLexerStateStructured)[] = [];
+        const closeRules: (ASTLexerStateMatchRule | ASTLexerStateImportRule)[] = [];
+        const open = rule.sections.find(v => v.name == 'opener');
+        const body = rule.sections.find(v => v.name == 'body');
+        const close = rule.sections.find(v => v.name == 'closer');
 
-        for (const r of sections.sections?.body?.rules) {
-            body.push(r);
+        for (const r of body?.state?.rules) {
+            bodyRules.push(r);
         }
 
-        for (const r of sections.sections?.close?.rules) {
+        for (const r of close?.state?.rules) {
             if ('when' in r) {
-                close.push({
+                closeRules.push({
                     when: r.when,
                     type: r.type,
                     tag: r.tag,
@@ -185,7 +188,7 @@ export class Generator {
                 });
             }
             if ('import' in r) {
-                close.push({
+                closeRules.push({
                     import: r.import,
                     set: r.set,
                     pop: r.set ? undefined : 1
@@ -193,14 +196,14 @@ export class Generator {
             }
         }
 
-        if (close.length)
-            body.push({ import: [`${name}$close`] })
+        if (closeRules.length)
+            bodyRules.push({ import: [`${name}$closer`] })
 
-        const target = body.length ? 'body' : 'close';
+        const target = bodyRules.length ? 'body' : 'closer';
 
-        for (const r of sections.sections?.open?.rules) {
+        for (const r of open?.state?.rules) {
             if ('when' in r) {
-                open.push({
+                openRules.push({
                     when: r.when,
                     type: r.type,
                     tag: r.tag,
@@ -215,7 +218,7 @@ export class Generator {
             }
 
             if ('import' in r) {
-                open.push({
+                openRules.push({
                     import: r.import,
                     goto: `${name}$${target}`
                 })
@@ -224,25 +227,25 @@ export class Generator {
 
         return [
             {
-                name: `${name}$open`,
+                name: `${name}$opener`,
                 state: {
-                    default: sections.sections.open.default,
-                    rules: open
+                    default: open.state.default,
+                    rules: openRules
                 }
             },
             {
                 name: `${name}$body`,
                 state: {
-                    default: sections.sections.body.default,
-                    unmatched: sections.sections.body.unmatched,
-                    rules: body
+                    default: body.state.default,
+                    unmatched: body.state.unmatched,
+                    rules: bodyRules
                 }
             },
             {
-                name: `${name}$close`,
+                name: `${name}$closer`,
                 state: {
-                    default: sections.sections.close.default,
-                    rules: close
+                    default: close.state.default,
+                    rules: closeRules
                 }
             }
         ]

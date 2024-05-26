@@ -373,15 +373,15 @@ function GWLanguage() {
                     ]
                 },
                 grammar: {
-                    regex: /(?:(?:(\s+))|(?:((?:\{))))/ym,
+                    regex: /(?:(?:(grammar(?![a-zA-Z\d_])\s*{)))/ym,
                     rules: [
-                        { tag: ["T_WS"], when: /\s+/ },
-                        { set: "grammar_inner", tag: ["CBRACKET_L"], when: "{" }
+                        { before: true, goto: "grammar$body", when: /grammar(?![a-zA-Z\d_])\s*{/ }
                     ]
                 },
-                grammar_inner: {
-                    regex: /(?:(?:(\/\/[^\n]*))|(?:(\[\s*[a-zA-Z_][a-zA-Z_\d]*\s*\]))|(?:((?:=>)))|(?:(\s+))|(?:(\/(?:[^\/\\\r\n]|\\.)+\/))|(?:((?:\?)))|(?:((?:\+)))|(?:((?:\*)))|(?:("(?:[^"\\\r\n]|\\.)*"))|(?:([a-zA-Z_][a-zA-Z_\d]*))|(?:((?::)))|(?:(\d+))|(?:((?:;)))|(?:((?:,)))|(?:((?:\|)))|(?:((?:\()))|(?:((?:\))))|(?:((?:\->)))|(?:((?:\$)))|(?:((?:\-)))|(?:((?:\}))))/ym,
+                grammar$body: {
+                    regex: /(?:(?:((?:\{)))|(?:(\/\/[^\n]*))|(?:(\[\s*[a-zA-Z_][a-zA-Z_\d]*\s*\]))|(?:((?:=>)))|(?:(\s+))|(?:(\/(?:[^\/\\\r\n]|\\.)+\/))|(?:((?:\?)))|(?:((?:\+)))|(?:((?:\*)))|(?:("(?:[^"\\\r\n]|\\.)*"))|(?:([a-zA-Z_][a-zA-Z_\d]*))|(?:((?::)))|(?:(\d+))|(?:((?:;)))|(?:((?:,)))|(?:((?:\|)))|(?:((?:\()))|(?:((?:\))))|(?:((?:\->)))|(?:((?:\$)))|(?:((?:\-)))|(?:((?:\}))))/ym,
                     rules: [
+                        { tag: ["CBRACKET_L"], when: "{" },
                         { highlight: "comment", tag: ["T_COMMENT"], when: /\/\/[^\n]*/ },
                         { highlight: "type.identifier", tag: ["T_SECTWORD"], when: /\[\s*[a-zA-Z_][a-zA-Z_\d]*\s*\]/ },
                         { goto: "js_template_inner", highlight: "annotation", when: "=>" },
@@ -403,6 +403,18 @@ function GWLanguage() {
                         { tag: ["L_DSIGN"], when: "$" },
                         { tag: ["L_DASH"], when: "-" },
                         { pop: 1, tag: ["CBRACKET_R"], when: "}" }
+                    ]
+                },
+                grammar$closer: {
+                    regex: /(?:(?:((?:\}))))/ym,
+                    rules: [
+                        { pop: 1, tag: ["CBRACKET_R"], when: "}" }
+                    ]
+                },
+                grammar$opener: {
+                    regex: /(?:(?:(grammar(?![a-zA-Z\d_])\s*{)))/ym,
+                    rules: [
+                        { before: true, goto: "grammar$body", when: /grammar(?![a-zA-Z\d_])\s*{/ }
                     ]
                 },
                 integer: {
@@ -601,7 +613,7 @@ function GWLanguage() {
                     ]
                 },
                 start: {
-                    regex: /(?:(?:("(?:[^"\\\r\n]|\\.)*"))|(?:(\s+))|(?:(\/\/[^\n]*))|(?:((?:\*)))|(?:(head(?![a-zA-Z\d_])))|(?:(body(?![a-zA-Z\d_])))|(?:(lexer(?![a-zA-Z\d_])))|(?:(grammar(?![a-zA-Z\d_])))|(?:(config(?![a-zA-Z\d_])))|(?:([a-zA-Z_][a-zA-Z_\d]*))|(?:((?::)))|(?:(\d+))|(?:((?:;))))/ym,
+                    regex: /(?:(?:("(?:[^"\\\r\n]|\\.)*"))|(?:(\s+))|(?:(\/\/[^\n]*))|(?:((?:\*)))|(?:(head(?![a-zA-Z\d_])))|(?:(body(?![a-zA-Z\d_])))|(?:(lexer(?![a-zA-Z\d_])))|(?:(grammar(?![a-zA-Z\d_])\s*{))|(?:(config(?![a-zA-Z\d_])))|(?:([a-zA-Z_][a-zA-Z_\d]*))|(?:((?::)))|(?:(\d+))|(?:((?:;))))/ym,
                     rules: [
                         { highlight: "string", tag: ["T_STRING"], when: /"(?:[^"\\\r\n]|\\.)*"/ },
                         { tag: ["T_WS"], when: /\s+/ },
@@ -610,7 +622,7 @@ function GWLanguage() {
                         { goto: "js_body", highlight: "tag", tag: ["T_WORD"], when: /head(?![a-zA-Z\d_])/ },
                         { goto: "js_body", highlight: "tag", tag: ["T_WORD"], when: /body(?![a-zA-Z\d_])/ },
                         { goto: "lexer", highlight: "tag", tag: ["T_WORD"], when: /lexer(?![a-zA-Z\d_])/ },
-                        { goto: "grammar", highlight: "tag", tag: ["T_WORD"], when: /grammar(?![a-zA-Z\d_])/ },
+                        { before: true, goto: "grammar$body", when: /grammar(?![a-zA-Z\d_])\s*{/ },
                         { goto: "config", highlight: "tag", tag: ["T_WORD"], when: /config(?![a-zA-Z\d_])/ },
                         { tag: ["T_WORD"], when: /[a-zA-Z_][a-zA-Z_\d]*/ },
                         { highlight: "keyword", tag: ["L_COLON"], when: ":" },

@@ -76,17 +76,13 @@ export type ASTDirectives = (ASTJavaScriptSection | ASTImport | ASTConfig | ASTG
 export interface ASTLexerState {
     unmatched?: ASTLexerStateNonMatchRule;
     default?: ASTLexerStateMatchRule;
-    rules: (ASTLexerStateImportRule | ASTLexerStateMatchRule | ASTLexerAnonymousStateStructured)[];
+    rules: (ASTLexerStateImportRule | ASTLexerStateMatchRule | ASTLexerStateStructured)[];
 }
 export interface ASTLexerStateStructured {
     sections: {
-        [key: string]: ASTLexerState;
-    };
-}
-export interface ASTLexerAnonymousStateStructured {
-    sections: {
-        [key: string]: ASTLexerState;
-    };
+        name: string;
+        state: (ASTLexerState);
+    }[];
 }
 export interface ASTLexerStateImportRule {
     import: string[];
@@ -124,3 +120,7 @@ export interface ASTLexerStateNonMatchRule {
     goto?: string;
     set?: string;
 }
+export type StateList = {
+    name: string;
+    state: (ASTLexerState | ASTLexerStateStructured);
+}[];

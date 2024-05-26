@@ -1,4 +1,4 @@
-import { ASTConfig, ASTDirectives, ASTGrammar, ASTGrammarProduction, ASTGrammarSymbol, ASTImport, ASTLexer, ASTLexerStateImportRule, ASTLexerStateMatchRule, ASTLexerStateNonMatchRule, GeneratorGrammarSymbol } from "../../../typings";
+import { ASTConfig, ASTDirectives, ASTGrammar, ASTGrammarProduction, ASTGrammarSymbol, ASTImport, ASTLexer, ASTLexerState, ASTLexerStateImportRule, ASTLexerStateMatchRule, ASTLexerStateNonMatchRule, GeneratorGrammarSymbol } from "../../../typings";
 export declare class V2GrammarString {
     source: string;
     append(directives: ASTDirectives | (ASTDirectives[])): void;
@@ -10,6 +10,7 @@ export declare class V2GrammarString {
     formatSymbol(exp: ASTGrammarSymbol | GeneratorGrammarSymbol | string): any;
     formatPostProcess(postProcess: ASTGrammarProduction['postprocess']): string;
     appendLexerDirective(directive: ASTLexer): void;
+    formatLexerState(name: string, state: ASTLexerState, depth?: number): string;
     formatLexerStateRule(rule: ASTLexerStateMatchRule | ASTLexerStateNonMatchRule | ASTLexerStateImportRule): string;
     formatWhen(when: string | {
         regex: string;

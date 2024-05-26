@@ -104,8 +104,8 @@ export class Generator {
     }
     importLexerState(name, state) {
         if ('sections' in state) {
+            this.state.addLexerState(this.aliasPrefix + name, { rules: [{ import: [`${name}$opener`] }] });
             const states = this.buildLexerStructuredStates(name, state);
-            this.state.addLexerState(this.aliasPrefix + name, { rules: [{ import: [`${name}$open`] }] });
             this.importLexerStates(states);
         }
         else {
@@ -124,7 +124,7 @@ export class Generator {
                         ++i;
                     const states = this.buildLexerStructuredStates(`${name}$${i}`, rule);
                     this.importLexerStates(states);
-                    rules.push({ import: `${name}$${i}$open` });
+                    rules.push({ import: `${name}$${i}$opener` });
                     continue;
                 }
                 else {
@@ -152,16 +152,19 @@ export class Generator {
             this.state.addLexerState(this.aliasPrefix + name, { ...state, rules });
         }
     }
-    buildLexerStructuredStates(name, sections) {
-        const open = [];
-        const body = [];
-        const close = [];
-        for (const r of sections.sections?.body?.rules) {
-            body.push(r);
+    buildLexerStructuredStates(name, rule) {
+        const openRules = [];
+        const bodyRules = [];
+        const closeRules = [];
+        const open = rule.sections.find(v => v.name == 'opener');
+        const body = rule.sections.find(v => v.name == 'body');
+        const close = rule.sections.find(v => v.name == 'closer');
+        for (const r of body?.state?.rules) {
+            bodyRules.push(r);
         }
-        for (const r of sections.sections?.close?.rules) {
+        for (const r of close?.state?.rules) {
             if ('when' in r) {
-                close.push({
+                closeRules.push({
                     when: r.when,
                     type: r.type,
                     tag: r.tag,
@@ -176,19 +179,19 @@ export class Generator {
                 });
             }
             if ('import' in r) {
-                close.push({
+                closeRules.push({
                     import: r.import,
                     set: r.set,
                     pop: r.set ? undefined : 1
                 });
             }
         }
-        if (close.length)
-            body.push({ import: [`${name}$close`] });
-        const target = body.length ? 'body' : 'close';
-        for (const r of sections.sections?.open?.rules) {
+        if (closeRules.length)
+            bodyRules.push({ import: [`${name}$closer`] });
+        const target = bodyRules.length ? 'body' : 'closer';
+        for (const r of open?.state?.rules) {
             if ('when' in r) {
-                open.push({
+                openRules.push({
                     when: r.when,
                     type: r.type,
                     tag: r.tag,
@@ -202,7 +205,7 @@ export class Generator {
                 });
             }
             if ('import' in r) {
-                open.push({
+                openRules.push({
                     import: r.import,
                     goto: `${name}$${target}`
                 });
@@ -210,25 +213,25 @@ export class Generator {
         }
         return [
             {
-                name: `${name}$open`,
+                name: `${name}$opener`,
                 state: {
-                    default: sections.sections.open.default,
-                    rules: open
+                    default: open.state.default,
+                    rules: openRules
                 }
             },
             {
                 name: `${name}$body`,
                 state: {
-                    default: sections.sections.body.default,
-                    unmatched: sections.sections.body.unmatched,
-                    rules: body
+                    default: body.state.default,
+                    unmatched: body.state.unmatched,
+                    rules: bodyRules
                 }
             },
             {
-                name: `${name}$close`,
+                name: `${name}$closer`,
                 state: {
-                    default: sections.sections.close.default,
-                    rules: close
+                    default: close.state.default,
+                    rules: closeRules
                 }
             }
         ];

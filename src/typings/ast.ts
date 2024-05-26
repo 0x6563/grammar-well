@@ -84,14 +84,11 @@ export type ASTDirectives = (ASTJavaScriptSection | ASTImport | ASTConfig | ASTG
 export interface ASTLexerState {
     unmatched?: ASTLexerStateNonMatchRule;
     default?: ASTLexerStateMatchRule;
-    rules: (ASTLexerStateImportRule | ASTLexerStateMatchRule | ASTLexerAnonymousStateStructured)[];
-}
-export interface ASTLexerStateStructured {
-    sections: { [key: string]: ASTLexerState };
+    rules: (ASTLexerStateImportRule | ASTLexerStateMatchRule | ASTLexerStateStructured)[];
 }
 
-export interface ASTLexerAnonymousStateStructured {
-    sections: { [key: string]: ASTLexerState };
+export interface ASTLexerStateStructured {
+    sections: { name: string, state: (ASTLexerState) }[];
 }
 
 export interface ASTLexerStateImportRule {
@@ -135,3 +132,5 @@ export interface ASTLexerStateNonMatchRule {
     goto?: string;
     set?: string;
 }
+
+export type StateList = { name: string, state: (ASTLexerState | ASTLexerStateStructured) }[];
