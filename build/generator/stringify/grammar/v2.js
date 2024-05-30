@@ -145,6 +145,9 @@ export class V2GrammarString {
             if (rule.before) {
                 body += 'before ' + this.formatSymbol(rule.when);
             }
+            else if (rule.skip) {
+                body += 'skip ' + this.formatSymbol(rule.when);
+            }
             else if ('when' in rule) {
                 body += 'when ' + this.formatSymbol(rule.when);
             }

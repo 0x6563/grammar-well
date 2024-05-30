@@ -41,6 +41,7 @@ export class LexerArtifact {
         return CommonGenerator.JSON({
             when: 'when' in rule ? CommonGenerator.SerializeSymbol(rule.when) : null,
             before: JSON.stringify(rule.before),
+            skip: JSON.stringify(rule.skip),
             type: JSON.stringify(rule.type),
             tag: JSON.stringify(rule.tag),
             open: JSON.stringify(rule.open),

@@ -43,8 +43,8 @@ export class StatefulLexer implements RuntimeLexer {
         }
     }
 
-    next() {
-        const next = this.matchNext();
+    next(skipped: boolean = false) {
+        const next = this.matchNext(skipped);
         if (!next) {
             return
         }
@@ -52,7 +52,22 @@ export class StatefulLexer implements RuntimeLexer {
         if (!rule) {
             throw new Error(`No matching rule for ${text}`);
         }
-        const token = this.createToken(rule, text, index)
+        const token = {
+            type: rule.type,
+            highlight: rule.highlight,
+            open: rule.open,
+            close: rule.close,
+            tag: this.getTags(rule.tag),
+            value: text,
+            text: text,
+            offset: index,
+            line: this.line,
+            lines: 0,
+            column: this.column,
+            state: this.current
+        }
+        this.adjustPosition(text);
+        token.lines = this.line - token.line;
         this.adjustStack(rule);
         return token;
     }
@@ -76,7 +91,7 @@ export class StatefulLexer implements RuntimeLexer {
         this.set(state)
     }
 
-    private matchNext() {
+    private matchNext(skipped: boolean = false) {
         if (this.index === this.buffer.length) {
             return;
         }
@@ -105,38 +120,15 @@ export class StatefulLexer implements RuntimeLexer {
             text = match[0];
             if (rule.before) {
                 this.adjustStack(rule);
+                return this.matchNext(skipped);
+            } else if (rule.skip && !skipped) {
+                this.adjustPosition(text);
+                this.adjustStack(rule);
                 return this.matchNext();
             }
         }
 
         return { index, rule, text }
-    }
-
-    private createToken(rule: ASTLexerStateMatchRule, text: string, offset: number) {
-        const token = {
-            type: rule.type,
-            highlight: rule.highlight,
-            open: rule.open,
-            close: rule.close,
-            tag: this.getTags(rule.tag),
-            value: text,
-            text: text,
-            offset: offset,
-            line: this.line,
-            lines: 0,
-            column: this.column,
-            state: this.current
-        }
-        for (let i = 0; i < text.length; i++) {
-            this.column++;
-            if (text[i] == '\n') {
-                token.lines++;
-                this.column = 1;
-            }
-        }
-        this.index += text.length;
-        this.line += token.lines;
-        return token;
     }
 
     private getTags(tags?: string[]) {
@@ -145,6 +137,17 @@ export class StatefulLexer implements RuntimeLexer {
         if (!this.tags.has(tags))
             this.tags.set(tags, new Set(tags));
         return this.tags.get(tags);
+    }
+
+    private adjustPosition(text: string) {
+        this.index += text.length;
+        for (let i = 0; i < text.length; i++) {
+            this.column++;
+            if (text[i] == '\n') {
+                this.line++;
+                this.column = 1;
+            }
+        }
     }
 
     private adjustStack(rule: ASTLexerStateMatchRule) {

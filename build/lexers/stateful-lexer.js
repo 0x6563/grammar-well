@@ -37,8 +37,8 @@ export class StatefulLexer {
             prefetched: this.prefetched,
         };
     }
-    next() {
-        const next = this.matchNext();
+    next(skipped = false) {
+        const next = this.matchNext(skipped);
         if (!next) {
             return;
         }
@@ -46,7 +46,22 @@ export class StatefulLexer {
         if (!rule) {
             throw new Error(`No matching rule for ${text}`);
         }
-        const token = this.createToken(rule, text, index);
+        const token = {
+            type: rule.type,
+            highlight: rule.highlight,
+            open: rule.open,
+            close: rule.close,
+            tag: this.getTags(rule.tag),
+            value: text,
+            text: text,
+            offset: index,
+            line: this.line,
+            lines: 0,
+            column: this.column,
+            state: this.current
+        };
+        this.adjustPosition(text);
+        token.lines = this.line - token.line;
         this.adjustStack(rule);
         return token;
     }
@@ -66,7 +81,7 @@ export class StatefulLexer {
         this.stack.push(this.current);
         this.set(state);
     }
-    matchNext() {
+    matchNext(skipped = false) {
         if (this.index === this.buffer.length) {
             return;
         }
@@ -96,36 +111,15 @@ export class StatefulLexer {
             text = match[0];
             if (rule.before) {
                 this.adjustStack(rule);
+                return this.matchNext(skipped);
+            }
+            else if (rule.skip && !skipped) {
+                this.adjustPosition(text);
+                this.adjustStack(rule);
                 return this.matchNext();
             }
         }
         return { index, rule, text };
-    }
-    createToken(rule, text, offset) {
-        const token = {
-            type: rule.type,
-            highlight: rule.highlight,
-            open: rule.open,
-            close: rule.close,
-            tag: this.getTags(rule.tag),
-            value: text,
-            text: text,
-            offset: offset,
-            line: this.line,
-            lines: 0,
-            column: this.column,
-            state: this.current
-        };
-        for (let i = 0; i < text.length; i++) {
-            this.column++;
-            if (text[i] == '\n') {
-                token.lines++;
-                this.column = 1;
-            }
-        }
-        this.index += text.length;
-        this.line += token.lines;
-        return token;
     }
     getTags(tags) {
         if (!tags)
@@ -133,6 +127,16 @@ export class StatefulLexer {
         if (!this.tags.has(tags))
             this.tags.set(tags, new Set(tags));
         return this.tags.get(tags);
+    }
+    adjustPosition(text) {
+        this.index += text.length;
+        for (let i = 0; i < text.length; i++) {
+            this.column++;
+            if (text[i] == '\n') {
+                this.line++;
+                this.column = 1;
+            }
+        }
     }
     adjustStack(rule) {
         if (rule.pop) {

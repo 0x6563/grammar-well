@@ -1,49 +1,63 @@
 lexer {
-	start: "start"
+	start: "main"
 
-	[start]
+	[main]
 		- import string, ws, comment, l_star
 		- when /head(?![a-zA-Z\d_])/ tag "T_WORD" highlight "tag" goto js_body
 		- when /body(?![a-zA-Z\d_])/ tag "T_WORD" highlight "tag" goto js_body
-		- when /lexer(?![a-zA-Z\d_])/ tag "T_WORD" highlight "tag" goto lexer
-		- import grammar
-		- when /config(?![a-zA-Z\d_])/ tag "T_WORD" highlight "tag" goto config
+		- when /lexer(?![a-zA-Z\d_])/ tag "T_WORD" highlight "tag" set lexer
+		- when /grammar(?![a-zA-Z\d_])/ tag "T_WORD" highlight "tag" set grammar
+		- when /config(?![a-zA-Z\d_])/ tag "T_WORD" highlight "tag" set config
 		- import kv
 
-	[config]
-		- import ws
-		- when "{" tag "CBRACKET_L" set config_inner
+	[config] sections {
 
-	[config_inner]
-		- import comment, kv
-		- when "}" tag "CBRACKET_R" pop
+		[opener]
+			- skip /\s+/
+			- when "{" tag "CBRACKET_L"
+
+		[body]
+			- import comment, kv
+			- when "}" tag "CBRACKET_R" set main
+
+	}
 
 	[grammar] sections {
 
 		[opener]
-			- before /grammar(?![a-zA-Z\d_])\s*{/
+			- skip /\s+/
+			- when "{" tag "CBRACKET_L"
 
 		[body]
-			- when "{" tag "CBRACKET_L"
 			- import comment, section_word, js_template, ws, regex, l_qmark, l_plus, l_star, kv, l_colon, l_comma, l_pipe, l_parenl, l_parenr, l_arrow, l_dsign, l_dash
+			- when "}" tag "CBRACKET_R" set main
+
+	}
+
+	[lexer] sections {
+
+		[opener]
+			- skip /\s+/
+			- when "{" tag "CBRACKET_L"
+
+		[body]
+			- import ws, comment, section_word, regex, l_comma, l_arrow, l_dash, kv, l_colon, lexer_sections
+			- when "}" tag "CBRACKET_R" set main
+
+	}
+
+	[lexer_sections] sections {
+
+		[opener]
+			- when "{" tag "CBRACKET_L"
+
+		[body]
+			- import ws, comment, section_word, regex, l_comma, l_arrow, l_dash, kv
 
 		[closer]
 			- when "}" tag "CBRACKET_R"
 
 	}
-
-	[lexer]
-		- import ws
-		- when "{" tag "CBRACKET_L" highlight "bracket" set lexer_inner
-
-	[lexer_inner]
-		- import ws, comment, section_word, regex, l_comma, l_arrow, l_dash, kv, l_colon
-		- when "{" tag "CBRACKET_L" goto lexer_sections
-		- when "}" tag "CBRACKET_R" pop
-
-	[lexer_sections]
-		- import ws, comment, section_word, regex, l_comma, l_arrow, l_dash, kv
-		- when "}" tag "CBRACKET_R" pop
 
 	[js_body]
 		- import ws
@@ -217,13 +231,15 @@ grammar {
 		| token_definition _ token_definition_list => ( [$0].concat($2) )
 
 	[token_definition]
+		| K_OPEN _ T_STRING => ( { open: $2 } )
+		| K_CLOSE _ T_STRING => ( { close: $2 } )
 		| K_TAG _ string_list => ( { tag: $2 } )
 		| K_WHEN _ T_STRING => ( { when: $2 } )
 		| K_WHEN _ T_REGEX => ( { when: $2 } )
-		| K_OPEN _ T_STRING => ( { open: $2 } )
-		| K_CLOSE _ T_STRING => ( { close: $2 } )
 		| K_BEFORE _ T_STRING => ( { when: $2, before: true } )
 		| K_BEFORE _ T_REGEX => ( { when: $2, before: true } )
+		| K_SKIP _ T_STRING => ( { when: $2, skip: true } )
+		| K_SKIP _ T_REGEX => ( { when: $2, skip: true } )
 		| K_POP => ( { pop: 1 } )
 		| K_POP _ T_INTEGER => ( { pop: parseInt($2) } )
 		| K_POP _ K_ALL => ( { pop: "all" } )
@@ -372,6 +388,9 @@ grammar {
 
 	[K_BEFORE]
 		| "before"
+
+	[K_SKIP]
+		| "skip"
 
 	[K_OPEN]
 		| "open"

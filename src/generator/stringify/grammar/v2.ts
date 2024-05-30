@@ -154,6 +154,8 @@ export class V2GrammarString {
             let body = '';
             if (rule.before) {
                 body += 'before ' + this.formatSymbol((rule as ASTLexerStateMatchRule).when)
+            } else if (rule.skip) {
+                body += 'skip ' + this.formatSymbol((rule as ASTLexerStateMatchRule).when)
             } else if ('when' in rule) {
                 body += 'when ' + this.formatSymbol(rule.when as any)
             }

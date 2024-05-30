@@ -22,15 +22,15 @@ export declare class StatefulLexer implements RuntimeLexer {
         stack: string[];
         prefetched: RegExpExecArray;
     };
-    next(): {
-        type: string;
-        highlight: string;
-        open: string;
-        close: string;
+    next(skipped?: boolean): {
+        type: any;
+        highlight: any;
+        open: any;
+        close: any;
         tag: Set<string>;
-        value: string;
-        text: string;
-        offset: number;
+        value: any;
+        text: any;
+        offset: any;
         line: number;
         lines: number;
         column: number;
@@ -40,8 +40,8 @@ export declare class StatefulLexer implements RuntimeLexer {
     private pop;
     private goto;
     private matchNext;
-    private createToken;
     private getTags;
+    private adjustPosition;
     private adjustStack;
     private getGroup;
 }

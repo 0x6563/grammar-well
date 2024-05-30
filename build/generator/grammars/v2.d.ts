@@ -128,6 +128,12 @@ declare function GWLanguage(): {
                     literal: string;
                 }[];
             }[];
+            K_SKIP: {
+                name: string;
+                symbols: {
+                    literal: string;
+                }[];
+            }[];
             K_TAG: {
                 name: string;
                 symbols: {
@@ -707,22 +713,6 @@ declare function GWLanguage(): {
                 postprocess: ({ data }: {
                     data: any;
                 }) => {
-                    tag: any;
-                };
-                symbols: string[];
-            } | {
-                name: string;
-                postprocess: ({ data }: {
-                    data: any;
-                }) => {
-                    when: any;
-                };
-                symbols: string[];
-            } | {
-                name: string;
-                postprocess: ({ data }: {
-                    data: any;
-                }) => {
                     open: any;
                 };
                 symbols: string[];
@@ -732,6 +722,22 @@ declare function GWLanguage(): {
                     data: any;
                 }) => {
                     close: any;
+                };
+                symbols: string[];
+            } | {
+                name: string;
+                postprocess: ({ data }: {
+                    data: any;
+                }) => {
+                    tag: any;
+                };
+                symbols: string[];
+            } | {
+                name: string;
+                postprocess: ({ data }: {
+                    data: any;
+                }) => {
+                    when: any;
                 };
                 symbols: string[];
             } | {
@@ -845,107 +851,127 @@ declare function GWLanguage(): {
             config: {
                 regex: RegExp;
                 rules: ({
+                    skip: boolean;
+                    when: RegExp;
+                    goto?: undefined;
+                    tag?: undefined;
+                } | {
+                    goto: string;
+                    tag: string[];
+                    when: string;
+                    skip?: undefined;
+                })[];
+            };
+            config$body: {
+                regex: RegExp;
+                rules: ({
+                    highlight: string;
                     tag: string[];
                     when: RegExp;
+                    set?: undefined;
+                } | {
+                    tag: string[];
+                    when: RegExp;
+                    highlight?: undefined;
+                    set?: undefined;
+                } | {
+                    highlight: string;
+                    tag: string[];
+                    when: string;
+                    set?: undefined;
+                } | {
+                    tag: string[];
+                    when: string;
+                    highlight?: undefined;
                     set?: undefined;
                 } | {
                     set: string;
                     tag: string[];
                     when: string;
+                    highlight?: undefined;
                 })[];
             };
-            config_inner: {
+            config$opener: {
                 regex: RegExp;
                 rules: ({
-                    highlight: string;
-                    tag: string[];
+                    skip: boolean;
                     when: RegExp;
-                    pop?: undefined;
+                    goto?: undefined;
+                    tag?: undefined;
                 } | {
-                    tag: string[];
-                    when: RegExp;
-                    highlight?: undefined;
-                    pop?: undefined;
-                } | {
-                    highlight: string;
+                    goto: string;
                     tag: string[];
                     when: string;
-                    pop?: undefined;
-                } | {
-                    tag: string[];
-                    when: string;
-                    highlight?: undefined;
-                    pop?: undefined;
-                } | {
-                    pop: number;
-                    tag: string[];
-                    when: string;
-                    highlight?: undefined;
+                    skip?: undefined;
                 })[];
             };
             grammar: {
                 regex: RegExp;
-                rules: {
-                    before: boolean;
-                    goto: string;
+                rules: ({
+                    skip: boolean;
                     when: RegExp;
-                }[];
+                    goto?: undefined;
+                    tag?: undefined;
+                } | {
+                    goto: string;
+                    tag: string[];
+                    when: string;
+                    skip?: undefined;
+                })[];
             };
             grammar$body: {
                 regex: RegExp;
                 rules: ({
-                    tag: string[];
-                    when: string;
-                    highlight?: undefined;
-                    goto?: undefined;
-                    pop?: undefined;
-                } | {
                     highlight: string;
                     tag: string[];
                     when: RegExp;
                     goto?: undefined;
-                    pop?: undefined;
+                    set?: undefined;
                 } | {
                     goto: string;
                     highlight: string;
                     when: string;
                     tag?: undefined;
-                    pop?: undefined;
+                    set?: undefined;
                 } | {
                     tag: string[];
                     when: RegExp;
                     highlight?: undefined;
                     goto?: undefined;
-                    pop?: undefined;
+                    set?: undefined;
+                } | {
+                    tag: string[];
+                    when: string;
+                    highlight?: undefined;
+                    goto?: undefined;
+                    set?: undefined;
                 } | {
                     highlight: string;
                     tag: string[];
                     when: string;
                     goto?: undefined;
-                    pop?: undefined;
+                    set?: undefined;
                 } | {
-                    pop: number;
+                    set: string;
                     tag: string[];
                     when: string;
                     highlight?: undefined;
                     goto?: undefined;
                 })[];
             };
-            grammar$closer: {
-                regex: RegExp;
-                rules: {
-                    pop: number;
-                    tag: string[];
-                    when: string;
-                }[];
-            };
             grammar$opener: {
                 regex: RegExp;
-                rules: {
-                    before: boolean;
-                    goto: string;
+                rules: ({
+                    skip: boolean;
                     when: RegExp;
-                }[];
+                    goto?: undefined;
+                    tag?: undefined;
+                } | {
+                    goto: string;
+                    tag: string[];
+                    when: string;
+                    skip?: undefined;
+                })[];
             };
             integer: {
                 regex: RegExp;
@@ -1131,58 +1157,80 @@ declare function GWLanguage(): {
             lexer: {
                 regex: RegExp;
                 rules: ({
-                    tag: string[];
+                    skip: boolean;
                     when: RegExp;
-                    highlight?: undefined;
-                    set?: undefined;
+                    goto?: undefined;
+                    tag?: undefined;
                 } | {
-                    highlight: string;
-                    set: string;
+                    goto: string;
                     tag: string[];
                     when: string;
+                    skip?: undefined;
                 })[];
             };
-            lexer_inner: {
+            lexer$body: {
                 regex: RegExp;
                 rules: ({
                     tag: string[];
                     when: RegExp;
                     highlight?: undefined;
                     goto?: undefined;
-                    pop?: undefined;
+                    set?: undefined;
                 } | {
                     highlight: string;
                     tag: string[];
                     when: RegExp;
                     goto?: undefined;
-                    pop?: undefined;
+                    set?: undefined;
                 } | {
                     tag: string[];
                     when: string;
                     highlight?: undefined;
                     goto?: undefined;
-                    pop?: undefined;
+                    set?: undefined;
                 } | {
                     highlight: string;
                     tag: string[];
                     when: string;
                     goto?: undefined;
-                    pop?: undefined;
+                    set?: undefined;
                 } | {
                     goto: string;
                     tag: string[];
                     when: string;
                     highlight?: undefined;
-                    pop?: undefined;
+                    set?: undefined;
                 } | {
-                    pop: number;
+                    set: string;
                     tag: string[];
                     when: string;
                     highlight?: undefined;
                     goto?: undefined;
                 })[];
             };
+            lexer$opener: {
+                regex: RegExp;
+                rules: ({
+                    skip: boolean;
+                    when: RegExp;
+                    goto?: undefined;
+                    tag?: undefined;
+                } | {
+                    goto: string;
+                    tag: string[];
+                    when: string;
+                    skip?: undefined;
+                })[];
+            };
             lexer_sections: {
+                regex: RegExp;
+                rules: {
+                    goto: string;
+                    tag: string[];
+                    when: string;
+                }[];
+            };
+            lexer_sections$body: {
                 regex: RegExp;
                 rules: ({
                     tag: string[];
@@ -1209,6 +1257,62 @@ declare function GWLanguage(): {
                     tag: string[];
                     when: string;
                     highlight?: undefined;
+                })[];
+            };
+            lexer_sections$closer: {
+                regex: RegExp;
+                rules: {
+                    pop: number;
+                    tag: string[];
+                    when: string;
+                }[];
+            };
+            lexer_sections$opener: {
+                regex: RegExp;
+                rules: {
+                    goto: string;
+                    tag: string[];
+                    when: string;
+                }[];
+            };
+            main: {
+                regex: RegExp;
+                rules: ({
+                    highlight: string;
+                    tag: string[];
+                    when: RegExp;
+                    goto?: undefined;
+                    set?: undefined;
+                } | {
+                    tag: string[];
+                    when: RegExp;
+                    highlight?: undefined;
+                    goto?: undefined;
+                    set?: undefined;
+                } | {
+                    tag: string[];
+                    when: string;
+                    highlight?: undefined;
+                    goto?: undefined;
+                    set?: undefined;
+                } | {
+                    goto: string;
+                    highlight: string;
+                    tag: string[];
+                    when: RegExp;
+                    set?: undefined;
+                } | {
+                    highlight: string;
+                    set: string;
+                    tag: string[];
+                    when: RegExp;
+                    goto?: undefined;
+                } | {
+                    highlight: string;
+                    tag: string[];
+                    when: string;
+                    goto?: undefined;
+                    set?: undefined;
                 })[];
             };
             regex: {
@@ -1226,46 +1330,6 @@ declare function GWLanguage(): {
                     tag: string[];
                     when: RegExp;
                 }[];
-            };
-            start: {
-                regex: RegExp;
-                rules: ({
-                    highlight: string;
-                    tag: string[];
-                    when: RegExp;
-                    goto?: undefined;
-                    before?: undefined;
-                } | {
-                    tag: string[];
-                    when: RegExp;
-                    highlight?: undefined;
-                    goto?: undefined;
-                    before?: undefined;
-                } | {
-                    tag: string[];
-                    when: string;
-                    highlight?: undefined;
-                    goto?: undefined;
-                    before?: undefined;
-                } | {
-                    goto: string;
-                    highlight: string;
-                    tag: string[];
-                    when: RegExp;
-                    before?: undefined;
-                } | {
-                    before: boolean;
-                    goto: string;
-                    when: RegExp;
-                    highlight?: undefined;
-                    tag?: undefined;
-                } | {
-                    highlight: string;
-                    tag: string[];
-                    when: string;
-                    goto?: undefined;
-                    before?: undefined;
-                })[];
             };
             string: {
                 regex: RegExp;

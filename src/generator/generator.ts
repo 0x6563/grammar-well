@@ -167,36 +167,39 @@ export class Generator {
         const body = rule.sections.find(v => v.name == 'body');
         const close = rule.sections.find(v => v.name == 'closer');
 
-        for (const r of body?.state?.rules) {
-            bodyRules.push(r);
-        }
-
-        for (const r of close?.state?.rules) {
-            if ('when' in r) {
-                closeRules.push({
-                    when: r.when,
-                    type: r.type,
-                    tag: r.tag,
-                    before: r.before,
-                    highlight: r.highlight,
-                    open: r.open,
-                    close: r.close,
-                    embed: r.embed,
-                    unembed: r.unembed,
-                    set: r.set,
-                    pop: r.set ? undefined : 1
-                });
+        if (body?.state?.rules)
+            for (const r of body?.state?.rules) {
+                bodyRules.push(r);
             }
-            if ('import' in r) {
-                closeRules.push({
-                    import: r.import,
-                    set: r.set,
-                    pop: r.set ? undefined : 1
-                })
-            }
-        }
 
-        if (closeRules.length)
+        if (close?.state?.rules)
+            for (const r of close?.state?.rules) {
+                if ('when' in r) {
+                    closeRules.push({
+                        when: r.when,
+                        type: r.type,
+                        tag: r.tag,
+                        before: r.before,
+                        skip: r.skip,
+                        highlight: r.highlight,
+                        open: r.open,
+                        close: r.close,
+                        embed: r.embed,
+                        unembed: r.unembed,
+                        set: r.skip ? undefined : r.set,
+                        pop: r.skip || r.set ? undefined : 1
+                    });
+                }
+                if ('import' in r) {
+                    closeRules.push({
+                        import: r.import,
+                        set: r.set,
+                        pop: r.set ? undefined : 1
+                    })
+                }
+            }
+
+        if (closeRules.length && bodyRules.length)
             bodyRules.push({ import: [`${name}$closer`] })
 
         const target = bodyRules.length ? 'body' : 'closer';
@@ -205,6 +208,7 @@ export class Generator {
             if ('when' in r) {
                 openRules.push({
                     when: r.when,
+                    skip: r.skip,
                     type: r.type,
                     tag: r.tag,
                     before: r.before,
@@ -213,7 +217,7 @@ export class Generator {
                     close: r.close,
                     embed: r.embed,
                     unembed: r.unembed,
-                    goto: `${name}$${target}`
+                    goto: r.skip ? undefined : `${name}$${target}`
                 });
             }
 
@@ -236,15 +240,15 @@ export class Generator {
             {
                 name: `${name}$body`,
                 state: {
-                    default: body.state.default,
-                    unmatched: body.state.unmatched,
+                    default: body?.state?.default,
+                    unmatched: body?.state?.unmatched,
                     rules: bodyRules
                 }
             },
             {
                 name: `${name}$closer`,
                 state: {
-                    default: close.state.default,
+                    default: close?.state?.default,
                     rules: closeRules
                 }
             }

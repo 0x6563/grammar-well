@@ -105,6 +105,7 @@ export interface ASTLexerStateMatchRule {
     type?: string;
     tag?: string[];
     before?: boolean;
+    skip?: boolean;
     highlight?: string;
     open?: string;
     close?: string;
@@ -121,6 +122,7 @@ export interface ASTLexerStateNonMatchRule {
     type?: string;
     tag?: string[];
     before?: undefined;
+    skip?: undefined;
     highlight?: string;
     open?: string;
     close?: string;
