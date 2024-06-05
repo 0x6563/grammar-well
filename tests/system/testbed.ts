@@ -1,7 +1,7 @@
 import { readFileSync } from 'fs';
 import assert from "node:assert";
 import { join } from 'path';
-import { Generate, Parse, Parser } from '../../src';
+import { Generate, Parse } from '../../src';
 
 export function Expected(actual: any, expected: any, message?: string) {
     if (expected instanceof RegExp) {
@@ -41,23 +41,21 @@ export function GetValue(test, prefix) {
 }
 
 export function GetFile(path: string) {
-    return readFileSync(join( import.meta.dirname, path), 'utf8')
-}
-
-export async function Build(grammar): Promise<any> {
-    const compiled = await Generate(grammar, { exportName: 'grammar' }) as string;
-    return Evalr(compiled);
-}
-
-export async function BuildTest(grammar, input, options) {
-    return Parse((await Build(grammar))(), input, options).results[0];
+    return readFileSync(join(import.meta.dirname, path), 'utf8')
 }
 
 
-export async function GrammarWellRunner(source) {
-    const compiled = await Generate(source, { exportName: 'grammar' });
-    const parser = new Parser(Evalr(compiled)(), { algorithm: 'earley' });
-    return (input) => parser.run(input);
+export async function RunTest(source: string, input: string, options: any) {
+    return Parse(await Build(source), input, options);
+}
+
+export async function GrammarWellRunner(source: string) {
+    const compiled = Evalr(await Generate(source, { exportName: 'grammar' }));
+    return (input) => Parse(compiled(), input, { algorithm: 'earley' }, 'full');
+}
+
+async function Build(source: string): Promise<any> {
+    return Evalr(await Generate(source, { exportName: 'grammar' }))();
 }
 
 function Evalr(source): any {

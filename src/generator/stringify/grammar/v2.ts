@@ -148,37 +148,38 @@ export class V2GrammarString {
     }
 
     formatLexerStateRule(rule: ASTLexerStateMatchRule | ASTLexerStateNonMatchRule | ASTLexerStateImportRule) {
+        let body = '';
         if ('import' in rule) {
-            return 'import ' + rule.import.join(', ')
+            body += 'import ' + rule.import.join(', ');
         } else {
-            let body = '';
             if (rule.before) {
-                body += 'before ' + this.formatSymbol((rule as ASTLexerStateMatchRule).when)
+                body += 'before ' + this.formatSymbol((rule as ASTLexerStateMatchRule).when);
             } else if (rule.skip) {
-                body += 'skip ' + this.formatSymbol((rule as ASTLexerStateMatchRule).when)
+                body += 'skip ' + this.formatSymbol((rule as ASTLexerStateMatchRule).when);
             } else if ('when' in rule) {
-                body += 'when ' + this.formatSymbol(rule.when as any)
+                body += 'when ' + this.formatSymbol(rule.when as any);
             }
+
             if (typeof rule.type != 'undefined') {
-                body += ` type ${JSON.stringify(rule.type)}`
+                body += ` type ${JSON.stringify(rule.type)}`;
             }
             if (typeof rule.tag != 'undefined') {
-                body += ` tag ${rule.tag.map(v => JSON.stringify(v)).join(', ')}`
+                body += ` tag ${rule.tag.map(v => JSON.stringify(v)).join(', ')}`;
             }
             if (typeof rule.open != 'undefined') {
-                body += ` open ${JSON.stringify(rule.open)}`
+                body += ` open ${JSON.stringify(rule.open)}`;
             }
             if (typeof rule.close != 'undefined') {
-                body += ` close ${JSON.stringify(rule.close)}`
+                body += ` close ${JSON.stringify(rule.close)}`;
             }
             if (typeof rule.highlight != 'undefined') {
-                body += ` highlight ${JSON.stringify(rule.highlight)}`
+                body += ` highlight ${JSON.stringify(rule.highlight)}`;
             }
             if (typeof rule.unembed != 'undefined') {
-                body += ` unembed`
+                body += ` unembed`;
             }
             if (typeof rule.embed != 'undefined') {
-                body += ` embed`
+                body += ` embed`;
             }
             if (typeof rule.pop != 'undefined') {
                 body += ` pop` + (rule.pop == 'all' || rule.pop > 1 ? ' ' + rule.pop : '');
@@ -187,19 +188,19 @@ export class V2GrammarString {
                 body += ` inset` + (rule.inset > 1 ? ' ' + rule.inset : '');
             }
             if (typeof rule.goto != 'undefined') {
-                body += ` goto ${rule.goto}`
+                body += ` goto ${rule.goto}`;
             }
             if (typeof rule.set != 'undefined') {
-                body += ` set ${rule.set}`
+                body += ` set ${rule.set}`;
             }
-            return body.trim();
         }
-
+        return body.trim();
     }
 
     formatWhen(when: string | { regex: string; flags: string }) {
         return typeof when == 'string' ? JSON.stringify(when) : `/${when.regex}/${when.flags || ''}`
     }
+
     formatKV(obj: { [key: string]: any }, depth: number = 0) {
         let body = '';
         for (const key in obj) {

@@ -1,7 +1,8 @@
 import { ASTConfig, ASTDirectives, ASTGrammar, ASTGrammarProduction, ASTGrammarProductionRule, ASTGrammarSymbol, ASTGrammarSymbolGroup, ASTGrammarSymbolLiteral, ASTGrammarSymbolRepeat, ASTImport, ASTLexer, ASTLexerConfig, ASTLexerState, ASTLexerStateImportRule, ASTLexerStateMatchRule, ASTLexerStateStructured, GeneratorContext, GeneratorGrammarProductionRule, GeneratorGrammarSymbol, GeneratorOptions, GeneratorTemplateFormat, ImportResolver } from "../typings";
 
-import { Parser } from "../parser/parser";
-import Language from './grammars/v2';
+import { Parse } from "../parser/parser";
+import GrammarV1 from './grammars/v1';
+import GrammarV2 from './grammars/v2';
 import { DefaultImportResolver } from "./import-resolvers/default";
 
 import * as BuiltInRegistry from "./builtin/registry.json";
@@ -17,7 +18,6 @@ export async function Generate(rules: string | ASTDirectives | (ASTDirectives[])
 }
 
 export class Generator {
-    private parser = new Parser(Language() as any);
     private context: GeneratorContext;
 
     state = new GeneratorState();
@@ -294,9 +294,10 @@ export class Generator {
     }
 
     private async mergeLanguageDefinitionString(body: string, alias: string = '') {
-        const builder = new Generator(this.config, this.context, alias);
-        await builder.import(this.parser.run(body).results[0]);
-        this.state.merge(builder.state);
+        const grammar = body.indexOf('// Grammar Well Version 1') == 0 ? GrammarV1 : GrammarV2;
+        const generator = new Generator(this.config, this.context, alias);
+        await generator.import(Parse(grammar() as any, body));
+        this.state.merge(generator.state);
         return;
     }
 

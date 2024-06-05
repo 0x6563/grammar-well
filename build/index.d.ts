@@ -4,3 +4,4 @@ export { StatefulLexer } from './lexers/stateful-lexer';
 export * from './parser/parser';
 export * from './typings';
 export * from './utility/monarch';
+export * from './utility/format';

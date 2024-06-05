@@ -137,11 +137,11 @@ export class V2GrammarString {
         return body;
     }
     formatLexerStateRule(rule) {
+        let body = '';
         if ('import' in rule) {
-            return 'import ' + rule.import.join(', ');
+            body += 'import ' + rule.import.join(', ');
         }
         else {
-            let body = '';
             if (rule.before) {
                 body += 'before ' + this.formatSymbol(rule.when);
             }
@@ -184,8 +184,8 @@ export class V2GrammarString {
             if (typeof rule.set != 'undefined') {
                 body += ` set ${rule.set}`;
             }
-            return body.trim();
         }
+        return body.trim();
     }
     formatWhen(when) {
         return typeof when == 'string' ? JSON.stringify(when) : `/${when.regex}/${when.flags || ''}`;

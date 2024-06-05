@@ -2,19 +2,8 @@ import { ParserAlgorithm, RuntimeGrammarProductionRule, RuntimeGrammarRuleSymbol
 declare const ParserRegistry: {
     [key: string]: ParserAlgorithm;
 };
-export declare function Parse(language: RuntimeLanguageDefinition, input: string, options?: ParserOptions): {
-    results: any[];
-};
-export declare class Parser {
-    private language;
-    private options;
-    constructor(language: RuntimeLanguageDefinition, options?: ParserOptions);
-    run(input: string): {
-        results: any[];
-    };
-    private getTokenQueue;
-}
-export declare abstract class ParserUtility {
+export declare function Parse(language: RuntimeLanguageDefinition, input: string, options?: ParserOptions, results?: 'full' | 'first'): any;
+export declare class ParserUtility {
     static SymbolMatchesToken(symbol: RuntimeGrammarRuleSymbol, token: RuntimeLexerToken): boolean;
     static SymbolIsTerminal(symbol: RuntimeGrammarRuleSymbol): boolean;
     static PostProcess(rule: RuntimeGrammarProductionRule, data: any, meta?: any): any;

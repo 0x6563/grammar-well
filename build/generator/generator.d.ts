@@ -6,7 +6,6 @@ export declare function Generate(rules: string | ASTDirectives | (ASTDirectives[
 export declare class Generator {
     private config;
     private aliasPrefix;
-    private parser;
     private context;
     state: GeneratorState;
     generator: JavaScriptGenerator;

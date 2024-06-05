@@ -1,5 +1,6 @@
-import { Parser } from "../parser/parser";
-import Language from './grammars/v2';
+import { Parse } from "../parser/parser";
+import GrammarV1 from './grammars/v1';
+import GrammarV2 from './grammars/v2';
 import { DefaultImportResolver } from "./import-resolvers/default";
 import * as BuiltInRegistry from "./builtin/registry.json";
 import { GeneratorState } from "./state";
@@ -14,7 +15,6 @@ export async function Generate(rules, config = {}) {
 export class Generator {
     config;
     aliasPrefix;
-    parser = new Parser(Language());
     context;
     state = new GeneratorState();
     generator = new JavaScriptGenerator(this.state);
@@ -273,9 +273,10 @@ export class Generator {
         }
     }
     async mergeLanguageDefinitionString(body, alias = '') {
-        const builder = new Generator(this.config, this.context, alias);
-        await builder.import(this.parser.run(body).results[0]);
-        this.state.merge(builder.state);
+        const grammar = body.indexOf('// Grammar Well Version 1') == 0 ? GrammarV1 : GrammarV2;
+        const generator = new Generator(this.config, this.context, alias);
+        await generator.import(Parse(grammar(), body));
+        this.state.merge(generator.state);
         return;
     }
     buildRules(name, expressions, rule) {

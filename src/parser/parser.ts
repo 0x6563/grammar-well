@@ -12,37 +12,35 @@ const ParserRegistry: { [key: string]: ParserAlgorithm } = {
     lr0: LRK
 }
 
-export function Parse(language: RuntimeLanguageDefinition, input: string, options?: ParserOptions) {
-    const i = new Parser(language, options);
-    return i.run(input);
+export function Parse(
+    language: RuntimeLanguageDefinition,
+    input: string,
+    options: ParserOptions = {
+        algorithm: 'earley',
+        parserOptions: {}
+    },
+    results: 'full' | 'first' = 'first'
+) {
+    const tokenizer = GetTokenizer(language);
+    tokenizer.feed(input);
+    const algorithm = typeof options.algorithm == 'function' ? options.algorithm : ParserRegistry[options.algorithm];
+    const result = algorithm({ ...language, tokens: tokenizer, utility: ParserUtility }, options.parserOptions);
+    return results == 'full' ? result : result.results[0];
 }
 
-export class Parser {
-
-    constructor(private language: RuntimeLanguageDefinition, private options: ParserOptions = { algorithm: 'earley', parserOptions: {} }) { }
-
-    run(input: string): { results: any[] } {
-        const tokenQueue = this.getTokenQueue();
-        tokenQueue.feed(input);
-        if (typeof this.options.algorithm == 'function')
-            return this.options.algorithm({ ...this.language, tokens: tokenQueue, utility: ParserUtility }, this.options.parserOptions);
-        return ParserRegistry[this.options.algorithm]({ ...this.language, tokens: tokenQueue, utility: ParserUtility }, this.options.parserOptions);
-    }
-
-    private getTokenQueue() {
-        const { lexer } = this.language;
-        if (!lexer) {
-            return new TokenBuffer(new CharacterLexer());
-        } else if ("feed" in lexer && typeof lexer.feed == 'function') {
-            return new TokenBuffer(lexer);
-        } else if ('states' in lexer) {
-            return new TokenBuffer(new StatefulLexer(lexer));
-        }
+function GetTokenizer({ lexer }: RuntimeLanguageDefinition) {
+    if (!lexer) {
+        return new TokenBuffer(new CharacterLexer());
+    } else if ("feed" in lexer && typeof lexer.feed == 'function') {
+        return new TokenBuffer(lexer);
+    } else if ('states' in lexer) {
+        return new TokenBuffer(new StatefulLexer(lexer));
     }
 }
 
+ 
 
-export abstract class ParserUtility {
+export class ParserUtility {
 
     static SymbolMatchesToken(symbol: RuntimeGrammarRuleSymbol, token: RuntimeLexerToken) {
         if (typeof symbol === 'string')

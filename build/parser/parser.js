@@ -9,35 +9,25 @@ const ParserRegistry = {
     cyk: CYK,
     lr0: LRK
 };
-export function Parse(language, input, options) {
-    const i = new Parser(language, options);
-    return i.run(input);
+export function Parse(language, input, options = {
+    algorithm: 'earley',
+    parserOptions: {}
+}, results = 'first') {
+    const tokenizer = GetTokenizer(language);
+    tokenizer.feed(input);
+    const algorithm = typeof options.algorithm == 'function' ? options.algorithm : ParserRegistry[options.algorithm];
+    const result = algorithm({ ...language, tokens: tokenizer, utility: ParserUtility }, options.parserOptions);
+    return results == 'full' ? result : result.results[0];
 }
-export class Parser {
-    language;
-    options;
-    constructor(language, options = { algorithm: 'earley', parserOptions: {} }) {
-        this.language = language;
-        this.options = options;
+function GetTokenizer({ lexer }) {
+    if (!lexer) {
+        return new TokenBuffer(new CharacterLexer());
     }
-    run(input) {
-        const tokenQueue = this.getTokenQueue();
-        tokenQueue.feed(input);
-        if (typeof this.options.algorithm == 'function')
-            return this.options.algorithm({ ...this.language, tokens: tokenQueue, utility: ParserUtility }, this.options.parserOptions);
-        return ParserRegistry[this.options.algorithm]({ ...this.language, tokens: tokenQueue, utility: ParserUtility }, this.options.parserOptions);
+    else if ("feed" in lexer && typeof lexer.feed == 'function') {
+        return new TokenBuffer(lexer);
     }
-    getTokenQueue() {
-        const { lexer } = this.language;
-        if (!lexer) {
-            return new TokenBuffer(new CharacterLexer());
-        }
-        else if ("feed" in lexer && typeof lexer.feed == 'function') {
-            return new TokenBuffer(lexer);
-        }
-        else if ('states' in lexer) {
-            return new TokenBuffer(new StatefulLexer(lexer));
-        }
+    else if ('states' in lexer) {
+        return new TokenBuffer(new StatefulLexer(lexer));
     }
 }
 export class ParserUtility {

@@ -1,6 +1,6 @@
 import test, { describe } from "node:test";
 import { parse } from 'yaml';
-import { AsyncRun, BuildTest, Expected, GetFile, GetValue } from './testbed';
+import { AsyncRun, RunTest, Expected, GetFile, GetValue } from './testbed';
 
 
 describe('Predefined Samples', () => {
@@ -17,7 +17,7 @@ describe('Predefined Samples', () => {
                     const result = GetValue(t, 'result');
                     const error = GetValue(t, 'error');
                     options.algorithm = GetValue(t, 'algorithm') || 'earley';
-                    const execution = await AsyncRun(() => BuildTest(grammar, input, options));
+                    const execution = await AsyncRun(() => RunTest(grammar, input, options));
                     try {
                         if (typeof t.throw == 'boolean') {
                             if (execution.success == t.throw) {
