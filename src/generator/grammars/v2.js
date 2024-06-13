@@ -6,6 +6,12 @@ function GWLanguage(){
     return {
         grammar: {
             rules: {
+                ABRACKET_L: [
+                    { name: "ABRACKET_L", symbols: [ { token: "ABRACKET_L" } ] }
+                ],
+                ABRACKET_R: [
+                    { name: "ABRACKET_R", symbols: [ { token: "ABRACKET_R" } ] }
+                ],
                 CBRACKET_L: [
                     { name: "CBRACKET_L", symbols: [ { token: "CBRACKET_L" } ] }
                 ],
@@ -227,8 +233,8 @@ function GWLanguage(){
                 expression_symbol_match: [
                     { name: "expression_symbol_match", postprocess: ({data}) => { return ({ rule: data[0] }); }, symbols: [ "T_WORD" ] },
                     { name: "expression_symbol_match", postprocess: ({data}) => { return ({ literal: data[0], insensitive: !!data[1] }); }, symbols: [ "T_STRING", "expression_symbol_match$RPT01x1" ] },
-                    { name: "expression_symbol_match", postprocess: ({data}) => { return ({ token: data[1]}); }, symbols: [ "L_DSIGN", "T_WORD" ] },
-                    { name: "expression_symbol_match", postprocess: ({data}) => { return ({ token: data[1]}); }, symbols: [ "L_DSIGN", "T_STRING" ] },
+                    { name: "expression_symbol_match", postprocess: ({data}) => { return ({ token: data[2]}); }, symbols: [ "ABRACKET_L", "_", "T_WORD", "_", "ABRACKET_R" ] },
+                    { name: "expression_symbol_match", postprocess: ({data}) => { return ({ token: data[2]}); }, symbols: [ "ABRACKET_L", "_", "T_STRING", "_", "ABRACKET_R" ] },
                     { name: "expression_symbol_match", postprocess: ({data}) => { return (data[0]); }, symbols: [ "T_REGEX" ] },
                     { name: "expression_symbol_match", postprocess: ({data}) => { return ({ subexpression: data[2] }); }, symbols: [ "L_PARENL", "_", "expression_list", "_", "L_PARENR" ] }
                 ],
@@ -396,7 +402,7 @@ function GWLanguage(){
                     ]
                 },
                 grammar$body: {
-                    regex: /(?:(?:(\/\/[^\n]*))|(?:(\[\s*[a-zA-Z_][a-zA-Z_\d]*\s*\]))|(?:((?:=>)))|(?:(\s+))|(?:(\/(?:[^\/\\\r\n]|\\.)+\/))|(?:((?:\?)))|(?:((?:\+)))|(?:((?:\*)))|(?:("(?:[^"\\\r\n]|\\.)*"))|(?:([a-zA-Z_][a-zA-Z_\d]*))|(?:((?::)))|(?:(\d+))|(?:((?:;)))|(?:((?:,)))|(?:((?:\|)))|(?:((?:\()))|(?:((?:\))))|(?:((?:\->)))|(?:((?:\$)))|(?:((?:\-)))|(?:((?:\}))))/ym,
+                    regex: /(?:(?:(\/\/[^\n]*))|(?:(\[\s*[a-zA-Z_][a-zA-Z_\d]*\s*\]))|(?:((?:=>)))|(?:(\s+))|(?:(\/(?:[^\/\\\r\n]|\\.)+\/))|(?:((?:\?)))|(?:((?:\+)))|(?:((?:\*)))|(?:("(?:[^"\\\r\n]|\\.)*"))|(?:([a-zA-Z_][a-zA-Z_\d]*))|(?:((?::)))|(?:(\d+))|(?:((?:;)))|(?:((?:,)))|(?:((?:\|)))|(?:((?:\()))|(?:((?:\))))|(?:((?:<)))|(?:((?:>)))|(?:((?:\->)))|(?:((?:\$)))|(?:((?:\-)))|(?:((?:\}))))/ym,
                     rules: [
                         { highlight: "comment", tag: ["T_COMMENT"], when: /\/\/[^\n]*/ },
                         { highlight: "type.identifier", tag: ["T_SECTWORD"], when: /\[\s*[a-zA-Z_][a-zA-Z_\d]*\s*\]/ },
@@ -415,6 +421,8 @@ function GWLanguage(){
                         { highlight: "keyword", tag: ["L_PIPE"], when: "|" },
                         { tag: ["L_PARENL"], when: "(" },
                         { tag: ["L_PARENR"], when: ")" },
+                        { tag: ["ABRACKET_L"], when: "<" },
+                        { tag: ["ABRACKET_R"], when: ">" },
                         { highlight: "keyword", tag: ["L_ARROW"], when: "->" },
                         { tag: ["L_DSIGN"], when: "$" },
                         { tag: ["L_DASH"], when: "-" },
@@ -493,6 +501,18 @@ function GWLanguage(){
                         { highlight: "keyword", tag: ["L_COLON"], when: ":" },
                         { highlight: "number", tag: ["T_INTEGER"], when: /\d+/ },
                         { tag: ["L_SCOLON"], when: ";" }
+                    ]
+                },
+                l_abracketl: {
+                    regex: /(?:(?:((?:<))))/ym,
+                    rules: [
+                        { tag: ["ABRACKET_L"], when: "<" }
+                    ]
+                },
+                l_abracketr: {
+                    regex: /(?:(?:((?:>))))/ym,
+                    rules: [
+                        { tag: ["ABRACKET_R"], when: ">" }
                     ]
                 },
                 l_arrow: {

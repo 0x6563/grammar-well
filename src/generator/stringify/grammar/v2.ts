@@ -78,7 +78,7 @@ export class V2GrammarString {
             return `/${exp.regex}/${exp.flags || ''}`;
         }
         if ('token' in exp) {
-            return `$${exp.token}`;
+            return `<${exp.token}>`;
         }
         if ('expression' in exp) {
             return this.formatSymbol(exp.expression) + (exp.repeat || '');

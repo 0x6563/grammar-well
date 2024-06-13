@@ -42,10 +42,10 @@ grammar {
 		| "null" => ( null )
 
 	[number]
-		| $number => ( parseFloat($0.value) )
+		| <number> => ( parseFloat($0.value) )
 
 	[string]
-		| $string => ( JSON.parse($0.value) )
+		| <string> => ( JSON.parse($0.value) )
 
 	[pair]
 		| key _ ":" _ value => ( [$k, $v] )

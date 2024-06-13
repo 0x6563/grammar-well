@@ -34,21 +34,21 @@ grammar {
 		| doubleQuoteString
 
 	[doubleQuoteString]
-		| $dquote stringInner $dquote => ( $1 )
-		| $dquote $dquote => ( '' )
+		| <dquote> stringInner <dquote> => ( $1 )
+		| <dquote> <dquote> => ( '' )
 
 	[singleQuoteString]
-		| $squote stringInner $squote => ( $1 )
-		| $squote $squote => ( '' )
+		| <squote> stringInner <squote> => ( $1 )
+		| <squote> <squote> => ( '' )
 
 	[stringInner]
 		| stringEscape => ( $0 )
-		| $string => ( $0.value )
+		| <string> => ( $0.value )
 		| stringInner stringEscape => ( $0 + $1 )
-		| stringInner $string => ( $0 + $1.value )
+		| stringInner <string> => ( $0 + $1.value )
 
 	[stringEscape]
-		| $escaped => ( JSON.parse('"' + $0.value + '"') )
-		| $quoteEscape => ( $0.value[1] )
+		| <escaped> => ( JSON.parse('"' + $0.value + '"') )
+		| <quoteEscape> => ( $0.value[1] )
 
 }

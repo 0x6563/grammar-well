@@ -2,6 +2,18 @@ export default GWLanguage;
 declare function GWLanguage(): {
     grammar: {
         rules: {
+            ABRACKET_L: {
+                name: string;
+                symbols: {
+                    token: string;
+                }[];
+            }[];
+            ABRACKET_R: {
+                name: string;
+                symbols: {
+                    token: string;
+                }[];
+            }[];
             CBRACKET_L: {
                 name: string;
                 symbols: {
@@ -1066,6 +1078,20 @@ declare function GWLanguage(): {
                     when: string;
                     highlight?: undefined;
                 })[];
+            };
+            l_abracketl: {
+                regex: RegExp;
+                rules: {
+                    tag: string[];
+                    when: string;
+                }[];
+            };
+            l_abracketr: {
+                regex: RegExp;
+                rules: {
+                    tag: string[];
+                    when: string;
+                }[];
             };
             l_arrow: {
                 regex: RegExp;

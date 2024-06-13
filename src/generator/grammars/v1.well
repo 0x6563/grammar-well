@@ -291,46 +291,46 @@ grammar {
 		| (T_WS | T_COMMENT)+ => ( null )
 
 	[L_COLON]
-		| $L_COLON
+		| <L_COLON>
 
 	[L_SCOLON]
-		| $L_SCOLON
+		| <L_SCOLON>
 
 	[L_QMARK]
-		| $L_QMARK
+		| <L_QMARK>
 
 	[L_PLUS]
-		| $L_PLUS
+		| <L_PLUS>
 
 	[L_STAR]
-		| $L_STAR
+		| <L_STAR>
 
 	[L_COMMA]
-		| $L_COMMA
+		| <L_COMMA>
 
 	[L_PIPE]
-		| $L_PIPE
+		| <L_PIPE>
 
 	[L_PARENL]
-		| $L_PARENL
+		| <L_PARENL>
 
 	[L_PARENR]
-		| $L_PARENR
+		| <L_PARENR>
 
 	[L_TEMPLATEL]
-		| $L_TEMPLATEL
+		| <L_TEMPLATEL>
 
 	[L_TEMPLATER]
-		| $L_TEMPLATER
+		| <L_TEMPLATER>
 
 	[L_ARROW]
-		| $L_ARROW
+		| <L_ARROW>
 
 	[L_DSIGN]
-		| $L_DSIGN
+		| <L_DSIGN>
 
 	[L_DASH]
-		| $L_DASH
+		| <L_DASH>
 
 	[K_ALL]
 		| "all"
@@ -396,27 +396,27 @@ grammar {
 		| "head"
 
 	[T_JS]
-		| $L_JSL $T_JSBODY* $L_JSR => ( { js: $1.map(v=>v.value).join('') } )
+		| <L_JSL> <T_JSBODY>* <L_JSR> => ( { js: $1.map(v=>v.value).join('') } )
 
 	[T_GRAMMAR_TEMPLATE]
-		| $L_TEMPLATEL _ $T_JSBODY* _ $L_TEMPLATER => ( { template: '(' + $2.map(v=>v.value).join('').trim() + ')' } )
+		| <L_TEMPLATEL> _ <T_JSBODY>* _ <L_TEMPLATER> => ( { template: '(' + $2.map(v=>v.value).join('').trim() + ')' } )
 
 	[T_STRING]
-		| $T_STRING => ( JSON.parse($0.value) )
+		| <T_STRING> => ( JSON.parse($0.value) )
 
 	[T_WORD]
-		| $T_WORD => ( $0.value )
+		| <T_WORD> => ( $0.value )
 
 	[T_REGEX]
-		| $T_REGEX /[gmiuy]/* => ( { regex: $0.value.slice(1,-1), flags: $1.map(v=>v.value).join('').trim() } )
+		| <T_REGEX> /[gmiuy]/* => ( { regex: $0.value.slice(1,-1), flags: $1.map(v=>v.value).join('').trim() } )
 
 	[T_COMMENT]
-		| $T_COMMENT
+		| <T_COMMENT>
 
 	[T_INTEGER]
-		| $T_INTEGER => ( $0.value )
+		| <T_INTEGER> => ( $0.value )
 
 	[T_WS]
-		| $T_WS => ( null )
+		| <T_WS> => ( null )
 
 }

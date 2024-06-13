@@ -8,9 +8,9 @@ lexer {
 grammar {
 
 	[_]
-		| $whitespace* => ( null )
+		| <whitespace>* => ( null )
 
 	[__]
-		| $whitespace+ => ( null )
+		| <whitespace>+ => ( null )
 
 }
