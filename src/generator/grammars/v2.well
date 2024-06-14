@@ -186,20 +186,20 @@ grammar {
 
 	[section_list]
 		| section => ( [$0] )
-		| section T_WS section_list => ( [$0].concat($2) )
+		| section __ section_list => ( [$0].concat($2) )
 
 	[section]
-		| K_CONFIG _ CBRACKET_L _ kv_list:list _ CBRACKET_R => ( { config: Object.assign(...$list) } )
-		| K_IMPORT _ L_STAR _ K_FROM __ T_WORD:import _ L_SCOLON => ( { import: $import } )
-		| K_IMPORT _ L_STAR _ K_FROM __ T_STRING:import _ L_SCOLON => ( { import: $import, path: true } )
-		| K_IMPORT _ L_STAR _ "as" _ T_WORD:alias _ K_FROM __ T_WORD:import _ L_SCOLON => ( { import: $import, alias: $alias} )
-		| K_IMPORT _ L_STAR _ "as" _ T_WORD:alias _ K_FROM __ T_STRING:import _ L_SCOLON => ( { import: $import, path: true, alias: $alias} )
-		| K_LEXER _ CBRACKET_L _ lexer:lexer _ CBRACKET_R => ( { lexer: Object.assign(...$lexer) } )
-		| K_GRAMMAR _ CBRACKET_L _ grammar:grammar _ CBRACKET_R => ( { grammar: $grammar } )
-		| K_BODY _ T_JS:js => ( { body: $js } )
-		| K_BODY _ T_STRING:js => ( { body: $js, path: true } )
-		| K_HEAD _ T_JS:js => ( { head: $js } )
-		| K_HEAD _ T_STRING:js => ( { head: $js, path: true } )
+		| "config" _ <CBRACKET_L> _ kv_list:list _ <CBRACKET_R> => ( { config: Object.assign(...$list) } )
+		| "import" _ <L_STAR> _ "from" __ T_WORD:import _ <L_SCOLON> => ( { import: $import } )
+		| "import" _ <L_STAR> _ "from" __ T_STRING:import _ <L_SCOLON> => ( { import: $import, path: true } )
+		| "import" _ <L_STAR> _ "as" _ T_WORD:alias _ "from" __ T_WORD:import _ <L_SCOLON> => ( { import: $import, alias: $alias} )
+		| "import" _ <L_STAR> _ "as" _ T_WORD:alias _ "from" __ T_STRING:import _ <L_SCOLON> => ( { import: $import, path: true, alias: $alias} )
+		| "lexer" _ <CBRACKET_L> _ lexer:lexer _ <CBRACKET_R> => ( { lexer: Object.assign(...$lexer) } )
+		| "grammar" _ <CBRACKET_L> _ grammar:grammar _ <CBRACKET_R> => ( { grammar: $grammar } )
+		| "body" _ T_JS:js => ( { body: $js } )
+		| "body" _ T_STRING:js => ( { body: $js, path: true } )
+		| "head" _ T_JS:js => ( { head: $js } )
+		| "head" _ T_STRING:js => ( { head: $js, path: true } )
 
 	[lexer]
 		| kv_list _ state_list => ( $0.concat({ states: $2 }) )
@@ -229,34 +229,34 @@ grammar {
 		| token _ token_list => ( [$0].concat($2) )
 
 	[token]
-		| L_DASH _ K_IMPORT _ word_list => ( { import: $4 } )
-		| L_DASH _ token_definition_list => ( Object.assign(...$2) )
+		| <L_DASH> _ "import" _ word_list => ( { import: $4 } )
+		| <L_DASH> _ token_definition_list => ( Object.assign(...$2) )
 
 	[token_definition_list]
 		| token_definition => ( data )
 		| token_definition _ token_definition_list => ( [$0].concat($2) )
 
 	[token_definition]
-		| K_OPEN _ T_STRING => ( { open: $2 } )
-		| K_CLOSE _ T_STRING => ( { close: $2 } )
-		| K_TAG _ string_list => ( { tag: $2 } )
-		| K_WHEN _ T_STRING => ( { when: $2 } )
-		| K_WHEN _ T_REGEX => ( { when: $2 } )
-		| K_BEFORE _ T_STRING => ( { when: $2, before: true } )
-		| K_BEFORE _ T_REGEX => ( { when: $2, before: true } )
-		| K_SKIP _ T_STRING => ( { when: $2, skip: true } )
-		| K_SKIP _ T_REGEX => ( { when: $2, skip: true } )
-		| K_POP => ( { pop: 1 } )
-		| K_POP _ T_INTEGER => ( { pop: parseInt($2) } )
-		| K_POP _ K_ALL => ( { pop: "all" } )
-		| K_HIGHLIGHT _ T_STRING => ( { highlight: $2 } )
-		| K_EMBED _ T_STRING => ( { embed: $2 } )
-		| K_UNEMBED => ( { unembed: true } )
-		| K_INSET => ( { inset: 1 } )
-		| K_INSET _ T_INTEGER => ( { inset: parseInt($2) } )
-		| K_SET _ T_WORD => ( { set: $2 } )
-		| K_GOTO _ T_WORD => ( { goto: $2 } )
-		| K_TYPE _ T_STRING => ( { type: $2 } )
+		| "open" _ T_STRING => ( { open: $2 } )
+		| "close" _ T_STRING => ( { close: $2 } )
+		| "tag" _ string_list => ( { tag: $2 } )
+		| "when" _ T_STRING => ( { when: $2 } )
+		| "when" _ T_REGEX => ( { when: $2 } )
+		| "before" _ T_STRING => ( { when: $2, before: true } )
+		| "before" _ T_REGEX => ( { when: $2, before: true } )
+		| "skip" _ T_STRING => ( { when: $2, skip: true } )
+		| "skip" _ T_REGEX => ( { when: $2, skip: true } )
+		| "pop" => ( { pop: 1 } )
+		| "pop" _ T_INTEGER => ( { pop: parseInt($2) } )
+		| "pop" _ "all" => ( { pop: "all" } )
+		| "highlight" _ T_STRING => ( { highlight: $2 } )
+		| "embed" _ T_STRING => ( { embed: $2 } )
+		| "unembed" => ( { unembed: true } )
+		| "inset" => ( { inset: 1 } )
+		| "inset" _ T_INTEGER => ( { inset: parseInt($2) } )
+		| "set" _ T_WORD => ( { set: $2 } )
+		| "goto" _ T_WORD => ( { goto: $2 } )
+		| "type" _ T_STRING => ( { type: $2 } )
 
 	[grammar]
 		| kv_list _ grammar_rule_list => ( { config: Object.assign(...$0), rules: $2 } )
@@ -275,8 +275,8 @@ grammar {
 
 	[expression_list]
 		| expression => ( [$0] )
-		| L_PIPE _ expression => ( [$2] )
-		| expression_list _ L_PIPE _ expression => ( $0.concat([$4]) )
+		| <L_PIPE> _ expression => ( [$2] )
+		| expression_list _ <L_PIPE> _ expression => ( $0.concat([$4]) )
 
 	[expression]
 		| expression_symbol_list => ( { symbols: $0 } )
@@ -284,26 +284,26 @@ grammar {
 
 	[expression_symbol_list]
 		| expression_symbol
-		| expression_symbol_list T_WS expression_symbol => ( $0.concat([$2]) )
+		| expression_symbol_list __ expression_symbol => ( $0.concat([$2]) )
 
 	[expression_symbol]
 		| expression_symbol_match => ( $0 )
-		| expression_symbol_match L_COLON T_WORD => ( { ...$0,  alias: $2 } )
+		| expression_symbol_match <L_COLON> T_WORD => ( { ...$0,  alias: $2 } )
 		| expression_symbol_match expression_repeater => ( { expression: $0, repeat: $1 } )
-		| expression_symbol_match expression_repeater L_COLON T_WORD => ( { expression: $0, repeat: $1, alias: $4 } )
+		| expression_symbol_match expression_repeater <L_COLON> T_WORD => ( { expression: $0, repeat: $1, alias: $4 } )
 
 	[expression_symbol_match]
 		| T_WORD => ( { rule: $0 } )
 		| T_STRING "i"? => ( { literal: $0, insensitive: !!$1 } )
-		| ABRACKET_L _ T_WORD:token _ ABRACKET_R => ( { token: $token} )
-		| ABRACKET_L _ T_STRING:token _ ABRACKET_R => ( { token: $token} )
+		| <ABRACKET_L> _ T_WORD:token _ <ABRACKET_R> => ( { token: $token} )
+		| <ABRACKET_L> _ T_STRING:token _ <ABRACKET_R> => ( { token: $token} )
 		| T_REGEX => ( $0 )
-		| L_PARENL _ expression_list _ L_PARENR => ( { subexpression: $2 } )
+		| <L_PARENL> _ expression_list _ <L_PARENR> => ( { subexpression: $2 } )
 
-	[expression_repeater] => ( $0[0].value )
-		| L_QMARK
-		| L_PLUS
-		| L_STAR
+	[expression_repeater] => ( $0.value )
+		| <L_QMARK>
+		| <L_PLUS>
+		| <L_STAR>
 
 	[kv_list]
 		| kv => ( data )
@@ -314,137 +314,17 @@ grammar {
 
 	[string_list]
 		| T_STRING => ( [$0] )
-		| T_STRING _ L_COMMA _ string_list => ( [$0].concat($4) )
+		| T_STRING _ <L_COMMA> _ string_list => ( [$0].concat($4) )
 
 	[word_list]
 		| T_WORD => ( [$0] )
-		| T_WORD _ L_COMMA _ word_list => ( [$0].concat($4) )
+		| T_WORD _ <L_COMMA> _ word_list => ( [$0].concat($4) )
 
 	[_]
-		| (T_WS | T_COMMENT)* => ( null )
+		| (<T_WS> | <T_COMMENT>)* => ( null )
 
 	[__]
-		| (T_WS | T_COMMENT)+ => ( null )
-
-	[L_COLON]
-		| <L_COLON>
-
-	[L_SCOLON]
-		| <L_SCOLON>
-
-	[L_QMARK]
-		| <L_QMARK>
-
-	[L_PLUS]
-		| <L_PLUS>
-
-	[L_STAR]
-		| <L_STAR>
-
-	[L_COMMA]
-		| <L_COMMA>
-
-	[L_PIPE]
-		| <L_PIPE>
-
-	[L_PARENL]
-		| <L_PARENL>
-
-	[L_PARENR]
-		| <L_PARENR>
-
-	[ABRACKET_L]
-		| <ABRACKET_L>
-
-	[ABRACKET_R]
-		| <ABRACKET_R>
-
-	[CBRACKET_L]
-		| <CBRACKET_L>
-
-	[CBRACKET_R]
-		| <CBRACKET_R>
-
-	[DCBRACKET_L]
-		| <DCBRACKET_L>
-
-	[DCBRACKET_R]
-		| <DCBRACKET_R>
-
-	[L_ARROW]
-		| <L_ARROW>
-
-	[L_DSIGN]
-		| <L_DSIGN>
-
-	[L_DASH]
-		| <L_DASH>
-
-	[K_ALL]
-		| "all"
-
-	[K_TAG]
-		| "tag"
-
-	[K_FROM]
-		| "from"
-
-	[K_TYPE]
-		| "type"
-
-	[K_WHEN]
-		| "when"
-
-	[K_POP]
-		| "pop"
-
-	[K_BEFORE]
-		| "before"
-
-	[K_SKIP]
-		| "skip"
-
-	[K_OPEN]
-		| "open"
-
-	[K_CLOSE]
-		| "close"
-
-	[K_HIGHLIGHT]
-		| "highlight"
-
-	[K_EMBED]
-		| "embed"
-
-	[K_UNEMBED]
-		| "unembed"
-
-	[K_INSET]
-		| "inset"
-
-	[K_SET]
-		| "set"
-
-	[K_GOTO]
-		| "goto"
-
-	[K_CONFIG]
-		| "config"
-
-	[K_LEXER]
-		| "lexer"
-
-	[K_GRAMMAR]
-		| "grammar"
-
-	[K_IMPORT]
-		| "import"
-
-	[K_BODY]
-		| "body"
-
-	[K_HEAD]
-		| "head"
+		| (<T_WS> | <T_COMMENT>)+ => ( null )
 
 	[T_JS]
 		| "{" <T_JSBODY>* "}" => ( { js: $1.map(v=>v.value).join('') } )
@@ -467,13 +347,7 @@ grammar {
 	[T_REGEX]
 		| <T_REGEX> /[gmiuy]/* => ( { regex: $0.value.slice(1,-1), flags: $1.map(v=>v.value).join('').trim() } )
 
-	[T_COMMENT]
-		| <T_COMMENT>
-
 	[T_INTEGER]
 		| <T_INTEGER> => ( $0.value )
-
-	[T_WS]
-		| <T_WS> => ( null )
 
 }

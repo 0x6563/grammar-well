@@ -2,246 +2,6 @@ export default GWLanguage;
 declare function GWLanguage(): {
     grammar: {
         rules: {
-            ABRACKET_L: {
-                name: string;
-                symbols: {
-                    token: string;
-                }[];
-            }[];
-            ABRACKET_R: {
-                name: string;
-                symbols: {
-                    token: string;
-                }[];
-            }[];
-            CBRACKET_L: {
-                name: string;
-                symbols: {
-                    token: string;
-                }[];
-            }[];
-            CBRACKET_R: {
-                name: string;
-                symbols: {
-                    token: string;
-                }[];
-            }[];
-            DCBRACKET_L: {
-                name: string;
-                symbols: {
-                    token: string;
-                }[];
-            }[];
-            DCBRACKET_R: {
-                name: string;
-                symbols: {
-                    token: string;
-                }[];
-            }[];
-            K_ALL: {
-                name: string;
-                symbols: {
-                    literal: string;
-                }[];
-            }[];
-            K_BEFORE: {
-                name: string;
-                symbols: {
-                    literal: string;
-                }[];
-            }[];
-            K_BODY: {
-                name: string;
-                symbols: {
-                    literal: string;
-                }[];
-            }[];
-            K_CLOSE: {
-                name: string;
-                symbols: {
-                    literal: string;
-                }[];
-            }[];
-            K_CONFIG: {
-                name: string;
-                symbols: {
-                    literal: string;
-                }[];
-            }[];
-            K_EMBED: {
-                name: string;
-                symbols: {
-                    literal: string;
-                }[];
-            }[];
-            K_FROM: {
-                name: string;
-                symbols: {
-                    literal: string;
-                }[];
-            }[];
-            K_GOTO: {
-                name: string;
-                symbols: {
-                    literal: string;
-                }[];
-            }[];
-            K_GRAMMAR: {
-                name: string;
-                symbols: {
-                    literal: string;
-                }[];
-            }[];
-            K_HEAD: {
-                name: string;
-                symbols: {
-                    literal: string;
-                }[];
-            }[];
-            K_HIGHLIGHT: {
-                name: string;
-                symbols: {
-                    literal: string;
-                }[];
-            }[];
-            K_IMPORT: {
-                name: string;
-                symbols: {
-                    literal: string;
-                }[];
-            }[];
-            K_INSET: {
-                name: string;
-                symbols: {
-                    literal: string;
-                }[];
-            }[];
-            K_LEXER: {
-                name: string;
-                symbols: {
-                    literal: string;
-                }[];
-            }[];
-            K_OPEN: {
-                name: string;
-                symbols: {
-                    literal: string;
-                }[];
-            }[];
-            K_POP: {
-                name: string;
-                symbols: {
-                    literal: string;
-                }[];
-            }[];
-            K_SET: {
-                name: string;
-                symbols: {
-                    literal: string;
-                }[];
-            }[];
-            K_SKIP: {
-                name: string;
-                symbols: {
-                    literal: string;
-                }[];
-            }[];
-            K_TAG: {
-                name: string;
-                symbols: {
-                    literal: string;
-                }[];
-            }[];
-            K_TYPE: {
-                name: string;
-                symbols: {
-                    literal: string;
-                }[];
-            }[];
-            K_UNEMBED: {
-                name: string;
-                symbols: {
-                    literal: string;
-                }[];
-            }[];
-            K_WHEN: {
-                name: string;
-                symbols: {
-                    literal: string;
-                }[];
-            }[];
-            L_ARROW: {
-                name: string;
-                symbols: {
-                    token: string;
-                }[];
-            }[];
-            L_COLON: {
-                name: string;
-                symbols: {
-                    token: string;
-                }[];
-            }[];
-            L_COMMA: {
-                name: string;
-                symbols: {
-                    token: string;
-                }[];
-            }[];
-            L_DASH: {
-                name: string;
-                symbols: {
-                    token: string;
-                }[];
-            }[];
-            L_DSIGN: {
-                name: string;
-                symbols: {
-                    token: string;
-                }[];
-            }[];
-            L_PARENL: {
-                name: string;
-                symbols: {
-                    token: string;
-                }[];
-            }[];
-            L_PARENR: {
-                name: string;
-                symbols: {
-                    token: string;
-                }[];
-            }[];
-            L_PIPE: {
-                name: string;
-                symbols: {
-                    token: string;
-                }[];
-            }[];
-            L_PLUS: {
-                name: string;
-                symbols: {
-                    token: string;
-                }[];
-            }[];
-            L_QMARK: {
-                name: string;
-                symbols: {
-                    token: string;
-                }[];
-            }[];
-            L_SCOLON: {
-                name: string;
-                symbols: {
-                    token: string;
-                }[];
-            }[];
-            L_STAR: {
-                name: string;
-                symbols: {
-                    token: string;
-                }[];
-            }[];
             POSTPROCESSOR: ({
                 name: string;
                 postprocess: ({ data }: {
@@ -315,12 +75,6 @@ declare function GWLanguage(): {
                     token: string;
                 })[];
             })[];
-            T_COMMENT: {
-                name: string;
-                symbols: {
-                    token: string;
-                }[];
-            }[];
             T_INTEGER: {
                 name: string;
                 postprocess: ({ data }: {
@@ -404,15 +158,6 @@ declare function GWLanguage(): {
                     token: string;
                 }[];
             }[];
-            T_WS: {
-                name: string;
-                postprocess: ({ data }: {
-                    data: any;
-                }) => any;
-                symbols: {
-                    token: string;
-                }[];
-            }[];
             _: {
                 name: string;
                 postprocess: ({ data }: {
@@ -433,7 +178,9 @@ declare function GWLanguage(): {
             })[];
             _$RPT0Nx1$SUBx1: {
                 name: string;
-                symbols: string[];
+                symbols: {
+                    token: string;
+                }[];
             }[];
             __: {
                 name: string;
@@ -455,11 +202,15 @@ declare function GWLanguage(): {
             })[];
             __$RPT1Nx1$SUBx1: {
                 name: string;
-                symbols: string[];
+                symbols: {
+                    token: string;
+                }[];
             }[];
             __$RPT1Nx1$SUBx2: {
                 name: string;
-                symbols: string[];
+                symbols: {
+                    token: string;
+                }[];
             }[];
             expression: {
                 name: string;
@@ -475,21 +226,27 @@ declare function GWLanguage(): {
                 postprocess: ({ data }: {
                     data: any;
                 }) => any;
-                symbols: string[];
+                symbols: (string | {
+                    token: string;
+                })[];
             }[];
             expression_repeater: {
                 name: string;
                 postprocess: ({ data }: {
                     data: any;
                 }) => any;
-                symbols: string[];
+                symbols: {
+                    token: string;
+                }[];
             }[];
             expression_symbol: {
                 name: string;
                 postprocess: ({ data }: {
                     data: any;
                 }) => any;
-                symbols: string[];
+                symbols: (string | {
+                    token: string;
+                })[];
             }[];
             expression_symbol_list: ({
                 name: string;
@@ -502,13 +259,33 @@ declare function GWLanguage(): {
                 }) => any;
                 symbols: string[];
             })[];
-            expression_symbol_match: {
+            expression_symbol_match: ({
+                name: string;
+                postprocess: ({ data }: {
+                    data: any;
+                }) => {
+                    token: any;
+                };
+                symbols: (string | {
+                    token: string;
+                })[];
+            } | {
                 name: string;
                 postprocess: ({ data }: {
                     data: any;
                 }) => any;
                 symbols: string[];
-            }[];
+            } | {
+                name: string;
+                postprocess: ({ data }: {
+                    data: any;
+                }) => {
+                    subexpression: any;
+                };
+                symbols: (string | {
+                    token: string;
+                })[];
+            })[];
             expression_symbol_match$RPT01x1: {
                 name: string;
                 postprocess: ({ data }: {
@@ -594,7 +371,13 @@ declare function GWLanguage(): {
                 }) => {
                     config: any;
                 };
-                symbols: string[];
+                symbols: (string | {
+                    literal: string;
+                    token?: undefined;
+                } | {
+                    token: string;
+                    literal?: undefined;
+                })[];
             } | {
                 name: string;
                 postprocess: ({ data }: {
@@ -602,14 +385,47 @@ declare function GWLanguage(): {
                 }) => {
                     import: any;
                 };
-                symbols: string[];
+                symbols: (string | {
+                    literal: string;
+                    token?: undefined;
+                } | {
+                    token: string;
+                    literal?: undefined;
+                })[];
             } | {
                 name: string;
                 postprocess: ({ data }: {
                     data: any;
                 }) => {
-                    import: any;
-                    alias: any;
+                    lexer: any;
+                };
+                symbols: (string | {
+                    literal: string;
+                    token?: undefined;
+                } | {
+                    token: string;
+                    literal?: undefined;
+                })[];
+            } | {
+                name: string;
+                postprocess: ({ data }: {
+                    data: any;
+                }) => {
+                    grammar: any;
+                };
+                symbols: (string | {
+                    literal: string;
+                    token?: undefined;
+                } | {
+                    token: string;
+                    literal?: undefined;
+                })[];
+            } | {
+                name: string;
+                postprocess: ({ data }: {
+                    data: any;
+                }) => {
+                    body: any;
                 };
                 symbols: (string | {
                     literal: string;
@@ -619,33 +435,11 @@ declare function GWLanguage(): {
                 postprocess: ({ data }: {
                     data: any;
                 }) => {
-                    lexer: any;
-                };
-                symbols: string[];
-            } | {
-                name: string;
-                postprocess: ({ data }: {
-                    data: any;
-                }) => {
-                    grammar: any;
-                };
-                symbols: string[];
-            } | {
-                name: string;
-                postprocess: ({ data }: {
-                    data: any;
-                }) => {
-                    body: any;
-                };
-                symbols: string[];
-            } | {
-                name: string;
-                postprocess: ({ data }: {
-                    data: any;
-                }) => {
                     head: any;
                 };
-                symbols: string[];
+                symbols: (string | {
+                    literal: string;
+                })[];
             })[];
             section_list: {
                 name: string;
@@ -711,15 +505,33 @@ declare function GWLanguage(): {
                 postprocess: ({ data }: {
                     data: any;
                 }) => any[];
-                symbols: string[];
+                symbols: (string | {
+                    token: string;
+                })[];
             }[];
-            token: {
+            token: ({
+                name: string;
+                postprocess: ({ data }: {
+                    data: any;
+                }) => {
+                    import: any;
+                };
+                symbols: (string | {
+                    token: string;
+                    literal?: undefined;
+                } | {
+                    literal: string;
+                    token?: undefined;
+                })[];
+            } | {
                 name: string;
                 postprocess: ({ data }: {
                     data: any;
                 }) => any;
-                symbols: string[];
-            }[];
+                symbols: (string | {
+                    token: string;
+                })[];
+            })[];
             token_definition: ({
                 name: string;
                 postprocess: ({ data }: {
@@ -727,7 +539,9 @@ declare function GWLanguage(): {
                 }) => {
                     open: any;
                 };
-                symbols: string[];
+                symbols: (string | {
+                    literal: string;
+                })[];
             } | {
                 name: string;
                 postprocess: ({ data }: {
@@ -735,7 +549,9 @@ declare function GWLanguage(): {
                 }) => {
                     close: any;
                 };
-                symbols: string[];
+                symbols: (string | {
+                    literal: string;
+                })[];
             } | {
                 name: string;
                 postprocess: ({ data }: {
@@ -743,7 +559,9 @@ declare function GWLanguage(): {
                 }) => {
                     tag: any;
                 };
-                symbols: string[];
+                symbols: (string | {
+                    literal: string;
+                })[];
             } | {
                 name: string;
                 postprocess: ({ data }: {
@@ -751,7 +569,9 @@ declare function GWLanguage(): {
                 }) => {
                     when: any;
                 };
-                symbols: string[];
+                symbols: (string | {
+                    literal: string;
+                })[];
             } | {
                 name: string;
                 postprocess: ({ data }: {
@@ -759,7 +579,9 @@ declare function GWLanguage(): {
                 }) => {
                     pop: number;
                 };
-                symbols: string[];
+                symbols: (string | {
+                    literal: string;
+                })[];
             } | {
                 name: string;
                 postprocess: ({ data }: {
@@ -767,7 +589,9 @@ declare function GWLanguage(): {
                 }) => {
                     pop: string;
                 };
-                symbols: string[];
+                symbols: (string | {
+                    literal: string;
+                })[];
             } | {
                 name: string;
                 postprocess: ({ data }: {
@@ -775,7 +599,9 @@ declare function GWLanguage(): {
                 }) => {
                     highlight: any;
                 };
-                symbols: string[];
+                symbols: (string | {
+                    literal: string;
+                })[];
             } | {
                 name: string;
                 postprocess: ({ data }: {
@@ -783,7 +609,9 @@ declare function GWLanguage(): {
                 }) => {
                     embed: any;
                 };
-                symbols: string[];
+                symbols: (string | {
+                    literal: string;
+                })[];
             } | {
                 name: string;
                 postprocess: ({ data }: {
@@ -791,7 +619,9 @@ declare function GWLanguage(): {
                 }) => {
                     unembed: boolean;
                 };
-                symbols: string[];
+                symbols: {
+                    literal: string;
+                }[];
             } | {
                 name: string;
                 postprocess: ({ data }: {
@@ -799,7 +629,9 @@ declare function GWLanguage(): {
                 }) => {
                     inset: number;
                 };
-                symbols: string[];
+                symbols: (string | {
+                    literal: string;
+                })[];
             } | {
                 name: string;
                 postprocess: ({ data }: {
@@ -807,7 +639,9 @@ declare function GWLanguage(): {
                 }) => {
                     set: any;
                 };
-                symbols: string[];
+                symbols: (string | {
+                    literal: string;
+                })[];
             } | {
                 name: string;
                 postprocess: ({ data }: {
@@ -815,7 +649,9 @@ declare function GWLanguage(): {
                 }) => {
                     goto: any;
                 };
-                symbols: string[];
+                symbols: (string | {
+                    literal: string;
+                })[];
             } | {
                 name: string;
                 postprocess: ({ data }: {
@@ -823,7 +659,9 @@ declare function GWLanguage(): {
                 }) => {
                     type: any;
                 };
-                symbols: string[];
+                symbols: (string | {
+                    literal: string;
+                })[];
             })[];
             token_definition_list: {
                 name: string;
@@ -844,7 +682,9 @@ declare function GWLanguage(): {
                 postprocess: ({ data }: {
                     data: any;
                 }) => any[];
-                symbols: string[];
+                symbols: (string | {
+                    token: string;
+                })[];
             }[];
         };
         start: string;

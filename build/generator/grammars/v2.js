@@ -2,126 +2,6 @@ function GWLanguage() {
     return {
         grammar: {
             rules: {
-                ABRACKET_L: [
-                    { name: "ABRACKET_L", symbols: [{ token: "ABRACKET_L" }] }
-                ],
-                ABRACKET_R: [
-                    { name: "ABRACKET_R", symbols: [{ token: "ABRACKET_R" }] }
-                ],
-                CBRACKET_L: [
-                    { name: "CBRACKET_L", symbols: [{ token: "CBRACKET_L" }] }
-                ],
-                CBRACKET_R: [
-                    { name: "CBRACKET_R", symbols: [{ token: "CBRACKET_R" }] }
-                ],
-                DCBRACKET_L: [
-                    { name: "DCBRACKET_L", symbols: [{ token: "DCBRACKET_L" }] }
-                ],
-                DCBRACKET_R: [
-                    { name: "DCBRACKET_R", symbols: [{ token: "DCBRACKET_R" }] }
-                ],
-                K_ALL: [
-                    { name: "K_ALL", symbols: [{ literal: "all" }] }
-                ],
-                K_BEFORE: [
-                    { name: "K_BEFORE", symbols: [{ literal: "before" }] }
-                ],
-                K_BODY: [
-                    { name: "K_BODY", symbols: [{ literal: "body" }] }
-                ],
-                K_CLOSE: [
-                    { name: "K_CLOSE", symbols: [{ literal: "close" }] }
-                ],
-                K_CONFIG: [
-                    { name: "K_CONFIG", symbols: [{ literal: "config" }] }
-                ],
-                K_EMBED: [
-                    { name: "K_EMBED", symbols: [{ literal: "embed" }] }
-                ],
-                K_FROM: [
-                    { name: "K_FROM", symbols: [{ literal: "from" }] }
-                ],
-                K_GOTO: [
-                    { name: "K_GOTO", symbols: [{ literal: "goto" }] }
-                ],
-                K_GRAMMAR: [
-                    { name: "K_GRAMMAR", symbols: [{ literal: "grammar" }] }
-                ],
-                K_HEAD: [
-                    { name: "K_HEAD", symbols: [{ literal: "head" }] }
-                ],
-                K_HIGHLIGHT: [
-                    { name: "K_HIGHLIGHT", symbols: [{ literal: "highlight" }] }
-                ],
-                K_IMPORT: [
-                    { name: "K_IMPORT", symbols: [{ literal: "import" }] }
-                ],
-                K_INSET: [
-                    { name: "K_INSET", symbols: [{ literal: "inset" }] }
-                ],
-                K_LEXER: [
-                    { name: "K_LEXER", symbols: [{ literal: "lexer" }] }
-                ],
-                K_OPEN: [
-                    { name: "K_OPEN", symbols: [{ literal: "open" }] }
-                ],
-                K_POP: [
-                    { name: "K_POP", symbols: [{ literal: "pop" }] }
-                ],
-                K_SET: [
-                    { name: "K_SET", symbols: [{ literal: "set" }] }
-                ],
-                K_SKIP: [
-                    { name: "K_SKIP", symbols: [{ literal: "skip" }] }
-                ],
-                K_TAG: [
-                    { name: "K_TAG", symbols: [{ literal: "tag" }] }
-                ],
-                K_TYPE: [
-                    { name: "K_TYPE", symbols: [{ literal: "type" }] }
-                ],
-                K_UNEMBED: [
-                    { name: "K_UNEMBED", symbols: [{ literal: "unembed" }] }
-                ],
-                K_WHEN: [
-                    { name: "K_WHEN", symbols: [{ literal: "when" }] }
-                ],
-                L_ARROW: [
-                    { name: "L_ARROW", symbols: [{ token: "L_ARROW" }] }
-                ],
-                L_COLON: [
-                    { name: "L_COLON", symbols: [{ token: "L_COLON" }] }
-                ],
-                L_COMMA: [
-                    { name: "L_COMMA", symbols: [{ token: "L_COMMA" }] }
-                ],
-                L_DASH: [
-                    { name: "L_DASH", symbols: [{ token: "L_DASH" }] }
-                ],
-                L_DSIGN: [
-                    { name: "L_DSIGN", symbols: [{ token: "L_DSIGN" }] }
-                ],
-                L_PARENL: [
-                    { name: "L_PARENL", symbols: [{ token: "L_PARENL" }] }
-                ],
-                L_PARENR: [
-                    { name: "L_PARENR", symbols: [{ token: "L_PARENR" }] }
-                ],
-                L_PIPE: [
-                    { name: "L_PIPE", symbols: [{ token: "L_PIPE" }] }
-                ],
-                L_PLUS: [
-                    { name: "L_PLUS", symbols: [{ token: "L_PLUS" }] }
-                ],
-                L_QMARK: [
-                    { name: "L_QMARK", symbols: [{ token: "L_QMARK" }] }
-                ],
-                L_SCOLON: [
-                    { name: "L_SCOLON", symbols: [{ token: "L_SCOLON" }] }
-                ],
-                L_STAR: [
-                    { name: "L_STAR", symbols: [{ token: "L_STAR" }] }
-                ],
                 POSTPROCESSOR: [
                     { name: "POSTPROCESSOR", postprocess: ({ data }) => { return ({ template: data[2].value + data[3].map(v => v.value).join('').trim() + data[4].value }); }, symbols: [{ literal: "=>" }, "_", { literal: "(" }, "POSTPROCESSOR$RPT0Nx1", { literal: ")" }] },
                     { name: "POSTPROCESSOR", postprocess: ({ data }) => { return ({ template: data[2].value + data[3].map(v => v.value).join('').trim() + data[4].value }); }, symbols: [{ literal: "=>" }, "_", { literal: "{" }, "POSTPROCESSOR$RPT0Nx2", { literal: "}" }] },
@@ -143,9 +23,6 @@ function GWLanguage() {
                 POSTPROCESSOR$RPT0Nx4: [
                     { name: "POSTPROCESSOR$RPT0Nx4", symbols: [] },
                     { name: "POSTPROCESSOR$RPT0Nx4", postprocess: ({ data }) => data[0].concat([data[1]]), symbols: ["POSTPROCESSOR$RPT0Nx4", { token: "T_JSBODY" }] }
-                ],
-                T_COMMENT: [
-                    { name: "T_COMMENT", symbols: [{ token: "T_COMMENT" }] }
                 ],
                 T_INTEGER: [
                     { name: "T_INTEGER", postprocess: ({ data }) => { return (data[0].value); }, symbols: [{ token: "T_INTEGER" }] }
@@ -173,9 +50,6 @@ function GWLanguage() {
                 T_WORD: [
                     { name: "T_WORD", postprocess: ({ data }) => { return (data[0].value); }, symbols: [{ token: "T_WORD" }] }
                 ],
-                T_WS: [
-                    { name: "T_WS", postprocess: ({ data }) => { return (null); }, symbols: [{ token: "T_WS" }] }
-                ],
                 _: [
                     { name: "_", postprocess: ({ data }) => { return (null); }, symbols: ["_$RPT0Nx1"] }
                 ],
@@ -184,8 +58,8 @@ function GWLanguage() {
                     { name: "_$RPT0Nx1", postprocess: ({ data }) => data[0].concat([data[1]]), symbols: ["_$RPT0Nx1", "_$RPT0Nx1$SUBx1"] }
                 ],
                 _$RPT0Nx1$SUBx1: [
-                    { name: "_$RPT0Nx1$SUBx1", symbols: ["T_WS"] },
-                    { name: "_$RPT0Nx1$SUBx1", symbols: ["T_COMMENT"] }
+                    { name: "_$RPT0Nx1$SUBx1", symbols: [{ token: "T_WS" }] },
+                    { name: "_$RPT0Nx1$SUBx1", symbols: [{ token: "T_COMMENT" }] }
                 ],
                 __: [
                     { name: "__", postprocess: ({ data }) => { return (null); }, symbols: ["__$RPT1Nx1"] }
@@ -195,12 +69,12 @@ function GWLanguage() {
                     { name: "__$RPT1Nx1", postprocess: ({ data }) => data[0].concat([data[1]]), symbols: ["__$RPT1Nx1", "__$RPT1Nx1$SUBx2"] }
                 ],
                 __$RPT1Nx1$SUBx1: [
-                    { name: "__$RPT1Nx1$SUBx1", symbols: ["T_WS"] },
-                    { name: "__$RPT1Nx1$SUBx1", symbols: ["T_COMMENT"] }
+                    { name: "__$RPT1Nx1$SUBx1", symbols: [{ token: "T_WS" }] },
+                    { name: "__$RPT1Nx1$SUBx1", symbols: [{ token: "T_COMMENT" }] }
                 ],
                 __$RPT1Nx1$SUBx2: [
-                    { name: "__$RPT1Nx1$SUBx2", symbols: ["T_WS"] },
-                    { name: "__$RPT1Nx1$SUBx2", symbols: ["T_COMMENT"] }
+                    { name: "__$RPT1Nx1$SUBx2", symbols: [{ token: "T_WS" }] },
+                    { name: "__$RPT1Nx1$SUBx2", symbols: [{ token: "T_COMMENT" }] }
                 ],
                 expression: [
                     { name: "expression", postprocess: ({ data }) => { return ({ symbols: data[0] }); }, symbols: ["expression_symbol_list"] },
@@ -208,31 +82,31 @@ function GWLanguage() {
                 ],
                 expression_list: [
                     { name: "expression_list", postprocess: ({ data }) => { return ([data[0]]); }, symbols: ["expression"] },
-                    { name: "expression_list", postprocess: ({ data }) => { return ([data[2]]); }, symbols: ["L_PIPE", "_", "expression"] },
-                    { name: "expression_list", postprocess: ({ data }) => { return (data[0].concat([data[4]])); }, symbols: ["expression_list", "_", "L_PIPE", "_", "expression"] }
+                    { name: "expression_list", postprocess: ({ data }) => { return ([data[2]]); }, symbols: [{ token: "L_PIPE" }, "_", "expression"] },
+                    { name: "expression_list", postprocess: ({ data }) => { return (data[0].concat([data[4]])); }, symbols: ["expression_list", "_", { token: "L_PIPE" }, "_", "expression"] }
                 ],
                 expression_repeater: [
-                    { name: "expression_repeater", postprocess: ({ data }) => { return (data[0][0].value); }, symbols: ["L_QMARK"] },
-                    { name: "expression_repeater", postprocess: ({ data }) => { return (data[0][0].value); }, symbols: ["L_PLUS"] },
-                    { name: "expression_repeater", postprocess: ({ data }) => { return (data[0][0].value); }, symbols: ["L_STAR"] }
+                    { name: "expression_repeater", postprocess: ({ data }) => { return (data[0].value); }, symbols: [{ token: "L_QMARK" }] },
+                    { name: "expression_repeater", postprocess: ({ data }) => { return (data[0].value); }, symbols: [{ token: "L_PLUS" }] },
+                    { name: "expression_repeater", postprocess: ({ data }) => { return (data[0].value); }, symbols: [{ token: "L_STAR" }] }
                 ],
                 expression_symbol: [
                     { name: "expression_symbol", postprocess: ({ data }) => { return (data[0]); }, symbols: ["expression_symbol_match"] },
-                    { name: "expression_symbol", postprocess: ({ data }) => { return ({ ...data[0], alias: data[2] }); }, symbols: ["expression_symbol_match", "L_COLON", "T_WORD"] },
+                    { name: "expression_symbol", postprocess: ({ data }) => { return ({ ...data[0], alias: data[2] }); }, symbols: ["expression_symbol_match", { token: "L_COLON" }, "T_WORD"] },
                     { name: "expression_symbol", postprocess: ({ data }) => { return ({ expression: data[0], repeat: data[1] }); }, symbols: ["expression_symbol_match", "expression_repeater"] },
-                    { name: "expression_symbol", postprocess: ({ data }) => { return ({ expression: data[0], repeat: data[1], alias: data[4] }); }, symbols: ["expression_symbol_match", "expression_repeater", "L_COLON", "T_WORD"] }
+                    { name: "expression_symbol", postprocess: ({ data }) => { return ({ expression: data[0], repeat: data[1], alias: data[4] }); }, symbols: ["expression_symbol_match", "expression_repeater", { token: "L_COLON" }, "T_WORD"] }
                 ],
                 expression_symbol_list: [
                     { name: "expression_symbol_list", symbols: ["expression_symbol"] },
-                    { name: "expression_symbol_list", postprocess: ({ data }) => { return (data[0].concat([data[2]])); }, symbols: ["expression_symbol_list", "T_WS", "expression_symbol"] }
+                    { name: "expression_symbol_list", postprocess: ({ data }) => { return (data[0].concat([data[2]])); }, symbols: ["expression_symbol_list", "__", "expression_symbol"] }
                 ],
                 expression_symbol_match: [
                     { name: "expression_symbol_match", postprocess: ({ data }) => { return ({ rule: data[0] }); }, symbols: ["T_WORD"] },
                     { name: "expression_symbol_match", postprocess: ({ data }) => { return ({ literal: data[0], insensitive: !!data[1] }); }, symbols: ["T_STRING", "expression_symbol_match$RPT01x1"] },
-                    { name: "expression_symbol_match", postprocess: ({ data }) => { return ({ token: data[2] }); }, symbols: ["ABRACKET_L", "_", "T_WORD", "_", "ABRACKET_R"] },
-                    { name: "expression_symbol_match", postprocess: ({ data }) => { return ({ token: data[2] }); }, symbols: ["ABRACKET_L", "_", "T_STRING", "_", "ABRACKET_R"] },
+                    { name: "expression_symbol_match", postprocess: ({ data }) => { return ({ token: data[2] }); }, symbols: [{ token: "ABRACKET_L" }, "_", "T_WORD", "_", { token: "ABRACKET_R" }] },
+                    { name: "expression_symbol_match", postprocess: ({ data }) => { return ({ token: data[2] }); }, symbols: [{ token: "ABRACKET_L" }, "_", "T_STRING", "_", { token: "ABRACKET_R" }] },
                     { name: "expression_symbol_match", postprocess: ({ data }) => { return (data[0]); }, symbols: ["T_REGEX"] },
-                    { name: "expression_symbol_match", postprocess: ({ data }) => { return ({ subexpression: data[2] }); }, symbols: ["L_PARENL", "_", "expression_list", "_", "L_PARENR"] }
+                    { name: "expression_symbol_match", postprocess: ({ data }) => { return ({ subexpression: data[2] }); }, symbols: [{ token: "L_PARENL" }, "_", "expression_list", "_", { token: "L_PARENR" }] }
                 ],
                 expression_symbol_match$RPT01x1: [
                     { name: "expression_symbol_match$RPT01x1", postprocess: ({ data }) => data[0], symbols: [{ literal: "i" }] },
@@ -274,21 +148,21 @@ function GWLanguage() {
                     { name: "main", postprocess: ({ data }) => { return (data[1]); }, symbols: ["_", "section_list", "_"] }
                 ],
                 section: [
-                    { name: "section", postprocess: ({ data }) => { return ({ config: Object.assign(...data[4]) }); }, symbols: ["K_CONFIG", "_", "CBRACKET_L", "_", "kv_list", "_", "CBRACKET_R"] },
-                    { name: "section", postprocess: ({ data }) => { return ({ import: data[6] }); }, symbols: ["K_IMPORT", "_", "L_STAR", "_", "K_FROM", "__", "T_WORD", "_", "L_SCOLON"] },
-                    { name: "section", postprocess: ({ data }) => { return ({ import: data[6], path: true }); }, symbols: ["K_IMPORT", "_", "L_STAR", "_", "K_FROM", "__", "T_STRING", "_", "L_SCOLON"] },
-                    { name: "section", postprocess: ({ data }) => { return ({ import: data[10], alias: data[6] }); }, symbols: ["K_IMPORT", "_", "L_STAR", "_", { literal: "as" }, "_", "T_WORD", "_", "K_FROM", "__", "T_WORD", "_", "L_SCOLON"] },
-                    { name: "section", postprocess: ({ data }) => { return ({ import: data[10], path: true, alias: data[6] }); }, symbols: ["K_IMPORT", "_", "L_STAR", "_", { literal: "as" }, "_", "T_WORD", "_", "K_FROM", "__", "T_STRING", "_", "L_SCOLON"] },
-                    { name: "section", postprocess: ({ data }) => { return ({ lexer: Object.assign(...data[4]) }); }, symbols: ["K_LEXER", "_", "CBRACKET_L", "_", "lexer", "_", "CBRACKET_R"] },
-                    { name: "section", postprocess: ({ data }) => { return ({ grammar: data[4] }); }, symbols: ["K_GRAMMAR", "_", "CBRACKET_L", "_", "grammar", "_", "CBRACKET_R"] },
-                    { name: "section", postprocess: ({ data }) => { return ({ body: data[2] }); }, symbols: ["K_BODY", "_", "T_JS"] },
-                    { name: "section", postprocess: ({ data }) => { return ({ body: data[2], path: true }); }, symbols: ["K_BODY", "_", "T_STRING"] },
-                    { name: "section", postprocess: ({ data }) => { return ({ head: data[2] }); }, symbols: ["K_HEAD", "_", "T_JS"] },
-                    { name: "section", postprocess: ({ data }) => { return ({ head: data[2], path: true }); }, symbols: ["K_HEAD", "_", "T_STRING"] }
+                    { name: "section", postprocess: ({ data }) => { return ({ config: Object.assign(...data[4]) }); }, symbols: [{ literal: "config" }, "_", { token: "CBRACKET_L" }, "_", "kv_list", "_", { token: "CBRACKET_R" }] },
+                    { name: "section", postprocess: ({ data }) => { return ({ import: data[6] }); }, symbols: [{ literal: "import" }, "_", { token: "L_STAR" }, "_", { literal: "from" }, "__", "T_WORD", "_", { token: "L_SCOLON" }] },
+                    { name: "section", postprocess: ({ data }) => { return ({ import: data[6], path: true }); }, symbols: [{ literal: "import" }, "_", { token: "L_STAR" }, "_", { literal: "from" }, "__", "T_STRING", "_", { token: "L_SCOLON" }] },
+                    { name: "section", postprocess: ({ data }) => { return ({ import: data[10], alias: data[6] }); }, symbols: [{ literal: "import" }, "_", { token: "L_STAR" }, "_", { literal: "as" }, "_", "T_WORD", "_", { literal: "from" }, "__", "T_WORD", "_", { token: "L_SCOLON" }] },
+                    { name: "section", postprocess: ({ data }) => { return ({ import: data[10], path: true, alias: data[6] }); }, symbols: [{ literal: "import" }, "_", { token: "L_STAR" }, "_", { literal: "as" }, "_", "T_WORD", "_", { literal: "from" }, "__", "T_STRING", "_", { token: "L_SCOLON" }] },
+                    { name: "section", postprocess: ({ data }) => { return ({ lexer: Object.assign(...data[4]) }); }, symbols: [{ literal: "lexer" }, "_", { token: "CBRACKET_L" }, "_", "lexer", "_", { token: "CBRACKET_R" }] },
+                    { name: "section", postprocess: ({ data }) => { return ({ grammar: data[4] }); }, symbols: [{ literal: "grammar" }, "_", { token: "CBRACKET_L" }, "_", "grammar", "_", { token: "CBRACKET_R" }] },
+                    { name: "section", postprocess: ({ data }) => { return ({ body: data[2] }); }, symbols: [{ literal: "body" }, "_", "T_JS"] },
+                    { name: "section", postprocess: ({ data }) => { return ({ body: data[2], path: true }); }, symbols: [{ literal: "body" }, "_", "T_STRING"] },
+                    { name: "section", postprocess: ({ data }) => { return ({ head: data[2] }); }, symbols: [{ literal: "head" }, "_", "T_JS"] },
+                    { name: "section", postprocess: ({ data }) => { return ({ head: data[2], path: true }); }, symbols: [{ literal: "head" }, "_", "T_STRING"] }
                 ],
                 section_list: [
                     { name: "section_list", postprocess: ({ data }) => { return ([data[0]]); }, symbols: ["section"] },
-                    { name: "section_list", postprocess: ({ data }) => { return ([data[0]].concat(data[2])); }, symbols: ["section", "T_WS", "section_list"] }
+                    { name: "section_list", postprocess: ({ data }) => { return ([data[0]].concat(data[2])); }, symbols: ["section", "__", "section_list"] }
                 ],
                 state: [
                     { name: "state", postprocess: ({ data }) => { return ({ name: data[0], state: data[2] }); }, symbols: ["T_SECTWORD", "_", "state_definition"] }
@@ -311,33 +185,33 @@ function GWLanguage() {
                 ],
                 string_list: [
                     { name: "string_list", postprocess: ({ data }) => { return ([data[0]]); }, symbols: ["T_STRING"] },
-                    { name: "string_list", postprocess: ({ data }) => { return ([data[0]].concat(data[4])); }, symbols: ["T_STRING", "_", "L_COMMA", "_", "string_list"] }
+                    { name: "string_list", postprocess: ({ data }) => { return ([data[0]].concat(data[4])); }, symbols: ["T_STRING", "_", { token: "L_COMMA" }, "_", "string_list"] }
                 ],
                 token: [
-                    { name: "token", postprocess: ({ data }) => { return ({ import: data[4] }); }, symbols: ["L_DASH", "_", "K_IMPORT", "_", "word_list"] },
-                    { name: "token", postprocess: ({ data }) => { return (Object.assign(...data[2])); }, symbols: ["L_DASH", "_", "token_definition_list"] }
+                    { name: "token", postprocess: ({ data }) => { return ({ import: data[4] }); }, symbols: [{ token: "L_DASH" }, "_", { literal: "import" }, "_", "word_list"] },
+                    { name: "token", postprocess: ({ data }) => { return (Object.assign(...data[2])); }, symbols: [{ token: "L_DASH" }, "_", "token_definition_list"] }
                 ],
                 token_definition: [
-                    { name: "token_definition", postprocess: ({ data }) => { return ({ open: data[2] }); }, symbols: ["K_OPEN", "_", "T_STRING"] },
-                    { name: "token_definition", postprocess: ({ data }) => { return ({ close: data[2] }); }, symbols: ["K_CLOSE", "_", "T_STRING"] },
-                    { name: "token_definition", postprocess: ({ data }) => { return ({ tag: data[2] }); }, symbols: ["K_TAG", "_", "string_list"] },
-                    { name: "token_definition", postprocess: ({ data }) => { return ({ when: data[2] }); }, symbols: ["K_WHEN", "_", "T_STRING"] },
-                    { name: "token_definition", postprocess: ({ data }) => { return ({ when: data[2] }); }, symbols: ["K_WHEN", "_", "T_REGEX"] },
-                    { name: "token_definition", postprocess: ({ data }) => { return ({ when: data[2], before: true }); }, symbols: ["K_BEFORE", "_", "T_STRING"] },
-                    { name: "token_definition", postprocess: ({ data }) => { return ({ when: data[2], before: true }); }, symbols: ["K_BEFORE", "_", "T_REGEX"] },
-                    { name: "token_definition", postprocess: ({ data }) => { return ({ when: data[2], skip: true }); }, symbols: ["K_SKIP", "_", "T_STRING"] },
-                    { name: "token_definition", postprocess: ({ data }) => { return ({ when: data[2], skip: true }); }, symbols: ["K_SKIP", "_", "T_REGEX"] },
-                    { name: "token_definition", postprocess: ({ data }) => { return ({ pop: 1 }); }, symbols: ["K_POP"] },
-                    { name: "token_definition", postprocess: ({ data }) => { return ({ pop: parseInt(data[2]) }); }, symbols: ["K_POP", "_", "T_INTEGER"] },
-                    { name: "token_definition", postprocess: ({ data }) => { return ({ pop: "all" }); }, symbols: ["K_POP", "_", "K_ALL"] },
-                    { name: "token_definition", postprocess: ({ data }) => { return ({ highlight: data[2] }); }, symbols: ["K_HIGHLIGHT", "_", "T_STRING"] },
-                    { name: "token_definition", postprocess: ({ data }) => { return ({ embed: data[2] }); }, symbols: ["K_EMBED", "_", "T_STRING"] },
-                    { name: "token_definition", postprocess: ({ data }) => { return ({ unembed: true }); }, symbols: ["K_UNEMBED"] },
-                    { name: "token_definition", postprocess: ({ data }) => { return ({ inset: 1 }); }, symbols: ["K_INSET"] },
-                    { name: "token_definition", postprocess: ({ data }) => { return ({ inset: parseInt(data[2]) }); }, symbols: ["K_INSET", "_", "T_INTEGER"] },
-                    { name: "token_definition", postprocess: ({ data }) => { return ({ set: data[2] }); }, symbols: ["K_SET", "_", "T_WORD"] },
-                    { name: "token_definition", postprocess: ({ data }) => { return ({ goto: data[2] }); }, symbols: ["K_GOTO", "_", "T_WORD"] },
-                    { name: "token_definition", postprocess: ({ data }) => { return ({ type: data[2] }); }, symbols: ["K_TYPE", "_", "T_STRING"] }
+                    { name: "token_definition", postprocess: ({ data }) => { return ({ open: data[2] }); }, symbols: [{ literal: "open" }, "_", "T_STRING"] },
+                    { name: "token_definition", postprocess: ({ data }) => { return ({ close: data[2] }); }, symbols: [{ literal: "close" }, "_", "T_STRING"] },
+                    { name: "token_definition", postprocess: ({ data }) => { return ({ tag: data[2] }); }, symbols: [{ literal: "tag" }, "_", "string_list"] },
+                    { name: "token_definition", postprocess: ({ data }) => { return ({ when: data[2] }); }, symbols: [{ literal: "when" }, "_", "T_STRING"] },
+                    { name: "token_definition", postprocess: ({ data }) => { return ({ when: data[2] }); }, symbols: [{ literal: "when" }, "_", "T_REGEX"] },
+                    { name: "token_definition", postprocess: ({ data }) => { return ({ when: data[2], before: true }); }, symbols: [{ literal: "before" }, "_", "T_STRING"] },
+                    { name: "token_definition", postprocess: ({ data }) => { return ({ when: data[2], before: true }); }, symbols: [{ literal: "before" }, "_", "T_REGEX"] },
+                    { name: "token_definition", postprocess: ({ data }) => { return ({ when: data[2], skip: true }); }, symbols: [{ literal: "skip" }, "_", "T_STRING"] },
+                    { name: "token_definition", postprocess: ({ data }) => { return ({ when: data[2], skip: true }); }, symbols: [{ literal: "skip" }, "_", "T_REGEX"] },
+                    { name: "token_definition", postprocess: ({ data }) => { return ({ pop: 1 }); }, symbols: [{ literal: "pop" }] },
+                    { name: "token_definition", postprocess: ({ data }) => { return ({ pop: parseInt(data[2]) }); }, symbols: [{ literal: "pop" }, "_", "T_INTEGER"] },
+                    { name: "token_definition", postprocess: ({ data }) => { return ({ pop: "all" }); }, symbols: [{ literal: "pop" }, "_", { literal: "all" }] },
+                    { name: "token_definition", postprocess: ({ data }) => { return ({ highlight: data[2] }); }, symbols: [{ literal: "highlight" }, "_", "T_STRING"] },
+                    { name: "token_definition", postprocess: ({ data }) => { return ({ embed: data[2] }); }, symbols: [{ literal: "embed" }, "_", "T_STRING"] },
+                    { name: "token_definition", postprocess: ({ data }) => { return ({ unembed: true }); }, symbols: [{ literal: "unembed" }] },
+                    { name: "token_definition", postprocess: ({ data }) => { return ({ inset: 1 }); }, symbols: [{ literal: "inset" }] },
+                    { name: "token_definition", postprocess: ({ data }) => { return ({ inset: parseInt(data[2]) }); }, symbols: [{ literal: "inset" }, "_", "T_INTEGER"] },
+                    { name: "token_definition", postprocess: ({ data }) => { return ({ set: data[2] }); }, symbols: [{ literal: "set" }, "_", "T_WORD"] },
+                    { name: "token_definition", postprocess: ({ data }) => { return ({ goto: data[2] }); }, symbols: [{ literal: "goto" }, "_", "T_WORD"] },
+                    { name: "token_definition", postprocess: ({ data }) => { return ({ type: data[2] }); }, symbols: [{ literal: "type" }, "_", "T_STRING"] }
                 ],
                 token_definition_list: [
                     { name: "token_definition_list", postprocess: ({ data }) => { return (data); }, symbols: ["token_definition"] },
@@ -349,7 +223,7 @@ function GWLanguage() {
                 ],
                 word_list: [
                     { name: "word_list", postprocess: ({ data }) => { return ([data[0]]); }, symbols: ["T_WORD"] },
-                    { name: "word_list", postprocess: ({ data }) => { return ([data[0]].concat(data[4])); }, symbols: ["T_WORD", "_", "L_COMMA", "_", "word_list"] }
+                    { name: "word_list", postprocess: ({ data }) => { return ([data[0]].concat(data[4])); }, symbols: ["T_WORD", "_", { token: "L_COMMA" }, "_", "word_list"] }
                 ]
             },
             start: "main"
