@@ -6,9 +6,9 @@ export class V2GrammarString {
         directives = Array.isArray(directives) ? directives : [directives];
         for (const directive of directives) {
             if ("head" in directive) {
-                this.appendSection("head", directive.head.js.trim());
+                this.appendSection("on load", directive.head.js.trim());
             } else if ("body" in directive) {
-                this.appendSection("body", directive.body.js.trim());
+                this.appendSection("on new", directive.body.js.trim());
             } else if ("import" in directive) {
                 this.appendImportDirective(directive);
             } else if ("config" in directive) {

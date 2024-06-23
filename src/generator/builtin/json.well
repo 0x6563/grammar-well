@@ -55,7 +55,7 @@ grammar {
 
 }
 
-head {
+on load {
 function extractPair(kv, output) {
         if(kv[0]) { output[kv[0]] = kv[1]; }
     }

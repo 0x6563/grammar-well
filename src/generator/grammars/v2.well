@@ -3,8 +3,8 @@ lexer {
 
 	[main]
 		- import string, ws, comment, l_star
-		- when /head(?![a-zA-Z\d_])/ tag "T_WORD" highlight "tag" goto js_body
-		- when /body(?![a-zA-Z\d_])/ tag "T_WORD" highlight "tag" goto js_body
+		- when /on\s+load(?![a-zA-Z\d_])/ tag "T_WORD" highlight "tag" goto js_body
+		- when /on\s+new(?![a-zA-Z\d_])/ tag "T_WORD" highlight "tag" goto js_body
 		- when /lexer(?![a-zA-Z\d_])/ tag "T_WORD" highlight "tag" set lexer
 		- when /grammar(?![a-zA-Z\d_])/ tag "T_WORD" highlight "tag" set grammar
 		- when /config(?![a-zA-Z\d_])/ tag "T_WORD" highlight "tag" set config
@@ -196,10 +196,10 @@ grammar {
 		| "import" _ <L_STAR> _ "as" _ T_WORD:alias _ "from" __ T_STRING:import _ <L_SCOLON> => ( { import: $import, path: true, alias: $alias} )
 		| "lexer" _ <CBRACKET_L> _ lexer:lexer _ <CBRACKET_R> => ( { lexer: Object.assign(...$lexer) } )
 		| "grammar" _ <CBRACKET_L> _ grammar:grammar _ <CBRACKET_R> => ( { grammar: $grammar } )
-		| "body" _ T_JS:js => ( { body: $js } )
-		| "body" _ T_STRING:js => ( { body: $js, path: true } )
-		| "head" _ T_JS:js => ( { head: $js } )
-		| "head" _ T_STRING:js => ( { head: $js, path: true } )
+		| /on\s+new/ _ T_JS:js => ( { body: $js } )
+		| /on\s+new/ _ T_STRING:js => ( { body: $js, path: true } )
+		| /on\s+load/ _ T_JS:js => ( { head: $js } )
+		| /on\s+load/ _ T_STRING:js => ( { head: $js, path: true } )
 
 	[lexer]
 		| kv_list _ state_list => ( $0.concat({ states: $2 }) )

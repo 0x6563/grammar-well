@@ -427,9 +427,7 @@ declare function GWLanguage(): {
                 }) => {
                     body: any;
                 };
-                symbols: (string | {
-                    literal: string;
-                })[];
+                symbols: (string | RegExp)[];
             } | {
                 name: string;
                 postprocess: ({ data }: {
@@ -437,9 +435,7 @@ declare function GWLanguage(): {
                 }) => {
                     head: any;
                 };
-                symbols: (string | {
-                    literal: string;
-                })[];
+                symbols: (string | RegExp)[];
             })[];
             section_list: {
                 name: string;

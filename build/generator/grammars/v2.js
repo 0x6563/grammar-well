@@ -155,10 +155,10 @@ function GWLanguage() {
                     { name: "section", postprocess: ({ data }) => { return ({ import: data[10], path: true, alias: data[6] }); }, symbols: [{ literal: "import" }, "_", { token: "L_STAR" }, "_", { literal: "as" }, "_", "T_WORD", "_", { literal: "from" }, "__", "T_STRING", "_", { token: "L_SCOLON" }] },
                     { name: "section", postprocess: ({ data }) => { return ({ lexer: Object.assign(...data[4]) }); }, symbols: [{ literal: "lexer" }, "_", { token: "CBRACKET_L" }, "_", "lexer", "_", { token: "CBRACKET_R" }] },
                     { name: "section", postprocess: ({ data }) => { return ({ grammar: data[4] }); }, symbols: [{ literal: "grammar" }, "_", { token: "CBRACKET_L" }, "_", "grammar", "_", { token: "CBRACKET_R" }] },
-                    { name: "section", postprocess: ({ data }) => { return ({ body: data[2] }); }, symbols: [{ literal: "body" }, "_", "T_JS"] },
-                    { name: "section", postprocess: ({ data }) => { return ({ body: data[2], path: true }); }, symbols: [{ literal: "body" }, "_", "T_STRING"] },
-                    { name: "section", postprocess: ({ data }) => { return ({ head: data[2] }); }, symbols: [{ literal: "head" }, "_", "T_JS"] },
-                    { name: "section", postprocess: ({ data }) => { return ({ head: data[2], path: true }); }, symbols: [{ literal: "head" }, "_", "T_STRING"] }
+                    { name: "section", postprocess: ({ data }) => { return ({ body: data[2] }); }, symbols: [/on\s+new/, "_", "T_JS"] },
+                    { name: "section", postprocess: ({ data }) => { return ({ body: data[2], path: true }); }, symbols: [/on\s+new/, "_", "T_STRING"] },
+                    { name: "section", postprocess: ({ data }) => { return ({ head: data[2] }); }, symbols: [/on\s+load/, "_", "T_JS"] },
+                    { name: "section", postprocess: ({ data }) => { return ({ head: data[2], path: true }); }, symbols: [/on\s+load/, "_", "T_STRING"] }
                 ],
                 section_list: [
                     { name: "section_list", postprocess: ({ data }) => { return ([data[0]]); }, symbols: ["section"] },
@@ -527,14 +527,14 @@ function GWLanguage() {
                     ]
                 },
                 main: {
-                    regex: /(?:(?:("(?:[^"\\\r\n]|\\.)*"))|(?:(\s+))|(?:(\/\/[^\n]*))|(?:((?:\*)))|(?:(head(?![a-zA-Z\d_])))|(?:(body(?![a-zA-Z\d_])))|(?:(lexer(?![a-zA-Z\d_])))|(?:(grammar(?![a-zA-Z\d_])))|(?:(config(?![a-zA-Z\d_])))|(?:([a-zA-Z_][a-zA-Z_\d]*))|(?:((?::)))|(?:(\d+))|(?:((?:;))))/ym,
+                    regex: /(?:(?:("(?:[^"\\\r\n]|\\.)*"))|(?:(\s+))|(?:(\/\/[^\n]*))|(?:((?:\*)))|(?:(on\s+load(?![a-zA-Z\d_])))|(?:(on\s+new(?![a-zA-Z\d_])))|(?:(lexer(?![a-zA-Z\d_])))|(?:(grammar(?![a-zA-Z\d_])))|(?:(config(?![a-zA-Z\d_])))|(?:([a-zA-Z_][a-zA-Z_\d]*))|(?:((?::)))|(?:(\d+))|(?:((?:;))))/ym,
                     rules: [
                         { highlight: "string", tag: ["T_STRING"], when: /"(?:[^"\\\r\n]|\\.)*"/ },
                         { tag: ["T_WS"], when: /\s+/ },
                         { highlight: "comment", tag: ["T_COMMENT"], when: /\/\/[^\n]*/ },
                         { tag: ["L_STAR"], when: "*" },
-                        { goto: "js_body", highlight: "tag", tag: ["T_WORD"], when: /head(?![a-zA-Z\d_])/ },
-                        { goto: "js_body", highlight: "tag", tag: ["T_WORD"], when: /body(?![a-zA-Z\d_])/ },
+                        { goto: "js_body", highlight: "tag", tag: ["T_WORD"], when: /on\s+load(?![a-zA-Z\d_])/ },
+                        { goto: "js_body", highlight: "tag", tag: ["T_WORD"], when: /on\s+new(?![a-zA-Z\d_])/ },
                         { highlight: "tag", set: "lexer", tag: ["T_WORD"], when: /lexer(?![a-zA-Z\d_])/ },
                         { highlight: "tag", set: "grammar", tag: ["T_WORD"], when: /grammar(?![a-zA-Z\d_])/ },
                         { highlight: "tag", set: "config", tag: ["T_WORD"], when: /config(?![a-zA-Z\d_])/ },
