@@ -15,6 +15,7 @@
     ".": "./build/index.js",
     "./parser": "./build/parser/parser.js",
     "./generator": "./build/generator/index.js",
+    "./grammars": "./build/generator/grammars/index.js",
     "./lexer": "./build/lexers/stateful-lexer.js",
     "./utility": "./build/utility/index.js"
   },
