@@ -1,5 +1,5 @@
 import { Dictionary, GeneratorGrammarProductionRule } from "../../typings";
-import { GeneratorState } from "../state";
+import { GeneratorState } from "../state.js";
 export declare class JavaScriptGenerator {
     state: GeneratorState;
     constructor(state: GeneratorState);

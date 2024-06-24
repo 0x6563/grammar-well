@@ -1,8 +1,8 @@
 import { RuntimeGrammarProductionRule, RuntimeGrammarRuleSymbol, RuntimeLanguageDefinition } from "../../../typings";
-import { ParserUtility } from "../../parser";
-import { BiMap } from "./bimap";
-import { ClosureBuilder } from "./closure";
-import { State } from "./state";
+import { ParserUtility } from "../../parser.js";
+import { BiMap } from "./bimap.js";
+import { ClosureBuilder } from "./closure.js";
+import { State } from "./state.js";
 
 export class CanonicalCollection {
     states: Map<string, State> = new Map();

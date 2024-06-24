@@ -1,4 +1,4 @@
-import { ParserUtility } from "../../parser";
+import { ParserUtility } from "../../parser.js";
 export class ClosureBuilder {
     grammar;
     constructor(grammar) {

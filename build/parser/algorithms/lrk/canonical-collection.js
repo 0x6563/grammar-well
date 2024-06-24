@@ -1,6 +1,6 @@
-import { ParserUtility } from "../../parser";
-import { BiMap } from "./bimap";
-import { ClosureBuilder } from "./closure";
+import { ParserUtility } from "../../parser.js";
+import { BiMap } from "./bimap.js";
+import { ClosureBuilder } from "./closure.js";
 export class CanonicalCollection {
     grammar;
     states = new Map();

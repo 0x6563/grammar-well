@@ -1,5 +1,5 @@
 import { ASTGrammarSymbolRegex, ASTLexerStateImportRule, ASTLexerStateMatchRule, ASTLexerStateNonMatchRule, Dictionary, GeneratorLexerConfig, GeneratorLexerState } from "../../typings";
-import { CommonGenerator } from "../stringify/common";
+import { CommonGenerator } from "../stringify/common.js";
 
 export class LexerArtifact {
     private resolved = new Set<string>();

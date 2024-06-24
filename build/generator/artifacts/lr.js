@@ -1,5 +1,5 @@
-import { Collection, GeneratorSymbolCollection } from "../../utility/general";
-import { CommonGenerator } from "../stringify/common";
+import { Collection, GeneratorSymbolCollection } from "../../utility/general.js";
+import { CommonGenerator } from "../stringify/common.js";
 export class LRParseTableBuilder {
     generator;
     rules = new Collection();

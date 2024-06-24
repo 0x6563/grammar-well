@@ -1,5 +1,5 @@
-import { TokenBuffer } from "../../lexers/token-buffer";
 import { RuntimeGrammarProductionRule, RuntimeLanguageDefinition, RuntimeLexerToken } from "../../typings";
+import { TokenBuffer } from "../../lexers/token-buffer.js";
 export declare function CYK(language: RuntimeLanguageDefinition & {
     tokens: TokenBuffer;
 }, _options?: {}): {

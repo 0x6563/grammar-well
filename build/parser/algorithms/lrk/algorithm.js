@@ -1,6 +1,6 @@
-import { ParserUtility } from "../../parser";
-import { CanonicalCollection } from "./canonical-collection";
-import { LRStack } from "./stack";
+import { ParserUtility } from "../../parser.js";
+import { CanonicalCollection } from "./canonical-collection.js";
+import { LRStack } from "./stack.js";
 export function LRK(language, options = {}) {
     const { grammar, tokens } = language;
     const { states, rules: rules } = new CanonicalCollection(grammar);

@@ -1,4 +1,4 @@
-import { Dictionary } from "./common";
+import { Dictionary } from "./common.js";
 export type AST = ASTDirectives[];
 export type ASTJavaScriptSection = {
     body: ASTJavaScriptLiteral;

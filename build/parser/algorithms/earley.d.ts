@@ -1,5 +1,5 @@
-import { TokenBuffer } from "../../lexers/token-buffer";
 import { Dictionary, RuntimeGrammarProductionRule, RuntimeLanguageDefinition } from "../../typings";
+import { TokenBuffer } from "../../lexers/token-buffer.js";
 export interface EarleyParserOptions {
     keepHistory?: boolean;
 }

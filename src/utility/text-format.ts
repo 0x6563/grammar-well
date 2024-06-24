@@ -1,4 +1,4 @@
-import { TokenBuffer } from "../lexers/token-buffer";
+import { TokenBuffer } from "../lexers/token-buffer.js";
 import { RuntimeGrammarProductionRule, RuntimeGrammarRuleSymbol, RuntimeLexerToken } from "../typings";
 
 export class TextFormatter {

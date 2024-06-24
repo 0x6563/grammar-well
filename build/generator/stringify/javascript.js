@@ -1,7 +1,7 @@
-import { BasicGrammarTable } from "../artifacts/basic";
-import { LexerArtifact } from "../artifacts/lexer";
-import { LRParseTableBuilder } from "../artifacts/lr";
-import { CommonGenerator } from "./common";
+import { BasicGrammarTable } from "../artifacts/basic.js";
+import { LexerArtifact } from "../artifacts/lexer.js";
+import { LRParseTableBuilder } from "../artifacts/lr.js";
+import { CommonGenerator } from "./common.js";
 const PostProcessors = {
     "join": "({data}) => data.join('')",
     "concat": "({data}) => data[0].concat([data[1]])",

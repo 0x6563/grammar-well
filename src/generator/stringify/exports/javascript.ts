@@ -1,4 +1,4 @@
-import { JavaScriptGenerator } from "../javascript";
+import { JavaScriptGenerator } from "../javascript.js";
 
 export function CJSOutput(generator: JavaScriptGenerator, exportName: string) {
     return `${Generate(generator, exportName)}

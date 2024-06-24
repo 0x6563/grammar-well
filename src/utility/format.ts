@@ -1,7 +1,7 @@
-import V1Grammar from '../generator/grammars/v1';
-import V2Grammar from '../generator/grammars/v2';
-import { V2GrammarString } from "../generator/stringify/grammar/v2";
-import { Parse } from "../parser/parser";
+import V1Grammar from '../generator/grammars/v1.js';
+import V2Grammar from '../generator/grammars/v2.js';
+import { V2GrammarString } from "../generator/stringify/grammar/v2.js";
+import { Parse } from "../parser/parser.js";
 
 export function Format(source: string, sourceVersion: '1' | '2' = '2') {
     const grammar = sourceVersion.toString() == '1' ? V1Grammar : V2Grammar;

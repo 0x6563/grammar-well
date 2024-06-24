@@ -1,9 +1,9 @@
 import { Dictionary, GeneratorGrammarProductionRule } from "../../typings";
-import { BasicGrammarTable } from "../artifacts/basic";
-import { LexerArtifact } from "../artifacts/lexer";
-import { LRParseTableBuilder } from "../artifacts/lr";
-import { GeneratorState } from "../state";
-import { CommonGenerator } from "./common";
+import { BasicGrammarTable } from "../artifacts/basic.js";
+import { LexerArtifact } from "../artifacts/lexer.js";
+import { LRParseTableBuilder } from "../artifacts/lr.js";
+import { GeneratorState } from "../state.js";
+import { CommonGenerator } from "./common.js";
 
 const PostProcessors = {
     "join": "({data}) => data.join('')",

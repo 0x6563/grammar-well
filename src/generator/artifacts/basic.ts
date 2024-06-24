@@ -1,5 +1,5 @@
-import { CommonGenerator } from "../stringify/common";
-import { JavaScriptGenerator } from "../stringify/javascript";
+import { CommonGenerator } from "../stringify/common.js";
+import { JavaScriptGenerator } from "../stringify/javascript.js";
 
 export class BasicGrammarTable {
 

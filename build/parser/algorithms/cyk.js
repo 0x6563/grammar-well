@@ -1,5 +1,5 @@
-import { Matrix } from "../../utility/general";
-import { ParserUtility } from "../parser";
+import { Matrix } from "../../utility/general.js";
+import { ParserUtility } from "../parser.js";
 export function CYK(language, _options = {}) {
     const { grammar, tokens } = language;
     const terminals = [];

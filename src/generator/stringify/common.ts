@@ -1,5 +1,5 @@
 import { ASTGrammarSymbolLiteral, ASTGrammarSymbolNonTerminal, ASTGrammarSymbolRegex, ASTGrammarSymbolToken, GeneratorGrammarSymbol } from "../../typings";
-import { GeneratorState } from "../state";
+import { GeneratorState } from "../state.js";
 
 export class CommonGenerator {
     constructor(public state: GeneratorState) { }

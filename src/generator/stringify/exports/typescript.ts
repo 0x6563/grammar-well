@@ -1,4 +1,4 @@
-import { JavaScriptGenerator } from "../javascript";
+import { JavaScriptGenerator } from "../javascript.js";
 
 export function TypescriptFormat(generator: JavaScriptGenerator, exportName: string) {
     return `// Generated automatically by Grammar-Well, version ${generator.state.version} 

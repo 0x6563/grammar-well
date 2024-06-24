@@ -1,9 +1,9 @@
-import { CharacterLexer } from "../lexers/character-lexer";
-import { StatefulLexer } from "../lexers/stateful-lexer";
-import { TokenBuffer } from "../lexers/token-buffer";
-import { CYK } from "./algorithms/cyk";
-import { Earley } from "./algorithms/earley";
-import { LRK } from "./algorithms/lrk/algorithm";
+import { CharacterLexer } from "../lexers/character-lexer.js";
+import { StatefulLexer } from "../lexers/stateful-lexer.js";
+import { TokenBuffer } from "../lexers/token-buffer.js";
+import { CYK } from "./algorithms/cyk.js";
+import { Earley } from "./algorithms/earley.js";
+import { LRK } from "./algorithms/lrk/algorithm.js";
 const ParserRegistry = {
     earley: Earley,
     cyk: CYK,

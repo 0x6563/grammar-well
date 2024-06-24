@@ -1,6 +1,6 @@
 import { readdirSync, readFileSync, writeFileSync } from "fs";
 import { resolve } from "path";
-import { Format, Generate } from "../src";
+import { Format, Generate } from "../src/index.js";
 const BaseDir = './src/generator/builtin/';
 (async () => {
     const files = readdirSync(BaseDir);

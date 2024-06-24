@@ -1,7 +1,7 @@
 import { ASTDirectives, GeneratorContext, GeneratorOptions, GeneratorTemplateFormat } from "../typings";
-import { GeneratorState } from "./state";
-import { ExportsRegistry } from "./stringify/exports/registry";
-import { JavaScriptGenerator } from "./stringify/javascript";
+import { GeneratorState } from "./state.js";
+import { ExportsRegistry } from "./stringify/exports/registry.js";
+import { JavaScriptGenerator } from "./stringify/javascript.js";
 export declare function Generate(rules: string | ASTDirectives | (ASTDirectives[]), config?: GeneratorOptions): Promise<string>;
 export declare class Generator {
     private config;

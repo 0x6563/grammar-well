@@ -1,11 +1,11 @@
-import { Parse } from "../parser/parser";
-import GrammarV1 from './grammars/v1';
-import GrammarV2 from './grammars/v2';
-import { DefaultImportResolver } from "./import-resolvers/default";
+import { Parse } from "../parser/parser.js";
+import GrammarV1 from './grammars/v1.js';
+import GrammarV2 from './grammars/v2.js';
+import { DefaultImportResolver } from "./import-resolvers/default.js";
 import * as BuiltInRegistry from "./builtin/registry.json";
-import { GeneratorState } from "./state";
-import { ExportsRegistry } from "./stringify/exports/registry";
-import { JavaScriptGenerator } from "./stringify/javascript";
+import { GeneratorState } from "./state.js";
+import { ExportsRegistry } from "./stringify/exports/registry.js";
+import { JavaScriptGenerator } from "./stringify/javascript.js";
 export async function Generate(rules, config = {}) {
     const builder = new Generator(config);
     await builder.import(rules);

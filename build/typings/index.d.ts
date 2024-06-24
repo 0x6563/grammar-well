@@ -1,7 +1,7 @@
-import { TokenBuffer } from "../lexers/token-buffer";
-import { ParserUtility } from "../parser/parser";
-import { ASTLexerStateMatchRule, ASTLexerStateNonMatchRule } from "./ast";
-import { RuntimeGrammarProductionRule, RuntimeGrammarRuleSymbol, RuntimeLanguageDefinition } from "./runtime";
+import { TokenBuffer } from "../lexers/token-buffer.js";
+import { ParserUtility } from "../parser/parser.js";
+import { ASTLexerStateMatchRule, ASTLexerStateNonMatchRule } from "./ast.js";
+import { RuntimeGrammarProductionRule, RuntimeGrammarRuleSymbol, RuntimeLanguageDefinition } from "./runtime.js";
 export * from './ast';
 export * from './common';
 export * from './generator';

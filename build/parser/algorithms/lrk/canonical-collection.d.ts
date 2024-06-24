@@ -1,6 +1,6 @@
 import { RuntimeGrammarProductionRule, RuntimeGrammarRuleSymbol, RuntimeLanguageDefinition } from "../../../typings";
-import { BiMap } from "./bimap";
-import { State } from "./state";
+import { BiMap } from "./bimap.js";
+import { State } from "./state.js";
 export declare class CanonicalCollection {
     grammar: RuntimeLanguageDefinition['grammar'];
     states: Map<string, State>;

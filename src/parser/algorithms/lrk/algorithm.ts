@@ -1,8 +1,8 @@
-import { TokenBuffer } from "../../../lexers/token-buffer";
 import { RuntimeLanguageDefinition } from "../../../typings";
-import { ParserUtility } from "../../parser";
-import { CanonicalCollection } from "./canonical-collection";
-import { LRStack } from "./stack";
+import { TokenBuffer } from "../../../lexers/token-buffer.js";
+import { ParserUtility } from "../../parser.js";
+import { CanonicalCollection } from "./canonical-collection.js";
+import { LRStack } from "./stack.js";
 
 export function LRK(language: RuntimeLanguageDefinition & { tokens: TokenBuffer }, options = {}) {
     const { grammar, tokens } = language;

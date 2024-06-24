@@ -1,10 +1,10 @@
 let resolver;
 if (typeof window === 'undefined') {
-    const { BrowserImportResolver } = await import("./browser");
+    const { BrowserImportResolver } = await import("./browser.js");
     resolver = BrowserImportResolver;
 }
 else {
-    const { FileSystemResolver } = await import("./filesystem");
+    const { FileSystemResolver } = await import("./filesystem.js");
     resolver = FileSystemResolver;
 }
 export const DefaultImportResolver = resolver;

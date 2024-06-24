@@ -1,4 +1,4 @@
-import { CommonGenerator } from "../stringify/common";
+import { CommonGenerator } from "../stringify/common.js";
 export class BasicGrammarTable {
     generator;
     constructor(generator) {
