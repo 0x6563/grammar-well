@@ -1,4 +1,4 @@
-import { ASTLexerStateMatchRule, ASTLexerStateNonMatchRule, RuntimeLexer, RuntimeLexerConfig, StatefulLexerStateDefinition } from "../typings";
+import { RuntimeLexerStateMatchRule, ASTLexerStateNonMatchRule, RuntimeLexer, RuntimeLexerConfig, StatefulLexerStateDefinition } from "../typings";
 
 export class StatefulLexer implements RuntimeLexer {
     private start: string;
@@ -11,7 +11,7 @@ export class StatefulLexer implements RuntimeLexer {
     private prefetched?: RegExpExecArray;
     private current: string;
     private unmatched: ASTLexerStateNonMatchRule;
-    private rules: ASTLexerStateMatchRule[];
+    private rules: RuntimeLexerStateMatchRule[];
     private regexp: RegExp;
     private tags = new Map<string[], Set<string>>();
 
@@ -98,7 +98,7 @@ export class StatefulLexer implements RuntimeLexer {
 
         const { index, buffer } = this;
         let text;
-        let rule: ASTLexerStateMatchRule | ASTLexerStateNonMatchRule;
+        let rule: RuntimeLexerStateMatchRule | ASTLexerStateNonMatchRule;
         let match;
 
         this.regexp.lastIndex = index;
@@ -150,7 +150,7 @@ export class StatefulLexer implements RuntimeLexer {
         }
     }
 
-    private adjustStack(rule: ASTLexerStateMatchRule) {
+    private adjustStack(rule: RuntimeLexerStateMatchRule) {
         if (rule.pop) {
             let i = rule.pop === 'all' ? this.stack.length : rule.pop;
             while (i-- > 0) {
@@ -173,7 +173,7 @@ export class StatefulLexer implements RuntimeLexer {
         }
     }
 
-    private getGroup(match): ASTLexerStateMatchRule {
+    private getGroup(match): RuntimeLexerStateMatchRule {
         for (let i = 0; i < this.rules.length; i++) {
             if (match[i + 1] !== undefined) {
                 return this.rules[i];

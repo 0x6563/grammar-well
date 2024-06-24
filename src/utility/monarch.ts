@@ -1,4 +1,4 @@
-import { RuntimeLexerConfig } from "../typings";
+import { RuntimeLexerConfig, RuntimeLexerStateMatchRule } from "../typings";
 
 export function CreateMonarchTokenizer(lexer: RuntimeLexerConfig) {
     const tokenizer: any = {}; // languages.IMonarchLanguage['tokenizer']
@@ -35,8 +35,8 @@ export function CreateMonarchTokenizer(lexer: RuntimeLexerConfig) {
     return { start, tokenizer };
 }
 
-function TransformWhen(obj) {
-    return typeof obj == 'string' ? new RegExp(RegexEscape(obj)) : new RegExp(obj.regex, obj.flags);
+function TransformWhen(obj: RuntimeLexerStateMatchRule['when']) {
+    return typeof obj == 'string' ? new RegExp(RegexEscape(obj)) : obj;
 }
 
 function RegexEscape(string) {

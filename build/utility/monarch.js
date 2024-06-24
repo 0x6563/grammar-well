@@ -33,7 +33,7 @@ export function CreateMonarchTokenizer(lexer) {
     return { start, tokenizer };
 }
 function TransformWhen(obj) {
-    return typeof obj == 'string' ? new RegExp(RegexEscape(obj)) : new RegExp(obj.regex, obj.flags);
+    return typeof obj == 'string' ? new RegExp(RegexEscape(obj)) : obj;
 }
 function RegexEscape(string) {
     return string.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');

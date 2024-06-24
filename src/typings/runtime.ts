@@ -39,7 +39,7 @@ export interface RuntimeLexerConfig {
 
 export interface RuntimeLexerState {
     unmatched?: ASTLexerStateNonMatchRule;
-    rules: ASTLexerStateMatchRule[];
+    rules: RuntimeLexerStateMatchRule[];
     regex: RegExp;
 }
 
@@ -58,3 +58,22 @@ export interface RuntimeLexerToken {
     line: number;
     column: number;
 } 
+
+
+export interface RuntimeLexerStateMatchRule {
+    when: string | RegExp;
+    type?: string;
+    tag?: string[];
+    before?: boolean;
+    skip?: boolean;
+    highlight?: string;
+    open?: string;
+    close?: string;
+    embed?: string;
+    unembed?: boolean;
+
+    pop?: number | 'all';
+    inset?: number;
+    goto?: string;
+    set?: string;
+}

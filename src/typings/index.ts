@@ -1,7 +1,7 @@
 import { TokenBuffer } from "../lexers/token-buffer.js";
 import { ParserUtility } from "../parser/parser.js";
 import { ASTLexerStateMatchRule, ASTLexerStateNonMatchRule } from "./ast.js";
-import { RuntimeGrammarProductionRule, RuntimeGrammarRuleSymbol, RuntimeLanguageDefinition } from "./runtime.js";
+import { RuntimeGrammarProductionRule, RuntimeGrammarRuleSymbol, RuntimeLanguageDefinition, RuntimeLexerStateMatchRule } from "./runtime.js";
 export * from './ast.js';
 export * from './common.js';
 export * from './generator.js';
@@ -34,5 +34,5 @@ export interface TQRestorePoint {
 export interface StatefulLexerStateDefinition {
     regex: RegExp;
     unmatched?: ASTLexerStateNonMatchRule;
-    rules: ASTLexerStateMatchRule[];
+    rules: RuntimeLexerStateMatchRule[];
 }
