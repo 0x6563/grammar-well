@@ -5,7 +5,7 @@ import GrammarV1 from './grammars/v1.js';
 import GrammarV2 from './grammars/v2.js';
 import { DefaultImportResolver } from "./import-resolvers/default.js";
 
-import * as BuiltInRegistry from "./builtin/registry.json";
+import BuiltInRegistry from "./builtin/registry.json" with {type: 'json'};
 import { GeneratorState } from "./state.js";
 import { ExportsRegistry } from "./stringify/exports/registry.js";
 import { JavaScriptGenerator } from "./stringify/javascript.js";
