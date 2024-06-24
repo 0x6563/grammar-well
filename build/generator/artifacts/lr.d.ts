@@ -1,4 +1,4 @@
-import { Dictionary, GeneratorGrammarProductionRule, GeneratorGrammarSymbol } from "../../typings";
+import { Dictionary, GeneratorGrammarProductionRule, GeneratorGrammarSymbol } from "../../typings/index.js";
 import { Collection, GeneratorSymbolCollection } from "../../utility/general.js";
 import { JavaScriptGenerator } from "../stringify/javascript.js";
 export declare class LRParseTableBuilder {

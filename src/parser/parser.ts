@@ -1,4 +1,4 @@
-import { ParserAlgorithm, RuntimeGrammarProductionRule, RuntimeGrammarRuleSymbol, RuntimeLanguageDefinition, RuntimeLexerToken } from "../typings";
+import { ParserAlgorithm, RuntimeGrammarProductionRule, RuntimeGrammarRuleSymbol, RuntimeLanguageDefinition, RuntimeLexerToken } from "../typings/index.js";
 import { CharacterLexer } from "../lexers/character-lexer.js";
 import { StatefulLexer } from "../lexers/stateful-lexer.js";
 import { TokenBuffer } from "../lexers/token-buffer.js";

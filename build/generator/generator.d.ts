@@ -1,4 +1,4 @@
-import { ASTDirectives, GeneratorContext, GeneratorOptions, GeneratorTemplateFormat } from "../typings";
+import { ASTDirectives, GeneratorContext, GeneratorOptions, GeneratorTemplateFormat } from "../typings/index.js";
 import { GeneratorState } from "./state.js";
 import { ExportsRegistry } from "./stringify/exports/registry.js";
 import { JavaScriptGenerator } from "./stringify/javascript.js";

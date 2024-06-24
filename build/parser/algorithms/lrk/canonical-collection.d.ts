@@ -1,4 +1,4 @@
-import { RuntimeGrammarProductionRule, RuntimeGrammarRuleSymbol, RuntimeLanguageDefinition } from "../../../typings";
+import { RuntimeGrammarProductionRule, RuntimeGrammarRuleSymbol, RuntimeLanguageDefinition } from "../../../typings/index.js";
 import { BiMap } from "./bimap.js";
 import { State } from "./state.js";
 export declare class CanonicalCollection {

@@ -1,4 +1,4 @@
-import { ASTGrammarSymbolRegex, ASTLexerStateImportRule, ASTLexerStateMatchRule, ASTLexerStateNonMatchRule, Dictionary, GeneratorLexerConfig, GeneratorLexerState } from "../../typings";
+import { ASTGrammarSymbolRegex, ASTLexerStateImportRule, ASTLexerStateMatchRule, ASTLexerStateNonMatchRule, Dictionary, GeneratorLexerConfig, GeneratorLexerState } from "../../typings/index.js";
 import { CommonGenerator } from "../stringify/common.js";
 
 export class LexerArtifact {

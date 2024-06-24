@@ -1,4 +1,4 @@
-import { RuntimeGrammarProductionRule, RuntimeGrammarRuleSymbol } from "../../../typings";
+import { RuntimeGrammarProductionRule, RuntimeGrammarRuleSymbol } from "../../../typings/index.js";
 import { State } from "./state.js";
 export declare class LRStack {
     stack: LRStackItem[];

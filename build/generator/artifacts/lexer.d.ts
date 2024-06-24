@@ -1,4 +1,4 @@
-import { GeneratorLexerConfig } from "../../typings";
+import { GeneratorLexerConfig } from "../../typings/index.js";
 export declare class LexerArtifact {
     private lexer;
     private resolved;

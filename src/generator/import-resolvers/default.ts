@@ -1,4 +1,4 @@
-import { ImportResolverConstructor } from "../../typings";
+import { ImportResolverConstructor } from "../../typings/index.js";
 
 let resolver;
 declare const window;

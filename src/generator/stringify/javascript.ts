@@ -1,4 +1,4 @@
-import { Dictionary, GeneratorGrammarProductionRule } from "../../typings";
+import { Dictionary, GeneratorGrammarProductionRule } from "../../typings/index.js";
 import { BasicGrammarTable } from "../artifacts/basic.js";
 import { LexerArtifact } from "../artifacts/lexer.js";
 import { LRParseTableBuilder } from "../artifacts/lr.js";

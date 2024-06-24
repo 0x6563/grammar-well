@@ -1,4 +1,4 @@
-import { ASTJavaScriptBuiltin, ASTJavaScriptLiteral, ASTLexerState, Dictionary, GeneratorGrammarProductionRule, GeneratorLexerConfig, GeneratorLexerState } from "../typings";
+import { ASTJavaScriptBuiltin, ASTJavaScriptLiteral, ASTLexerState, Dictionary, GeneratorGrammarProductionRule, GeneratorLexerConfig, GeneratorLexerState } from "../typings/index.js";
 
 export class GeneratorState {
     grammar: {

@@ -1,4 +1,4 @@
-import { ASTGrammarSymbolNonTerminal, Dictionary, GeneratorGrammarProductionRule, GeneratorGrammarSymbol } from "../../typings";
+import { ASTGrammarSymbolNonTerminal, Dictionary, GeneratorGrammarProductionRule, GeneratorGrammarSymbol } from "../../typings/index.js";
 import { Collection, GeneratorSymbolCollection } from "../../utility/general.js";
 import { CommonGenerator } from "../stringify/common.js";
 import { JavaScriptGenerator } from "../stringify/javascript.js";

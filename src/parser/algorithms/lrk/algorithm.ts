@@ -1,4 +1,4 @@
-import { RuntimeLanguageDefinition } from "../../../typings";
+import { RuntimeLanguageDefinition } from "../../../typings/index.js";
 import { TokenBuffer } from "../../../lexers/token-buffer.js";
 import { ParserUtility } from "../../parser.js";
 import { CanonicalCollection } from "./canonical-collection.js";

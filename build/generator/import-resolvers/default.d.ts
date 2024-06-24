@@ -1,2 +1,2 @@
-import { ImportResolverConstructor } from "../../typings";
+import { ImportResolverConstructor } from "../../typings/index.js";
 export declare const DefaultImportResolver: ImportResolverConstructor;

@@ -1,4 +1,4 @@
-import { RuntimeLexer, RuntimeLexerToken, TQRestorePoint } from '../typings';
+import { RuntimeLexer, RuntimeLexerToken, TQRestorePoint } from '../typings/index.js';
 export declare class TokenBuffer {
     private lexer;
     private history;

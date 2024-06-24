@@ -1,4 +1,4 @@
-import { RuntimeLexer } from "../typings";
+import { RuntimeLexer } from "../typings/index.js";
 
 export class CharacterLexer implements RuntimeLexer {
     private buffer: string | any[] = '';

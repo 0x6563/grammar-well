@@ -1,7 +1,7 @@
 /// <reference types="typescript/lib/lib.webworker" />
 import { readFile } from 'fs/promises';
 import { dirname, resolve } from 'path';
-import { ImportResolver } from "../../typings";
+import { ImportResolver } from "../../typings/index.js";
 
 export class FileSystemResolver implements ImportResolver {
     private baseDir: string;

@@ -1,4 +1,4 @@
-import { RuntimeGrammarProductionRule, RuntimeGrammarRuleSymbol, RuntimeLanguageDefinition } from "../../../typings";
+import { RuntimeGrammarProductionRule, RuntimeGrammarRuleSymbol, RuntimeLanguageDefinition } from "../../../typings/index.js";
 import { ParserUtility } from "../../parser.js";
 import { BiMap } from "./bimap.js";
 import { ClosureBuilder } from "./closure.js";

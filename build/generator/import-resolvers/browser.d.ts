@@ -1,4 +1,4 @@
-import { ImportResolver } from "../../typings";
+import { ImportResolver } from "../../typings/index.js";
 export declare class BrowserImportResolver implements ImportResolver {
     private baseURL;
     constructor(baseURL: string);
