@@ -1,3 +1,3 @@
-export { default as V1Grammar } from './v1';
-export { default as V2Grammar } from './v2';
+export { default as V1Grammar } from './v1.js';
+export { default as V2Grammar } from './v2.js';
 //# sourceMappingURL=index.js.map

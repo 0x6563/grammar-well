@@ -1,1 +1,1 @@
-{"version":3,"file":"index.js","sourceRoot":"","sources":["../../../src/generator/grammars/index.js"],"names":[],"mappings":"AAAA,OAAO,EAAE,OAAO,IAAI,SAAS,EAAE,MAAM,MAAM,CAAC;AAC5C,OAAO,EAAE,OAAO,IAAI,SAAS,EAAE,MAAM,MAAM,CAAC"}
+{"version":3,"file":"index.js","sourceRoot":"","sources":["../../../src/generator/grammars/index.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,OAAO,IAAI,SAAS,EAAE,MAAM,SAAS,CAAC;AAC/C,OAAO,EAAE,OAAO,IAAI,SAAS,EAAE,MAAM,SAAS,CAAC"}
