@@ -1,1 +1,1 @@
-export * from './monarch';
+export * from './monarch.js';

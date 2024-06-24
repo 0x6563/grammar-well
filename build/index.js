@@ -1,8 +1,8 @@
-export * from './generator/generator';
-export * from './generator/import-resolvers/default';
-export { StatefulLexer } from './lexers/stateful-lexer';
-export * from './parser/parser';
+export * from './generator/generator.js';
+export * from './generator/import-resolvers/default.js';
+export { StatefulLexer } from './lexers/stateful-lexer.js';
+export * from './parser/parser.js';
 export * from './typings';
-export * from './utility/monarch';
-export * from './utility/format';
+export * from './utility/monarch.js';
+export * from './utility/format.js';
 //# sourceMappingURL=index.js.map

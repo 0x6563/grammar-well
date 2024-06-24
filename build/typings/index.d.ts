@@ -2,10 +2,10 @@ import { TokenBuffer } from "../lexers/token-buffer.js";
 import { ParserUtility } from "../parser/parser.js";
 import { ASTLexerStateMatchRule, ASTLexerStateNonMatchRule } from "./ast.js";
 import { RuntimeGrammarProductionRule, RuntimeGrammarRuleSymbol, RuntimeLanguageDefinition } from "./runtime.js";
-export * from './ast';
-export * from './common';
-export * from './generator';
-export * from './runtime';
+export * from './ast.js';
+export * from './common.js';
+export * from './generator.js';
+export * from './runtime.js';
 export interface ImportResolver {
     path(path: string): string;
     body(path: string): Promise<string>;

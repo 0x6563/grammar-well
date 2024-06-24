@@ -1,5 +1,5 @@
-export * from './ast';
-export * from './common';
-export * from './generator';
-export * from './runtime';
+export * from './ast.js';
+export * from './common.js';
+export * from './generator.js';
+export * from './runtime.js';
 //# sourceMappingURL=index.js.map
