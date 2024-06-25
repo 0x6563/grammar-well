@@ -9,4 +9,4 @@ if (typeof process && process?.release?.name?.search(/node|io\.js/) >= 0) {
     resolver = BrowserImportResolver;
 }
 
-export const DefaultImportResolver = resolver as ImportResolverConstructor;
+export const AutoImportResolver = resolver as ImportResolverConstructor;

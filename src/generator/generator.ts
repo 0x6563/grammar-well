@@ -3,12 +3,12 @@ import { ASTConfig, ASTDirectives, ASTGrammar, ASTGrammarProduction, ASTGrammarP
 import { Parse } from "../parser/parser.js";
 import GrammarV1 from './grammars/v1.js';
 import GrammarV2 from './grammars/v2.js';
-import { DefaultImportResolver } from "./import-resolvers/default.js";
 
 import BuiltInRegistry from "./builtin/registry.json" with {type: 'json'};
 import { GeneratorState } from "./state.js";
 import { ExportsRegistry } from "./stringify/exports/registry.js";
 import { JavaScriptGenerator } from "./stringify/javascript.js";
+import { BrowserImportResolver } from "./import-resolvers/browser.js";
 
 export async function Generate(rules: string | ASTDirectives | (ASTDirectives[]), config: GeneratorOptions = {}) {
     const builder = new Generator(config);
@@ -35,7 +35,7 @@ export class Generator {
         } else if (config.resolver && typeof config.resolver.path == 'function' && typeof config.resolver.body == 'function') {
             this.context.resolver = config.resolver;
         } else {
-            this.context.resolver == new DefaultImportResolver(config.basedir);
+            this.context.resolver == new BrowserImportResolver(config.basedir);
         }
 
         this.state.grammar.uuids = this.context.uuids;
