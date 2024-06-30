@@ -94,6 +94,7 @@ export class Generator {
             this.state.lexer.start = this.aliasPrefix + directive.lexer.start;
         }
         if (!this.state.lexer.start && directive.lexer.states.length) {
+            this.state.lexer.start = this.aliasPrefix + directive.lexer.states[0].name;
         }
         this.importLexerStates(directive.lexer.states);
     }
