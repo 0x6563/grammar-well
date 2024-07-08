@@ -10,7 +10,7 @@ export function CreateMonarchTokenizer(lexer: RuntimeLexerConfig) {
             tokenizer[name].push([TransformWhen(rule.when), CreateAction(rule)])
         }
         if (unmatched) {
-            tokenizer[name].push([/.*/, CreateAction(unmatched)]);
+            tokenizer[name].push([`.*?(?:(${tokenizer[name].map(v => `(${v.source})`).join('|')}))`, CreateAction(unmatched)]);
         }
     }
     return { start, tokenizer };
