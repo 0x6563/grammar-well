@@ -273,8 +273,8 @@ function GWLanguage(){
                 ],
                 state_definition_kv: [
                     { name: "state_definition_kv", postprocess: ({data}) => { return ({ tag: data[4] }); }, symbols: [ { literal: "default" }, "_", { literal: ":" }, "_", "T_WORD" ] },
+                    { name: "state_definition_kv", postprocess: ({data}) => { return ({ tag: data[4] }); }, symbols: [ { literal: "default" }, "_", { literal: ":" }, "_", "T_STRING" ] },
                     { name: "state_definition_kv", postprocess: ({data}) => { return ({ tag: data[4] }); }, symbols: [ { literal: "unmatched" }, "_", { literal: ":" }, "_", "T_WORD" ] },
-                    { name: "state_definition_kv", postprocess: ({data}) => { return ({ tag: data[4] }); }, symbols: [ { literal: "unmatched" }, "_", { literal: ":" }, "_", "T_STRING" ] },
                     { name: "state_definition_kv", postprocess: ({data}) => { return ({ tag: data[4] }); }, symbols: [ { literal: "unmatched" }, "_", { literal: ":" }, "_", "T_STRING" ] }
                 ],
                 state_definition_kv_list: [

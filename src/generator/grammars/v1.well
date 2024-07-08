@@ -187,8 +187,8 @@ grammar {
 
 	[state_definition_kv] => ( { tag: $4 } )
 		| "default" _ ":" _ T_WORD
+		| "default" _ ":" _ T_STRING
 		| "unmatched" _ ":" _ T_WORD
-		| "unmatched" _ ":" _ T_STRING
 		| "unmatched" _ ":" _ T_STRING
 
 	[token_list]
