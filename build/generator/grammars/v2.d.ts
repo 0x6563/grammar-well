@@ -115,9 +115,14 @@ declare function GWLanguage(): {
                 }) => {
                     regex: any;
                     flags: any;
+                    quote: any;
                 };
                 symbols: (string | {
+                    literal: string;
+                    token?: undefined;
+                } | {
                     token: string;
+                    literal?: undefined;
                 })[];
             }[];
             T_REGEX$RPT0Nx1: ({
@@ -1045,6 +1050,12 @@ declare function GWLanguage(): {
                     goto?: undefined;
                     set?: undefined;
                 } | {
+                    goto: string;
+                    highlight: string;
+                    when: string;
+                    tag?: undefined;
+                    set?: undefined;
+                } | {
                     tag: string[];
                     when: string;
                     highlight?: undefined;
@@ -1098,27 +1109,38 @@ declare function GWLanguage(): {
                     tag: string[];
                     when: RegExp;
                     highlight?: undefined;
+                    goto?: undefined;
                     pop?: undefined;
                 } | {
                     highlight: string;
                     tag: string[];
                     when: RegExp;
+                    goto?: undefined;
+                    pop?: undefined;
+                } | {
+                    goto: string;
+                    highlight: string;
+                    when: string;
+                    tag?: undefined;
                     pop?: undefined;
                 } | {
                     tag: string[];
                     when: string;
                     highlight?: undefined;
+                    goto?: undefined;
                     pop?: undefined;
                 } | {
                     highlight: string;
                     tag: string[];
                     when: string;
+                    goto?: undefined;
                     pop?: undefined;
                 } | {
                     pop: number;
                     tag: string[];
                     when: string;
                     highlight?: undefined;
+                    goto?: undefined;
                 })[];
             };
             lexer_sections$closer: {
@@ -1180,9 +1202,40 @@ declare function GWLanguage(): {
             regex: {
                 regex: RegExp;
                 rules: {
+                    goto: string;
                     highlight: string;
+                    when: string;
+                }[];
+            };
+            regex$body: {
+                regex: RegExp;
+                rules: ({
                     tag: string[];
                     when: RegExp;
+                    highlight?: undefined;
+                    pop?: undefined;
+                } | {
+                    highlight: string;
+                    pop: number;
+                    tag: string[];
+                    when: RegExp;
+                })[];
+            };
+            regex$closer: {
+                regex: RegExp;
+                rules: {
+                    highlight: string;
+                    pop: number;
+                    tag: string[];
+                    when: RegExp;
+                }[];
+            };
+            regex$opener: {
+                regex: RegExp;
+                rules: {
+                    goto: string;
+                    highlight: string;
+                    when: string;
                 }[];
             };
             section_word: {

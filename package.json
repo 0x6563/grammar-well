@@ -5,6 +5,7 @@
   "description": "Cross-platform Parser written in TypeScript",
   "scripts": {
     "prebuild": "tsc --build --clean && tsx scripts/prebuild.ts",
+    "grammar": "tsc --build --clean && tsx scripts/grammar.ts",
     "build": "tsc --build",
     "builde": "tsc --build",
     "benchmark": "node tests/performance/benchmark.js",

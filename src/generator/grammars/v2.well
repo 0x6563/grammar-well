@@ -3,17 +3,17 @@ lexer {
 
 	[main]
 		- import string, ws, comment, l_star
-		- when /on\s+load(?![a-zA-Z\d_])/ tag "T_WORD" highlight "tag" goto js_body
-		- when /on\s+new(?![a-zA-Z\d_])/ tag "T_WORD" highlight "tag" goto js_body
-		- when /lexer(?![a-zA-Z\d_])/ tag "T_WORD" highlight "tag" set lexer
-		- when /grammar(?![a-zA-Z\d_])/ tag "T_WORD" highlight "tag" set grammar
-		- when /config(?![a-zA-Z\d_])/ tag "T_WORD" highlight "tag" set config
+		- when \r "on\s+load(?![a-zA-Z\d_])" tag "T_WORD" highlight "tag" goto js_body
+		- when \r "on\s+new(?![a-zA-Z\d_])" tag "T_WORD" highlight "tag" goto js_body
+		- when \r "lexer(?![a-zA-Z\d_])" tag "T_WORD" highlight "tag" set lexer
+		- when \r "grammar(?![a-zA-Z\d_])" tag "T_WORD" highlight "tag" set grammar
+		- when \r "config(?![a-zA-Z\d_])" tag "T_WORD" highlight "tag" set config
 		- import kv
 
 	[config] sections {
 
 		[opener]
-			- skip /\s+/
+			- skip \r "\s+"
 			- when "{" tag "CBRACKET_L"
 
 		[body]
@@ -25,7 +25,7 @@ lexer {
 	[grammar] sections {
 
 		[opener]
-			- skip /\s+/
+			- skip \r "\s+"
 			- when "{" tag "CBRACKET_L"
 
 		[body]
@@ -37,7 +37,7 @@ lexer {
 	[lexer] sections {
 
 		[opener]
-			- skip /\s+/
+			- skip \r "\s+"
 			- when "{" tag "CBRACKET_L"
 
 		[body]
@@ -86,36 +86,48 @@ lexer {
 		- import string, ws, word, l_colon, integer, l_scolon
 
 	[jsignore]
-		- when /"(?:[^"\\\r\n]|\\.)*"/ tag "T_JSBODY"
-		- when /'(?:[^'\\\r\n]|\\.)*'/ tag "T_JSBODY"
-		- when /`(?:[^`\\]|\\.)*`/ tag "T_JSBODY"
-		- when /\/(?:[^\/\\\r\n]|\\.)+\/[gmiyu]*/ tag "T_JSBODY"
-		- when /\/\/[^\n]*/ tag "T_JSBODY"
-		- when /\/\*.*\*\// tag "T_JSBODY"
+		- when \r "\"(?:[^\"\\\r\n]|\\.)*\"" tag "T_JSBODY"
+		- when \r "'(?:[^'\\\r\n]|\\.)*'" tag "T_JSBODY"
+		- when \r "`(?:[^`\\]|\\.)*`" tag "T_JSBODY"
+		- when \r "/(?:[^/\\\r\n]|\\.)+/[gmiyu]*" tag "T_JSBODY"
+		- when \r "//[^\n]*" tag "T_JSBODY"
+		- when \r "/\*.*\*/" tag "T_JSBODY"
 
 	[string]
-		- when /"(?:[^"\\\r\n]|\\.)*"/ tag "T_STRING" highlight "string"
+		- when \r "\"(?:[^\"\\\r\n]|\\.)*\"" tag "T_STRING" highlight "string"
 
 	[string2]
-		- when /'(?:[^'\\\r\n]|\\.)*'/ tag "T_STRING" highlight "string"
+		- when \r "'(?:[^'\\\r\n]|\\.)*'" tag "T_STRING" highlight "string"
 
 	[string3]
-		- when /`(?:[^`\\]|\\.)*`/ tag "T_STRING" highlight "string"
+		- when \r "`(?:[^`\\]|\\.)*`" tag "T_STRING" highlight "string"
 
-	[regex]
-		- when /\/(?:[^\/\\\r\n]|\\.)+\// tag "T_REGEX" highlight "regexp"
+	[regex] sections {
+
+		[opener]
+			- when "\\r" highlight "keyword"
+
+		[body]
+			- import ws
+
+		[closer]
+			- when \r "\"(?:[^\"\\\r\n]|\\.)*\"" tag "T_REGEX" highlight "regexp"
+			- when \r "'(?:[^'\\\r\n]|\\.)*'" tag "T_REGEX" highlight "regexp"
+			- when \r "`(?:[^`\\]|\\.)*`" tag "T_REGEX" highlight "regexp"
+
+	}
 
 	[integer]
-		- when /\d+/ tag "T_INTEGER" highlight "number"
+		- when \r "\d+" tag "T_INTEGER" highlight "number"
 
 	[word]
-		- when /[a-zA-Z_][a-zA-Z_\d]*/ tag "T_WORD"
+		- when \r "[a-zA-Z_][a-zA-Z_\d]*" tag "T_WORD"
 
 	[section_word]
-		- when /\[\s*[a-zA-Z_][a-zA-Z_\d]*\s*\]/ tag "T_SECTWORD" highlight "type.identifier"
+		- when \r "\[\s*[a-zA-Z_][a-zA-Z_\d]*\s*\]" tag "T_SECTWORD" highlight "type.identifier"
 
 	[ws]
-		- when /\s+/ tag "T_WS"
+		- when \r "\s+" tag "T_WS"
 
 	[l_colon]
 		- when ":" tag "L_COLON" highlight "keyword"
@@ -172,10 +184,10 @@ lexer {
 		- when "-" tag "L_DASH"
 
 	[comment]
-		- when /\/\/[^\n]*/ tag "T_COMMENT" highlight "comment"
+		- when \r "//[^\n]*" tag "T_COMMENT" highlight "comment"
 
 	[commentmulti]
-		- when /\/\*.*\*\// tag "T_COMMENT" highlight "comment"
+		- when \r "/\*.*\*/" tag "T_COMMENT" highlight "comment"
 
 }
 
@@ -196,10 +208,10 @@ grammar {
 		| "import" _ <L_STAR> _ "as" _ T_WORD:alias _ "from" __ T_STRING:import _ <L_SCOLON> => ( { import: $import, path: true, alias: $alias} )
 		| "lexer" _ <CBRACKET_L> _ lexer:lexer _ <CBRACKET_R> => ( { lexer: Object.assign(...$lexer) } )
 		| "grammar" _ <CBRACKET_L> _ grammar:grammar _ <CBRACKET_R> => ( { grammar: $grammar } )
-		| /on\s+new/ _ T_JS:js => ( { body: $js } )
-		| /on\s+new/ _ T_STRING:js => ( { body: $js, path: true } )
-		| /on\s+load/ _ T_JS:js => ( { head: $js } )
-		| /on\s+load/ _ T_STRING:js => ( { head: $js, path: true } )
+		| \r "on\s+new" _ T_JS:js => ( { body: $js } )
+		| \r "on\s+new" _ T_STRING:js => ( { body: $js, path: true } )
+		| \r "on\s+load" _ T_JS:js => ( { head: $js } )
+		| \r "on\s+load" _ T_STRING:js => ( { head: $js, path: true } )
 
 	[lexer]
 		| kv_list _ state_list => ( $0.concat({ states: $2 }) )
@@ -345,7 +357,7 @@ grammar {
 		| <T_SECTWORD> => ( $0.value.substring(1, $0.value.length-1).trim() )
 
 	[T_REGEX]
-		| <T_REGEX> /[gmiuy]/* => ( { regex: $0.value.slice(1,-1), flags: $1.map(v=>v.value).join('').trim() } )
+		| "\\r" _ <T_REGEX> \r "[gmiuy]"* => ( { regex: $2.value.slice(1,-1), flags: $3.map(v => v.value).join('').trim(), quote: $2.value[0] } )
 
 	[T_INTEGER]
 		| <T_INTEGER> => ( $0.value )

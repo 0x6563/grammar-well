@@ -12,10 +12,6 @@ export declare class V2GrammarString {
     appendLexerDirective(directive: ASTLexer): void;
     formatLexerState(name: string, state: ASTLexerState, depth?: number): string;
     formatLexerStateRule(rule: ASTLexerStateMatchRule | ASTLexerStateNonMatchRule | ASTLexerStateImportRule): string;
-    formatWhen(when: string | {
-        regex: string;
-        flags: string;
-    }): string;
     formatKV(obj: {
         [key: string]: any;
     }, depth?: number): string;

@@ -65,7 +65,7 @@ export class CommonGenerator {
         return JSON.stringify(s.rule);
     }
     static SerializeSymbolRegex(s) {
-        return `/${s.regex}/${s.flags || ''}`;
+        return `/${(new RegExp(s.regex, s.flags)).source}/${s.flags || ''}`;
     }
     static SerializeSymbolToken(s) {
         return `{ token: ${JSON.stringify(s.token)} }`;

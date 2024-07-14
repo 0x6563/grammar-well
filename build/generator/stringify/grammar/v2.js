@@ -72,7 +72,7 @@ export class V2GrammarString {
             return JSON.stringify(exp.literal) + (exp.insensitive ? 'i' : '');
         }
         if ('regex' in exp) {
-            return `/${exp.regex}/${exp.flags || ''}`;
+            return `\\r ${exp.quote}${exp.regex}${exp.quote}${exp.flags || ''}`;
         }
         if ('token' in exp) {
             return `<${exp.token}>`;
@@ -186,9 +186,6 @@ export class V2GrammarString {
             }
         }
         return body.trim();
-    }
-    formatWhen(when) {
-        return typeof when == 'string' ? JSON.stringify(when) : `/${when.regex}/${when.flags || ''}`;
     }
     formatKV(obj, depth = 0) {
         let body = '';

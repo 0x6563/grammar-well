@@ -68,7 +68,7 @@ export class CommonGenerator {
     }
 
     static SerializeSymbolRegex(s: ASTGrammarSymbolRegex) {
-        return `/${s.regex}/${s.flags || ''}`;
+        return `/${(new RegExp(s.regex, s.flags)).source}/${s.flags || ''}`;
     }
 
     static SerializeSymbolToken(s: ASTGrammarSymbolToken) {

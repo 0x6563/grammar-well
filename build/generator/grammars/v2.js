@@ -35,7 +35,7 @@ function GWLanguage() {
                     { name: "T_JS$RPT0Nx1", postprocess: ({ data }) => data[0].concat([data[1]]), symbols: ["T_JS$RPT0Nx1", { token: "T_JSBODY" }] }
                 ],
                 T_REGEX: [
-                    { name: "T_REGEX", postprocess: ({ data }) => { return ({ regex: data[0].value.slice(1, -1), flags: data[1].map(v => v.value).join('').trim() }); }, symbols: [{ token: "T_REGEX" }, "T_REGEX$RPT0Nx1"] }
+                    { name: "T_REGEX", postprocess: ({ data }) => { return ({ regex: data[2].value.slice(1, -1), flags: data[3].map(v => v.value).join('').trim(), quote: data[2].value[0] }); }, symbols: [{ literal: "\\r" }, "_", { token: "T_REGEX" }, "T_REGEX$RPT0Nx1"] }
                 ],
                 T_REGEX$RPT0Nx1: [
                     { name: "T_REGEX$RPT0Nx1", symbols: [] },
@@ -245,10 +245,10 @@ function GWLanguage() {
                     ]
                 },
                 config$body: {
-                    regex: /(?:(?:(\/\/[^\n]*))|(?:("(?:[^"\\\r\n]|\\.)*"))|(?:(\s+))|(?:([a-zA-Z_][a-zA-Z_\d]*))|(?:((?::)))|(?:(\d+))|(?:((?:;)))|(?:((?:\}))))/ym,
+                    regex: /(?:(?:(\/\/[^\n]*))|(?:(\"(?:[^\"\\\r\n]|\\.)*\"))|(?:(\s+))|(?:([a-zA-Z_][a-zA-Z_\d]*))|(?:((?::)))|(?:(\d+))|(?:((?:;)))|(?:((?:\}))))/ym,
                     rules: [
                         { highlight: "comment", tag: ["T_COMMENT"], when: /\/\/[^\n]*/ },
-                        { highlight: "string", tag: ["T_STRING"], when: /"(?:[^"\\\r\n]|\\.)*"/ },
+                        { highlight: "string", tag: ["T_STRING"], when: /\"(?:[^\"\\\r\n]|\\.)*\"/ },
                         { tag: ["T_WS"], when: /\s+/ },
                         { tag: ["T_WORD"], when: /[a-zA-Z_][a-zA-Z_\d]*/ },
                         { highlight: "keyword", tag: ["L_COLON"], when: ":" },
@@ -272,17 +272,17 @@ function GWLanguage() {
                     ]
                 },
                 grammar$body: {
-                    regex: /(?:(?:(\/\/[^\n]*))|(?:(\[\s*[a-zA-Z_][a-zA-Z_\d]*\s*\]))|(?:((?:=>)))|(?:(\s+))|(?:(\/(?:[^\/\\\r\n]|\\.)+\/))|(?:((?:\?)))|(?:((?:\+)))|(?:((?:\*)))|(?:("(?:[^"\\\r\n]|\\.)*"))|(?:([a-zA-Z_][a-zA-Z_\d]*))|(?:((?::)))|(?:(\d+))|(?:((?:;)))|(?:((?:,)))|(?:((?:\|)))|(?:((?:\()))|(?:((?:\))))|(?:((?:<)))|(?:((?:>)))|(?:((?:\->)))|(?:((?:\$)))|(?:((?:\-)))|(?:((?:\}))))/ym,
+                    regex: /(?:(?:(\/\/[^\n]*))|(?:(\[\s*[a-zA-Z_][a-zA-Z_\d]*\s*\]))|(?:((?:=>)))|(?:(\s+))|(?:((?:\\r)))|(?:((?:\?)))|(?:((?:\+)))|(?:((?:\*)))|(?:(\"(?:[^\"\\\r\n]|\\.)*\"))|(?:([a-zA-Z_][a-zA-Z_\d]*))|(?:((?::)))|(?:(\d+))|(?:((?:;)))|(?:((?:,)))|(?:((?:\|)))|(?:((?:\()))|(?:((?:\))))|(?:((?:<)))|(?:((?:>)))|(?:((?:\->)))|(?:((?:\$)))|(?:((?:\-)))|(?:((?:\}))))/ym,
                     rules: [
                         { highlight: "comment", tag: ["T_COMMENT"], when: /\/\/[^\n]*/ },
                         { highlight: "type.identifier", tag: ["T_SECTWORD"], when: /\[\s*[a-zA-Z_][a-zA-Z_\d]*\s*\]/ },
                         { goto: "js_template_inner", highlight: "annotation", when: "=>" },
                         { tag: ["T_WS"], when: /\s+/ },
-                        { highlight: "regexp", tag: ["T_REGEX"], when: /\/(?:[^\/\\\r\n]|\\.)+\// },
+                        { goto: "regex$body", highlight: "keyword", when: "\\r" },
                         { tag: ["L_QMARK"], when: "?" },
                         { tag: ["L_PLUS"], when: "+" },
                         { tag: ["L_STAR"], when: "*" },
-                        { highlight: "string", tag: ["T_STRING"], when: /"(?:[^"\\\r\n]|\\.)*"/ },
+                        { highlight: "string", tag: ["T_STRING"], when: /\"(?:[^\"\\\r\n]|\\.)*\"/ },
                         { tag: ["T_WORD"], when: /[a-zA-Z_][a-zA-Z_\d]*/ },
                         { highlight: "keyword", tag: ["L_COLON"], when: ":" },
                         { highlight: "number", tag: ["T_INTEGER"], when: /\d+/ },
@@ -320,12 +320,12 @@ function GWLanguage() {
                     ]
                 },
                 js_literal: {
-                    regex: /(?:(?:("(?:[^"\\\r\n]|\\.)*"))|(?:('(?:[^'\\\r\n]|\\.)*'))|(?:(`(?:[^`\\]|\\.)*`))|(?:(\/(?:[^\/\\\r\n]|\\.)+\/[gmiyu]*))|(?:(\/\/[^\n]*))|(?:(\/\*.*\*\/))|(?:((?:\{)))|(?:((?:\})))|(?:((?:\()))|(?:((?:\)))))/gm,
+                    regex: /(?:(?:(\"(?:[^\"\\\r\n]|\\.)*\"))|(?:('(?:[^'\\\r\n]|\\.)*'))|(?:(`(?:[^`\\]|\\.)*`))|(?:(\/(?:[^/\\\r\n]|\\.)+\/[gmiyu]*))|(?:(\/\/[^\n]*))|(?:(\/\*.*\*\/))|(?:((?:\{)))|(?:((?:\})))|(?:((?:\()))|(?:((?:\)))))/gm,
                     rules: [
-                        { tag: ["T_JSBODY"], when: /"(?:[^"\\\r\n]|\\.)*"/ },
+                        { tag: ["T_JSBODY"], when: /\"(?:[^\"\\\r\n]|\\.)*\"/ },
                         { tag: ["T_JSBODY"], when: /'(?:[^'\\\r\n]|\\.)*'/ },
                         { tag: ["T_JSBODY"], when: /`(?:[^`\\]|\\.)*`/ },
-                        { tag: ["T_JSBODY"], when: /\/(?:[^\/\\\r\n]|\\.)+\/[gmiyu]*/ },
+                        { tag: ["T_JSBODY"], when: /\/(?:[^/\\\r\n]|\\.)+\/[gmiyu]*/ },
                         { tag: ["T_JSBODY"], when: /\/\/[^\n]*/ },
                         { tag: ["T_JSBODY"], when: /\/\*.*\*\// },
                         { goto: "js_literal", highlight: "annotation", tag: ["T_JSBODY"], when: "{" },
@@ -352,20 +352,20 @@ function GWLanguage() {
                     ]
                 },
                 jsignore: {
-                    regex: /(?:(?:("(?:[^"\\\r\n]|\\.)*"))|(?:('(?:[^'\\\r\n]|\\.)*'))|(?:(`(?:[^`\\]|\\.)*`))|(?:(\/(?:[^\/\\\r\n]|\\.)+\/[gmiyu]*))|(?:(\/\/[^\n]*))|(?:(\/\*.*\*\/)))/ym,
+                    regex: /(?:(?:(\"(?:[^\"\\\r\n]|\\.)*\"))|(?:('(?:[^'\\\r\n]|\\.)*'))|(?:(`(?:[^`\\]|\\.)*`))|(?:(\/(?:[^/\\\r\n]|\\.)+\/[gmiyu]*))|(?:(\/\/[^\n]*))|(?:(\/\*.*\*\/)))/ym,
                     rules: [
-                        { tag: ["T_JSBODY"], when: /"(?:[^"\\\r\n]|\\.)*"/ },
+                        { tag: ["T_JSBODY"], when: /\"(?:[^\"\\\r\n]|\\.)*\"/ },
                         { tag: ["T_JSBODY"], when: /'(?:[^'\\\r\n]|\\.)*'/ },
                         { tag: ["T_JSBODY"], when: /`(?:[^`\\]|\\.)*`/ },
-                        { tag: ["T_JSBODY"], when: /\/(?:[^\/\\\r\n]|\\.)+\/[gmiyu]*/ },
+                        { tag: ["T_JSBODY"], when: /\/(?:[^/\\\r\n]|\\.)+\/[gmiyu]*/ },
                         { tag: ["T_JSBODY"], when: /\/\/[^\n]*/ },
                         { tag: ["T_JSBODY"], when: /\/\*.*\*\// }
                     ]
                 },
                 kv: {
-                    regex: /(?:(?:("(?:[^"\\\r\n]|\\.)*"))|(?:(\s+))|(?:([a-zA-Z_][a-zA-Z_\d]*))|(?:((?::)))|(?:(\d+))|(?:((?:;))))/ym,
+                    regex: /(?:(?:(\"(?:[^\"\\\r\n]|\\.)*\"))|(?:(\s+))|(?:([a-zA-Z_][a-zA-Z_\d]*))|(?:((?::)))|(?:(\d+))|(?:((?:;))))/ym,
                     rules: [
-                        { highlight: "string", tag: ["T_STRING"], when: /"(?:[^"\\\r\n]|\\.)*"/ },
+                        { highlight: "string", tag: ["T_STRING"], when: /\"(?:[^\"\\\r\n]|\\.)*\"/ },
                         { tag: ["T_WS"], when: /\s+/ },
                         { tag: ["T_WORD"], when: /[a-zA-Z_][a-zA-Z_\d]*/ },
                         { highlight: "keyword", tag: ["L_COLON"], when: ":" },
@@ -465,16 +465,16 @@ function GWLanguage() {
                     ]
                 },
                 lexer$body: {
-                    regex: /(?:(?:(\s+))|(?:(\/\/[^\n]*))|(?:(\[\s*[a-zA-Z_][a-zA-Z_\d]*\s*\]))|(?:(\/(?:[^\/\\\r\n]|\\.)+\/))|(?:((?:,)))|(?:((?:\->)))|(?:((?:\-)))|(?:("(?:[^"\\\r\n]|\\.)*"))|(?:([a-zA-Z_][a-zA-Z_\d]*))|(?:((?::)))|(?:(\d+))|(?:((?:;)))|(?:((?:\{)))|(?:((?:\}))))/ym,
+                    regex: /(?:(?:(\s+))|(?:(\/\/[^\n]*))|(?:(\[\s*[a-zA-Z_][a-zA-Z_\d]*\s*\]))|(?:((?:\\r)))|(?:((?:,)))|(?:((?:\->)))|(?:((?:\-)))|(?:(\"(?:[^\"\\\r\n]|\\.)*\"))|(?:([a-zA-Z_][a-zA-Z_\d]*))|(?:((?::)))|(?:(\d+))|(?:((?:;)))|(?:((?:\{)))|(?:((?:\}))))/ym,
                     rules: [
                         { tag: ["T_WS"], when: /\s+/ },
                         { highlight: "comment", tag: ["T_COMMENT"], when: /\/\/[^\n]*/ },
                         { highlight: "type.identifier", tag: ["T_SECTWORD"], when: /\[\s*[a-zA-Z_][a-zA-Z_\d]*\s*\]/ },
-                        { highlight: "regexp", tag: ["T_REGEX"], when: /\/(?:[^\/\\\r\n]|\\.)+\// },
+                        { goto: "regex$body", highlight: "keyword", when: "\\r" },
                         { tag: ["L_COMMA"], when: "," },
                         { highlight: "keyword", tag: ["L_ARROW"], when: "->" },
                         { tag: ["L_DASH"], when: "-" },
-                        { highlight: "string", tag: ["T_STRING"], when: /"(?:[^"\\\r\n]|\\.)*"/ },
+                        { highlight: "string", tag: ["T_STRING"], when: /\"(?:[^\"\\\r\n]|\\.)*\"/ },
                         { tag: ["T_WORD"], when: /[a-zA-Z_][a-zA-Z_\d]*/ },
                         { highlight: "keyword", tag: ["L_COLON"], when: ":" },
                         { highlight: "number", tag: ["T_INTEGER"], when: /\d+/ },
@@ -497,16 +497,16 @@ function GWLanguage() {
                     ]
                 },
                 lexer_sections$body: {
-                    regex: /(?:(?:(\s+))|(?:(\/\/[^\n]*))|(?:(\[\s*[a-zA-Z_][a-zA-Z_\d]*\s*\]))|(?:(\/(?:[^\/\\\r\n]|\\.)+\/))|(?:((?:,)))|(?:((?:\->)))|(?:((?:\-)))|(?:("(?:[^"\\\r\n]|\\.)*"))|(?:([a-zA-Z_][a-zA-Z_\d]*))|(?:((?::)))|(?:(\d+))|(?:((?:;)))|(?:((?:\}))))/ym,
+                    regex: /(?:(?:(\s+))|(?:(\/\/[^\n]*))|(?:(\[\s*[a-zA-Z_][a-zA-Z_\d]*\s*\]))|(?:((?:\\r)))|(?:((?:,)))|(?:((?:\->)))|(?:((?:\-)))|(?:(\"(?:[^\"\\\r\n]|\\.)*\"))|(?:([a-zA-Z_][a-zA-Z_\d]*))|(?:((?::)))|(?:(\d+))|(?:((?:;)))|(?:((?:\}))))/ym,
                     rules: [
                         { tag: ["T_WS"], when: /\s+/ },
                         { highlight: "comment", tag: ["T_COMMENT"], when: /\/\/[^\n]*/ },
                         { highlight: "type.identifier", tag: ["T_SECTWORD"], when: /\[\s*[a-zA-Z_][a-zA-Z_\d]*\s*\]/ },
-                        { highlight: "regexp", tag: ["T_REGEX"], when: /\/(?:[^\/\\\r\n]|\\.)+\// },
+                        { goto: "regex$body", highlight: "keyword", when: "\\r" },
                         { tag: ["L_COMMA"], when: "," },
                         { highlight: "keyword", tag: ["L_ARROW"], when: "->" },
                         { tag: ["L_DASH"], when: "-" },
-                        { highlight: "string", tag: ["T_STRING"], when: /"(?:[^"\\\r\n]|\\.)*"/ },
+                        { highlight: "string", tag: ["T_STRING"], when: /\"(?:[^\"\\\r\n]|\\.)*\"/ },
                         { tag: ["T_WORD"], when: /[a-zA-Z_][a-zA-Z_\d]*/ },
                         { highlight: "keyword", tag: ["L_COLON"], when: ":" },
                         { highlight: "number", tag: ["T_INTEGER"], when: /\d+/ },
@@ -527,9 +527,9 @@ function GWLanguage() {
                     ]
                 },
                 main: {
-                    regex: /(?:(?:("(?:[^"\\\r\n]|\\.)*"))|(?:(\s+))|(?:(\/\/[^\n]*))|(?:((?:\*)))|(?:(on\s+load(?![a-zA-Z\d_])))|(?:(on\s+new(?![a-zA-Z\d_])))|(?:(lexer(?![a-zA-Z\d_])))|(?:(grammar(?![a-zA-Z\d_])))|(?:(config(?![a-zA-Z\d_])))|(?:([a-zA-Z_][a-zA-Z_\d]*))|(?:((?::)))|(?:(\d+))|(?:((?:;))))/ym,
+                    regex: /(?:(?:(\"(?:[^\"\\\r\n]|\\.)*\"))|(?:(\s+))|(?:(\/\/[^\n]*))|(?:((?:\*)))|(?:(on\s+load(?![a-zA-Z\d_])))|(?:(on\s+new(?![a-zA-Z\d_])))|(?:(lexer(?![a-zA-Z\d_])))|(?:(grammar(?![a-zA-Z\d_])))|(?:(config(?![a-zA-Z\d_])))|(?:([a-zA-Z_][a-zA-Z_\d]*))|(?:((?::)))|(?:(\d+))|(?:((?:;))))/ym,
                     rules: [
-                        { highlight: "string", tag: ["T_STRING"], when: /"(?:[^"\\\r\n]|\\.)*"/ },
+                        { highlight: "string", tag: ["T_STRING"], when: /\"(?:[^\"\\\r\n]|\\.)*\"/ },
                         { tag: ["T_WS"], when: /\s+/ },
                         { highlight: "comment", tag: ["T_COMMENT"], when: /\/\/[^\n]*/ },
                         { tag: ["L_STAR"], when: "*" },
@@ -545,9 +545,32 @@ function GWLanguage() {
                     ]
                 },
                 regex: {
-                    regex: /(?:(?:(\/(?:[^\/\\\r\n]|\\.)+\/)))/ym,
+                    regex: /(?:(?:((?:\\r))))/ym,
                     rules: [
-                        { highlight: "regexp", tag: ["T_REGEX"], when: /\/(?:[^\/\\\r\n]|\\.)+\// }
+                        { goto: "regex$body", highlight: "keyword", when: "\\r" }
+                    ]
+                },
+                regex$body: {
+                    regex: /(?:(?:(\s+))|(?:(\"(?:[^\"\\\r\n]|\\.)*\"))|(?:('(?:[^'\\\r\n]|\\.)*'))|(?:(`(?:[^`\\]|\\.)*`)))/ym,
+                    rules: [
+                        { tag: ["T_WS"], when: /\s+/ },
+                        { highlight: "regexp", pop: 1, tag: ["T_REGEX"], when: /\"(?:[^\"\\\r\n]|\\.)*\"/ },
+                        { highlight: "regexp", pop: 1, tag: ["T_REGEX"], when: /'(?:[^'\\\r\n]|\\.)*'/ },
+                        { highlight: "regexp", pop: 1, tag: ["T_REGEX"], when: /`(?:[^`\\]|\\.)*`/ }
+                    ]
+                },
+                regex$closer: {
+                    regex: /(?:(?:(\"(?:[^\"\\\r\n]|\\.)*\"))|(?:('(?:[^'\\\r\n]|\\.)*'))|(?:(`(?:[^`\\]|\\.)*`)))/ym,
+                    rules: [
+                        { highlight: "regexp", pop: 1, tag: ["T_REGEX"], when: /\"(?:[^\"\\\r\n]|\\.)*\"/ },
+                        { highlight: "regexp", pop: 1, tag: ["T_REGEX"], when: /'(?:[^'\\\r\n]|\\.)*'/ },
+                        { highlight: "regexp", pop: 1, tag: ["T_REGEX"], when: /`(?:[^`\\]|\\.)*`/ }
+                    ]
+                },
+                regex$opener: {
+                    regex: /(?:(?:((?:\\r))))/ym,
+                    rules: [
+                        { goto: "regex$body", highlight: "keyword", when: "\\r" }
                     ]
                 },
                 section_word: {
@@ -557,9 +580,9 @@ function GWLanguage() {
                     ]
                 },
                 string: {
-                    regex: /(?:(?:("(?:[^"\\\r\n]|\\.)*")))/ym,
+                    regex: /(?:(?:(\"(?:[^\"\\\r\n]|\\.)*\")))/ym,
                     rules: [
-                        { highlight: "string", tag: ["T_STRING"], when: /"(?:[^"\\\r\n]|\\.)*"/ }
+                        { highlight: "string", tag: ["T_STRING"], when: /\"(?:[^\"\\\r\n]|\\.)*\"/ }
                     ]
                 },
                 word: {

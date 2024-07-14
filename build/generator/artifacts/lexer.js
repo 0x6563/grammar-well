@@ -165,7 +165,7 @@ function CompileRegExp(name, state) {
         flags += "u";
     if (isCI === true)
         flags += "i";
-    return `/${RegexLib.Join(subexpressions)}/${flags}`;
+    return `/${new RegExp(RegexLib.Join(subexpressions)).source}/${flags}`;
 }
 class RegexLib {
     static IsRegex(o) {

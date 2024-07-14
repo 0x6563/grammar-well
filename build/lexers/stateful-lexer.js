@@ -44,7 +44,7 @@ export class StatefulLexer {
         }
         const { rule, text, index } = next;
         if (!rule) {
-            throw new Error(`No matching rule for ${text}`);
+            throw new Error(`No matching rule for ${text.split(/\n|\r\n/).slice(0, 3).join('\n')}`);
         }
         const token = {
             type: rule.type,

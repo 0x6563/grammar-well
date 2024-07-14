@@ -64,6 +64,7 @@ export interface ASTGrammarSymbolNonTerminal {
 export interface ASTGrammarSymbolRegex {
     regex: string;
     flags?: string;
+    quote?: string;
 }
 export interface ASTGrammarSymbolToken {
     token: string;
@@ -103,6 +104,7 @@ export interface ASTLexerStateMatchRule {
     embed?: string;
     unembed?: boolean;
     pop?: number | 'all';
+    stay?: true;
     inset?: number;
     goto?: string;
     set?: string;
