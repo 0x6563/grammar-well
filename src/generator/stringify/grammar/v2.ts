@@ -75,7 +75,12 @@ export class V2GrammarString {
             return JSON.stringify(exp.literal) + (exp.insensitive ? 'i' : '')
         }
         if ('regex' in exp) {
-            return `\\r ${exp.quote}${exp.regex}${exp.quote}${exp.flags || ''}`;
+            let { quote, regex, flags } = exp;
+            if (!quote) {
+                regex = regex.replace(/"/g, '\\"');
+                quote = "\"";
+            }
+            return `\\r ${quote}${regex}${quote}${flags || ''}`;
         }
         if ('token' in exp) {
             return `<${exp.token}>`;
@@ -196,7 +201,7 @@ export class V2GrammarString {
         }
         return body.trim();
     }
- 
+
     formatKV(obj: { [key: string]: any }, depth: number = 0) {
         let body = '';
         for (const key in obj) {
