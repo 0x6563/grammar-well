@@ -72,7 +72,7 @@ export class V2GrammarString {
             return exp.rule;
         }
         if ('literal' in exp) {
-            return JSON.stringify(exp.literal) + (exp.insensitive ? 'i' : '')
+            return (exp.insensitive ? '\\i ' : '') + JSON.stringify(exp.literal);
         }
         if ('regex' in exp) {
             let { quote, regex, flags } = exp;
@@ -80,7 +80,7 @@ export class V2GrammarString {
                 regex = regex.replace(/"/g, '\\"');
                 quote = "\"";
             }
-            return `\\r ${quote}${regex}${quote}${flags || ''}`;
+            return `\\r${flags || ''} ${quote}${regex}${quote}`;
         }
         if ('token' in exp) {
             return `<${exp.token}>`;

@@ -29,7 +29,7 @@ lexer {
 			- when "{" tag "CBRACKET_L"
 
 		[body]
-			- import comment, section_word, js_template, ws, regex, l_qmark, l_plus, l_star, kv, l_colon, l_comma, l_pipe, l_parenl, l_parenr, l_abracketl, l_abracketr, l_arrow, l_dsign, l_dash
+			- import comment, section_word, js_template, ws, insensitive, regex, l_qmark, l_plus, l_star, kv, l_colon, l_comma, l_pipe, l_parenl, l_parenr, l_abracketl, l_abracketr, l_arrow, l_dsign, l_dash
 			- when "}" tag "CBRACKET_R" set main
 
 	}
@@ -105,10 +105,11 @@ lexer {
 	[regex] sections {
 
 		[opener]
-			- when "\\r" highlight "keyword"
+			- when "\\r" highlight "constant"
 
 		[body]
 			- import ws
+			- when \r "[a-z]" highlight "constant"
 
 		[closer]
 			- when \r "\"(?:[^\"\\\r\n]|\\.)*\"" tag "T_REGEX" highlight "regexp"
@@ -116,6 +117,9 @@ lexer {
 			- when \r "`(?:[^`\\]|\\.)*`" tag "T_REGEX" highlight "regexp"
 
 	}
+
+	[insensitive]
+		- when "\\i" highlight "constant"
 
 	[integer]
 		- when \r "\d+" tag "T_INTEGER" highlight "number"
@@ -306,7 +310,8 @@ grammar {
 
 	[expression_symbol_match]
 		| T_WORD => ( { rule: $0 } )
-		| T_STRING "i"? => ( { literal: $0, insensitive: !!$1 } )
+		| T_STRING => ( { literal: $0, insensitive: false } )
+		| "\\i" _ T_STRING => ( { literal: $2, insensitive: true } )
 		| <ABRACKET_L> _ T_WORD:token _ <ABRACKET_R> => ( { token: $token} )
 		| <ABRACKET_L> _ T_STRING:token _ <ABRACKET_R> => ( { token: $token} )
 		| T_REGEX => ( $0 )
@@ -357,7 +362,7 @@ grammar {
 		| <T_SECTWORD> => ( $0.value.substring(1, $0.value.length-1).trim() )
 
 	[T_REGEX]
-		| "\\r" _ <T_REGEX> \r "[gmiuy]"* => ( { regex: $2.value.slice(1,-1), flags: $3.map(v => v.value).join('').trim(), quote: $2.value[0] } )
+		| "\\r" \r "[gmiuy]"* _ <T_REGEX> => ( { regex: $3.value.slice(1,-1), flags: $1.map(v => v.value).join('').trim(), quote: $3.value[0] } )
 
 	[T_INTEGER]
 		| <T_INTEGER> => ( $0.value )

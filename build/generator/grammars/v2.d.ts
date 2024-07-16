@@ -269,6 +269,17 @@ declare function GWLanguage(): {
                 postprocess: ({ data }: {
                     data: any;
                 }) => {
+                    literal: any;
+                    insensitive: boolean;
+                };
+                symbols: (string | {
+                    literal: string;
+                })[];
+            } | {
+                name: string;
+                postprocess: ({ data }: {
+                    data: any;
+                }) => {
                     token: any;
                 };
                 symbols: (string | {
@@ -291,15 +302,6 @@ declare function GWLanguage(): {
                     token: string;
                 })[];
             })[];
-            expression_symbol_match$RPT01x1: {
-                name: string;
-                postprocess: ({ data }: {
-                    data: any;
-                }) => any;
-                symbols: {
-                    literal: string;
-                }[];
-            }[];
             grammar: {
                 name: string;
                 postprocess: ({ data }: {
@@ -793,6 +795,12 @@ declare function GWLanguage(): {
                     goto?: undefined;
                     set?: undefined;
                 } | {
+                    highlight: string;
+                    when: string;
+                    tag?: undefined;
+                    goto?: undefined;
+                    set?: undefined;
+                } | {
                     tag: string[];
                     when: string;
                     highlight?: undefined;
@@ -825,6 +833,13 @@ declare function GWLanguage(): {
                     when: string;
                     skip?: undefined;
                 })[];
+            };
+            insensitive: {
+                regex: RegExp;
+                rules: {
+                    highlight: string;
+                    when: string;
+                }[];
             };
             integer: {
                 regex: RegExp;
@@ -1213,6 +1228,11 @@ declare function GWLanguage(): {
                     tag: string[];
                     when: RegExp;
                     highlight?: undefined;
+                    pop?: undefined;
+                } | {
+                    highlight: string;
+                    when: RegExp;
+                    tag?: undefined;
                     pop?: undefined;
                 } | {
                     highlight: string;
