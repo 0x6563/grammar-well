@@ -2,11 +2,11 @@ lexer {
 	start: "root"
 	[root]
 		- when "(" tag "open" goto inner
-		- when /[a-z]/ tag "letter"
+		- when \r "[a-z]" tag "letter"
 		- when ")" tag "close"
 
 	[inner]
-		- when /[a-z]/ tag "letter"
+		- when \r "[a-z]" tag "letter"
 		- before ")" pop
 
 }
@@ -18,15 +18,15 @@ grammar {
 		| B
 
 	[A]
-		| $letter+
+		| <letter>+
 
 	[B]
-		| $open A $close
+		| <open> A <close>
 
 	[B]
-		| $open $close
+		| <open> <close>
 
 	[B]
-		| $open B $close
+		| <open> B <close>
 
 }

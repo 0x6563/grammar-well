@@ -2,9 +2,9 @@ lexer {
 
 	[root]
 		- import keywords
-		- when /\d+/ tag "digits" highlight "number"
-		- when /"(?:\\["bfnrt\/\\]|\\u[a-fA-F0-9]{4}|[^"\\])*"/ tag "string"
-		- when /[_a-zA-Z][_a-zA-Z\d]*/ tag "word"
+		- when \r '\d+' tag "digits" highlight "number"
+		- when \r '"(?:\\["bfnrt\/\\]|\\u[a-fA-F0-9]{4}|[^"\\])*"' tag "string"
+		- when \r '[_a-zA-Z][_a-zA-Z\d]*' tag "word"
 		- when "==" tag "l_eqeq" highlight "keyword"
 		- when ">=" tag "l_gteq" highlight "keyword"
 		- when "<=" tag "l_lteq" highlight "keyword"
@@ -28,22 +28,22 @@ lexer {
 		- when "}" tag "l_rcurly" highlight "delimiter"
 		- when "[" tag "l_lbrack" highlight "delimiter"
 		- when "]" tag "l_rbrack" highlight "delimiter"
-		- when /\s+/ tag "ws"
+		- when \r "\s+" tag "ws"
 
 	[keywords]
-		- when /var(?![a-zA-Z])/ tag "keyword" highlight "keyword"
-		- when /function(?![a-zA-Z])/ tag "keyword" highlight "keyword"
-		- when /true(?![a-zA-Z])/ tag "keyword" highlight "keyword"
-		- when /false(?![a-zA-Z])/ tag "keyword" highlight "keyword"
-		- when /null(?![a-zA-Z])/ tag "keyword" highlight "keyword"
-		- when /and(?![a-zA-Z])/ tag "keyword" highlight "keyword"
-		- when /or(?![a-zA-Z])/ tag "keyword" highlight "keyword"
-		- when /on(?![a-zA-Z])/ tag "keyword" highlight "keyword"
-		- when /if(?![a-zA-Z])/ tag "keyword" highlight "keyword"
-		- when /in(?![a-zA-Z])/ tag "keyword" highlight "keyword"
-		- when /each(?![a-zA-Z])/ tag "keyword" highlight "keyword"
-		- when /else(?![a-zA-Z])/ tag "keyword" highlight "keyword"
-		- when /while(?![a-zA-Z])/ tag "keyword" highlight "keyword"
+		- when \r "var(?![a-zA-Z])" tag "keyword" highlight "keyword"
+		- when \r "function(?![a-zA-Z])" tag "keyword" highlight "keyword"
+		- when \r "true(?![a-zA-Z])" tag "keyword" highlight "keyword"
+		- when \r "false(?![a-zA-Z])" tag "keyword" highlight "keyword"
+		- when \r "null(?![a-zA-Z])" tag "keyword" highlight "keyword"
+		- when \r "and(?![a-zA-Z])" tag "keyword" highlight "keyword"
+		- when \r "or(?![a-zA-Z])" tag "keyword" highlight "keyword"
+		- when \r "on(?![a-zA-Z])" tag "keyword" highlight "keyword"
+		- when \r "if(?![a-zA-Z])" tag "keyword" highlight "keyword"
+		- when \r "in(?![a-zA-Z])" tag "keyword" highlight "keyword"
+		- when \r "each(?![a-zA-Z])" tag "keyword" highlight "keyword"
+		- when \r "else(?![a-zA-Z])" tag "keyword" highlight "keyword"
+		- when \r "while(?![a-zA-Z])" tag "keyword" highlight "keyword"
 
 }
 

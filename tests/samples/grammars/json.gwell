@@ -1,4 +1,4 @@
-head {
+on load {
 function extractPair(kv, output) {
         if(kv[0]) { output[kv[0]] = kv[1]; }
     }
@@ -30,9 +30,9 @@ lexer {
 	start: "json"
 
 	[json]
-		- when /\s+/ tag "space"
-		- when /-?(?:[0-9]|[1-9][0-9]+)(?:\.[0-9]+)?(?:[eE][-+]?[0-9]+)?\b/ tag "number"
-		- when /"(?:\\["bfnrt\/\\]|\\u[a-fA-F0-9]{4}|[^"\\])*"/ tag "string"
+		- when \r '\s+' tag "space"
+		- when \r '-?(?:[0-9]|[1-9][0-9]+)(?:\.[0-9]+)?(?:[eE][-+]?[0-9]+)?\b' tag "number"
+		- when \r '"(?:\\["bfnrt\/\\]|\\u[a-fA-F0-9]{4}|[^"\\])*"' tag "string"
 		- when "{" tag "{"
 		- when "}" tag "}"
 		- when "[" tag "["
@@ -68,10 +68,10 @@ grammar {
 		| "null" => ( null )
 
 	[number]
-		| $number => ( parseFloat($0.value) )
+		| <number> => ( parseFloat($0.value) )
 
 	[string]
-		| $string => ( JSON.parse($0.value) )
+		| <string> => ( JSON.parse($0.value) )
 
 	[pair]
 		| key:k _ ":" _ value:v => ( [$k, $v] )
@@ -80,6 +80,6 @@ grammar {
 		| string => ( $0 )
 
 	[_]
-		| $space? => ( null )
+		| <space>? => ( null )
 
 }
