@@ -328,7 +328,7 @@ function GWLanguage(){
                     ]
                 },
                 js_literal: {
-                    regex: /(?:(?:(\"(?:[^\"\\\r\n]|\\.)*\"))|(?:('(?:[^'\\\r\n]|\\.)*'))|(?:(`(?:[^`\\]|\\.)*`))|(?:(\/(?:[^/\\\r\n]|\\.)+\/[gmiyu]*))|(?:(\/\/[^\n]*))|(?:(\/\*.*\*\/))|(?:((?:\{)))|(?:((?:\})))|(?:((?:\()))|(?:((?:\)))))/gm,
+                    regex: /(?:(?:(\"(?:[^\"\\\r\n]|\\.)*\"))|(?:('(?:[^'\\\r\n]|\\.)*'))|(?:(`(?:[^`\\]|\\.)*`))|(?:(\/(?:[^/\\\r\n]|\\.)+\/[gmiyu]*))|(?:(\/\/[^\n]*))|(?:(\/\*.*\*\/))|(?:((?:\{)))|(?:((?:\})))|(?:((?:\()))|(?:((?:\))))|(?:((?:\[)))|(?:((?:\]))))/gm,
                     rules: [
                         { tag: ["T_JSBODY"], when: /\"(?:[^\"\\\r\n]|\\.)*\"/ },
                         { tag: ["T_JSBODY"], when: /'(?:[^'\\\r\n]|\\.)*'/ },
@@ -339,7 +339,9 @@ function GWLanguage(){
                         { goto: "js_literal", highlight: "annotation", tag: ["T_JSBODY"], when: "{" },
                         { highlight: "annotation", pop: 1, tag: ["T_JSBODY"], when: "}" },
                         { goto: "js_literal", highlight: "annotation", tag: ["T_JSBODY"], when: "(" },
-                        { highlight: "annotation", pop: 1, tag: ["T_JSBODY"], when: ")" }
+                        { highlight: "annotation", pop: 1, tag: ["T_JSBODY"], when: ")" },
+                        { goto: "js_literal", highlight: "annotation", tag: ["T_JSBODY"], when: "[" },
+                        { highlight: "annotation", pop: 1, tag: ["T_JSBODY"], when: "]" }
                     ],
                     unmatched: { tag: ["T_JSBODY"] }
                 },

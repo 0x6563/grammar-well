@@ -71,6 +71,8 @@ lexer {
 		- when "}" highlight "annotation" pop
 		- when "(" highlight "annotation" goto js_literal
 		- when ")" highlight "annotation" pop
+		- when "[" highlight "annotation" goto js_literal
+		- when "]" highlight "annotation" pop
 
 	[js_template]
 		- when "=>" highlight "annotation" goto js_template_inner
