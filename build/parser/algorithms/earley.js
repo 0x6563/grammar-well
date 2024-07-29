@@ -2,7 +2,7 @@ import { TextFormatter } from "../../utility/text-format.js";
 import { ParserUtility } from "../../utility/parsing.js";
 export function Earley(language, options = {}) {
     const { tokens } = language;
-    const { rules, start } = language.grammar;
+    const { rules, start } = language.artifacts.grammar;
     const column = new Column(rules, 0);
     const table = [column];
     column.wants[start] = [];

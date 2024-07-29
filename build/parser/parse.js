@@ -14,7 +14,7 @@ export function Parse(language, input, options = {
     algorithm: 'earley',
     parserOptions: {}
 }, results = 'first') {
-    const tokenizer = GetTokenizer(language);
+    const tokenizer = GetTokenizer(language.artifacts);
     tokenizer.feed(input);
     const algorithm = typeof options.algorithm == 'function' ? options.algorithm : ParserRegistry[options.algorithm];
     const result = algorithm({ ...language, tokens: tokenizer, utility: ParserUtility }, options.parserOptions);

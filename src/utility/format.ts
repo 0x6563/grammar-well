@@ -5,7 +5,7 @@ import { Parse } from '../parser/parse.js';
 
 export function Format(source: string, sourceVersion: '1' | '2' = '2') {
     const grammar = sourceVersion.toString() == '1' ? V1Grammar : V2Grammar;
-    const result = Parse(grammar() as any, source);
+    const result = Parse(new grammar() as any, source);
     const stringer = new V2GrammarString();
     stringer.append(result);
     return stringer.source;

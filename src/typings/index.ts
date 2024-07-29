@@ -1,7 +1,7 @@
 import { TokenBuffer } from "../lexers/token-buffer.js";
 import { ParserUtility } from "../utility/parsing.js";
 import { ASTLexerStateNonMatchRule } from "./ast.js";
-import { RuntimeGrammarProductionRule, RuntimeGrammarRuleSymbol, RuntimeLanguageDefinition, RuntimeLexerStateMatchRule } from "./runtime.js";
+import { RuntimeGrammarProductionRule, RuntimeGrammarRuleSymbol, RuntimeParserClass, RuntimeLexerStateMatchRule } from "./runtime.js";
 export * from './ast.js';
 export * from './common.js';
 export * from './generator.js';
@@ -16,7 +16,7 @@ export interface ImportResolverConstructor {
     new(basePath: string): ImportResolver;
 }
 
-export type ParserAlgorithm = ((language: RuntimeLanguageDefinition & { tokens: TokenBuffer; utility: ParserUtility }, options?: any) => { results: any[], info?: any });
+export type ParserAlgorithm = ((language: RuntimeParserClass & { tokens: TokenBuffer; utility: ParserUtility }, options?: any) => { results: any[], info?: any });
 
 export interface LRState {
     actions: Next[];

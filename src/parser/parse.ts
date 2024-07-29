@@ -1,4 +1,4 @@
-import { ParserAlgorithm, RuntimeLanguageDefinition } from "../typings/index.js";
+import { ParserAlgorithm, RuntimeParserClass } from "../typings/index.js";
 import { CharacterLexer } from "../lexers/character-lexer.js";
 import { StatefulLexer } from "../lexers/stateful-lexer.js";
 import { TokenBuffer } from "../lexers/token-buffer.js";
@@ -14,7 +14,7 @@ const ParserRegistry: { [key: string]: ParserAlgorithm } = {
 }
 
 export function Parse(
-    language: RuntimeLanguageDefinition,
+    language: RuntimeParserClass,
     input: string,
     options: ParserOptions = {
         algorithm: 'earley',
@@ -22,14 +22,14 @@ export function Parse(
     },
     results: 'full' | 'first' = 'first'
 ) {
-    const tokenizer = GetTokenizer(language);
+    const tokenizer = GetTokenizer(language.artifacts);
     tokenizer.feed(input);
     const algorithm = typeof options.algorithm == 'function' ? options.algorithm : ParserRegistry[options.algorithm];
     const result = algorithm({ ...language, tokens: tokenizer, utility: ParserUtility }, options.parserOptions);
     return results == 'full' ? result : result.results[0];
 }
 
-function GetTokenizer({ lexer }: RuntimeLanguageDefinition) {
+function GetTokenizer({ lexer }: RuntimeParserClass['artifacts']) {
     if (!lexer) {
         return new TokenBuffer(new CharacterLexer());
     } else if ("feed" in lexer && typeof lexer.feed == 'function') {

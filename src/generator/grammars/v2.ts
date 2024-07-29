@@ -1,9 +1,11 @@
 // Generated automatically by Grammar-Well, version unknown 
 // https://github.com/0x6563/grammar-well
+// @ts-nocheck
 
-function grammar(){
-    
-    return {
+
+
+class grammar {
+    artifacts =  {
         grammar: {
             rules: {
                 POSTPROCESSOR: [
@@ -611,6 +613,7 @@ function grammar(){
             }
         }
     }
+    constructor(){}
 }
 
 export default grammar;

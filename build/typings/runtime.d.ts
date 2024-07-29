@@ -1,15 +1,17 @@
 import { LRState } from "./index.js";
 import { ASTGrammarSymbolLiteral, ASTGrammarSymbolToken, ASTLexerStateNonMatchRule } from "./ast.js";
 import { Dictionary } from "./common.js";
-export interface RuntimeLanguageDefinition {
-    lexer?: RuntimeLexer | RuntimeLexerConfig;
-    grammar: {
-        start: string;
-        rules: Dictionary<RuntimeGrammarProductionRule[]>;
-    };
-    lr?: {
-        k: number;
-        table: Dictionary<LRState>;
+export interface RuntimeParserClass {
+    artifacts: {
+        lexer?: RuntimeLexer | RuntimeLexerConfig;
+        grammar: {
+            start: string;
+            rules: Dictionary<RuntimeGrammarProductionRule[]>;
+        };
+        lr?: {
+            k: number;
+            table: Dictionary<LRState>;
+        };
     };
 }
 export interface RuntimeGrammarProductionRule {

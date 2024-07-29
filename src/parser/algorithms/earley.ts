@@ -1,4 +1,4 @@
-import { Dictionary, RuntimeGrammarProductionRule, RuntimeLanguageDefinition } from "../../typings/index.js";
+import { Dictionary, RuntimeGrammarProductionRule, RuntimeParserClass } from "../../typings/index.js";
 import { TokenBuffer } from "../../lexers/token-buffer.js";
 import { TextFormatter } from "../../utility/text-format.js";
 import { ParserUtility } from "../../utility/parsing.js";
@@ -7,9 +7,9 @@ export interface EarleyParserOptions {
     keepHistory?: boolean;
 }
 
-export function Earley(language: RuntimeLanguageDefinition & { tokens: TokenBuffer }, options: EarleyParserOptions = {}) {
+export function Earley(language: RuntimeParserClass & { tokens: TokenBuffer }, options: EarleyParserOptions = {}) {
     const { tokens } = language;
-    const { rules, start } = language.grammar;
+    const { rules, start } = language.artifacts.grammar;
     const column = new Column(rules, 0);
     const table: Column[] = [column];
     column.wants[start] = [];

@@ -1,6 +1,6 @@
-export function LintGrammarSymbols(language) {
+export function LintGrammarSymbols(grammar) {
     const unused = new Set();
-    const { rules, start } = language.grammar;
+    const { rules, start } = grammar;
     for (const rule in rules) {
         unused.add(rule);
     }

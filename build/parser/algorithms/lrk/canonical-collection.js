@@ -11,12 +11,12 @@ export class CanonicalCollection {
         this.grammar = grammar;
         const augmented = {
             name: Symbol(),
-            symbols: [grammar.start]
+            symbols: [this.grammar.start]
         };
-        grammar['rules'][augmented.name] = [augmented];
-        this.closure = new ClosureBuilder(grammar);
+        this.grammar['rules'][augmented.name] = [augmented];
+        this.closure = new ClosureBuilder(this.grammar);
         this.rules.id(augmented);
-        this.addState(grammar['rules'][augmented.name][0], 0);
+        this.addState(this.grammar['rules'][augmented.name][0], 0);
         this.linkStates('0.0');
     }
     addState(rule, dot) {

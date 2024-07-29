@@ -1,7 +1,8 @@
 import { Matrix } from "../../utility/general.js";
 import { ParserUtility } from "../../utility/parsing.js";
 export function CYK(language, _options = {}) {
-    const { grammar, tokens } = language;
+    const { grammar } = language.artifacts;
+    const { tokens } = language;
     const terminals = [];
     const nonTerminals = [];
     for (const name in grammar.rules) {

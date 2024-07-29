@@ -1,6 +1,6 @@
-import { RuntimeGrammarProductionRule, RuntimeLanguageDefinition, RuntimeLexerToken } from "../../typings/index.js";
+import { RuntimeGrammarProductionRule, RuntimeParserClass, RuntimeLexerToken } from "../../typings/index.js";
 import { TokenBuffer } from "../../lexers/token-buffer.js";
-export declare function CYK(language: RuntimeLanguageDefinition & {
+export declare function CYK(language: RuntimeParserClass & {
     tokens: TokenBuffer;
 }, _options?: {}): {
     results: any[];

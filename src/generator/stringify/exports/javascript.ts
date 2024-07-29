@@ -19,9 +19,11 @@ function Generate(generator: JavaScriptGenerator) {
     const exportName = generator.name();
     return `// Generated automatically by Grammar-Well, version ${generator.state.version} 
 // https://github.com/0x6563/grammar-well
+
 ${generator.head()}
-function ${exportName}(){
-    ${generator.body()}
-    return ${generator.artifacts(1)}
+
+class ${exportName} {
+    artifacts =  ${generator.artifacts(1)}
+    constructor(){${generator.body()}}
 }`;
 }

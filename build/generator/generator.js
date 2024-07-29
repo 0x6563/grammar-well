@@ -273,7 +273,7 @@ export class Generator {
     async mergeGrammar(body, alias = '') {
         const grammar = body.indexOf('// Grammar Well Version 1') == 0 ? GrammarV1 : GrammarV2;
         const generator = new Generator(this.config, { ...this.context, state: this.state }, alias);
-        await generator.import(Parse(grammar(), body));
+        await generator.import(Parse(new grammar(), body));
         this.state.merge(generator.state);
         return;
     }

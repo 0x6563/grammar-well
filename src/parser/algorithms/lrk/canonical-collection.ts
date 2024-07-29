@@ -1,4 +1,4 @@
-import { RuntimeGrammarProductionRule, RuntimeGrammarRuleSymbol, RuntimeLanguageDefinition } from "../../../typings/index.js";
+import { RuntimeGrammarProductionRule, RuntimeGrammarRuleSymbol, RuntimeParserClass } from "../../../typings/index.js";
 import { ParserUtility } from "../../../utility/parsing.js";
 import { BiMap } from "./bimap.js";
 import { ClosureBuilder } from "./closure.js";
@@ -11,16 +11,16 @@ export class CanonicalCollection {
 
     private closure: ClosureBuilder;
     constructor(
-        public grammar: RuntimeLanguageDefinition['grammar']
+        public grammar:  RuntimeParserClass['artifacts']['grammar']
     ) {
         const augmented = {
             name: Symbol() as unknown as string,
-            symbols: [grammar.start]
+            symbols: [this.grammar.start]
         }
-        grammar['rules'][augmented.name] = [augmented];
-        this.closure = new ClosureBuilder(grammar);
+        this.grammar['rules'][augmented.name] = [augmented];
+        this.closure = new ClosureBuilder(this.grammar);
         this.rules.id(augmented);
-        this.addState(grammar['rules'][augmented.name][0], 0);
+        this.addState(this.grammar['rules'][augmented.name][0], 0);
         this.linkStates('0.0');
     }
 

@@ -1,5 +1,5 @@
-function grammar() {
-    return {
+class grammar {
+    artifacts = {
         grammar: {
             rules: {
                 POSTPROCESSOR: [
@@ -607,6 +607,7 @@ function grammar() {
             }
         }
     };
+    constructor() { }
 }
 export default grammar;
 //# sourceMappingURL=v2.js.map

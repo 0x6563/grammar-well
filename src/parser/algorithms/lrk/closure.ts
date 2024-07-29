@@ -1,9 +1,9 @@
-import { RuntimeGrammarProductionRule, RuntimeGrammarRuleSymbol, RuntimeLanguageDefinition } from "../../../typings/index.js";
+import { RuntimeGrammarProductionRule, RuntimeGrammarRuleSymbol, RuntimeParserClass } from "../../../typings/index.js";
 import { ParserUtility } from "../../../utility/parsing.js";
 
 export class ClosureBuilder {
     constructor(
-        private grammar: RuntimeLanguageDefinition['grammar'],
+        private grammar: RuntimeParserClass['artifacts']['grammar'],
     ) { }
 
     get(rule: string) {

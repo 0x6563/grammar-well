@@ -1,9 +1,9 @@
-import { Dictionary, RuntimeGrammarProductionRule, RuntimeLanguageDefinition } from "../../typings/index.js";
+import { Dictionary, RuntimeGrammarProductionRule, RuntimeParserClass } from "../../typings/index.js";
 import { TokenBuffer } from "../../lexers/token-buffer.js";
 export interface EarleyParserOptions {
     keepHistory?: boolean;
 }
-export declare function Earley(language: RuntimeLanguageDefinition & {
+export declare function Earley(language: RuntimeParserClass & {
     tokens: TokenBuffer;
 }, options?: EarleyParserOptions): {
     results: any[];

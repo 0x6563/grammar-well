@@ -1,5 +1,5 @@
-function grammar() {
-    return {
+class grammar {
+    artifacts = {
         grammar: {
             rules: {
                 K_ALL: [
@@ -608,6 +608,7 @@ function grammar() {
             }
         }
     };
+    constructor() { }
 }
 export default grammar;
 //# sourceMappingURL=v1.js.map

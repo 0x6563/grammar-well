@@ -51,11 +51,11 @@ export async function RunTest(source: string, input: string, options: any) {
 
 export async function GrammarWellRunner(source: string) {
     const compiled = Evalr(await Generate(source, { export: { name: 'grammar', format: 'commonjs' } }));
-    return (input) => Parse(compiled(), input, { algorithm: 'earley' }, 'full');
+    return (input) => Parse(new compiled(), input, { algorithm: 'earley' }, 'full');
 }
 
 async function Build(source: string): Promise<any> {
-    return Evalr(await Generate(source, { export: { name: 'grammar', format: 'commonjs' } }))();
+    return new (Evalr(await Generate(source, { export: { name: 'grammar', format: 'commonjs' } })) as () => void);
 }
 
 function Evalr(source): any {
