@@ -1,4 +1,4 @@
-import { Dictionary, GeneratorGrammarProductionRule } from "../../typings/index.js";
+import { Dictionary, GeneratorExportOptions, GeneratorGrammarProductionRule } from "../../typings/index.js";
 import { BasicGrammarTable } from "../artifacts/basic.js";
 import { LexerArtifact } from "../artifacts/lexer.js";
 import { LRParseTableBuilder } from "../artifacts/lr.js";
@@ -14,40 +14,46 @@ const PostProcessors = {
 
 export class JavaScriptGenerator {
 
-    constructor(public state: GeneratorState) { }
+    constructor(public state: GeneratorState, public options: GeneratorExportOptions) { }
 
+    name() {
+        return this.options.name || 'GWLanguage';
+    }
     head() {
-        if (this.state.config.noscript)
+        if (this.options.noscript)
             return '';
         return this.state.head.join('\n');
     }
 
     body() {
-        if (this.state.config.noscript)
+        if (this.options.noscript)
             return '';
         return this.state.body.join('\n');
     }
 
     artifacts(depth: number = 0) {
-        const basic = new BasicGrammarTable(this);
-        let lr = null;
-        let lexer = null;
-        if ('lr' in this.state.config) {
+        let output: { [key: string]: string } = {};
+        const artifacts = this.options.artifacts;
+
+        if (artifacts && artifacts.lr) {
             const table = new LRParseTableBuilder(this);
-            lr = CommonGenerator.JSON({
+            output.lr = CommonGenerator.JSON({
                 k: "0",
                 table: table.stringify(depth + 2)
             }, depth + 1);
         }
-        if ('lexer' in this.state) {
+
+        if ('lexer' in this.state && (!artifacts || artifacts.lexer)) {
             const l = new LexerArtifact(this.state.lexer);
-            lexer = l.output(depth + 1);
+            output.lexer = l.output(depth + 1);
         }
-        return CommonGenerator.JSON({
-            grammar: basic.stringify(depth + 1),
-            lexer,
-            lr
-        }, depth);
+
+        if (!artifacts || artifacts.grammar) {
+            const basic = new BasicGrammarTable(this);
+            output.grammar = basic.stringify(depth + 1);
+        }
+
+        return CommonGenerator.JSON(output, depth);
     }
 
     postProcess(postprocess: GeneratorGrammarProductionRule['postprocess'], alias: Dictionary<number>) {
@@ -56,7 +62,7 @@ export class JavaScriptGenerator {
             return null;
         if ('builtin' in postprocess)
             return PostProcessors[postprocess.builtin];
-        if (this.state.config.noscript)
+        if (this.options.noscript)
             return;
         if (typeof postprocess == 'string')
             return postprocess;

@@ -6,26 +6,24 @@ import { GeneratorState } from "./state.js";
 import { ExportsRegistry } from "./stringify/exports/registry.js";
 import { JavaScriptGenerator } from "./stringify/javascript.js";
 import { BrowserImportResolver } from "./import-resolvers/browser.js";
-export async function Generate(rules, config = {}) {
+export async function Generate(source, config = {}) {
     const builder = new Generator(config);
-    await builder.import(rules);
-    Object.assign(builder.state.config, config.overrides);
-    return builder.export(config.template);
+    await builder.import(source);
+    return builder.format(config.export);
 }
 export class Generator {
     config;
-    aliasPrefix;
     context;
+    aliasPrefix;
     state = new GeneratorState();
-    generator = new JavaScriptGenerator(this.state);
-    constructor(config = {}, context, aliasPrefix = '') {
+    constructor(config = {}, context = {
+        imported: new Set(),
+        resolver: undefined,
+        state: undefined
+    }, aliasPrefix = '') {
         this.config = config;
+        this.context = context;
         this.aliasPrefix = aliasPrefix;
-        this.context = context || {
-            imported: new Set(),
-            resolver: undefined,
-            uuids: {}
-        };
         if (typeof config.resolver == 'function') {
             this.context.resolver = new config.resolver(config.basedir);
         }
@@ -35,11 +33,14 @@ export class Generator {
         else {
             this.context.resolver == new BrowserImportResolver(config.basedir);
         }
-        this.state.grammar.uuids = this.context.uuids;
+        if (this.context.state?.grammar) {
+            this.state.initializeGrammar();
+            this.state.grammar.uuids = context.state.grammar.uuids;
+        }
     }
     async import(directives) {
         if (typeof directives == 'string') {
-            await this.mergeLanguageDefinitionString(directives);
+            await this.mergeGrammar(directives);
             return;
         }
         directives = Array.isArray(directives) ? directives : [directives];
@@ -64,13 +65,13 @@ export class Generator {
             }
         }
     }
-    export(format, name = 'GWLanguage') {
-        const grammar = this.state;
-        const output = format || grammar.config.preprocessor || '_default';
-        if (ExportsRegistry[output]) {
-            return ExportsRegistry[output](this.generator, name);
+    format(options) {
+        const format = options?.format || 'esm';
+        if (!ExportsRegistry[format]) {
+            throw new Error("No such output format: " + format);
         }
-        throw new Error("No such preprocessor: " + output);
+        const generator = new JavaScriptGenerator(this.state, options);
+        return ExportsRegistry[format](generator);
     }
     async processImportDirective(directive) {
         if (directive.path) {
@@ -84,12 +85,7 @@ export class Generator {
         Object.assign(this.state.config, directive.config);
     }
     processLexerDirective(directive) {
-        if (!this.state.lexer) {
-            this.state.lexer = {
-                start: '',
-                states: {}
-            };
-        }
+        this.state.initializeLexer();
         if (directive.lexer.start) {
             this.state.lexer.start = this.aliasPrefix + directive.lexer.start;
         }
@@ -242,6 +238,7 @@ export class Generator {
         ];
     }
     processGrammarDirective(directive) {
+        this.state.initializeGrammar();
         if (directive.grammar.config) {
             if (directive.grammar.config.start) {
                 this.state.grammar.start = this.aliasPrefix + directive.grammar.config.start;
@@ -262,7 +259,7 @@ export class Generator {
             this.context.imported.add(name);
             if (!BuiltInRegistry[name])
                 return;
-            await this.mergeLanguageDefinitionString(BuiltInRegistry[name], alias);
+            await this.mergeGrammar(BuiltInRegistry[name], alias);
         }
     }
     async importGrammar(path, alias) {
@@ -270,12 +267,12 @@ export class Generator {
         const fullPath = resolver.path(path);
         if (!this.context.imported.has(fullPath)) {
             this.context.imported.add(fullPath);
-            await this.mergeLanguageDefinitionString(await resolver.body(fullPath), alias);
+            await this.mergeGrammar(await resolver.body(fullPath), alias);
         }
     }
-    async mergeLanguageDefinitionString(body, alias = '') {
+    async mergeGrammar(body, alias = '') {
         const grammar = body.indexOf('// Grammar Well Version 1') == 0 ? GrammarV1 : GrammarV2;
-        const generator = new Generator(this.config, this.context, alias);
+        const generator = new Generator(this.config, { ...this.context, state: this.state }, alias);
         await generator.import(Parse(grammar(), body));
         this.state.merge(generator.state);
         return;

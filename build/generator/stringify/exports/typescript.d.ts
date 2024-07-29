@@ -1,2 +1,2 @@
 import { JavaScriptGenerator } from "../javascript.js";
-export declare function TypescriptFormat(generator: JavaScriptGenerator, exportName: string): string;
+export declare function TypescriptFormat(generator: JavaScriptGenerator): string;

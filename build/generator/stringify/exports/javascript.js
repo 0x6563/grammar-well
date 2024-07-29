@@ -1,5 +1,6 @@
-export function CJSOutput(generator, exportName) {
-    return `${Generate(generator, exportName)}
+export function CJSOutput(generator) {
+    const exportName = generator.name();
+    return `${Generate(generator)}
 
 if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
     module.exports = ${exportName};
@@ -7,12 +8,11 @@ if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
     window.${exportName} = ${exportName};
 }`;
 }
-export function ESMOutput(generator, exportName) {
-    return `${Generate(generator, exportName)}
-
-export default ${exportName};`;
+export function ESMOutput(generator) {
+    return `${Generate(generator)}\n\nexport default ${generator.name()};`;
 }
-function Generate(generator, exportName) {
+function Generate(generator) {
+    const exportName = generator.name();
     return `// Generated automatically by Grammar-Well, version ${generator.state.version} 
 // https://github.com/0x6563/grammar-well
 ${generator.head()}

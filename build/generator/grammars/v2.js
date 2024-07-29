@@ -1,4 +1,4 @@
-function GWLanguage() {
+function grammar() {
     return {
         grammar: {
             rules: {
@@ -608,5 +608,5 @@ function GWLanguage() {
         }
     };
 }
-export default GWLanguage;
+export default grammar;
 //# sourceMappingURL=v2.js.map

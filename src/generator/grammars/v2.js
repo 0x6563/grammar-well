@@ -1,7 +1,7 @@
 // Generated automatically by Grammar-Well, version unknown 
 // https://github.com/0x6563/grammar-well
 
-function GWLanguage(){
+function grammar(){
     
     return {
         grammar: {
@@ -613,4 +613,4 @@ function GWLanguage(){
     }
 }
 
-export default GWLanguage;
+export default grammar;

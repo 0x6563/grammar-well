@@ -50,12 +50,12 @@ export async function RunTest(source: string, input: string, options: any) {
 }
 
 export async function GrammarWellRunner(source: string) {
-    const compiled = Evalr(await Generate(source, { exportName: 'grammar' }));
+    const compiled = Evalr(await Generate(source, { export: { name: 'grammar', format: 'commonjs' } }));
     return (input) => Parse(compiled(), input, { algorithm: 'earley' }, 'full');
 }
 
 async function Build(source: string): Promise<any> {
-    return Evalr(await Generate(source, { exportName: 'grammar' }))();
+    return Evalr(await Generate(source, { export: { name: 'grammar', format: 'commonjs' } }))();
 }
 
 function Evalr(source): any {

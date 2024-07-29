@@ -1,19 +1,22 @@
-import { ASTDirectives, GeneratorContext, GeneratorOptions, GeneratorTemplateFormat } from "../typings/index.js";
+import { ASTDirectives, GeneratorContext, GeneratorOptions, GeneratorExportOptions, GenerateOptions } from "../typings/index.js";
 import { GeneratorState } from "./state.js";
-import { ExportsRegistry } from "./stringify/exports/registry.js";
-import { JavaScriptGenerator } from "./stringify/javascript.js";
-export declare function Generate(rules: string | ASTDirectives | (ASTDirectives[]), config?: GeneratorOptions): Promise<string>;
+export declare function Generate(source: string, config?: GenerateOptions): Promise<ReturnType<Generator['format']>>;
+export declare function Generate(directive: ASTDirectives, config?: GenerateOptions): Promise<ReturnType<Generator['format']>>;
+export declare function Generate(directives: ASTDirectives[], config?: GenerateOptions): Promise<ReturnType<Generator['format']>>;
 export declare class Generator {
     private config;
-    private aliasPrefix;
     private context;
-    state: GeneratorState;
-    generator: JavaScriptGenerator;
+    private aliasPrefix;
+    private state;
     constructor(config?: GeneratorOptions, context?: GeneratorContext, aliasPrefix?: string);
     import(source: string): Promise<void>;
     import(directive: ASTDirectives): Promise<void>;
     import(directives: ASTDirectives[]): Promise<void>;
-    export<T extends GeneratorTemplateFormat = '_default'>(format: any, name?: string): ReturnType<typeof ExportsRegistry[T]>;
+    import(directives: string | ASTDirectives | (ASTDirectives[])): Promise<void>;
+    format(options: GeneratorExportOptions): string | {
+        state: GeneratorState;
+        export: GeneratorExportOptions;
+    };
     private processImportDirective;
     private processConfigDirective;
     private processLexerDirective;
@@ -23,7 +26,7 @@ export declare class Generator {
     private processGrammarDirective;
     private importBuiltIn;
     private importGrammar;
-    private mergeLanguageDefinitionString;
+    private mergeGrammar;
     private buildRules;
     private buildRule;
     private buildSymbol;

@@ -10,39 +10,43 @@ const PostProcessors = {
 };
 export class JavaScriptGenerator {
     state;
-    constructor(state) {
+    options;
+    constructor(state, options) {
         this.state = state;
+        this.options = options;
+    }
+    name() {
+        return this.options.name || 'GWLanguage';
     }
     head() {
-        if (this.state.config.noscript)
+        if (this.options.noscript)
             return '';
         return this.state.head.join('\n');
     }
     body() {
-        if (this.state.config.noscript)
+        if (this.options.noscript)
             return '';
         return this.state.body.join('\n');
     }
     artifacts(depth = 0) {
-        const basic = new BasicGrammarTable(this);
-        let lr = null;
-        let lexer = null;
-        if ('lr' in this.state.config) {
+        let output = {};
+        const artifacts = this.options.artifacts;
+        if (artifacts && artifacts.lr) {
             const table = new LRParseTableBuilder(this);
-            lr = CommonGenerator.JSON({
+            output.lr = CommonGenerator.JSON({
                 k: "0",
                 table: table.stringify(depth + 2)
             }, depth + 1);
         }
-        if ('lexer' in this.state) {
+        if ('lexer' in this.state && (!artifacts || artifacts.lexer)) {
             const l = new LexerArtifact(this.state.lexer);
-            lexer = l.output(depth + 1);
+            output.lexer = l.output(depth + 1);
         }
-        return CommonGenerator.JSON({
-            grammar: basic.stringify(depth + 1),
-            lexer,
-            lr
-        }, depth);
+        if (!artifacts || artifacts.grammar) {
+            const basic = new BasicGrammarTable(this);
+            output.grammar = basic.stringify(depth + 1);
+        }
+        return CommonGenerator.JSON(output, depth);
     }
     postProcess(postprocess, alias) {
         postprocess = this.state.grammar.config.postprocessorOverride || postprocess || this.state.grammar.config.postprocessorDefault;
@@ -50,7 +54,7 @@ export class JavaScriptGenerator {
             return null;
         if ('builtin' in postprocess)
             return PostProcessors[postprocess.builtin];
-        if (this.state.config.noscript)
+        if (this.options.noscript)
             return;
         if (typeof postprocess == 'string')
             return postprocess;

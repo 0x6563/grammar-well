@@ -31,7 +31,16 @@ const BaseDir = './src/generator/builtin/';
 
 async function Transpile(path) {
     const source = read(path);
-    const js = await Generate(source, { exportName: 'grammar', template: 'esmodule', overrides: {} });
+    const js = await Generate(source, {
+        export: {
+            name: 'grammar',
+            format: 'esmodule',
+            artifacts: {
+                lexer: true,
+                grammar: true
+            }
+        }
+    });
     write(path.replace(/\.well$/, '.js'), js);
 }
 

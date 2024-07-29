@@ -1,41 +1,29 @@
-import { ASTJavaScriptBuiltin, ASTJavaScriptLiteral, ASTLexerState, Dictionary, GeneratorGrammarProductionRule, GeneratorLexerConfig, GeneratorLexerState } from "../typings/index.js";
+import { GeneratorGrammarProductionRule, GeneratorLexerConfig, GeneratorLexerState, GeneratorStateGrammar } from "../typings/index.js";
 
 export class GeneratorState {
-    grammar: {
-        start: string;
-        config: {
-            postprocessorDefault?: ASTJavaScriptLiteral | ASTJavaScriptBuiltin;
-            postprocessorOverride?: ASTJavaScriptLiteral | ASTJavaScriptBuiltin;
-        }
-        rules: Dictionary<GeneratorGrammarProductionRule[]>,
-        uuids: { [key: string]: number }
-    } = {
-            start: '',
-            config: {},
-            rules: {},
-            uuids: {},
-        }
-    lexer: GeneratorLexerConfig | undefined;
+    grammar?: GeneratorStateGrammar;
+    lexer?: GeneratorLexerConfig;
 
     head: string[] = [];
     body: string[] = [];
-    config: Dictionary<string> = {};
+    config = {};
     version: string = 'unknown';
 
     merge(state: GeneratorState) {
-        Object.assign(this.grammar.rules, state.grammar.rules);
-        this.grammar.start = state.grammar.start || this.grammar.start;
-        this.grammar.config.postprocessorDefault = state.grammar.config.postprocessorDefault || this.grammar.config.postprocessorDefault;
-        this.grammar.config.postprocessorOverride = state.grammar.config.postprocessorOverride || this.grammar.config.postprocessorOverride;
+        if (state.grammar) {
+            this.initializeGrammar();
+            Object.assign(this.grammar.rules, state.grammar.rules);
+            this.grammar.start = state.grammar.start || this.grammar.start;
+            this.grammar.config.postprocessorDefault = state.grammar.config.postprocessorDefault || this.grammar.config.postprocessorDefault;
+            this.grammar.config.postprocessorOverride = state.grammar.config.postprocessorOverride || this.grammar.config.postprocessorOverride;
+        }
 
         if (state.lexer) {
-            if (this.lexer) {
-                Object.assign(this.lexer.states, state.lexer.states);
-            } else {
-                this.lexer = state.lexer;
-            }
+            this.initializeLexer();
+            Object.assign(this.lexer.states, state.lexer.states);
             this.lexer.start = state.lexer.start || this.lexer.start;
         }
+
         this.head.push(...state.head);
         this.body.push(...state.body);
         Object.assign(this.config, state.config);
@@ -46,9 +34,29 @@ export class GeneratorState {
         return name + 'x' + this.grammar.uuids[name];
     }
 
+    initializeGrammar() {
+        if (!this.grammar) {
+            this.grammar = {
+                start: '',
+                config: {},
+                rules: {},
+                uuids: {},
+            }
+        }
+    }
+
     addGrammarRule(rule: GeneratorGrammarProductionRule) {
         this.grammar.rules[rule.name] = this.grammar.rules[rule.name] || [];
         this.grammar.rules[rule.name].push(rule);
+    }
+
+    initializeLexer() {
+        if (!this.lexer) {
+            this.lexer = {
+                start: '',
+                states: {}
+            };
+        }
     }
 
     addLexerState(name: string, state?: GeneratorLexerState) {

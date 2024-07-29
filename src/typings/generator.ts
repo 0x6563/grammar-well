@@ -1,24 +1,45 @@
+import { GeneratorState } from "../generator/state.js";
 import { ASTGrammarSymbolLiteral, ASTGrammarSymbolNonTerminal, ASTGrammarSymbolRegex, ASTGrammarSymbolToken, ASTJavaScriptBuiltin, ASTJavaScriptLiteral, ASTJavaScriptTemplate, ASTLexerStateImportRule, ASTLexerStateMatchRule, ASTLexerStateNonMatchRule } from "./ast.js";
 import { Dictionary } from "./common.js";
 import { ImportResolver, ImportResolverConstructor } from "./index.js";
 
+
+export type GenerateOptions = GeneratorOptions & { export?: GeneratorExportOptions };
+
 export interface GeneratorOptions {
     version?: string;
-    noscript?: boolean;
     basedir?: string;
     resolver?: ImportResolverConstructor | ImportResolver;
-    exportName?: string;
-    template?: GeneratorTemplateFormat;
     overrides?: Dictionary<string>;
 }
 
-export type GeneratorTemplateFormat = '_default' | 'object' | 'json' | 'js' | 'javascript' | 'module' | 'esmodule' | 'esm' | 'ts' | 'typescript'
+export interface GeneratorExportOptions {
+    artifacts?: {
+        lexer?: boolean;
+        grammar?: boolean;
+        [key: string]: boolean;
+    };
+    format?: GeneratorExportFormat;
+    noscript?: boolean;
+    name?: string;
+}
+
+export type GeneratorExportFormat = 'object' | 'json' | 'cjs' | 'commonjs' | 'js' | 'javascript' | 'module' | 'esmodule' | 'esm' | 'ts' | 'typescript';
 
 export interface GeneratorContext {
     imported: Set<string>;
     resolver: ImportResolver;
-    uuids: Dictionary<number>;
+    state: GeneratorState;
 }
+export interface GeneratorStateGrammar {
+    start: string;
+    config: {
+        postprocessorDefault?: ASTJavaScriptLiteral | ASTJavaScriptBuiltin;
+        postprocessorOverride?: ASTJavaScriptLiteral | ASTJavaScriptBuiltin;
+    }
+    rules: Dictionary<GeneratorGrammarProductionRule[]>,
+    uuids: { [key: string]: number }
+};
 
 export interface GeneratorLexerConfig {
     start?: string

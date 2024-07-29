@@ -1,8 +1,10 @@
-import { Dictionary, GeneratorGrammarProductionRule } from "../../typings/index.js";
+import { Dictionary, GeneratorExportOptions, GeneratorGrammarProductionRule } from "../../typings/index.js";
 import { GeneratorState } from "../state.js";
 export declare class JavaScriptGenerator {
     state: GeneratorState;
-    constructor(state: GeneratorState);
+    options: GeneratorExportOptions;
+    constructor(state: GeneratorState, options: GeneratorExportOptions);
+    name(): string;
     head(): string;
     body(): string;
     artifacts(depth?: number): string;

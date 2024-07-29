@@ -1,5 +1,5 @@
-export default GWLanguage;
-declare function GWLanguage(): {
+export default grammar;
+declare function grammar(): {
     grammar: {
         rules: {
             K_ALL: {

@@ -1,15 +1,17 @@
 
+import { JavaScriptGenerator } from "../javascript.js";
 import { CJSOutput, ESMOutput } from "./javascript.js";
 import { JSONFormatter } from "./json.js";
 import { TypescriptFormat } from "./typescript.js";
 
 
 export const ExportsRegistry = {
-    _default: CJSOutput,
-    object: (grammar, exportName) => ({ grammar, exportName }),
+    object: (generator: JavaScriptGenerator) => ({ state: generator.state, export: generator.options }),
     json: JSONFormatter,
     js: CJSOutput,
+    cjs: CJSOutput,
     javascript: CJSOutput,
+    commonjs: CJSOutput,
     module: ESMOutput,
     esmodule: ESMOutput,
     esm: ESMOutput,
