@@ -1,5 +1,5 @@
 import { TextFormatter } from "../../utility/text-format.js";
-import { ParserUtility } from "../parser.js";
+import { ParserUtility } from "../../utility/parsing.js";
 export function Earley(language, options = {}) {
     const { tokens } = language;
     const { rules, start } = language.grammar;

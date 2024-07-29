@@ -1,7 +1,7 @@
 import { RuntimeGrammarProductionRule, RuntimeGrammarRuleSymbol, RuntimeLanguageDefinition, RuntimeLexerToken } from "../../typings/index.js";
 import { TokenBuffer } from "../../lexers/token-buffer.js";
 import { Matrix } from "../../utility/general.js";
-import { ParserUtility } from "../parser.js";
+import { ParserUtility } from "../../utility/parsing.js";
 
 export function CYK(language: RuntimeLanguageDefinition & { tokens: TokenBuffer }, _options = {}) {
     const { grammar, tokens } = language;

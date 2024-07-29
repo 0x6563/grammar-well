@@ -1,4 +1,4 @@
-import { ParserUtility } from "../../parser.js";
+import { ParserUtility } from "../../../utility/parsing.js";
 import { BiMap } from "./bimap.js";
 import { ClosureBuilder } from "./closure.js";
 export class CanonicalCollection {

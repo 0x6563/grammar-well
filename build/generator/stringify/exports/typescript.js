@@ -2,13 +2,14 @@ export function TypescriptFormat(generator) {
     const exportName = generator.name();
     return `// Generated automatically by Grammar-Well, version ${generator.state.version} 
 // https://github.com/0x6563/grammar-well
-import type { RuntimeLanguageDefinition } from 'grammar-well';
-
+import { RuntimeLanguageDefinition } from 'grammar-well';
 ${generator.head()}
 
-function ${exportName}(): RuntimeLanguageDefinition {
-    ${generator.body()}
-    return ${generator.artifacts(1)}
+class ${exportName} {
+    artifacts =  ${generator.artifacts(1)}
+    constructor(){
+        ${generator.body()}
+    }
 }
 
 export default ${exportName};

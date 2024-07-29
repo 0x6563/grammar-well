@@ -17,6 +17,7 @@ export interface GeneratorExportOptions {
         grammar?: boolean;
         [key: string]: boolean;
     };
+    parser?: boolean;
     format?: GeneratorExportFormat;
     noscript?: boolean;
     name?: string;
@@ -30,6 +31,7 @@ export interface GeneratorContext {
 export interface GeneratorStateGrammar {
     start: string;
     config: {
+        algorithm?: 'earley' | 'lr0' | 'cyk';
         postprocessorDefault?: ASTJavaScriptLiteral | ASTJavaScriptBuiltin;
         postprocessorOverride?: ASTJavaScriptLiteral | ASTJavaScriptBuiltin;
     };

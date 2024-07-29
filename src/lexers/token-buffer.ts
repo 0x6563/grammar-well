@@ -15,7 +15,7 @@ export class TokenBuffer {
         return { historyIndex: this.$historyIndex, offset: this.offset };
     }
 
-    constructor(private lexer: RuntimeLexer) { }
+    constructor(public lexer: RuntimeLexer) { }
 
     reset(buffer: string) {
         this.lexer.feed(buffer);

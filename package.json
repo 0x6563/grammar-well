@@ -14,6 +14,8 @@
   },
   "exports": {
     ".": "./build/index.js",
+    "./parse": "./build/parser/parse.js",
+    "./algorithms/*": "./build/parser/algorithms/*.js",
     "./parser": "./build/parser/parser.js",
     "./generator": "./build/generator/index.js",
     "./import-resolvers/*": "./build/generator/import-resolvers/*.js",

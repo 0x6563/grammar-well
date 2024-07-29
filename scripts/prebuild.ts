@@ -27,6 +27,8 @@ const BaseDir = './src/generator/builtin/';
     write('../grammars/v1.well', Format(read('../grammars/v1.well')));
     await Transpile('../grammars/v1.well');
     await Transpile('../grammars/v2.well');
+    await TranspileTypescript('../grammars/v1.well');
+    await TranspileTypescript('../grammars/v2.well');
 })();
 
 async function Transpile(path) {
@@ -42,6 +44,20 @@ async function Transpile(path) {
         }
     });
     write(path.replace(/\.well$/, '.js'), js);
+}
+async function TranspileTypescript(path) {
+    const source = read(path);
+    const js = await Generate(source, {
+        export: {
+            name: 'grammar',
+            format: 'typescript',
+            artifacts: {
+                lexer: true,
+                grammar: true
+            }
+        }
+    });
+    write(path.replace(/\.well$/, '.ts'), js);
 }
 
 function read(filename) {

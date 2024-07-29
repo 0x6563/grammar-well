@@ -1,4 +1,4 @@
-import { Parse } from "../parser/parser.js";
+import { Parse } from "../parser/parse.js";
 import GrammarV1 from './grammars/v1.js';
 import GrammarV2 from './grammars/v2.js';
 import BuiltInRegistry from "./builtin/registry.json" with { type: 'json' };
