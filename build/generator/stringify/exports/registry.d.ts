@@ -5,7 +5,7 @@ import { TypescriptFormat } from "./typescript.js";
 export declare const ExportsRegistry: {
     object: (generator: JavaScriptGenerator) => {
         state: import("../../state.js").GeneratorState;
-        export: import("../../../index.js").GeneratorExportOptions;
+        output: import("../../../index.js").GeneratorOutputOptions;
     };
     json: typeof JSONFormatter;
     js: typeof CJSOutput;

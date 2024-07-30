@@ -9,7 +9,7 @@ import { BrowserImportResolver } from "./import-resolvers/browser.js";
 export async function Generate(source, config = {}) {
     const builder = new Generator(config);
     await builder.import(source);
-    return builder.format(config.export);
+    return builder.output(config.output);
 }
 export class Generator {
     config;
@@ -62,7 +62,7 @@ export class Generator {
             }
         }
     }
-    format(options) {
+    output(options) {
         const format = options?.format || 'esm';
         if (!ExportsRegistry[format]) {
             throw new Error("No such output format: " + format);

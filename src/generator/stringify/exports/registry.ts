@@ -6,7 +6,7 @@ import { TypescriptFormat } from "./typescript.js";
 
 
 export const ExportsRegistry = {
-    object: (generator: JavaScriptGenerator) => ({ state: generator.state, export: generator.options }),
+    object: (generator: JavaScriptGenerator) => ({ state: generator.state, output: generator.options }),
     json: JSONFormatter,
     js: CJSOutput,
     cjs: CJSOutput,

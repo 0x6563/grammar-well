@@ -2,7 +2,7 @@ import { CJSOutput, ESMOutput } from "./javascript.js";
 import { JSONFormatter } from "./json.js";
 import { TypescriptFormat } from "./typescript.js";
 export const ExportsRegistry = {
-    object: (generator) => ({ state: generator.state, export: generator.options }),
+    object: (generator) => ({ state: generator.state, output: generator.options }),
     json: JSONFormatter,
     js: CJSOutput,
     cjs: CJSOutput,

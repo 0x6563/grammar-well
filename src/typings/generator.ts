@@ -4,7 +4,7 @@ import { Dictionary } from "./common.js";
 import { ImportResolver, ImportResolverConstructor } from "./index.js";
 
 
-export type GenerateOptions = GeneratorOptions & { export?: GeneratorExportOptions };
+export type GenerateOptions = GeneratorOptions & { output?: GeneratorOutputOptions };
 
 export interface GeneratorOptions {
     version?: string;
@@ -13,7 +13,7 @@ export interface GeneratorOptions {
     overrides?: Dictionary<string>;
 }
 
-export interface GeneratorExportOptions {
+export interface GeneratorOutputOptions {
     artifacts?: {
         lexer?: boolean;
         grammar?: boolean;

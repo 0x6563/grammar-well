@@ -1,4 +1,4 @@
-import { ASTConfig, ASTDirectives, ASTGrammar, ASTGrammarProduction, ASTGrammarProductionRule, ASTGrammarSymbol, ASTGrammarSymbolGroup, ASTGrammarSymbolLiteral, ASTGrammarSymbolRepeat, ASTImport, ASTLexer, ASTLexerConfig, ASTLexerState, ASTLexerStateImportRule, ASTLexerStateMatchRule, ASTLexerStateSpan, GeneratorContext, GeneratorGrammarProductionRule, GeneratorGrammarSymbol, GeneratorOptions, GeneratorExportFormat, ImportResolver, GeneratorExportOptions, GenerateOptions, ASTJavascriptLifecycleLiteral } from "../typings/index.js";
+import { ASTConfig, ASTDirectives, ASTGrammar, ASTGrammarProduction, ASTGrammarProductionRule, ASTGrammarSymbol, ASTGrammarSymbolGroup, ASTGrammarSymbolLiteral, ASTGrammarSymbolRepeat, ASTImport, ASTLexer, ASTLexerConfig, ASTLexerState, ASTLexerStateImportRule, ASTLexerStateMatchRule, ASTLexerStateSpan, GeneratorContext, GeneratorGrammarProductionRule, GeneratorGrammarSymbol, GeneratorOptions, GeneratorExportFormat, ImportResolver, GeneratorOutputOptions, GenerateOptions, ASTJavascriptLifecycleLiteral } from "../typings/index.js";
 
 import { Parse } from "../parser/parse.js";
 import GrammarV1 from './grammars/v1.js';
@@ -11,13 +11,13 @@ import { JavaScriptGenerator } from "./stringify/javascript.js";
 import { BrowserImportResolver } from "./import-resolvers/browser.js";
 
 
-export async function Generate(source: string, config?: GenerateOptions): Promise<ReturnType<Generator['format']>>;
-export async function Generate(directive: ASTDirectives, config?: GenerateOptions): Promise<ReturnType<Generator['format']>>;
-export async function Generate(directives: ASTDirectives[], config?: GenerateOptions): Promise<ReturnType<Generator['format']>>;
+export async function Generate(source: string, config?: GenerateOptions): Promise<ReturnType<Generator['output']>>;
+export async function Generate(directive: ASTDirectives, config?: GenerateOptions): Promise<ReturnType<Generator['output']>>;
+export async function Generate(directives: ASTDirectives[], config?: GenerateOptions): Promise<ReturnType<Generator['output']>>;
 export async function Generate(source: string | ASTDirectives | (ASTDirectives[]), config: GenerateOptions = {}) {
     const builder = new Generator(config);
     await builder.import(source);
-    return builder.format(config.export);
+    return builder.output(config.output);
 }
 
 export class Generator {
@@ -73,7 +73,7 @@ export class Generator {
         }
     }
 
-    format(options: GeneratorExportOptions) {
+    output(options: GeneratorOutputOptions) {
         const format = options?.format || 'esm';
         if (!ExportsRegistry[format]) {
             throw new Error("No such output format: " + format)

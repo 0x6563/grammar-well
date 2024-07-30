@@ -1,4 +1,4 @@
-import { Dictionary, GeneratorExportOptions, GeneratorGrammarProductionRule } from "../../typings/index.js";
+import { Dictionary, GeneratorOutputOptions, GeneratorGrammarProductionRule } from "../../typings/index.js";
 import { BasicGrammarTable } from "../artifacts/basic.js";
 import { LexerArtifact } from "../artifacts/lexer.js";
 import { LRParseTableBuilder } from "../artifacts/lr.js";
@@ -14,7 +14,7 @@ const PostProcessors = {
 
 export class JavaScriptGenerator {
 
-    constructor(public state: GeneratorState, public options: GeneratorExportOptions) { }
+    constructor(public state: GeneratorState, public options: GeneratorOutputOptions) { }
 
     name() {
         return this.options.name || 'GWLanguage';

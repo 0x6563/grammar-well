@@ -1,8 +1,8 @@
-import { ASTDirectives, GeneratorContext, GeneratorOptions, GeneratorExportOptions, GenerateOptions } from "../typings/index.js";
+import { ASTDirectives, GeneratorContext, GeneratorOptions, GeneratorOutputOptions, GenerateOptions } from "../typings/index.js";
 import { GeneratorState } from "./state.js";
-export declare function Generate(source: string, config?: GenerateOptions): Promise<ReturnType<Generator['format']>>;
-export declare function Generate(directive: ASTDirectives, config?: GenerateOptions): Promise<ReturnType<Generator['format']>>;
-export declare function Generate(directives: ASTDirectives[], config?: GenerateOptions): Promise<ReturnType<Generator['format']>>;
+export declare function Generate(source: string, config?: GenerateOptions): Promise<ReturnType<Generator['output']>>;
+export declare function Generate(directive: ASTDirectives, config?: GenerateOptions): Promise<ReturnType<Generator['output']>>;
+export declare function Generate(directives: ASTDirectives[], config?: GenerateOptions): Promise<ReturnType<Generator['output']>>;
 export declare class Generator {
     private config;
     private context;
@@ -13,9 +13,9 @@ export declare class Generator {
     import(directive: ASTDirectives): Promise<void>;
     import(directives: ASTDirectives[]): Promise<void>;
     import(directives: string | ASTDirectives | (ASTDirectives[])): Promise<void>;
-    format(options: GeneratorExportOptions): string | {
+    output(options: GeneratorOutputOptions): string | {
         state: GeneratorState;
-        export: GeneratorExportOptions;
+        output: GeneratorOutputOptions;
     };
     private processImportDirective;
     private processLifecycleDirective;

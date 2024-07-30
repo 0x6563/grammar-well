@@ -34,7 +34,7 @@ const BaseDir = './src/generator/builtin/';
 async function Transpile(path) {
     const source = read(path);
     const js = await Generate(source, {
-        export: {
+        output: {
             name: 'grammar',
             format: 'esmodule',
             artifacts: {
@@ -48,7 +48,7 @@ async function Transpile(path) {
 async function TranspileTypescript(path) {
     const source = read(path);
     const js = await Generate(source, {
-        export: {
+        output: {
             name: 'grammar',
             format: 'typescript',
             artifacts: {
