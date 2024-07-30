@@ -110,19 +110,19 @@ export class V2GrammarString {
         }
         if (directive.lexer.states) {
             for (const { state, name } of directive.lexer.states) {
-                if ('sections' in state) {
-                    body += '\n' + this.indent(1, `[${name}] sections {\n`);
-                    const stateOpen = state.sections.find(v => v.name == 'opener');
-                    const stateBody = state.sections.find(v => v.name == 'body');
-                    const stateClose = state.sections.find(v => v.name == 'closer');
+                if ('span' in state) {
+                    body += '\n' + this.indent(1, `[${name}] span {\n`);
+                    const stateOpen = state.span.find(v => v.name == 'start');
+                    const stateBody = state.span.find(v => v.name == 'span');
+                    const stateClose = state.span.find(v => v.name == 'stop');
                     if (stateOpen) {
-                        body += this.formatLexerState('opener', stateOpen.state, 2);
+                        body += this.formatLexerState('start', stateOpen.state, 2);
                     }
                     if (stateBody) {
-                        body += this.formatLexerState('body', stateBody.state, 2);
+                        body += this.formatLexerState('span', stateBody.state, 2);
                     }
                     if (stateClose) {
-                        body += this.formatLexerState('closer', stateClose.state, 2);
+                        body += this.formatLexerState('stop', stateClose.state, 2);
                     }
                     body += '\n' + this.indent(1, `}\n`);
                 } else {
@@ -143,7 +143,7 @@ export class V2GrammarString {
             body += this.indent(depth + 1, 'unmatched: ' + this.formatLexerStateRule(state.unmatched) + ';\n');
         }
         for (const rule of state.rules) {
-            if ('sections' in rule)
+            if ('span' in rule)
                 continue;
             body += this.indent(depth + 1, '- ' + this.formatLexerStateRule(rule) + '\n');
         }

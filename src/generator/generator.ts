@@ -1,4 +1,4 @@
-import { ASTConfig, ASTDirectives, ASTGrammar, ASTGrammarProduction, ASTGrammarProductionRule, ASTGrammarSymbol, ASTGrammarSymbolGroup, ASTGrammarSymbolLiteral, ASTGrammarSymbolRepeat, ASTImport, ASTLexer, ASTLexerConfig, ASTLexerState, ASTLexerStateImportRule, ASTLexerStateMatchRule, ASTLexerStateStructured, GeneratorContext, GeneratorGrammarProductionRule, GeneratorGrammarSymbol, GeneratorOptions, GeneratorExportFormat, ImportResolver, GeneratorExportOptions, GenerateOptions, ASTJavascriptLifecycleLiteral } from "../typings/index.js";
+import { ASTConfig, ASTDirectives, ASTGrammar, ASTGrammarProduction, ASTGrammarProductionRule, ASTGrammarSymbol, ASTGrammarSymbolGroup, ASTGrammarSymbolLiteral, ASTGrammarSymbolRepeat, ASTImport, ASTLexer, ASTLexerConfig, ASTLexerState, ASTLexerStateImportRule, ASTLexerStateMatchRule, ASTLexerStateSpan, GeneratorContext, GeneratorGrammarProductionRule, GeneratorGrammarSymbol, GeneratorOptions, GeneratorExportFormat, ImportResolver, GeneratorExportOptions, GenerateOptions, ASTJavascriptLifecycleLiteral } from "../typings/index.js";
 
 import { Parse } from "../parser/parse.js";
 import GrammarV1 from './grammars/v1.js';
@@ -116,9 +116,9 @@ export class Generator {
         }
     }
 
-    private importLexerState(name: string, state: ASTLexerState | ASTLexerStateStructured) {
-        if ('sections' in state) {
-            this.state.addLexerState(this.aliasPrefix + name, { rules: [{ import: [`${name}$opener`] }] });
+    private importLexerState(name: string, state: ASTLexerState | ASTLexerStateSpan) {
+        if ('span' in state) {
+            this.state.addLexerState(this.aliasPrefix + name, { rules: [{ import: [`${name}$start`] }] });
             const states = this.buildLexerStructuredStates(name, state);
             this.importLexerStates(states);
         } else {
@@ -131,13 +131,13 @@ export class Generator {
             }
             const rules = [];
             for (const rule of state.rules) {
-                if ('sections' in rule) {
+                if ('span' in rule) {
                     let i = 1;
                     while (`${this.aliasPrefix}${name}$${i}` in this.state.lexer.states)
                         ++i;
                     const states = this.buildLexerStructuredStates(`${name}$${i}`, rule);
                     this.importLexerStates(states);
-                    rules.push({ import: `${name}$${i}$opener` });
+                    rules.push({ import: `${name}$${i}$start` });
                     continue;
                 } else {
                     if (this.aliasPrefix) {
@@ -165,13 +165,13 @@ export class Generator {
         }
     }
 
-    private buildLexerStructuredStates(name: string, rule: ASTLexerStateStructured): ASTLexerConfig['states'] {
+    private buildLexerStructuredStates(name: string, rule: ASTLexerStateSpan): ASTLexerConfig['states'] {
         const openRules: (ASTLexerStateMatchRule | ASTLexerStateImportRule)[] = [];
-        const bodyRules: (ASTLexerStateMatchRule | ASTLexerStateImportRule | ASTLexerStateStructured)[] = [];
+        const bodyRules: (ASTLexerStateMatchRule | ASTLexerStateImportRule | ASTLexerStateSpan)[] = [];
         const closeRules: (ASTLexerStateMatchRule | ASTLexerStateImportRule)[] = [];
-        const open = rule.sections.find(v => v.name == 'opener');
-        const body = rule.sections.find(v => v.name == 'body');
-        const close = rule.sections.find(v => v.name == 'closer');
+        const open = rule.span.find(v => v.name == 'start');
+        const body = rule.span.find(v => v.name == 'span');
+        const close = rule.span.find(v => v.name == 'stop');
 
         if (body?.state?.rules)
             for (const r of body?.state?.rules) {
@@ -206,9 +206,9 @@ export class Generator {
             }
 
         if (closeRules.length && bodyRules.length)
-            bodyRules.push({ import: [`${name}$closer`] })
+            bodyRules.push({ import: [`${name}$stop`] })
 
-        const target = bodyRules.length ? 'body' : 'closer';
+        const target = bodyRules.length ? 'span' : 'stop';
 
         for (const r of open?.state?.rules) {
             if ('when' in r) {
@@ -237,14 +237,14 @@ export class Generator {
 
         return [
             {
-                name: `${name}$opener`,
+                name: `${name}$start`,
                 state: {
                     default: open.state.default,
                     rules: openRules
                 }
             },
             {
-                name: `${name}$body`,
+                name: `${name}$span`,
                 state: {
                     default: body?.state?.default,
                     unmatched: body?.state?.unmatched,
@@ -252,7 +252,7 @@ export class Generator {
                 }
             },
             {
-                name: `${name}$closer`,
+                name: `${name}$stop`,
                 state: {
                     default: close?.state?.default,
                     rules: closeRules

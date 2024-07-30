@@ -35,7 +35,7 @@ export interface ASTLexerConfig {
     start?: string;
     states: {
         name: string;
-        state: (ASTLexerState | ASTLexerStateStructured);
+        state: (ASTLexerState | ASTLexerStateSpan);
     }[];
 }
 export interface ASTGrammarProduction {
@@ -77,10 +77,10 @@ export type ASTDirectives = (ASTJavascriptLifecycleLiteral | ASTImport | ASTConf
 export interface ASTLexerState {
     unmatched?: ASTLexerStateNonMatchRule;
     default?: ASTLexerStateMatchRule;
-    rules: (ASTLexerStateImportRule | ASTLexerStateMatchRule | ASTLexerStateStructured)[];
+    rules: (ASTLexerStateImportRule | ASTLexerStateMatchRule | ASTLexerStateSpan)[];
 }
-export interface ASTLexerStateStructured {
-    sections: {
+export interface ASTLexerStateSpan {
+    span: {
         name: string;
         state: (ASTLexerState);
     }[];
@@ -127,5 +127,5 @@ export interface ASTLexerStateNonMatchRule {
 }
 export type StateList = {
     name: string;
-    state: (ASTLexerState | ASTLexerStateStructured);
+    state: (ASTLexerState | ASTLexerStateSpan);
 }[];

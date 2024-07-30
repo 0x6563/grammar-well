@@ -485,7 +485,7 @@ declare class grammar {
                     postprocess: ({ data }: {
                         data: any;
                     }) => {
-                        sections: any;
+                        span: any;
                     };
                     symbols: (string | {
                         literal: string;
@@ -720,7 +720,7 @@ declare class grammar {
                         when: string;
                     })[];
                 };
-                config$body: {
+                config$span: {
                     regex: RegExp;
                     rules: ({
                         highlight: string;
@@ -749,7 +749,7 @@ declare class grammar {
                         highlight?: undefined;
                     })[];
                 };
-                config$opener: {
+                config$start: {
                     regex: RegExp;
                     rules: ({
                         tag: string[];
@@ -773,7 +773,7 @@ declare class grammar {
                         when: string;
                     })[];
                 };
-                grammar$body: {
+                grammar$span: {
                     regex: RegExp;
                     rules: ({
                         highlight: string;
@@ -819,7 +819,7 @@ declare class grammar {
                         goto?: undefined;
                     })[];
                 };
-                grammar$opener: {
+                grammar$start: {
                     regex: RegExp;
                     rules: ({
                         tag: string[];
@@ -1047,7 +1047,7 @@ declare class grammar {
                         when: string;
                     })[];
                 };
-                lexer$body: {
+                lexer$span: {
                     regex: RegExp;
                     rules: ({
                         tag: string[];
@@ -1093,7 +1093,7 @@ declare class grammar {
                         goto?: undefined;
                     })[];
                 };
-                lexer$opener: {
+                lexer$start: {
                     regex: RegExp;
                     rules: ({
                         tag: string[];
@@ -1105,7 +1105,7 @@ declare class grammar {
                         when: string;
                     })[];
                 };
-                lexer_sections: {
+                lexer_span: {
                     regex: RegExp;
                     rules: {
                         goto: string;
@@ -1113,7 +1113,7 @@ declare class grammar {
                         when: string;
                     }[];
                 };
-                lexer_sections$body: {
+                lexer_span$span: {
                     regex: RegExp;
                     rules: ({
                         tag: string[];
@@ -1153,18 +1153,18 @@ declare class grammar {
                         goto?: undefined;
                     })[];
                 };
-                lexer_sections$closer: {
+                lexer_span$start: {
                     regex: RegExp;
                     rules: {
-                        pop: number;
+                        goto: string;
                         tag: string[];
                         when: string;
                     }[];
                 };
-                lexer_sections$opener: {
+                lexer_span$stop: {
                     regex: RegExp;
                     rules: {
-                        goto: string;
+                        pop: number;
                         tag: string[];
                         when: string;
                     }[];
@@ -1178,7 +1178,7 @@ declare class grammar {
                         when: RegExp;
                     }[];
                 };
-                lifecycle$body: {
+                lifecycle$span: {
                     regex: RegExp;
                     rules: ({
                         before: boolean;
@@ -1210,7 +1210,7 @@ declare class grammar {
                         set?: undefined;
                     })[];
                 };
-                lifecycle$opener: {
+                lifecycle$start: {
                     regex: RegExp;
                     rules: {
                         goto: string;
@@ -1267,7 +1267,7 @@ declare class grammar {
                         when: string;
                     }[];
                 };
-                regex$body: {
+                regex$span: {
                     regex: RegExp;
                     rules: ({
                         tag: string[];
@@ -1286,21 +1286,21 @@ declare class grammar {
                         when: RegExp;
                     })[];
                 };
-                regex$closer: {
+                regex$start: {
+                    regex: RegExp;
+                    rules: {
+                        goto: string;
+                        highlight: string;
+                        when: string;
+                    }[];
+                };
+                regex$stop: {
                     regex: RegExp;
                     rules: {
                         highlight: string;
                         pop: number;
                         tag: string[];
                         when: RegExp;
-                    }[];
-                };
-                regex$opener: {
-                    regex: RegExp;
-                    rules: {
-                        goto: string;
-                        highlight: string;
-                        when: string;
                     }[];
                 };
                 section_word: {

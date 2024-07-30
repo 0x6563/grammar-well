@@ -100,8 +100,8 @@ export class Generator {
         }
     }
     importLexerState(name, state) {
-        if ('sections' in state) {
-            this.state.addLexerState(this.aliasPrefix + name, { rules: [{ import: [`${name}$opener`] }] });
+        if ('span' in state) {
+            this.state.addLexerState(this.aliasPrefix + name, { rules: [{ import: [`${name}$start`] }] });
             const states = this.buildLexerStructuredStates(name, state);
             this.importLexerStates(states);
         }
@@ -115,13 +115,13 @@ export class Generator {
             }
             const rules = [];
             for (const rule of state.rules) {
-                if ('sections' in rule) {
+                if ('span' in rule) {
                     let i = 1;
                     while (`${this.aliasPrefix}${name}$${i}` in this.state.lexer.states)
                         ++i;
                     const states = this.buildLexerStructuredStates(`${name}$${i}`, rule);
                     this.importLexerStates(states);
-                    rules.push({ import: `${name}$${i}$opener` });
+                    rules.push({ import: `${name}$${i}$start` });
                     continue;
                 }
                 else {
@@ -153,9 +153,9 @@ export class Generator {
         const openRules = [];
         const bodyRules = [];
         const closeRules = [];
-        const open = rule.sections.find(v => v.name == 'opener');
-        const body = rule.sections.find(v => v.name == 'body');
-        const close = rule.sections.find(v => v.name == 'closer');
+        const open = rule.span.find(v => v.name == 'start');
+        const body = rule.span.find(v => v.name == 'span');
+        const close = rule.span.find(v => v.name == 'stop');
         if (body?.state?.rules)
             for (const r of body?.state?.rules) {
                 bodyRules.push(r);
@@ -187,8 +187,8 @@ export class Generator {
                 }
             }
         if (closeRules.length && bodyRules.length)
-            bodyRules.push({ import: [`${name}$closer`] });
-        const target = bodyRules.length ? 'body' : 'closer';
+            bodyRules.push({ import: [`${name}$stop`] });
+        const target = bodyRules.length ? 'span' : 'stop';
         for (const r of open?.state?.rules) {
             if ('when' in r) {
                 openRules.push({
@@ -214,14 +214,14 @@ export class Generator {
         }
         return [
             {
-                name: `${name}$opener`,
+                name: `${name}$start`,
                 state: {
                     default: open.state.default,
                     rules: openRules
                 }
             },
             {
-                name: `${name}$body`,
+                name: `${name}$span`,
                 state: {
                     default: body?.state?.default,
                     unmatched: body?.state?.unmatched,
@@ -229,7 +229,7 @@ export class Generator {
                 }
             },
             {
-                name: `${name}$closer`,
+                name: `${name}$stop`,
                 state: {
                     default: close?.state?.default,
                     rules: closeRules

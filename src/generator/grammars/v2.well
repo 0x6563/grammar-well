@@ -8,62 +8,62 @@ lexer {
 		- when \r "config(?![a-zA-Z\d_])" tag "T_WORD" highlight "tag" set config
 		- import kv
 
-	[config] sections {
+	[config] span {
 
-		[opener]
+		[start]
 			- when \r "\s+" tag "T_WS" stay
 			- when "{" tag "CBRACKET_L"
 
-		[body]
+		[span]
 			- import comment, kv
 			- when "}" tag "CBRACKET_R" set main
 
 	}
 
-	[lifecycle] sections {
+	[lifecycle] span {
 
-		[opener]
+		[start]
 			- when \r "on(?![a-zA-Z\d_])" tag "T_WORD" highlight "tag"
 
-		[body]
+		[span]
 			- before \r '[\'"`]' pop
 			- import js_body, l_colon, word
 
 	}
 
-	[grammar] sections {
+	[grammar] span {
 
-		[opener]
+		[start]
 			- when \r "\s+" tag "T_WS" stay
 			- when "{" tag "CBRACKET_L"
 
-		[body]
+		[span]
 			- import comment, section_word, js_template, ws, insensitive, regex, l_qmark, l_plus, l_star, kv, l_colon, l_comma, l_pipe, l_parenl, l_parenr, l_abracketl, l_abracketr, l_arrow, l_dsign, l_dash
 			- when "}" tag "CBRACKET_R" set main
 
 	}
 
-	[lexer] sections {
+	[lexer] span {
 
-		[opener]
+		[start]
 			- when \r "\s+" tag "T_WS" stay
 			- when "{" tag "CBRACKET_L"
 
-		[body]
-			- import ws, comment, section_word, regex, l_comma, l_arrow, l_dash, kv, l_colon, lexer_sections
+		[span]
+			- import ws, comment, section_word, regex, l_comma, l_arrow, l_dash, kv, l_colon, lexer_span
 			- when "}" tag "CBRACKET_R" set main
 
 	}
 
-	[lexer_sections] sections {
+	[lexer_span] span {
 
-		[opener]
+		[start]
 			- when "{" tag "CBRACKET_L"
 
-		[body]
+		[span]
 			- import ws, comment, section_word, regex, l_comma, l_arrow, l_dash, kv
 
-		[closer]
+		[stop]
 			- when "}" tag "CBRACKET_R"
 
 	}
@@ -113,16 +113,16 @@ lexer {
 	[string3]
 		- when \r "`(?:[^`\\]|\\.)*`" tag "T_STRING" highlight "string"
 
-	[regex] sections {
+	[regex] span {
 
-		[opener]
+		[start]
 			- when "\\r" highlight "constant"
 
-		[body]
+		[span]
 			- import ws
 			- when \r "[a-z]" highlight "constant"
 
-		[closer]
+		[stop]
 			- when \r "\"(?:[^\"\\\r\n]|\\.)*\"" tag "T_REGEX" highlight "regexp"
 			- when \r "'(?:[^'\\\r\n]|\\.)*'" tag "T_REGEX" highlight "regexp"
 			- when \r "`(?:[^`\\]|\\.)*`" tag "T_REGEX" highlight "regexp"
@@ -240,7 +240,7 @@ grammar {
 	[state_definition]
 		| state_config_list _ token_list => ( Object.assign($0, { rules: $2 }) )
 		| token_list => ( { rules: $0 } )
-		| "sections" _ "{" _ state_list _ "}" => ( { sections: $4} )
+		| "span" _ "{" _ state_list _ "}" => ( { span: $4} )
 
 	[state_config_list]
 		| state_config => ( $0 )

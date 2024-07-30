@@ -178,7 +178,7 @@ class grammar {
                 state_definition: [
                     { name: "state_definition", postprocess: ({data}) => { return (Object.assign(data[0], { rules: data[2] })); }, symbols: [ "state_config_list", "_", "token_list" ] },
                     { name: "state_definition", postprocess: ({data}) => { return ({ rules: data[0] }); }, symbols: [ "token_list" ] },
-                    { name: "state_definition", postprocess: ({data}) => { return ({ sections: data[4]}); }, symbols: [ { literal: "sections" }, "_", { literal: "{" }, "_", "state_list", "_", { literal: "}" } ] }
+                    { name: "state_definition", postprocess: ({data}) => { return ({ span: data[4]}); }, symbols: [ { literal: "span" }, "_", { literal: "{" }, "_", "state_list", "_", { literal: "}" } ] }
                 ],
                 state_list: [
                     { name: "state_list", postprocess: ({data}) => { return ([data[0]]); }, symbols: [ "state" ] },
@@ -243,10 +243,10 @@ class grammar {
                     regex: /(?:(?:(\s+))|(?:((?:\{))))/ym,
                     rules: [
                         { tag: ["T_WS"], when: /\s+/ },
-                        { goto: "config$body", tag: ["CBRACKET_L"], when: "{" }
+                        { goto: "config$span", tag: ["CBRACKET_L"], when: "{" }
                     ]
                 },
-                config$body: {
+                config$span: {
                     regex: /(?:(?:(\/\/[^\n]*))|(?:(\"(?:[^\"\\\r\n]|\\.)*\"))|(?:(\s+))|(?:([a-zA-Z_][a-zA-Z_\d]*))|(?:((?::)))|(?:(\d+))|(?:((?:;)))|(?:((?:\}))))/ym,
                     rules: [
                         { highlight: "comment", tag: ["T_COMMENT"], when: /\/\/[^\n]*/ },
@@ -259,21 +259,21 @@ class grammar {
                         { set: "main", tag: ["CBRACKET_R"], when: "}" }
                     ]
                 },
-                config$opener: {
+                config$start: {
                     regex: /(?:(?:(\s+))|(?:((?:\{))))/ym,
                     rules: [
                         { tag: ["T_WS"], when: /\s+/ },
-                        { goto: "config$body", tag: ["CBRACKET_L"], when: "{" }
+                        { goto: "config$span", tag: ["CBRACKET_L"], when: "{" }
                     ]
                 },
                 grammar: {
                     regex: /(?:(?:(\s+))|(?:((?:\{))))/ym,
                     rules: [
                         { tag: ["T_WS"], when: /\s+/ },
-                        { goto: "grammar$body", tag: ["CBRACKET_L"], when: "{" }
+                        { goto: "grammar$span", tag: ["CBRACKET_L"], when: "{" }
                     ]
                 },
-                grammar$body: {
+                grammar$span: {
                     regex: /(?:(?:(\/\/[^\n]*))|(?:(\[\s*[a-zA-Z_][a-zA-Z_\d]*\s*\]))|(?:((?:=>)))|(?:(\s+))|(?:((?:\\i)))|(?:((?:\\r)))|(?:((?:\?)))|(?:((?:\+)))|(?:((?:\*)))|(?:(\"(?:[^\"\\\r\n]|\\.)*\"))|(?:([a-zA-Z_][a-zA-Z_\d]*))|(?:((?::)))|(?:(\d+))|(?:((?:;)))|(?:((?:,)))|(?:((?:\|)))|(?:((?:\()))|(?:((?:\))))|(?:((?:<)))|(?:((?:>)))|(?:((?:\->)))|(?:((?:\$)))|(?:((?:\-)))|(?:((?:\}))))/ym,
                     rules: [
                         { highlight: "comment", tag: ["T_COMMENT"], when: /\/\/[^\n]*/ },
@@ -281,7 +281,7 @@ class grammar {
                         { goto: "js_template_inner", highlight: "annotation", when: "=>" },
                         { tag: ["T_WS"], when: /\s+/ },
                         { highlight: "constant", when: "\\i" },
-                        { goto: "regex$body", highlight: "constant", when: "\\r" },
+                        { goto: "regex$span", highlight: "constant", when: "\\r" },
                         { tag: ["L_QMARK"], when: "?" },
                         { tag: ["L_PLUS"], when: "+" },
                         { tag: ["L_STAR"], when: "*" },
@@ -302,11 +302,11 @@ class grammar {
                         { set: "main", tag: ["CBRACKET_R"], when: "}" }
                     ]
                 },
-                grammar$opener: {
+                grammar$start: {
                     regex: /(?:(?:(\s+))|(?:((?:\{))))/ym,
                     rules: [
                         { tag: ["T_WS"], when: /\s+/ },
-                        { goto: "grammar$body", tag: ["CBRACKET_L"], when: "{" }
+                        { goto: "grammar$span", tag: ["CBRACKET_L"], when: "{" }
                     ]
                 },
                 insensitive: {
@@ -472,16 +472,16 @@ class grammar {
                     regex: /(?:(?:(\s+))|(?:((?:\{))))/ym,
                     rules: [
                         { tag: ["T_WS"], when: /\s+/ },
-                        { goto: "lexer$body", tag: ["CBRACKET_L"], when: "{" }
+                        { goto: "lexer$span", tag: ["CBRACKET_L"], when: "{" }
                     ]
                 },
-                lexer$body: {
+                lexer$span: {
                     regex: /(?:(?:(\s+))|(?:(\/\/[^\n]*))|(?:(\[\s*[a-zA-Z_][a-zA-Z_\d]*\s*\]))|(?:((?:\\r)))|(?:((?:,)))|(?:((?:\->)))|(?:((?:\-)))|(?:(\"(?:[^\"\\\r\n]|\\.)*\"))|(?:([a-zA-Z_][a-zA-Z_\d]*))|(?:((?::)))|(?:(\d+))|(?:((?:;)))|(?:((?:\{)))|(?:((?:\}))))/ym,
                     rules: [
                         { tag: ["T_WS"], when: /\s+/ },
                         { highlight: "comment", tag: ["T_COMMENT"], when: /\/\/[^\n]*/ },
                         { highlight: "type.identifier", tag: ["T_SECTWORD"], when: /\[\s*[a-zA-Z_][a-zA-Z_\d]*\s*\]/ },
-                        { goto: "regex$body", highlight: "constant", when: "\\r" },
+                        { goto: "regex$span", highlight: "constant", when: "\\r" },
                         { tag: ["L_COMMA"], when: "," },
                         { highlight: "keyword", tag: ["L_ARROW"], when: "->" },
                         { tag: ["L_DASH"], when: "-" },
@@ -490,30 +490,30 @@ class grammar {
                         { highlight: "keyword", tag: ["L_COLON"], when: ":" },
                         { highlight: "number", tag: ["T_INTEGER"], when: /\d+/ },
                         { tag: ["L_SCOLON"], when: ";" },
-                        { goto: "lexer_sections$body", tag: ["CBRACKET_L"], when: "{" },
+                        { goto: "lexer_span$span", tag: ["CBRACKET_L"], when: "{" },
                         { set: "main", tag: ["CBRACKET_R"], when: "}" }
                     ]
                 },
-                lexer$opener: {
+                lexer$start: {
                     regex: /(?:(?:(\s+))|(?:((?:\{))))/ym,
                     rules: [
                         { tag: ["T_WS"], when: /\s+/ },
-                        { goto: "lexer$body", tag: ["CBRACKET_L"], when: "{" }
+                        { goto: "lexer$span", tag: ["CBRACKET_L"], when: "{" }
                     ]
                 },
-                lexer_sections: {
+                lexer_span: {
                     regex: /(?:(?:((?:\{))))/ym,
                     rules: [
-                        { goto: "lexer_sections$body", tag: ["CBRACKET_L"], when: "{" }
+                        { goto: "lexer_span$span", tag: ["CBRACKET_L"], when: "{" }
                     ]
                 },
-                lexer_sections$body: {
+                lexer_span$span: {
                     regex: /(?:(?:(\s+))|(?:(\/\/[^\n]*))|(?:(\[\s*[a-zA-Z_][a-zA-Z_\d]*\s*\]))|(?:((?:\\r)))|(?:((?:,)))|(?:((?:\->)))|(?:((?:\-)))|(?:(\"(?:[^\"\\\r\n]|\\.)*\"))|(?:([a-zA-Z_][a-zA-Z_\d]*))|(?:((?::)))|(?:(\d+))|(?:((?:;)))|(?:((?:\}))))/ym,
                     rules: [
                         { tag: ["T_WS"], when: /\s+/ },
                         { highlight: "comment", tag: ["T_COMMENT"], when: /\/\/[^\n]*/ },
                         { highlight: "type.identifier", tag: ["T_SECTWORD"], when: /\[\s*[a-zA-Z_][a-zA-Z_\d]*\s*\]/ },
-                        { goto: "regex$body", highlight: "constant", when: "\\r" },
+                        { goto: "regex$span", highlight: "constant", when: "\\r" },
                         { tag: ["L_COMMA"], when: "," },
                         { highlight: "keyword", tag: ["L_ARROW"], when: "->" },
                         { tag: ["L_DASH"], when: "-" },
@@ -525,25 +525,25 @@ class grammar {
                         { pop: 1, tag: ["CBRACKET_R"], when: "}" }
                     ]
                 },
-                lexer_sections$closer: {
+                lexer_span$start: {
+                    regex: /(?:(?:((?:\{))))/ym,
+                    rules: [
+                        { goto: "lexer_span$span", tag: ["CBRACKET_L"], when: "{" }
+                    ]
+                },
+                lexer_span$stop: {
                     regex: /(?:(?:((?:\}))))/ym,
                     rules: [
                         { pop: 1, tag: ["CBRACKET_R"], when: "}" }
                     ]
                 },
-                lexer_sections$opener: {
-                    regex: /(?:(?:((?:\{))))/ym,
-                    rules: [
-                        { goto: "lexer_sections$body", tag: ["CBRACKET_L"], when: "{" }
-                    ]
-                },
                 lifecycle: {
                     regex: /(?:(?:(on(?![a-zA-Z\d_]))))/ym,
                     rules: [
-                        { goto: "lifecycle$body", highlight: "tag", tag: ["T_WORD"], when: /on(?![a-zA-Z\d_])/ }
+                        { goto: "lifecycle$span", highlight: "tag", tag: ["T_WORD"], when: /on(?![a-zA-Z\d_])/ }
                     ]
                 },
-                lifecycle$body: {
+                lifecycle$span: {
                     regex: /(?:(?:([\'"`]))|(?:(\s+))|(?:((?:\{)))|(?:((?::)))|(?:([a-zA-Z_][a-zA-Z_\d]*)))/ym,
                     rules: [
                         { before: true, pop: 1, when: /[\'"`]/ },
@@ -553,10 +553,10 @@ class grammar {
                         { tag: ["T_WORD"], when: /[a-zA-Z_][a-zA-Z_\d]*/ }
                     ]
                 },
-                lifecycle$opener: {
+                lifecycle$start: {
                     regex: /(?:(?:(on(?![a-zA-Z\d_]))))/ym,
                     rules: [
-                        { goto: "lifecycle$body", highlight: "tag", tag: ["T_WORD"], when: /on(?![a-zA-Z\d_])/ }
+                        { goto: "lifecycle$span", highlight: "tag", tag: ["T_WORD"], when: /on(?![a-zA-Z\d_])/ }
                     ]
                 },
                 main: {
@@ -566,7 +566,7 @@ class grammar {
                         { tag: ["T_WS"], when: /\s+/ },
                         { highlight: "comment", tag: ["T_COMMENT"], when: /\/\/[^\n]*/ },
                         { tag: ["L_STAR"], when: "*" },
-                        { goto: "lifecycle$body", highlight: "tag", tag: ["T_WORD"], when: /on(?![a-zA-Z\d_])/ },
+                        { goto: "lifecycle$span", highlight: "tag", tag: ["T_WORD"], when: /on(?![a-zA-Z\d_])/ },
                         { highlight: "tag", set: "lexer", tag: ["T_WORD"], when: /lexer(?![a-zA-Z\d_])/ },
                         { highlight: "tag", set: "grammar", tag: ["T_WORD"], when: /grammar(?![a-zA-Z\d_])/ },
                         { highlight: "tag", set: "config", tag: ["T_WORD"], when: /config(?![a-zA-Z\d_])/ },
@@ -579,10 +579,10 @@ class grammar {
                 regex: {
                     regex: /(?:(?:((?:\\r))))/ym,
                     rules: [
-                        { goto: "regex$body", highlight: "constant", when: "\\r" }
+                        { goto: "regex$span", highlight: "constant", when: "\\r" }
                     ]
                 },
-                regex$body: {
+                regex$span: {
                     regex: /(?:(?:(\s+))|(?:([a-z]))|(?:(\"(?:[^\"\\\r\n]|\\.)*\"))|(?:('(?:[^'\\\r\n]|\\.)*'))|(?:(`(?:[^`\\]|\\.)*`)))/ym,
                     rules: [
                         { tag: ["T_WS"], when: /\s+/ },
@@ -592,18 +592,18 @@ class grammar {
                         { highlight: "regexp", pop: 1, tag: ["T_REGEX"], when: /`(?:[^`\\]|\\.)*`/ }
                     ]
                 },
-                regex$closer: {
+                regex$start: {
+                    regex: /(?:(?:((?:\\r))))/ym,
+                    rules: [
+                        { goto: "regex$span", highlight: "constant", when: "\\r" }
+                    ]
+                },
+                regex$stop: {
                     regex: /(?:(?:(\"(?:[^\"\\\r\n]|\\.)*\"))|(?:('(?:[^'\\\r\n]|\\.)*'))|(?:(`(?:[^`\\]|\\.)*`)))/ym,
                     rules: [
                         { highlight: "regexp", pop: 1, tag: ["T_REGEX"], when: /\"(?:[^\"\\\r\n]|\\.)*\"/ },
                         { highlight: "regexp", pop: 1, tag: ["T_REGEX"], when: /'(?:[^'\\\r\n]|\\.)*'/ },
                         { highlight: "regexp", pop: 1, tag: ["T_REGEX"], when: /`(?:[^`\\]|\\.)*`/ }
-                    ]
-                },
-                regex$opener: {
-                    regex: /(?:(?:((?:\\r))))/ym,
-                    rules: [
-                        { goto: "regex$body", highlight: "constant", when: "\\r" }
                     ]
                 },
                 section_word: {
