@@ -19,16 +19,11 @@ export class JavaScriptGenerator {
     name() {
         return this.options.name || 'GWLanguage';
     }
-    head() {
-        if (this.options.noscript)
-            return '';
-        return this.state.head.join('\n');
-    }
 
-    body() {
+    lifecycle(lifecycle: string) {
         if (this.options.noscript)
             return '';
-        return this.state.body.join('\n');
+        return this.state.lifecycle[lifecycle] || '';
     }
 
     artifacts(depth: number = 0) {

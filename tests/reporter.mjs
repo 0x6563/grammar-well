@@ -55,10 +55,10 @@ class TestReporter {
             } else {
                 let l = '';
                 if (this.suiteHeader) {
-                    l += this.print(`${FgYellow}Testing${Reset} ${this.running.join(' > ')}`);
+                    l += this.print(`${FgYellow}Suite${Reset} ${this.running.join(' > ')}`);
                     this.suiteHeader = false;
                 }
-                l += this.print(`${FgGreen}passed${Reset} ${event.data.name}`, true);
+                l += this.print(`${FgGreen}✓${Reset} ${event.data.name}`, true);
                 return l;
             }
         },
@@ -70,11 +70,11 @@ class TestReporter {
             } else {
                 let l = '';
                 if (this.suiteHeader) {
-                    l += this.print(`${FgYellow}Testing${Reset} ${this.running.join(' > ')}`);
+                    l += this.print(`${FgYellow}Suite${Reset} ${this.running.join(' > ')}`);
                     this.suiteHeader = false;
                 }
-                l += this.print(`${FgRed}failed${Reset} ${event.data.name}`, true);
-                l += this.print(`${FgRed}${event.data.details.error.cause}${Reset}`, true);
+                l += this.print(`${FgRed}𐄂${Reset} ${BgRed}${FgWhite}${event.data.name}${Reset}`, true);
+                l += this.print(`${FgWhite}${event.data.details.error.cause}${Reset}\n`, 4);
                 return l;
             }
         },
@@ -85,10 +85,10 @@ class TestReporter {
             // return this.print(`Diagnostic: ${event.data.message}`, false);
         },
         'test:stderr': (event) => {
-            return this.print("test:stderr " + event.data.message);
+            return this.print(`${FgRed}${event.data.message}${Reset}`);
         },
         'test:stdout': (event) => {
-            return this.print("test:stdout " + event.data.message);
+            return this.print(event.data.message);
 
             // return this.print(event.data.message);
         },
@@ -103,8 +103,9 @@ class TestReporter {
     print(content, indent = false, temporary = false) {
         const space = ' ';
         const empty = '';
+        const leading = indent ? space.repeat(indent + 1) : empty;
         const prefix = this.last.temporary ? `\r${space.repeat(this.last.length)}\r` : empty;
-        const line = `${indent ? space + space : empty}${content}${temporary ? empty : '\n'}`;
+        const line = leading + content.replace(/\n/gm, '\n' + leading) + (temporary ? empty : '\n');
         this.last = {
             temporary,
             length: line.length,

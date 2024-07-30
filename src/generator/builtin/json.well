@@ -20,6 +20,7 @@ lexer {
 }
 
 grammar {
+	start: "json"
 
 	[json]
 		| _ (object | array) _ => ( $1[0] )
@@ -48,14 +49,14 @@ grammar {
 		| <string> => ( JSON.parse($0.value) )
 
 	[pair]
-		| key _ ":" _ value => ( [$k, $v] )
+		| key:k _ ":" _ value:v => ( [$k, $v] )
 
 	[key]
 		| string => ( $0 )
 
 }
 
-on load {
+on:import {
 function extractPair(kv, output) {
         if(kv[0]) { output[kv[0]] = kv[1]; }
     }

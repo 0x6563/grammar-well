@@ -6,11 +6,11 @@ export function TypescriptFormat(generator: JavaScriptGenerator) {
 // https://github.com/0x6563/grammar-well
 // @ts-nocheck
 
-${generator.head()}
+${generator.lifecycle('import')}
 
 class ${exportName} {
     artifacts =  ${generator.artifacts(1)}
-    constructor(){${generator.body()}}
+    constructor(){${generator.lifecycle('new')}}
 }
 
 export default ${exportName};`;

@@ -1,4 +1,4 @@
-import { ASTConfig, ASTDirectives, ASTGrammar, ASTGrammarProduction, ASTGrammarProductionRule, ASTGrammarSymbol, ASTGrammarSymbolGroup, ASTGrammarSymbolLiteral, ASTGrammarSymbolRepeat, ASTImport, ASTLexer, ASTLexerConfig, ASTLexerState, ASTLexerStateImportRule, ASTLexerStateMatchRule, ASTLexerStateStructured, GeneratorContext, GeneratorGrammarProductionRule, GeneratorGrammarSymbol, GeneratorOptions, GeneratorExportFormat, ImportResolver, GeneratorExportOptions, GenerateOptions } from "../typings/index.js";
+import { ASTConfig, ASTDirectives, ASTGrammar, ASTGrammarProduction, ASTGrammarProductionRule, ASTGrammarSymbol, ASTGrammarSymbolGroup, ASTGrammarSymbolLiteral, ASTGrammarSymbolRepeat, ASTImport, ASTLexer, ASTLexerConfig, ASTLexerState, ASTLexerStateImportRule, ASTLexerStateMatchRule, ASTLexerStateStructured, GeneratorContext, GeneratorGrammarProductionRule, GeneratorGrammarSymbol, GeneratorOptions, GeneratorExportFormat, ImportResolver, GeneratorExportOptions, GenerateOptions, ASTJavascriptLifecycleLiteral } from "../typings/index.js";
 
 import { Parse } from "../parser/parse.js";
 import GrammarV1 from './grammars/v1.js';
@@ -59,10 +59,8 @@ export class Generator {
         }
         directives = Array.isArray(directives) ? directives : [directives];
         for (const directive of directives) {
-            if ("head" in directive) {
-                this.state.head.push(directive.head.js);
-            } else if ("body" in directive) {
-                this.state.body.push(directive.body.js);
+            if ("lifecycle" in directive) {
+                await this.processLifecycleDirective(directive);
             } else if ("import" in directive) {
                 await this.processImportDirective(directive);
             } else if ("config" in directive) {
@@ -90,6 +88,10 @@ export class Generator {
         } else {
             await this.importBuiltIn(directive.import, this.aliasPrefix + (directive.alias || ''));
         }
+    }
+
+    private async processLifecycleDirective(directive: ASTJavascriptLifecycleLiteral) {
+        this.state.addLifecycle(directive.lifecycle, directive.js.js);
     }
 
     private processConfigDirective(directive: ASTConfig) {

@@ -1,14 +1,14 @@
 lexer {
 
 	[whitespace]
-		- when \r "\s+" tag "whitespace"
+		- when \r '\s+' tag "whitespace"
 
 }
 
 grammar {
 
 	[_]
-		| <whitespace>* => ( null )
+		| <whitespace>? => ( null )
 
 	[__]
 		| <whitespace>+ => ( null )

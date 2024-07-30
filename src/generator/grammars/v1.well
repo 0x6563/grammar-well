@@ -158,10 +158,10 @@ grammar {
 		| K_IMPORT _ L_STAR _ "as" _ T_WORD:alias _ K_FROM __ T_STRING:import _ L_SCOLON => ( { import: $import, path: true, alias: $alias} )
 		| K_LEXER _ L_COLON _ L_TEMPLATEL _ lexer:lexer _ L_TEMPLATER => ( { lexer: Object.assign(...$lexer) } )
 		| K_GRAMMAR _ L_COLON _ L_TEMPLATEL _ grammar:grammar _ L_TEMPLATER => ( { grammar: $grammar } )
-		| K_BODY _ L_COLON _ T_JS:js => ( { body: $js } )
-		| K_BODY _ L_COLON _ T_STRING:js => ( { body: $js, path: true } )
-		| K_HEAD _ L_COLON _ T_JS:js => ( { head: $js } )
-		| K_HEAD _ L_COLON _ T_STRING:js => ( { head: $js, path: true } )
+		| K_BODY _ L_COLON _ T_JS:js => ( { lifecycle: "new", js: $js } )
+		| K_BODY _ L_COLON _ T_STRING:js => ( { lifecycle: "new", js: $js, path: true } )
+		| K_HEAD _ L_COLON _ T_JS:js => ( { lifecycle:"import", "js": $js } )
+		| K_HEAD _ L_COLON _ T_STRING:js => ( { lifecycle:"import", "js": $js, path: true } )
 
 	[lexer]
 		| kv_list _ state_list => ( $0.concat({ states: $2 }) )

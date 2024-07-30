@@ -2,8 +2,10 @@ import { GeneratorGrammarProductionRule, GeneratorLexerConfig, GeneratorLexerSta
 export declare class GeneratorState {
     grammar?: GeneratorStateGrammar;
     lexer?: GeneratorLexerConfig;
-    head: string[];
-    body: string[];
+    lifecycle: {
+        import?: string;
+        new?: string;
+    };
     config: {};
     version: string;
     merge(state: GeneratorState): void;
@@ -12,11 +14,14 @@ export declare class GeneratorState {
     addGrammarRule(rule: GeneratorGrammarProductionRule): void;
     initializeLexer(): void;
     addLexerState(name: string, state?: GeneratorLexerState): void;
+    addLifecycle(lifecycle: string, literal: string): void;
     export(): {
         grammar: GeneratorStateGrammar;
         lexer: GeneratorLexerConfig;
-        head: string[];
-        body: string[];
+        lifecycle: {
+            import?: string;
+            new?: string;
+        };
         config: {};
         version: string;
     };

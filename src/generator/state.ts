@@ -3,9 +3,11 @@ import { GeneratorGrammarProductionRule, GeneratorLexerConfig, GeneratorLexerSta
 export class GeneratorState {
     grammar?: GeneratorStateGrammar;
     lexer?: GeneratorLexerConfig;
+    lifecycle: {
+        import?: string;
+        new?: string;
+    } = {}
 
-    head: string[] = [];
-    body: string[] = [];
     config = {};
     version: string = 'unknown';
 
@@ -24,8 +26,10 @@ export class GeneratorState {
             this.lexer.start = state.lexer.start || this.lexer.start;
         }
 
-        this.head.push(...state.head);
-        this.body.push(...state.body);
+        for (const key in state.lifecycle) {
+            this.addLifecycle(key, state.lifecycle[key]);
+        }
+
         Object.assign(this.config, state.config);
     }
 
@@ -68,12 +72,16 @@ export class GeneratorState {
         }
     }
 
+    addLifecycle(lifecycle: string, literal: string) {
+        this.lifecycle[lifecycle] = this.lifecycle[lifecycle] || '';
+        this.lifecycle[lifecycle] += literal;
+    }
+
     export() {
         return {
             grammar: this.grammar,
             lexer: this.lexer,
-            head: this.head,
-            body: this.body,
+            lifecycle: this.lifecycle,
             config: this.config,
             version: this.version
         }

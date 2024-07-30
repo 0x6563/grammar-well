@@ -18,15 +18,10 @@ export class JavaScriptGenerator {
     name() {
         return this.options.name || 'GWLanguage';
     }
-    head() {
+    lifecycle(lifecycle) {
         if (this.options.noscript)
             return '';
-        return this.state.head.join('\n');
-    }
-    body() {
-        if (this.options.noscript)
-            return '';
-        return this.state.body.join('\n');
+        return this.state.lifecycle[lifecycle] || '';
     }
     artifacts(depth = 0) {
         let output = {};

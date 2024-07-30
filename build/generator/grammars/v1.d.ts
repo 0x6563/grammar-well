@@ -542,15 +542,8 @@ declare class grammar {
                     postprocess: ({ data }: {
                         data: any;
                     }) => {
-                        body: any;
-                    };
-                    symbols: string[];
-                } | {
-                    name: string;
-                    postprocess: ({ data }: {
-                        data: any;
-                    }) => {
-                        head: any;
+                        lifecycle: string;
+                        js: any;
                     };
                     symbols: string[];
                 })[];

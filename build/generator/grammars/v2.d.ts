@@ -432,17 +432,12 @@ declare class grammar {
                     postprocess: ({ data }: {
                         data: any;
                     }) => {
-                        body: any;
+                        lifecycle: any;
+                        js: any;
                     };
-                    symbols: (string | RegExp)[];
-                } | {
-                    name: string;
-                    postprocess: ({ data }: {
-                        data: any;
-                    }) => {
-                        head: any;
-                    };
-                    symbols: (string | RegExp)[];
+                    symbols: (string | RegExp | {
+                        literal: string;
+                    })[];
                 })[];
                 section_list: {
                     name: string;
@@ -854,8 +849,10 @@ declare class grammar {
                     rules: ({
                         tag: string[];
                         when: RegExp;
+                        highlight?: undefined;
                         set?: undefined;
                     } | {
+                        highlight: string;
                         set: string;
                         tag: string[];
                         when: string;
@@ -1172,6 +1169,56 @@ declare class grammar {
                         goto: string;
                         tag: string[];
                         when: string;
+                    }[];
+                };
+                lifecycle: {
+                    regex: RegExp;
+                    rules: {
+                        goto: string;
+                        highlight: string;
+                        tag: string[];
+                        when: RegExp;
+                    }[];
+                };
+                lifecycle$body: {
+                    regex: RegExp;
+                    rules: ({
+                        before: boolean;
+                        pop: number;
+                        when: RegExp;
+                        tag?: undefined;
+                        highlight?: undefined;
+                        set?: undefined;
+                    } | {
+                        tag: string[];
+                        when: RegExp;
+                        before?: undefined;
+                        pop?: undefined;
+                        highlight?: undefined;
+                        set?: undefined;
+                    } | {
+                        highlight: string;
+                        set: string;
+                        tag: string[];
+                        when: string;
+                        before?: undefined;
+                        pop?: undefined;
+                    } | {
+                        highlight: string;
+                        tag: string[];
+                        when: string;
+                        before?: undefined;
+                        pop?: undefined;
+                        set?: undefined;
+                    })[];
+                };
+                lifecycle$opener: {
+                    regex: RegExp;
+                    rules: {
+                        goto: string;
+                        highlight: string;
+                        tag: string[];
+                        when: RegExp;
                     }[];
                 };
                 main: {

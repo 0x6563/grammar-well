@@ -3,11 +3,8 @@ export class V2GrammarString {
     append(directives) {
         directives = Array.isArray(directives) ? directives : [directives];
         for (const directive of directives) {
-            if ("head" in directive) {
-                this.appendSection("on load", directive.head.js.trim());
-            }
-            else if ("body" in directive) {
-                this.appendSection("on new", directive.body.js.trim());
+            if ("lifecycle" in directive) {
+                this.appendSection("on:" + directive.lifecycle, directive.js.js.trim());
             }
             else if ("import" in directive) {
                 this.appendImportDirective(directive);

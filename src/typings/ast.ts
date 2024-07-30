@@ -2,7 +2,11 @@ import { Dictionary } from "./common.js";
 
 export type AST = ASTDirectives[];
 
-export type ASTJavaScriptSection = { body: ASTJavaScriptLiteral; } | { head: ASTJavaScriptLiteral }
+export type ASTJavascriptLifecycleLiteral = {
+    lifecycle: string;
+    path?: boolean;
+    js: ASTJavaScriptLiteral;
+}
 export type ASTJavaScriptLiteral = { js: string }
 export type ASTJavaScriptTemplate = { template: string }
 
@@ -80,7 +84,7 @@ export interface ASTGrammarSymbolLiteral {
     insensitive?: boolean;
 }
 
-export type ASTDirectives = (ASTJavaScriptSection | ASTImport | ASTConfig | ASTGrammar | ASTLexer);
+export type ASTDirectives = (ASTJavascriptLifecycleLiteral | ASTImport | ASTConfig | ASTGrammar | ASTLexer);
 
 export interface ASTLexerState {
     unmatched?: ASTLexerStateNonMatchRule;

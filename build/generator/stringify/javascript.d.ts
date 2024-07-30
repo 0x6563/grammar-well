@@ -5,8 +5,7 @@ export declare class JavaScriptGenerator {
     options: GeneratorExportOptions;
     constructor(state: GeneratorState, options: GeneratorExportOptions);
     name(): string;
-    head(): string;
-    body(): string;
+    lifecycle(lifecycle: string): any;
     artifacts(depth?: number): string;
     postProcess(postprocess: GeneratorGrammarProductionRule['postprocess'], alias: Dictionary<number>): any;
     grammarRule(rule: GeneratorGrammarProductionRule): string;

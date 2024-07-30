@@ -45,11 +45,8 @@ export class Generator {
         }
         directives = Array.isArray(directives) ? directives : [directives];
         for (const directive of directives) {
-            if ("head" in directive) {
-                this.state.head.push(directive.head.js);
-            }
-            else if ("body" in directive) {
-                this.state.body.push(directive.body.js);
+            if ("lifecycle" in directive) {
+                await this.processLifecycleDirective(directive);
             }
             else if ("import" in directive) {
                 await this.processImportDirective(directive);
@@ -80,6 +77,9 @@ export class Generator {
         else {
             await this.importBuiltIn(directive.import, this.aliasPrefix + (directive.alias || ''));
         }
+    }
+    async processLifecycleDirective(directive) {
+        this.state.addLifecycle(directive.lifecycle, directive.js.js);
     }
     processConfigDirective(directive) {
         Object.assign(this.state.config, directive.config);

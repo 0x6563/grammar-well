@@ -18,6 +18,7 @@ export declare class Generator {
         export: GeneratorExportOptions;
     };
     private processImportDirective;
+    private processLifecycleDirective;
     private processConfigDirective;
     private processLexerDirective;
     private importLexerStates;

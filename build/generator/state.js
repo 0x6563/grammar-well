@@ -1,8 +1,7 @@
 export class GeneratorState {
     grammar;
     lexer;
-    head = [];
-    body = [];
+    lifecycle = {};
     config = {};
     version = 'unknown';
     merge(state) {
@@ -18,8 +17,9 @@ export class GeneratorState {
             Object.assign(this.lexer.states, state.lexer.states);
             this.lexer.start = state.lexer.start || this.lexer.start;
         }
-        this.head.push(...state.head);
-        this.body.push(...state.body);
+        for (const key in state.lifecycle) {
+            this.addLifecycle(key, state.lifecycle[key]);
+        }
         Object.assign(this.config, state.config);
     }
     grammarUUID(name) {
@@ -56,12 +56,15 @@ export class GeneratorState {
             target.rules.push(...state.rules);
         }
     }
+    addLifecycle(lifecycle, literal) {
+        this.lifecycle[lifecycle] = this.lifecycle[lifecycle] || '';
+        this.lifecycle[lifecycle] += literal;
+    }
     export() {
         return {
             grammar: this.grammar,
             lexer: this.lexer,
-            head: this.head,
-            body: this.body,
+            lifecycle: this.lifecycle,
             config: this.config,
             version: this.version
         };

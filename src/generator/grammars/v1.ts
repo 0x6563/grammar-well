@@ -254,10 +254,10 @@ class grammar {
                     { name: "section", postprocess: ({data}) => { return ({ import: data[10], path: true, alias: data[6]}); }, symbols: [ "K_IMPORT", "_", "L_STAR", "_", { literal: "as" }, "_", "T_WORD", "_", "K_FROM", "__", "T_STRING", "_", "L_SCOLON" ] },
                     { name: "section", postprocess: ({data}) => { return ({ lexer: Object.assign(...data[6]) }); }, symbols: [ "K_LEXER", "_", "L_COLON", "_", "L_TEMPLATEL", "_", "lexer", "_", "L_TEMPLATER" ] },
                     { name: "section", postprocess: ({data}) => { return ({ grammar: data[6] }); }, symbols: [ "K_GRAMMAR", "_", "L_COLON", "_", "L_TEMPLATEL", "_", "grammar", "_", "L_TEMPLATER" ] },
-                    { name: "section", postprocess: ({data}) => { return ({ body: data[4] }); }, symbols: [ "K_BODY", "_", "L_COLON", "_", "T_JS" ] },
-                    { name: "section", postprocess: ({data}) => { return ({ body: data[4], path: true }); }, symbols: [ "K_BODY", "_", "L_COLON", "_", "T_STRING" ] },
-                    { name: "section", postprocess: ({data}) => { return ({ head: data[4] }); }, symbols: [ "K_HEAD", "_", "L_COLON", "_", "T_JS" ] },
-                    { name: "section", postprocess: ({data}) => { return ({ head: data[4], path: true }); }, symbols: [ "K_HEAD", "_", "L_COLON", "_", "T_STRING" ] }
+                    { name: "section", postprocess: ({data}) => { return ({ lifecycle: "new", js: data[4] }); }, symbols: [ "K_BODY", "_", "L_COLON", "_", "T_JS" ] },
+                    { name: "section", postprocess: ({data}) => { return ({ lifecycle: "new", js: data[4], path: true }); }, symbols: [ "K_BODY", "_", "L_COLON", "_", "T_STRING" ] },
+                    { name: "section", postprocess: ({data}) => { return ({ lifecycle:"import", "js": data[4] }); }, symbols: [ "K_HEAD", "_", "L_COLON", "_", "T_JS" ] },
+                    { name: "section", postprocess: ({data}) => { return ({ lifecycle:"import", "js": data[4], path: true }); }, symbols: [ "K_HEAD", "_", "L_COLON", "_", "T_STRING" ] }
                 ],
                 section_list: [
                     { name: "section_list", postprocess: ({data}) => { return ([data[0]]); }, symbols: [ "section" ] },
