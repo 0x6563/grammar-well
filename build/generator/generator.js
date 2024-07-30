@@ -202,13 +202,13 @@ export class Generator {
                     close: r.close,
                     embed: r.embed,
                     unembed: r.unembed,
-                    goto: r.skip ? undefined : `${name}$${target}`
+                    goto: r.stay ? undefined : `${name}$${target}`
                 });
             }
             if ('import' in r) {
                 openRules.push({
                     import: r.import,
-                    goto: `${name}$${target}`
+                    goto: r.stay ? undefined : `${name}$${target}`
                 });
             }
         }

@@ -11,7 +11,7 @@ lexer {
 	[config] sections {
 
 		[opener]
-			- skip \r "\s+"
+			- when \r "\s+" tag "T_WS" stay
 			- when "{" tag "CBRACKET_L"
 
 		[body]
@@ -34,7 +34,7 @@ lexer {
 	[grammar] sections {
 
 		[opener]
-			- skip \r "\s+"
+			- when \r "\s+" tag "T_WS" stay
 			- when "{" tag "CBRACKET_L"
 
 		[body]
@@ -46,7 +46,7 @@ lexer {
 	[lexer] sections {
 
 		[opener]
-			- skip \r "\s+"
+			- when \r "\s+" tag "T_WS" stay
 			- when "{" tag "CBRACKET_L"
 
 		[body]
@@ -271,6 +271,7 @@ grammar {
 		| "before" _ T_REGEX => ( { when: $2, before: true } )
 		| "skip" _ T_STRING => ( { when: $2, skip: true } )
 		| "skip" _ T_REGEX => ( { when: $2, skip: true } )
+		| "stay" => ( { stay: true } )
 		| "pop" => ( { pop: 1 } )
 		| "pop" _ T_INTEGER => ( { pop: parseInt($2) } )
 		| "pop" _ "all" => ( { pop: "all" } )

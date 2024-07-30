@@ -202,6 +202,7 @@ class grammar {
                     { name: "token_definition", postprocess: ({data}) => { return ({ when: data[2], before: true }); }, symbols: [ { literal: "before" }, "_", "T_REGEX" ] },
                     { name: "token_definition", postprocess: ({data}) => { return ({ when: data[2], skip: true }); }, symbols: [ { literal: "skip" }, "_", "T_STRING" ] },
                     { name: "token_definition", postprocess: ({data}) => { return ({ when: data[2], skip: true }); }, symbols: [ { literal: "skip" }, "_", "T_REGEX" ] },
+                    { name: "token_definition", postprocess: ({data}) => { return ({ stay: true }); }, symbols: [ { literal: "stay" } ] },
                     { name: "token_definition", postprocess: ({data}) => { return ({ pop: 1 }); }, symbols: [ { literal: "pop" } ] },
                     { name: "token_definition", postprocess: ({data}) => { return ({ pop: parseInt(data[2]) }); }, symbols: [ { literal: "pop" }, "_", "T_INTEGER" ] },
                     { name: "token_definition", postprocess: ({data}) => { return ({ pop: "all" }); }, symbols: [ { literal: "pop" }, "_", { literal: "all" } ] },
@@ -241,7 +242,7 @@ class grammar {
                 config: {
                     regex: /(?:(?:(\s+))|(?:((?:\{))))/ym,
                     rules: [
-                        { skip: true, when: /\s+/ },
+                        { tag: ["T_WS"], when: /\s+/ },
                         { goto: "config$body", tag: ["CBRACKET_L"], when: "{" }
                     ]
                 },
@@ -261,14 +262,14 @@ class grammar {
                 config$opener: {
                     regex: /(?:(?:(\s+))|(?:((?:\{))))/ym,
                     rules: [
-                        { skip: true, when: /\s+/ },
+                        { tag: ["T_WS"], when: /\s+/ },
                         { goto: "config$body", tag: ["CBRACKET_L"], when: "{" }
                     ]
                 },
                 grammar: {
                     regex: /(?:(?:(\s+))|(?:((?:\{))))/ym,
                     rules: [
-                        { skip: true, when: /\s+/ },
+                        { tag: ["T_WS"], when: /\s+/ },
                         { goto: "grammar$body", tag: ["CBRACKET_L"], when: "{" }
                     ]
                 },
@@ -304,7 +305,7 @@ class grammar {
                 grammar$opener: {
                     regex: /(?:(?:(\s+))|(?:((?:\{))))/ym,
                     rules: [
-                        { skip: true, when: /\s+/ },
+                        { tag: ["T_WS"], when: /\s+/ },
                         { goto: "grammar$body", tag: ["CBRACKET_L"], when: "{" }
                     ]
                 },
@@ -470,7 +471,7 @@ class grammar {
                 lexer: {
                     regex: /(?:(?:(\s+))|(?:((?:\{))))/ym,
                     rules: [
-                        { skip: true, when: /\s+/ },
+                        { tag: ["T_WS"], when: /\s+/ },
                         { goto: "lexer$body", tag: ["CBRACKET_L"], when: "{" }
                     ]
                 },
@@ -496,7 +497,7 @@ class grammar {
                 lexer$opener: {
                     regex: /(?:(?:(\s+))|(?:((?:\{))))/ym,
                     rules: [
-                        { skip: true, when: /\s+/ },
+                        { tag: ["T_WS"], when: /\s+/ },
                         { goto: "lexer$body", tag: ["CBRACKET_L"], when: "{" }
                     ]
                 },

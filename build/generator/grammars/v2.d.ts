@@ -575,6 +575,16 @@ declare class grammar {
                     postprocess: ({ data }: {
                         data: any;
                     }) => {
+                        stay: boolean;
+                    };
+                    symbols: {
+                        literal: string;
+                    }[];
+                } | {
+                    name: string;
+                    postprocess: ({ data }: {
+                        data: any;
+                    }) => {
                         pop: number;
                     };
                     symbols: (string | {
@@ -701,15 +711,13 @@ declare class grammar {
                 config: {
                     regex: RegExp;
                     rules: ({
-                        skip: boolean;
+                        tag: string[];
                         when: RegExp;
                         goto?: undefined;
-                        tag?: undefined;
                     } | {
                         goto: string;
                         tag: string[];
                         when: string;
-                        skip?: undefined;
                     })[];
                 };
                 config$body: {
@@ -744,29 +752,25 @@ declare class grammar {
                 config$opener: {
                     regex: RegExp;
                     rules: ({
-                        skip: boolean;
+                        tag: string[];
                         when: RegExp;
                         goto?: undefined;
-                        tag?: undefined;
                     } | {
                         goto: string;
                         tag: string[];
                         when: string;
-                        skip?: undefined;
                     })[];
                 };
                 grammar: {
                     regex: RegExp;
                     rules: ({
-                        skip: boolean;
+                        tag: string[];
                         when: RegExp;
                         goto?: undefined;
-                        tag?: undefined;
                     } | {
                         goto: string;
                         tag: string[];
                         when: string;
-                        skip?: undefined;
                     })[];
                 };
                 grammar$body: {
@@ -818,15 +822,13 @@ declare class grammar {
                 grammar$opener: {
                     regex: RegExp;
                     rules: ({
-                        skip: boolean;
+                        tag: string[];
                         when: RegExp;
                         goto?: undefined;
-                        tag?: undefined;
                     } | {
                         goto: string;
                         tag: string[];
                         when: string;
-                        skip?: undefined;
                     })[];
                 };
                 insensitive: {
@@ -1036,15 +1038,13 @@ declare class grammar {
                 lexer: {
                     regex: RegExp;
                     rules: ({
-                        skip: boolean;
+                        tag: string[];
                         when: RegExp;
                         goto?: undefined;
-                        tag?: undefined;
                     } | {
                         goto: string;
                         tag: string[];
                         when: string;
-                        skip?: undefined;
                     })[];
                 };
                 lexer$body: {
@@ -1096,15 +1096,13 @@ declare class grammar {
                 lexer$opener: {
                     regex: RegExp;
                     rules: ({
-                        skip: boolean;
+                        tag: string[];
                         when: RegExp;
                         goto?: undefined;
-                        tag?: undefined;
                     } | {
                         goto: string;
                         tag: string[];
                         when: string;
-                        skip?: undefined;
                     })[];
                 };
                 lexer_sections: {

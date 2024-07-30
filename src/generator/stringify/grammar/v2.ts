@@ -196,6 +196,9 @@ export class V2GrammarString {
             if (typeof rule.set != 'undefined') {
                 body += ` set ${rule.set}`;
             }
+            if ("stay" in rule && rule.stay) {
+                body += ` stay`;
+            }
         }
         return body.trim();
     }

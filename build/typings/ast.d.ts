@@ -91,6 +91,7 @@ export interface ASTLexerStateImportRule {
     inset?: number;
     goto?: string;
     set?: string;
+    stay?: boolean;
 }
 export interface ASTLexerStateMatchRule {
     when: string | ASTGrammarSymbolRegex;
