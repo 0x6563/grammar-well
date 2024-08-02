@@ -105,6 +105,9 @@ export class V2GrammarString {
                     const stateOpen = state.span.find(v => v.name == 'start');
                     const stateBody = state.span.find(v => v.name == 'span');
                     const stateClose = state.span.find(v => v.name == 'stop');
+                    if (state.config) {
+                        body += this.formatKV(state.config, 2);
+                    }
                     if (stateOpen) {
                         body += this.formatLexerState('start', stateOpen.state, 2);
                     }

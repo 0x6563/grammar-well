@@ -22,6 +22,7 @@ lexer {
 	}
 
 	[config] span {
+		transition: "set"
 
 		[start]
 			- when \r "\s+" tag "T_WS" stay
@@ -36,6 +37,7 @@ lexer {
 	}
 
 	[grammar] span {
+		transition: "set"
 
 		[start]
 			- when \r "\s+" tag "T_WS" stay
@@ -50,6 +52,7 @@ lexer {
 	}
 
 	[lexer] span {
+		transition: "set"
 
 		[start]
 			- when \r "\s+" tag "T_WS" stay
