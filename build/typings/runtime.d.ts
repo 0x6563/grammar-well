@@ -13,6 +13,7 @@ export interface RuntimeParserClass {
             table: Dictionary<LRState>;
         };
     };
+    new (): any;
 }
 export interface RuntimeGrammarProductionRule {
     name: string;

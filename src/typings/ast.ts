@@ -93,6 +93,9 @@ export interface ASTLexerState {
 }
 
 export interface ASTLexerStateSpan {
+    config?: {
+        transition?: "goto" | "set"
+    }
     span: { name: string, state: (ASTLexerState) }[];
 }
 

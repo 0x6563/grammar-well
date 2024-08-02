@@ -232,7 +232,7 @@ declare class grammar {
                         data: any;
                     }) => any;
                     symbols: (string | {
-                        token: string;
+                        literal: string;
                     })[];
                 }[];
                 expression_repeater: {
@@ -241,7 +241,7 @@ declare class grammar {
                         data: any;
                     }) => any;
                     symbols: {
-                        token: string;
+                        literal: string;
                     }[];
                 }[];
                 expression_symbol: {
@@ -250,7 +250,7 @@ declare class grammar {
                         data: any;
                     }) => any;
                     symbols: (string | {
-                        token: string;
+                        literal: string;
                     })[];
                 }[];
                 expression_symbol_list: ({
@@ -283,7 +283,7 @@ declare class grammar {
                         token: any;
                     };
                     symbols: (string | {
-                        token: string;
+                        literal: string;
                     })[];
                 } | {
                     name: string;
@@ -299,7 +299,7 @@ declare class grammar {
                         subexpression: any;
                     };
                     symbols: (string | {
-                        token: string;
+                        literal: string;
                     })[];
                 })[];
                 grammar: {
@@ -380,10 +380,6 @@ declare class grammar {
                     };
                     symbols: (string | {
                         literal: string;
-                        token?: undefined;
-                    } | {
-                        token: string;
-                        literal?: undefined;
                     })[];
                 } | {
                     name: string;
@@ -394,10 +390,6 @@ declare class grammar {
                     };
                     symbols: (string | {
                         literal: string;
-                        token?: undefined;
-                    } | {
-                        token: string;
-                        literal?: undefined;
                     })[];
                 } | {
                     name: string;
@@ -408,10 +400,6 @@ declare class grammar {
                     };
                     symbols: (string | {
                         literal: string;
-                        token?: undefined;
-                    } | {
-                        token: string;
-                        literal?: undefined;
                     })[];
                 } | {
                     name: string;
@@ -422,10 +410,6 @@ declare class grammar {
                     };
                     symbols: (string | {
                         literal: string;
-                        token?: undefined;
-                    } | {
-                        token: string;
-                        literal?: undefined;
                     })[];
                 } | {
                     name: string;
@@ -504,32 +488,18 @@ declare class grammar {
                         data: any;
                     }) => any[];
                     symbols: (string | {
-                        token: string;
+                        literal: string;
                     })[];
                 }[];
-                token: ({
-                    name: string;
-                    postprocess: ({ data }: {
-                        data: any;
-                    }) => {
-                        import: any;
-                    };
-                    symbols: (string | {
-                        token: string;
-                        literal?: undefined;
-                    } | {
-                        literal: string;
-                        token?: undefined;
-                    })[];
-                } | {
+                token: {
                     name: string;
                     postprocess: ({ data }: {
                         data: any;
                     }) => any;
                     symbols: (string | {
-                        token: string;
+                        literal: string;
                     })[];
-                })[];
+                }[];
                 token_definition: ({
                     name: string;
                     postprocess: ({ data }: {
@@ -691,7 +661,7 @@ declare class grammar {
                         data: any;
                     }) => any[];
                     symbols: (string | {
-                        token: string;
+                        literal: string;
                     })[];
                 }[];
             };
@@ -713,11 +683,11 @@ declare class grammar {
                     rules: ({
                         tag: string[];
                         when: RegExp;
-                        goto?: undefined;
+                        set?: undefined;
                     } | {
-                        goto: string;
-                        tag: string[];
+                        set: string;
                         when: string;
+                        tag?: undefined;
                     })[];
                 };
                 config$span: {
@@ -726,27 +696,27 @@ declare class grammar {
                         highlight: string;
                         tag: string[];
                         when: RegExp;
-                        set?: undefined;
+                        pop?: undefined;
                     } | {
                         tag: string[];
                         when: RegExp;
                         highlight?: undefined;
-                        set?: undefined;
+                        pop?: undefined;
                     } | {
                         highlight: string;
-                        tag: string[];
                         when: string;
-                        set?: undefined;
+                        tag?: undefined;
+                        pop?: undefined;
                     } | {
-                        tag: string[];
                         when: string;
                         highlight?: undefined;
-                        set?: undefined;
+                        tag?: undefined;
+                        pop?: undefined;
                     } | {
-                        set: string;
-                        tag: string[];
+                        pop: number;
                         when: string;
                         highlight?: undefined;
+                        tag?: undefined;
                     })[];
                 };
                 config$start: {
@@ -754,23 +724,30 @@ declare class grammar {
                     rules: ({
                         tag: string[];
                         when: RegExp;
-                        goto?: undefined;
+                        set?: undefined;
                     } | {
-                        goto: string;
-                        tag: string[];
+                        set: string;
                         when: string;
+                        tag?: undefined;
                     })[];
+                };
+                config$stop: {
+                    regex: RegExp;
+                    rules: {
+                        pop: number;
+                        when: string;
+                    }[];
                 };
                 grammar: {
                     regex: RegExp;
                     rules: ({
                         tag: string[];
                         when: RegExp;
-                        goto?: undefined;
+                        set?: undefined;
                     } | {
-                        goto: string;
-                        tag: string[];
+                        set: string;
                         when: string;
+                        tag?: undefined;
                     })[];
                 };
                 grammar$span: {
@@ -780,42 +757,36 @@ declare class grammar {
                         tag: string[];
                         when: RegExp;
                         goto?: undefined;
-                        set?: undefined;
+                        pop?: undefined;
                     } | {
                         goto: string;
                         highlight: string;
                         when: string;
                         tag?: undefined;
-                        set?: undefined;
+                        pop?: undefined;
                     } | {
                         tag: string[];
                         when: RegExp;
                         highlight?: undefined;
                         goto?: undefined;
-                        set?: undefined;
+                        pop?: undefined;
                     } | {
                         highlight: string;
                         when: string;
                         tag?: undefined;
                         goto?: undefined;
-                        set?: undefined;
+                        pop?: undefined;
                     } | {
-                        tag: string[];
                         when: string;
                         highlight?: undefined;
+                        tag?: undefined;
                         goto?: undefined;
-                        set?: undefined;
+                        pop?: undefined;
                     } | {
-                        highlight: string;
-                        tag: string[];
-                        when: string;
-                        goto?: undefined;
-                        set?: undefined;
-                    } | {
-                        set: string;
-                        tag: string[];
+                        pop: number;
                         when: string;
                         highlight?: undefined;
+                        tag?: undefined;
                         goto?: undefined;
                     })[];
                 };
@@ -824,12 +795,19 @@ declare class grammar {
                     rules: ({
                         tag: string[];
                         when: RegExp;
-                        goto?: undefined;
+                        set?: undefined;
                     } | {
-                        goto: string;
-                        tag: string[];
+                        set: string;
                         when: string;
+                        tag?: undefined;
                     })[];
+                };
+                grammar$stop: {
+                    regex: RegExp;
+                    rules: {
+                        pop: number;
+                        when: string;
+                    }[];
                 };
                 insensitive: {
                     regex: RegExp;
@@ -926,25 +904,23 @@ declare class grammar {
                         highlight?: undefined;
                     } | {
                         highlight: string;
-                        tag: string[];
                         when: string;
+                        tag?: undefined;
                     } | {
-                        tag: string[];
                         when: string;
                         highlight?: undefined;
+                        tag?: undefined;
                     })[];
                 };
                 l_abracketl: {
                     regex: RegExp;
                     rules: {
-                        tag: string[];
                         when: string;
                     }[];
                 };
                 l_abracketr: {
                     regex: RegExp;
                     rules: {
-                        tag: string[];
                         when: string;
                     }[];
                 };
@@ -952,7 +928,6 @@ declare class grammar {
                     regex: RegExp;
                     rules: {
                         highlight: string;
-                        tag: string[];
                         when: string;
                     }[];
                 };
@@ -960,42 +935,36 @@ declare class grammar {
                     regex: RegExp;
                     rules: {
                         highlight: string;
-                        tag: string[];
                         when: string;
                     }[];
                 };
                 l_comma: {
                     regex: RegExp;
                     rules: {
-                        tag: string[];
                         when: string;
                     }[];
                 };
                 l_dash: {
                     regex: RegExp;
                     rules: {
-                        tag: string[];
                         when: string;
                     }[];
                 };
                 l_dsign: {
                     regex: RegExp;
                     rules: {
-                        tag: string[];
                         when: string;
                     }[];
                 };
                 l_parenl: {
                     regex: RegExp;
                     rules: {
-                        tag: string[];
                         when: string;
                     }[];
                 };
                 l_parenr: {
                     regex: RegExp;
                     rules: {
-                        tag: string[];
                         when: string;
                     }[];
                 };
@@ -1003,35 +972,30 @@ declare class grammar {
                     regex: RegExp;
                     rules: {
                         highlight: string;
-                        tag: string[];
                         when: string;
                     }[];
                 };
                 l_plus: {
                     regex: RegExp;
                     rules: {
-                        tag: string[];
                         when: string;
                     }[];
                 };
                 l_qmark: {
                     regex: RegExp;
                     rules: {
-                        tag: string[];
                         when: string;
                     }[];
                 };
                 l_scolon: {
                     regex: RegExp;
                     rules: {
-                        tag: string[];
                         when: string;
                     }[];
                 };
                 l_star: {
                     regex: RegExp;
                     rules: {
-                        tag: string[];
                         when: string;
                     }[];
                 };
@@ -1040,11 +1004,11 @@ declare class grammar {
                     rules: ({
                         tag: string[];
                         when: RegExp;
-                        goto?: undefined;
+                        set?: undefined;
                     } | {
-                        goto: string;
-                        tag: string[];
+                        set: string;
                         when: string;
+                        tag?: undefined;
                     })[];
                 };
                 lexer$span: {
@@ -1054,41 +1018,41 @@ declare class grammar {
                         when: RegExp;
                         highlight?: undefined;
                         goto?: undefined;
-                        set?: undefined;
+                        pop?: undefined;
                     } | {
                         highlight: string;
                         tag: string[];
                         when: RegExp;
                         goto?: undefined;
-                        set?: undefined;
+                        pop?: undefined;
                     } | {
                         goto: string;
                         highlight: string;
                         when: string;
                         tag?: undefined;
-                        set?: undefined;
+                        pop?: undefined;
                     } | {
-                        tag: string[];
                         when: string;
+                        tag?: undefined;
                         highlight?: undefined;
                         goto?: undefined;
-                        set?: undefined;
+                        pop?: undefined;
                     } | {
                         highlight: string;
-                        tag: string[];
                         when: string;
+                        tag?: undefined;
                         goto?: undefined;
-                        set?: undefined;
+                        pop?: undefined;
                     } | {
                         goto: string;
-                        tag: string[];
                         when: string;
+                        tag?: undefined;
                         highlight?: undefined;
-                        set?: undefined;
+                        pop?: undefined;
                     } | {
-                        set: string;
-                        tag: string[];
+                        pop: number;
                         when: string;
+                        tag?: undefined;
                         highlight?: undefined;
                         goto?: undefined;
                     })[];
@@ -1098,18 +1062,24 @@ declare class grammar {
                     rules: ({
                         tag: string[];
                         when: RegExp;
-                        goto?: undefined;
+                        set?: undefined;
                     } | {
-                        goto: string;
-                        tag: string[];
+                        set: string;
                         when: string;
+                        tag?: undefined;
                     })[];
+                };
+                lexer$stop: {
+                    regex: RegExp;
+                    rules: {
+                        pop: number;
+                        when: string;
+                    }[];
                 };
                 lexer_span: {
                     regex: RegExp;
                     rules: {
                         goto: string;
-                        tag: string[];
                         when: string;
                     }[];
                 };
@@ -1134,21 +1104,21 @@ declare class grammar {
                         tag?: undefined;
                         pop?: undefined;
                     } | {
-                        tag: string[];
                         when: string;
+                        tag?: undefined;
                         highlight?: undefined;
                         goto?: undefined;
                         pop?: undefined;
                     } | {
                         highlight: string;
-                        tag: string[];
                         when: string;
+                        tag?: undefined;
                         goto?: undefined;
                         pop?: undefined;
                     } | {
                         pop: number;
-                        tag: string[];
                         when: string;
+                        tag?: undefined;
                         highlight?: undefined;
                         goto?: undefined;
                     })[];
@@ -1157,7 +1127,6 @@ declare class grammar {
                     regex: RegExp;
                     rules: {
                         goto: string;
-                        tag: string[];
                         when: string;
                     }[];
                 };
@@ -1165,7 +1134,6 @@ declare class grammar {
                     regex: RegExp;
                     rules: {
                         pop: number;
-                        tag: string[];
                         when: string;
                     }[];
                 };
@@ -1181,19 +1149,12 @@ declare class grammar {
                 lifecycle$span: {
                     regex: RegExp;
                     rules: ({
-                        before: boolean;
-                        pop: number;
-                        when: RegExp;
-                        tag?: undefined;
-                        highlight?: undefined;
-                        set?: undefined;
-                    } | {
                         tag: string[];
                         when: RegExp;
-                        before?: undefined;
-                        pop?: undefined;
                         highlight?: undefined;
                         set?: undefined;
+                        before?: undefined;
+                        pop?: undefined;
                     } | {
                         highlight: string;
                         set: string;
@@ -1203,10 +1164,17 @@ declare class grammar {
                         pop?: undefined;
                     } | {
                         highlight: string;
-                        tag: string[];
                         when: string;
+                        tag?: undefined;
+                        set?: undefined;
                         before?: undefined;
                         pop?: undefined;
+                    } | {
+                        before: boolean;
+                        pop: number;
+                        when: RegExp;
+                        tag?: undefined;
+                        highlight?: undefined;
                         set?: undefined;
                     })[];
                 };
@@ -1219,6 +1187,14 @@ declare class grammar {
                         when: RegExp;
                     }[];
                 };
+                lifecycle$stop: {
+                    regex: RegExp;
+                    rules: {
+                        before: boolean;
+                        pop: number;
+                        when: RegExp;
+                    }[];
+                };
                 main: {
                     regex: RegExp;
                     rules: ({
@@ -1226,37 +1202,26 @@ declare class grammar {
                         tag: string[];
                         when: RegExp;
                         goto?: undefined;
-                        set?: undefined;
                     } | {
                         tag: string[];
                         when: RegExp;
                         highlight?: undefined;
                         goto?: undefined;
-                        set?: undefined;
                     } | {
-                        tag: string[];
                         when: string;
                         highlight?: undefined;
+                        tag?: undefined;
                         goto?: undefined;
-                        set?: undefined;
                     } | {
                         goto: string;
                         highlight: string;
                         tag: string[];
                         when: RegExp;
-                        set?: undefined;
                     } | {
                         highlight: string;
-                        set: string;
-                        tag: string[];
-                        when: RegExp;
-                        goto?: undefined;
-                    } | {
-                        highlight: string;
-                        tag: string[];
                         when: string;
+                        tag?: undefined;
                         goto?: undefined;
-                        set?: undefined;
                     })[];
                 };
                 regex: {

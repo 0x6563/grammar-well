@@ -80,6 +80,9 @@ export interface ASTLexerState {
     rules: (ASTLexerStateImportRule | ASTLexerStateMatchRule | ASTLexerStateSpan)[];
 }
 export interface ASTLexerStateSpan {
+    config?: {
+        transition?: "goto" | "set";
+    };
     span: {
         name: string;
         state: (ASTLexerState);

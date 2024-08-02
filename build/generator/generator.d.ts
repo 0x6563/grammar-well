@@ -23,7 +23,7 @@ export declare class Generator {
     private processLexerDirective;
     private importLexerStates;
     private importLexerState;
-    private buildLexerStructuredStates;
+    private buildLexerSpanStates;
     private processGrammarDirective;
     private importBuiltIn;
     private importGrammar;

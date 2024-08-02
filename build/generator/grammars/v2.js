@@ -82,19 +82,19 @@ class grammar {
                 ],
                 expression_list: [
                     { name: "expression_list", postprocess: ({ data }) => { return ([data[0]]); }, symbols: ["expression"] },
-                    { name: "expression_list", postprocess: ({ data }) => { return ([data[2]]); }, symbols: [{ token: "L_PIPE" }, "_", "expression"] },
-                    { name: "expression_list", postprocess: ({ data }) => { return (data[0].concat([data[4]])); }, symbols: ["expression_list", "_", { token: "L_PIPE" }, "_", "expression"] }
+                    { name: "expression_list", postprocess: ({ data }) => { return ([data[2]]); }, symbols: [{ literal: "|" }, "_", "expression"] },
+                    { name: "expression_list", postprocess: ({ data }) => { return (data[0].concat([data[4]])); }, symbols: ["expression_list", "_", { literal: "|" }, "_", "expression"] }
                 ],
                 expression_repeater: [
-                    { name: "expression_repeater", postprocess: ({ data }) => { return (data[0].value); }, symbols: [{ token: "L_QMARK" }] },
-                    { name: "expression_repeater", postprocess: ({ data }) => { return (data[0].value); }, symbols: [{ token: "L_PLUS" }] },
-                    { name: "expression_repeater", postprocess: ({ data }) => { return (data[0].value); }, symbols: [{ token: "L_STAR" }] }
+                    { name: "expression_repeater", postprocess: ({ data }) => { return (data[0].value); }, symbols: [{ literal: "?" }] },
+                    { name: "expression_repeater", postprocess: ({ data }) => { return (data[0].value); }, symbols: [{ literal: "+" }] },
+                    { name: "expression_repeater", postprocess: ({ data }) => { return (data[0].value); }, symbols: [{ literal: "*" }] }
                 ],
                 expression_symbol: [
                     { name: "expression_symbol", postprocess: ({ data }) => { return (data[0]); }, symbols: ["expression_symbol_match"] },
-                    { name: "expression_symbol", postprocess: ({ data }) => { return ({ ...data[0], alias: data[2] }); }, symbols: ["expression_symbol_match", { token: "L_COLON" }, "T_WORD"] },
+                    { name: "expression_symbol", postprocess: ({ data }) => { return ({ ...data[0], alias: data[2] }); }, symbols: ["expression_symbol_match", { literal: ":" }, "T_WORD"] },
                     { name: "expression_symbol", postprocess: ({ data }) => { return ({ expression: data[0], repeat: data[1] }); }, symbols: ["expression_symbol_match", "expression_repeater"] },
-                    { name: "expression_symbol", postprocess: ({ data }) => { return ({ expression: data[0], repeat: data[1], alias: data[4] }); }, symbols: ["expression_symbol_match", "expression_repeater", { token: "L_COLON" }, "T_WORD"] }
+                    { name: "expression_symbol", postprocess: ({ data }) => { return ({ expression: data[0], repeat: data[1], alias: data[4] }); }, symbols: ["expression_symbol_match", "expression_repeater", { literal: ":" }, "T_WORD"] }
                 ],
                 expression_symbol_list: [
                     { name: "expression_symbol_list", symbols: ["expression_symbol"] },
@@ -104,10 +104,10 @@ class grammar {
                     { name: "expression_symbol_match", postprocess: ({ data }) => { return ({ rule: data[0] }); }, symbols: ["T_WORD"] },
                     { name: "expression_symbol_match", postprocess: ({ data }) => { return ({ literal: data[0], insensitive: false }); }, symbols: ["T_STRING"] },
                     { name: "expression_symbol_match", postprocess: ({ data }) => { return ({ literal: data[2], insensitive: true }); }, symbols: [{ literal: "\\i" }, "_", "T_STRING"] },
-                    { name: "expression_symbol_match", postprocess: ({ data }) => { return ({ token: data[2] }); }, symbols: [{ token: "ABRACKET_L" }, "_", "T_WORD", "_", { token: "ABRACKET_R" }] },
-                    { name: "expression_symbol_match", postprocess: ({ data }) => { return ({ token: data[2] }); }, symbols: [{ token: "ABRACKET_L" }, "_", "T_STRING", "_", { token: "ABRACKET_R" }] },
+                    { name: "expression_symbol_match", postprocess: ({ data }) => { return ({ token: data[2] }); }, symbols: [{ literal: "<" }, "_", "T_WORD", "_", { literal: ">" }] },
+                    { name: "expression_symbol_match", postprocess: ({ data }) => { return ({ token: data[2] }); }, symbols: [{ literal: "<" }, "_", "T_STRING", "_", { literal: ">" }] },
                     { name: "expression_symbol_match", postprocess: ({ data }) => { return (data[0]); }, symbols: ["T_REGEX"] },
-                    { name: "expression_symbol_match", postprocess: ({ data }) => { return ({ subexpression: data[2] }); }, symbols: [{ token: "L_PARENL" }, "_", "expression_list", "_", { token: "L_PARENR" }] }
+                    { name: "expression_symbol_match", postprocess: ({ data }) => { return ({ subexpression: data[2] }); }, symbols: [{ literal: "(" }, "_", "expression_list", "_", { literal: ")" }] }
                 ],
                 grammar: [
                     { name: "grammar", postprocess: ({ data }) => { return ({ config: Object.assign(...data[0]), rules: data[2] }); }, symbols: ["kv_list", "_", "grammar_rule_list"] },
@@ -145,13 +145,13 @@ class grammar {
                     { name: "main", postprocess: ({ data }) => { return (data[1]); }, symbols: ["_", "section_list", "_"] }
                 ],
                 section: [
-                    { name: "section", postprocess: ({ data }) => { return ({ config: Object.assign(...data[4]) }); }, symbols: [{ literal: "config" }, "_", { token: "CBRACKET_L" }, "_", "kv_list", "_", { token: "CBRACKET_R" }] },
-                    { name: "section", postprocess: ({ data }) => { return ({ import: data[6] }); }, symbols: [{ literal: "import" }, "_", { token: "L_STAR" }, "_", { literal: "from" }, "__", "T_WORD", "_", { token: "L_SCOLON" }] },
-                    { name: "section", postprocess: ({ data }) => { return ({ import: data[6], path: true }); }, symbols: [{ literal: "import" }, "_", { token: "L_STAR" }, "_", { literal: "from" }, "__", "T_STRING", "_", { token: "L_SCOLON" }] },
-                    { name: "section", postprocess: ({ data }) => { return ({ import: data[10], alias: data[6] }); }, symbols: [{ literal: "import" }, "_", { token: "L_STAR" }, "_", { literal: "as" }, "_", "T_WORD", "_", { literal: "from" }, "__", "T_WORD", "_", { token: "L_SCOLON" }] },
-                    { name: "section", postprocess: ({ data }) => { return ({ import: data[10], path: true, alias: data[6] }); }, symbols: [{ literal: "import" }, "_", { token: "L_STAR" }, "_", { literal: "as" }, "_", "T_WORD", "_", { literal: "from" }, "__", "T_STRING", "_", { token: "L_SCOLON" }] },
-                    { name: "section", postprocess: ({ data }) => { return ({ lexer: Object.assign(...data[4]) }); }, symbols: [{ literal: "lexer" }, "_", { token: "CBRACKET_L" }, "_", "lexer", "_", { token: "CBRACKET_R" }] },
-                    { name: "section", postprocess: ({ data }) => { return ({ grammar: data[4] }); }, symbols: [{ literal: "grammar" }, "_", { token: "CBRACKET_L" }, "_", "grammar", "_", { token: "CBRACKET_R" }] },
+                    { name: "section", postprocess: ({ data }) => { return ({ config: Object.assign(...data[4]) }); }, symbols: [{ literal: "config" }, "_", { literal: "{" }, "_", "kv_list", "_", { literal: "}" }] },
+                    { name: "section", postprocess: ({ data }) => { return ({ import: data[6] }); }, symbols: [{ literal: "import" }, "_", { literal: "*" }, "_", { literal: "from" }, "__", "T_WORD", "_", { literal: ";" }] },
+                    { name: "section", postprocess: ({ data }) => { return ({ import: data[6], path: true }); }, symbols: [{ literal: "import" }, "_", { literal: "*" }, "_", { literal: "from" }, "__", "T_STRING", "_", { literal: ";" }] },
+                    { name: "section", postprocess: ({ data }) => { return ({ import: data[10], alias: data[6] }); }, symbols: [{ literal: "import" }, "_", { literal: "*" }, "_", { literal: "as" }, "_", "T_WORD", "_", { literal: "from" }, "__", "T_WORD", "_", { literal: ";" }] },
+                    { name: "section", postprocess: ({ data }) => { return ({ import: data[10], path: true, alias: data[6] }); }, symbols: [{ literal: "import" }, "_", { literal: "*" }, "_", { literal: "as" }, "_", "T_WORD", "_", { literal: "from" }, "__", "T_STRING", "_", { literal: ";" }] },
+                    { name: "section", postprocess: ({ data }) => { return ({ lexer: Object.assign(...data[4]) }); }, symbols: [{ literal: "lexer" }, "_", { literal: "{" }, "_", "lexer", "_", { literal: "}" }] },
+                    { name: "section", postprocess: ({ data }) => { return ({ grammar: data[4] }); }, symbols: [{ literal: "grammar" }, "_", { literal: "{" }, "_", "grammar", "_", { literal: "}" }] },
                     { name: "section", postprocess: ({ data }) => { return ({ lifecycle: data[2], js: data[4] }); }, symbols: [/on/, { literal: ":" }, "T_WORD", "_", "T_JS"] },
                     { name: "section", postprocess: ({ data }) => { return ({ lifecycle: data[2], js: data[4], path: true }); }, symbols: [/on/, { literal: ":" }, "T_WORD", "_", "T_STRING"] }
                 ],
@@ -172,6 +172,7 @@ class grammar {
                 state_definition: [
                     { name: "state_definition", postprocess: ({ data }) => { return (Object.assign(data[0], { rules: data[2] })); }, symbols: ["state_config_list", "_", "token_list"] },
                     { name: "state_definition", postprocess: ({ data }) => { return ({ rules: data[0] }); }, symbols: ["token_list"] },
+                    { name: "state_definition", postprocess: ({ data }) => { return ({ config: Object.assign(...data[4]), span: data[6] }); }, symbols: [{ literal: "span" }, "_", { literal: "{" }, "_", "kv_list", "_", "state_list", "_", { literal: "}" }] },
                     { name: "state_definition", postprocess: ({ data }) => { return ({ span: data[4] }); }, symbols: [{ literal: "span" }, "_", { literal: "{" }, "_", "state_list", "_", { literal: "}" }] }
                 ],
                 state_list: [
@@ -180,11 +181,11 @@ class grammar {
                 ],
                 string_list: [
                     { name: "string_list", postprocess: ({ data }) => { return ([data[0]]); }, symbols: ["T_STRING"] },
-                    { name: "string_list", postprocess: ({ data }) => { return ([data[0]].concat(data[4])); }, symbols: ["T_STRING", "_", { token: "L_COMMA" }, "_", "string_list"] }
+                    { name: "string_list", postprocess: ({ data }) => { return ([data[0]].concat(data[4])); }, symbols: ["T_STRING", "_", { literal: "," }, "_", "string_list"] }
                 ],
                 token: [
-                    { name: "token", postprocess: ({ data }) => { return ({ import: data[4] }); }, symbols: [{ token: "L_DASH" }, "_", { literal: "import" }, "_", "word_list"] },
-                    { name: "token", postprocess: ({ data }) => { return (Object.assign(...data[2])); }, symbols: [{ token: "L_DASH" }, "_", "token_definition_list"] }
+                    { name: "token", postprocess: ({ data }) => { return ({ import: data[4] }); }, symbols: [{ literal: "-" }, "_", { literal: "import" }, "_", "word_list"] },
+                    { name: "token", postprocess: ({ data }) => { return (Object.assign(...data[2])); }, symbols: [{ literal: "-" }, "_", "token_definition_list"] }
                 ],
                 token_definition: [
                     { name: "token_definition", postprocess: ({ data }) => { return ({ open: data[2] }); }, symbols: [{ literal: "open" }, "_", "T_STRING"] },
@@ -219,7 +220,7 @@ class grammar {
                 ],
                 word_list: [
                     { name: "word_list", postprocess: ({ data }) => { return ([data[0]]); }, symbols: ["T_WORD"] },
-                    { name: "word_list", postprocess: ({ data }) => { return ([data[0]].concat(data[4])); }, symbols: ["T_WORD", "_", { token: "L_COMMA" }, "_", "word_list"] }
+                    { name: "word_list", postprocess: ({ data }) => { return ([data[0]].concat(data[4])); }, symbols: ["T_WORD", "_", { literal: "," }, "_", "word_list"] }
                 ]
             },
             start: "main"
@@ -237,7 +238,7 @@ class grammar {
                     regex: /(?:(?:(\s+))|(?:((?:\{))))/ym,
                     rules: [
                         { tag: ["T_WS"], when: /\s+/ },
-                        { goto: "config$span", tag: ["CBRACKET_L"], when: "{" }
+                        { set: "config$span", when: "{" }
                     ]
                 },
                 config$span: {
@@ -247,24 +248,30 @@ class grammar {
                         { highlight: "string", tag: ["T_STRING"], when: /\"(?:[^\"\\\r\n]|\\.)*\"/ },
                         { tag: ["T_WS"], when: /\s+/ },
                         { tag: ["T_WORD"], when: /[a-zA-Z_][a-zA-Z_\d]*/ },
-                        { highlight: "keyword", tag: ["L_COLON"], when: ":" },
+                        { highlight: "keyword", when: ":" },
                         { highlight: "number", tag: ["T_INTEGER"], when: /\d+/ },
-                        { tag: ["L_SCOLON"], when: ";" },
-                        { set: "main", tag: ["CBRACKET_R"], when: "}" }
+                        { when: ";" },
+                        { pop: 1, when: "}" }
                     ]
                 },
                 config$start: {
                     regex: /(?:(?:(\s+))|(?:((?:\{))))/ym,
                     rules: [
                         { tag: ["T_WS"], when: /\s+/ },
-                        { goto: "config$span", tag: ["CBRACKET_L"], when: "{" }
+                        { set: "config$span", when: "{" }
+                    ]
+                },
+                config$stop: {
+                    regex: /(?:(?:((?:\}))))/ym,
+                    rules: [
+                        { pop: 1, when: "}" }
                     ]
                 },
                 grammar: {
                     regex: /(?:(?:(\s+))|(?:((?:\{))))/ym,
                     rules: [
                         { tag: ["T_WS"], when: /\s+/ },
-                        { goto: "grammar$span", tag: ["CBRACKET_L"], when: "{" }
+                        { set: "grammar$span", when: "{" }
                     ]
                 },
                 grammar$span: {
@@ -276,31 +283,37 @@ class grammar {
                         { tag: ["T_WS"], when: /\s+/ },
                         { highlight: "constant", when: "\\i" },
                         { goto: "regex$span", highlight: "constant", when: "\\r" },
-                        { tag: ["L_QMARK"], when: "?" },
-                        { tag: ["L_PLUS"], when: "+" },
-                        { tag: ["L_STAR"], when: "*" },
+                        { when: "?" },
+                        { when: "+" },
+                        { when: "*" },
                         { highlight: "string", tag: ["T_STRING"], when: /\"(?:[^\"\\\r\n]|\\.)*\"/ },
                         { tag: ["T_WORD"], when: /[a-zA-Z_][a-zA-Z_\d]*/ },
-                        { highlight: "keyword", tag: ["L_COLON"], when: ":" },
+                        { highlight: "keyword", when: ":" },
                         { highlight: "number", tag: ["T_INTEGER"], when: /\d+/ },
-                        { tag: ["L_SCOLON"], when: ";" },
-                        { tag: ["L_COMMA"], when: "," },
-                        { highlight: "keyword", tag: ["L_PIPE"], when: "|" },
-                        { tag: ["L_PARENL"], when: "(" },
-                        { tag: ["L_PARENR"], when: ")" },
-                        { tag: ["ABRACKET_L"], when: "<" },
-                        { tag: ["ABRACKET_R"], when: ">" },
-                        { highlight: "keyword", tag: ["L_ARROW"], when: "->" },
-                        { tag: ["L_DSIGN"], when: "$" },
-                        { tag: ["L_DASH"], when: "-" },
-                        { set: "main", tag: ["CBRACKET_R"], when: "}" }
+                        { when: ";" },
+                        { when: "," },
+                        { highlight: "keyword", when: "|" },
+                        { when: "(" },
+                        { when: ")" },
+                        { when: "<" },
+                        { when: ">" },
+                        { highlight: "keyword", when: "->" },
+                        { when: "$" },
+                        { when: "-" },
+                        { pop: 1, when: "}" }
                     ]
                 },
                 grammar$start: {
                     regex: /(?:(?:(\s+))|(?:((?:\{))))/ym,
                     rules: [
                         { tag: ["T_WS"], when: /\s+/ },
-                        { goto: "grammar$span", tag: ["CBRACKET_L"], when: "{" }
+                        { set: "grammar$span", when: "{" }
+                    ]
+                },
+                grammar$stop: {
+                    regex: /(?:(?:((?:\}))))/ym,
+                    rules: [
+                        { pop: 1, when: "}" }
                     ]
                 },
                 insensitive: {
@@ -373,100 +386,100 @@ class grammar {
                         { highlight: "string", tag: ["T_STRING"], when: /\"(?:[^\"\\\r\n]|\\.)*\"/ },
                         { tag: ["T_WS"], when: /\s+/ },
                         { tag: ["T_WORD"], when: /[a-zA-Z_][a-zA-Z_\d]*/ },
-                        { highlight: "keyword", tag: ["L_COLON"], when: ":" },
+                        { highlight: "keyword", when: ":" },
                         { highlight: "number", tag: ["T_INTEGER"], when: /\d+/ },
-                        { tag: ["L_SCOLON"], when: ";" }
+                        { when: ";" }
                     ]
                 },
                 l_abracketl: {
                     regex: /(?:(?:((?:<))))/ym,
                     rules: [
-                        { tag: ["ABRACKET_L"], when: "<" }
+                        { when: "<" }
                     ]
                 },
                 l_abracketr: {
                     regex: /(?:(?:((?:>))))/ym,
                     rules: [
-                        { tag: ["ABRACKET_R"], when: ">" }
+                        { when: ">" }
                     ]
                 },
                 l_arrow: {
                     regex: /(?:(?:((?:\->))))/ym,
                     rules: [
-                        { highlight: "keyword", tag: ["L_ARROW"], when: "->" }
+                        { highlight: "keyword", when: "->" }
                     ]
                 },
                 l_colon: {
                     regex: /(?:(?:((?::))))/ym,
                     rules: [
-                        { highlight: "keyword", tag: ["L_COLON"], when: ":" }
+                        { highlight: "keyword", when: ":" }
                     ]
                 },
                 l_comma: {
                     regex: /(?:(?:((?:,))))/ym,
                     rules: [
-                        { tag: ["L_COMMA"], when: "," }
+                        { when: "," }
                     ]
                 },
                 l_dash: {
                     regex: /(?:(?:((?:\-))))/ym,
                     rules: [
-                        { tag: ["L_DASH"], when: "-" }
+                        { when: "-" }
                     ]
                 },
                 l_dsign: {
                     regex: /(?:(?:((?:\$))))/ym,
                     rules: [
-                        { tag: ["L_DSIGN"], when: "$" }
+                        { when: "$" }
                     ]
                 },
                 l_parenl: {
                     regex: /(?:(?:((?:\())))/ym,
                     rules: [
-                        { tag: ["L_PARENL"], when: "(" }
+                        { when: "(" }
                     ]
                 },
                 l_parenr: {
                     regex: /(?:(?:((?:\)))))/ym,
                     rules: [
-                        { tag: ["L_PARENR"], when: ")" }
+                        { when: ")" }
                     ]
                 },
                 l_pipe: {
                     regex: /(?:(?:((?:\|))))/ym,
                     rules: [
-                        { highlight: "keyword", tag: ["L_PIPE"], when: "|" }
+                        { highlight: "keyword", when: "|" }
                     ]
                 },
                 l_plus: {
                     regex: /(?:(?:((?:\+))))/ym,
                     rules: [
-                        { tag: ["L_PLUS"], when: "+" }
+                        { when: "+" }
                     ]
                 },
                 l_qmark: {
                     regex: /(?:(?:((?:\?))))/ym,
                     rules: [
-                        { tag: ["L_QMARK"], when: "?" }
+                        { when: "?" }
                     ]
                 },
                 l_scolon: {
                     regex: /(?:(?:((?:;))))/ym,
                     rules: [
-                        { tag: ["L_SCOLON"], when: ";" }
+                        { when: ";" }
                     ]
                 },
                 l_star: {
                     regex: /(?:(?:((?:\*))))/ym,
                     rules: [
-                        { tag: ["L_STAR"], when: "*" }
+                        { when: "*" }
                     ]
                 },
                 lexer: {
                     regex: /(?:(?:(\s+))|(?:((?:\{))))/ym,
                     rules: [
                         { tag: ["T_WS"], when: /\s+/ },
-                        { goto: "lexer$span", tag: ["CBRACKET_L"], when: "{" }
+                        { set: "lexer$span", when: "{" }
                     ]
                 },
                 lexer$span: {
@@ -476,29 +489,35 @@ class grammar {
                         { highlight: "comment", tag: ["T_COMMENT"], when: /\/\/[^\n]*/ },
                         { highlight: "type.identifier", tag: ["T_SECTWORD"], when: /\[\s*[a-zA-Z_][a-zA-Z_\d]*\s*\]/ },
                         { goto: "regex$span", highlight: "constant", when: "\\r" },
-                        { tag: ["L_COMMA"], when: "," },
-                        { highlight: "keyword", tag: ["L_ARROW"], when: "->" },
-                        { tag: ["L_DASH"], when: "-" },
+                        { when: "," },
+                        { highlight: "keyword", when: "->" },
+                        { when: "-" },
                         { highlight: "string", tag: ["T_STRING"], when: /\"(?:[^\"\\\r\n]|\\.)*\"/ },
                         { tag: ["T_WORD"], when: /[a-zA-Z_][a-zA-Z_\d]*/ },
-                        { highlight: "keyword", tag: ["L_COLON"], when: ":" },
+                        { highlight: "keyword", when: ":" },
                         { highlight: "number", tag: ["T_INTEGER"], when: /\d+/ },
-                        { tag: ["L_SCOLON"], when: ";" },
-                        { goto: "lexer_span$span", tag: ["CBRACKET_L"], when: "{" },
-                        { set: "main", tag: ["CBRACKET_R"], when: "}" }
+                        { when: ";" },
+                        { goto: "lexer_span$span", when: "{" },
+                        { pop: 1, when: "}" }
                     ]
                 },
                 lexer$start: {
                     regex: /(?:(?:(\s+))|(?:((?:\{))))/ym,
                     rules: [
                         { tag: ["T_WS"], when: /\s+/ },
-                        { goto: "lexer$span", tag: ["CBRACKET_L"], when: "{" }
+                        { set: "lexer$span", when: "{" }
+                    ]
+                },
+                lexer$stop: {
+                    regex: /(?:(?:((?:\}))))/ym,
+                    rules: [
+                        { pop: 1, when: "}" }
                     ]
                 },
                 lexer_span: {
                     regex: /(?:(?:((?:\{))))/ym,
                     rules: [
-                        { goto: "lexer_span$span", tag: ["CBRACKET_L"], when: "{" }
+                        { goto: "lexer_span$span", when: "{" }
                     ]
                 },
                 lexer_span$span: {
@@ -508,27 +527,27 @@ class grammar {
                         { highlight: "comment", tag: ["T_COMMENT"], when: /\/\/[^\n]*/ },
                         { highlight: "type.identifier", tag: ["T_SECTWORD"], when: /\[\s*[a-zA-Z_][a-zA-Z_\d]*\s*\]/ },
                         { goto: "regex$span", highlight: "constant", when: "\\r" },
-                        { tag: ["L_COMMA"], when: "," },
-                        { highlight: "keyword", tag: ["L_ARROW"], when: "->" },
-                        { tag: ["L_DASH"], when: "-" },
+                        { when: "," },
+                        { highlight: "keyword", when: "->" },
+                        { when: "-" },
                         { highlight: "string", tag: ["T_STRING"], when: /\"(?:[^\"\\\r\n]|\\.)*\"/ },
                         { tag: ["T_WORD"], when: /[a-zA-Z_][a-zA-Z_\d]*/ },
-                        { highlight: "keyword", tag: ["L_COLON"], when: ":" },
+                        { highlight: "keyword", when: ":" },
                         { highlight: "number", tag: ["T_INTEGER"], when: /\d+/ },
-                        { tag: ["L_SCOLON"], when: ";" },
-                        { pop: 1, tag: ["CBRACKET_R"], when: "}" }
+                        { when: ";" },
+                        { pop: 1, when: "}" }
                     ]
                 },
                 lexer_span$start: {
                     regex: /(?:(?:((?:\{))))/ym,
                     rules: [
-                        { goto: "lexer_span$span", tag: ["CBRACKET_L"], when: "{" }
+                        { goto: "lexer_span$span", when: "{" }
                     ]
                 },
                 lexer_span$stop: {
                     regex: /(?:(?:((?:\}))))/ym,
                     rules: [
-                        { pop: 1, tag: ["CBRACKET_R"], when: "}" }
+                        { pop: 1, when: "}" }
                     ]
                 },
                 lifecycle: {
@@ -538,13 +557,13 @@ class grammar {
                     ]
                 },
                 lifecycle$span: {
-                    regex: /(?:(?:([\'"`]))|(?:(\s+))|(?:((?:\{)))|(?:((?::)))|(?:([a-zA-Z_][a-zA-Z_\d]*)))/ym,
+                    regex: /(?:(?:(\s+))|(?:((?:\{)))|(?:((?::)))|(?:([a-zA-Z_][a-zA-Z_\d]*))|(?:([\'"`])))/ym,
                     rules: [
-                        { before: true, pop: 1, when: /[\'"`]/ },
                         { tag: ["T_WS"], when: /\s+/ },
                         { highlight: "annotation", set: "js_literal", tag: ["T_JSBODY"], when: "{" },
-                        { highlight: "keyword", tag: ["L_COLON"], when: ":" },
-                        { tag: ["T_WORD"], when: /[a-zA-Z_][a-zA-Z_\d]*/ }
+                        { highlight: "keyword", when: ":" },
+                        { tag: ["T_WORD"], when: /[a-zA-Z_][a-zA-Z_\d]*/ },
+                        { before: true, pop: 1, when: /[\'"`]/ }
                     ]
                 },
                 lifecycle$start: {
@@ -553,21 +572,27 @@ class grammar {
                         { goto: "lifecycle$span", highlight: "tag", tag: ["T_WORD"], when: /on(?![a-zA-Z\d_])/ }
                     ]
                 },
+                lifecycle$stop: {
+                    regex: /(?:(?:([\'"`])))/ym,
+                    rules: [
+                        { before: true, pop: 1, when: /[\'"`]/ }
+                    ]
+                },
                 main: {
                     regex: /(?:(?:(\"(?:[^\"\\\r\n]|\\.)*\"))|(?:(\s+))|(?:(\/\/[^\n]*))|(?:((?:\*)))|(?:(on(?![a-zA-Z\d_])))|(?:(lexer(?![a-zA-Z\d_])))|(?:(grammar(?![a-zA-Z\d_])))|(?:(config(?![a-zA-Z\d_])))|(?:([a-zA-Z_][a-zA-Z_\d]*))|(?:((?::)))|(?:(\d+))|(?:((?:;))))/ym,
                     rules: [
                         { highlight: "string", tag: ["T_STRING"], when: /\"(?:[^\"\\\r\n]|\\.)*\"/ },
                         { tag: ["T_WS"], when: /\s+/ },
                         { highlight: "comment", tag: ["T_COMMENT"], when: /\/\/[^\n]*/ },
-                        { tag: ["L_STAR"], when: "*" },
+                        { when: "*" },
                         { goto: "lifecycle$span", highlight: "tag", tag: ["T_WORD"], when: /on(?![a-zA-Z\d_])/ },
-                        { highlight: "tag", set: "lexer", tag: ["T_WORD"], when: /lexer(?![a-zA-Z\d_])/ },
-                        { highlight: "tag", set: "grammar", tag: ["T_WORD"], when: /grammar(?![a-zA-Z\d_])/ },
-                        { highlight: "tag", set: "config", tag: ["T_WORD"], when: /config(?![a-zA-Z\d_])/ },
+                        { goto: "lexer", highlight: "tag", tag: ["T_WORD"], when: /lexer(?![a-zA-Z\d_])/ },
+                        { goto: "grammar", highlight: "tag", tag: ["T_WORD"], when: /grammar(?![a-zA-Z\d_])/ },
+                        { goto: "config", highlight: "tag", tag: ["T_WORD"], when: /config(?![a-zA-Z\d_])/ },
                         { tag: ["T_WORD"], when: /[a-zA-Z_][a-zA-Z_\d]*/ },
-                        { highlight: "keyword", tag: ["L_COLON"], when: ":" },
+                        { highlight: "keyword", when: ":" },
                         { highlight: "number", tag: ["T_INTEGER"], when: /\d+/ },
-                        { tag: ["L_SCOLON"], when: ";" }
+                        { when: ";" }
                     ]
                 },
                 regex: {

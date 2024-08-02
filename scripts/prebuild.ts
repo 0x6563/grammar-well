@@ -27,8 +27,6 @@ const BaseDir = './src/generator/builtin/';
     write(`./registry.json`, JSON.stringify(registry));
     write('../grammars/v2.well', Format(read('../grammars/v2.well')));
     write('../grammars/v1.well', Format(read('../grammars/v1.well')));
-    await TranspileTypescript('../builtin/json.well');
-    await TranspileTypescript('../builtin/whitespace.well');
 })();
 
 async function Transpile(path) {

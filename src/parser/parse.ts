@@ -14,7 +14,7 @@ const ParserRegistry: { [key: string]: ParserAlgorithm } = {
 }
 
 export function Parse(
-    language: RuntimeParserClass,
+    language: InstanceType<RuntimeParserClass>,
     input: string,
     options: ParserOptions = {
         algorithm: 'earley',

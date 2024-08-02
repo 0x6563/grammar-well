@@ -14,6 +14,7 @@ export interface RuntimeParserClass {
             table: Dictionary<LRState>;
         }
     }
+    new();
 }
 
 export interface RuntimeGrammarProductionRule {

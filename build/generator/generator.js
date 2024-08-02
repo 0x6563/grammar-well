@@ -102,7 +102,7 @@ export class Generator {
     importLexerState(name, state) {
         if ('span' in state) {
             this.state.addLexerState(this.aliasPrefix + name, { rules: [{ import: [`${name}$start`] }] });
-            const states = this.buildLexerStructuredStates(name, state);
+            const states = this.buildLexerSpanStates(name, state);
             this.importLexerStates(states);
         }
         else {
@@ -119,7 +119,7 @@ export class Generator {
                     let i = 1;
                     while (`${this.aliasPrefix}${name}$${i}` in this.state.lexer.states)
                         ++i;
-                    const states = this.buildLexerStructuredStates(`${name}$${i}`, rule);
+                    const states = this.buildLexerSpanStates(`${name}$${i}`, rule);
                     this.importLexerStates(states);
                     rules.push({ import: `${name}$${i}$start` });
                     continue;
@@ -149,21 +149,22 @@ export class Generator {
             this.state.addLexerState(this.aliasPrefix + name, { ...state, rules });
         }
     }
-    buildLexerStructuredStates(name, rule) {
-        const openRules = [];
-        const bodyRules = [];
-        const closeRules = [];
-        const open = rule.span.find(v => v.name == 'start');
-        const body = rule.span.find(v => v.name == 'span');
-        const close = rule.span.find(v => v.name == 'stop');
-        if (body?.state?.rules)
-            for (const r of body?.state?.rules) {
-                bodyRules.push(r);
+    buildLexerSpanStates(name, rule) {
+        const transition = rule.config?.transition == 'set' ? 'set' : 'goto';
+        const startRules = [];
+        const spanRules = [];
+        const stopRules = [];
+        const start = rule.span.find(v => v.name == 'start');
+        const span = rule.span.find(v => v.name == 'span');
+        const stop = rule.span.find(v => v.name == 'stop');
+        if (span?.state?.rules)
+            for (const r of span?.state?.rules) {
+                spanRules.push(r);
             }
-        if (close?.state?.rules)
-            for (const r of close?.state?.rules) {
+        if (stop?.state?.rules)
+            for (const r of stop?.state?.rules) {
                 if ('when' in r) {
-                    closeRules.push({
+                    stopRules.push({
                         when: r.when,
                         type: r.type,
                         tag: r.tag,
@@ -179,19 +180,19 @@ export class Generator {
                     });
                 }
                 if ('import' in r) {
-                    closeRules.push({
+                    stopRules.push({
                         import: r.import,
                         set: r.set,
                         pop: r.set ? undefined : 1
                     });
                 }
             }
-        if (closeRules.length && bodyRules.length)
-            bodyRules.push({ import: [`${name}$stop`] });
-        const target = bodyRules.length ? 'span' : 'stop';
-        for (const r of open?.state?.rules) {
+        if (stopRules.length && spanRules.length)
+            spanRules.push({ import: [`${name}$stop`] });
+        const target = spanRules.length ? 'span' : 'stop';
+        for (const r of start?.state?.rules) {
             if ('when' in r) {
-                openRules.push({
+                startRules.push({
                     when: r.when,
                     skip: r.skip,
                     type: r.type,
@@ -202,13 +203,13 @@ export class Generator {
                     close: r.close,
                     embed: r.embed,
                     unembed: r.unembed,
-                    goto: r.stay ? undefined : `${name}$${target}`
+                    [transition]: r.stay ? undefined : `${name}$${target}`
                 });
             }
             if ('import' in r) {
-                openRules.push({
+                startRules.push({
                     import: r.import,
-                    goto: r.stay ? undefined : `${name}$${target}`
+                    [transition]: r.stay ? undefined : `${name}$${target}`
                 });
             }
         }
@@ -216,23 +217,23 @@ export class Generator {
             {
                 name: `${name}$start`,
                 state: {
-                    default: open.state.default,
-                    rules: openRules
+                    default: start.state.default,
+                    rules: startRules
                 }
             },
             {
                 name: `${name}$span`,
                 state: {
-                    default: body?.state?.default,
-                    unmatched: body?.state?.unmatched,
-                    rules: bodyRules
+                    default: span?.state?.default,
+                    unmatched: span?.state?.unmatched,
+                    rules: spanRules
                 }
             },
             {
                 name: `${name}$stop`,
                 state: {
-                    default: close?.state?.default,
-                    rules: closeRules
+                    default: stop?.state?.default,
+                    rules: stopRules
                 }
             }
         ];

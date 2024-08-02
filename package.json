@@ -21,7 +21,8 @@
     "./import-resolvers/*": "./build/generator/import-resolvers/*.js",
     "./grammars": "./build/generator/grammars/index.js",
     "./lexer": "./build/lexers/stateful-lexer.js",
-    "./utility": "./build/utility/index.js"
+    "./utility": "./build/utility/index.js",
+    "./typings": "./build/typings/index.js"
   },
   "author": "0x6563",
   "license": "LGPL-3.0",
