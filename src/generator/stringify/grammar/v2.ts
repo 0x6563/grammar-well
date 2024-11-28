@@ -56,7 +56,7 @@ export class V2GrammarString {
     }
 
     formatSymbols(exp: GeneratorGrammarSymbol[]) {
-        return exp.map(v => this.formatSymbol(v) + (v.alias ? ":" + v.alias : '')).join(' ');
+        return exp.map(v => this.formatSymbol(v) + (v.alias ? "@" + v.alias : '')).join(' ');
     }
 
     formatSymbol(exp: ASTGrammarSymbol | GeneratorGrammarSymbol | string) {

@@ -98,9 +98,9 @@ class grammar {
                 ],
                 expression_symbol: [
                     { name: "expression_symbol", postprocess: ({data}) => { return (data[0]); }, symbols: [ "expression_symbol_match" ] },
-                    { name: "expression_symbol", postprocess: ({data}) => { return ({ ...data[0],  alias: data[2] }); }, symbols: [ "expression_symbol_match", { literal: ":" }, "T_WORD" ] },
+                    { name: "expression_symbol", postprocess: ({data}) => { return ({ ...data[0],  alias: data[2] }); }, symbols: [ "expression_symbol_match", { literal: "@" }, "T_WORD" ] },
                     { name: "expression_symbol", postprocess: ({data}) => { return ({ expression: data[0], repeat: data[1] }); }, symbols: [ "expression_symbol_match", "expression_repeater" ] },
-                    { name: "expression_symbol", postprocess: ({data}) => { return ({ expression: data[0], repeat: data[1], alias: data[4] }); }, symbols: [ "expression_symbol_match", "expression_repeater", { literal: ":" }, "T_WORD" ] }
+                    { name: "expression_symbol", postprocess: ({data}) => { return ({ expression: data[0], repeat: data[1], alias: data[4] }); }, symbols: [ "expression_symbol_match", "expression_repeater", { literal: "@" }, "T_WORD" ] }
                 ],
                 expression_symbol_list: [
                     { name: "expression_symbol_list", symbols: [ "expression_symbol" ] },
@@ -281,7 +281,7 @@ class grammar {
                     ]
                 },
                 grammar$span: {
-                    regex: /(?:(?:(\/\/[^\n]*))|(?:(\[\s*[a-zA-Z_][a-zA-Z_\d]*\s*\]))|(?:((?:=>)))|(?:(\s+))|(?:((?:\\i)))|(?:((?:\\r)))|(?:((?:\?)))|(?:((?:\+)))|(?:((?:\*)))|(?:(\"(?:[^\"\\\r\n]|\\.)*\"))|(?:([a-zA-Z_][a-zA-Z_\d]*))|(?:((?::)))|(?:(\d+))|(?:((?:;)))|(?:((?:,)))|(?:((?:\|)))|(?:((?:\()))|(?:((?:\))))|(?:((?:<)))|(?:((?:>)))|(?:((?:\->)))|(?:((?:\$)))|(?:((?:\-)))|(?:((?:\}))))/ym,
+                    regex: /(?:(?:(\/\/[^\n]*))|(?:(\[\s*[a-zA-Z_][a-zA-Z_\d]*\s*\]))|(?:((?:=>)))|(?:(\s+))|(?:((?:\\i)))|(?:((?:\\r)))|(?:((?:\?)))|(?:((?:\+)))|(?:((?:\*)))|(?:(\"(?:[^\"\\\r\n]|\\.)*\"))|(?:([a-zA-Z_][a-zA-Z_\d]*))|(?:((?::)))|(?:(\d+))|(?:((?:;)))|(?:((?:@)))|(?:((?:,)))|(?:((?:\|)))|(?:((?:\()))|(?:((?:\))))|(?:((?:<)))|(?:((?:>)))|(?:((?:\->)))|(?:((?:\$)))|(?:((?:\-)))|(?:((?:\}))))/ym,
                     rules: [
                         { highlight: "comment", tag: ["T_COMMENT"], when: /\/\/[^\n]*/ },
                         { highlight: "type.identifier", tag: ["T_SECTWORD"], when: /\[\s*[a-zA-Z_][a-zA-Z_\d]*\s*\]/ },
@@ -297,6 +297,7 @@ class grammar {
                         { highlight: "keyword", when: ":" },
                         { highlight: "number", tag: ["T_INTEGER"], when: /\d+/ },
                         { when: ";" },
+                        { highlight: "keyword", when: "@" },
                         { when: "," },
                         { highlight: "keyword", when: "|" },
                         { when: "(" },
@@ -413,6 +414,12 @@ class grammar {
                     regex: /(?:(?:((?:\->))))/ym,
                     rules: [
                         { highlight: "keyword", when: "->" }
+                    ]
+                },
+                l_at: {
+                    regex: /(?:(?:((?:@))))/ym,
+                    rules: [
+                        { highlight: "keyword", when: "@" }
                     ]
                 },
                 l_colon: {

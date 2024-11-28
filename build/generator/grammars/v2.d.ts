@@ -931,6 +931,13 @@ declare class grammar {
                         when: string;
                     }[];
                 };
+                l_at: {
+                    regex: RegExp;
+                    rules: {
+                        highlight: string;
+                        when: string;
+                    }[];
+                };
                 l_colon: {
                     regex: RegExp;
                     rules: {

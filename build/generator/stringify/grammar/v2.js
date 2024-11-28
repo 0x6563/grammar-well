@@ -53,7 +53,7 @@ export class V2GrammarString {
         return body;
     }
     formatSymbols(exp) {
-        return exp.map(v => this.formatSymbol(v) + (v.alias ? ":" + v.alias : '')).join(' ');
+        return exp.map(v => this.formatSymbol(v) + (v.alias ? "@" + v.alias : '')).join(' ');
     }
     formatSymbol(exp) {
         if (typeof exp == 'string') {

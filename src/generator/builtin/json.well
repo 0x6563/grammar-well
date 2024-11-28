@@ -49,7 +49,7 @@ grammar {
 		| <string> => ( JSON.parse($0.value) )
 
 	[pair]
-		| key:k _ ":" _ value:v => ( [$k, $v] )
+		| key@k _ ":" _ value@v => ( [$k, $v] )
 
 	[key]
 		| string => ( $0 )

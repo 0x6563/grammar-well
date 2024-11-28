@@ -44,7 +44,7 @@ lexer {
 			- when "{"
 
 		[span]
-			- import comment, section_word, js_template, ws, insensitive, regex, l_qmark, l_plus, l_star, kv, l_colon, l_comma, l_pipe, l_parenl, l_parenr, l_abracketl, l_abracketr, l_arrow, l_dsign, l_dash
+			- import comment, section_word, js_template, ws, insensitive, regex, l_qmark, l_plus, l_star, kv, l_at, l_colon, l_comma, l_pipe, l_parenl, l_parenr, l_abracketl, l_abracketr, l_arrow, l_dsign, l_dash
 
 		[stop]
 			- when "}"
@@ -155,6 +155,9 @@ lexer {
 	[ws]
 		- when \r "\s+" tag "T_WS"
 
+	[l_at]
+		- when "@" highlight "keyword"
+
 	[l_colon]
 		- when ":" highlight "keyword"
 
@@ -227,15 +230,15 @@ grammar {
 		| section __ section_list => ( [$0].concat($2) )
 
 	[section]
-		| "config" _ "{" _ kv_list:list _ "}" => ( { config: Object.assign(...$list) } )
-		| "import" _ "*" _ "from" __ T_WORD:import _ ";" => ( { import: $import } )
-		| "import" _ "*" _ "from" __ T_STRING:import _ ";" => ( { import: $import, path: true } )
-		| "import" _ "*" _ "as" _ T_WORD:alias _ "from" __ T_WORD:import _ ";" => ( { import: $import, alias: $alias} )
-		| "import" _ "*" _ "as" _ T_WORD:alias _ "from" __ T_STRING:import _ ";" => ( { import: $import, path: true, alias: $alias} )
-		| "lexer" _ "{" _ lexer:lexer _ "}" => ( { lexer: Object.assign(...$lexer) } )
-		| "grammar" _ "{" _ grammar:grammar _ "}" => ( { grammar: $grammar } )
-		| \r "on" ":" T_WORD:lifecycle _ T_JS:js => ( { lifecycle: $lifecycle, js: $js } )
-		| \r "on" ":" T_WORD:lifecycle _ T_STRING:js => ( { lifecycle: $lifecycle, js: $js, path: true } )
+		| "config" _ "{" _ kv_list@list _ "}" => ( { config: Object.assign(...$list) } )
+		| "import" _ "*" _ "from" __ T_WORD@import _ ";" => ( { import: $import } )
+		| "import" _ "*" _ "from" __ T_STRING@import _ ";" => ( { import: $import, path: true } )
+		| "import" _ "*" _ "as" _ T_WORD@alias _ "from" __ T_WORD@import _ ";" => ( { import: $import, alias: $alias} )
+		| "import" _ "*" _ "as" _ T_WORD@alias _ "from" __ T_STRING@import _ ";" => ( { import: $import, path: true, alias: $alias} )
+		| "lexer" _ "{" _ lexer@lexer _ "}" => ( { lexer: Object.assign(...$lexer) } )
+		| "grammar" _ "{" _ grammar@grammar _ "}" => ( { grammar: $grammar } )
+		| \r "on" ":" T_WORD@lifecycle _ T_JS@js => ( { lifecycle: $lifecycle, js: $js } )
+		| \r "on" ":" T_WORD@lifecycle _ T_STRING@js => ( { lifecycle: $lifecycle, js: $js, path: true } )
 
 	[lexer]
 		| kv_list _ state_list => ( $0.concat({ states: $2 }) )
@@ -251,8 +254,8 @@ grammar {
 	[state_definition]
 		| state_config_list _ token_list => ( Object.assign($0, { rules: $2 }) )
 		| token_list => ( { rules: $0 } )
-		| "span" _ "{" _ kv_list:kv _ state_list:span _ "}" => ( { config: Object.assign(...$kv), span: $span} )
-		| "span" _ "{" _ state_list:span _ "}" => ( { span: $span} )
+		| "span" _ "{" _ kv_list@kv _ state_list@span _ "}" => ( { config: Object.assign(...$kv), span: $span} )
+		| "span" _ "{" _ state_list@span _ "}" => ( { span: $span} )
 
 	[state_config_list]
 		| state_config => ( $0 )
@@ -306,7 +309,7 @@ grammar {
 
 	[grammar_rule]
 		| grammar_rule_name _ expression_list => ( { name: $0, expressions: $2 } )
-		| grammar_rule_name __ POSTPROCESSOR:template _ expression_list:expressions => ( { name: $0, expressions: $expressions, postprocess: $template } )
+		| grammar_rule_name __ POSTPROCESSOR@template _ expression_list@expressions => ( { name: $0, expressions: $expressions, postprocess: $template } )
 
 	[grammar_rule_name]
 		| T_SECTWORD => ( $0 )
@@ -318,7 +321,7 @@ grammar {
 
 	[expression]
 		| expression_symbol_list => ( { symbols: $0 } )
-		| expression_symbol_list _ POSTPROCESSOR:template => ( { symbols: $0, postprocess: $template } )
+		| expression_symbol_list _ POSTPROCESSOR@template => ( { symbols: $0, postprocess: $template } )
 
 	[expression_symbol_list]
 		| expression_symbol
@@ -326,16 +329,16 @@ grammar {
 
 	[expression_symbol]
 		| expression_symbol_match => ( $0 )
-		| expression_symbol_match ":" T_WORD => ( { ...$0,  alias: $2 } )
+		| expression_symbol_match "@" T_WORD => ( { ...$0,  alias: $2 } )
 		| expression_symbol_match expression_repeater => ( { expression: $0, repeat: $1 } )
-		| expression_symbol_match expression_repeater ":" T_WORD => ( { expression: $0, repeat: $1, alias: $4 } )
+		| expression_symbol_match expression_repeater "@" T_WORD => ( { expression: $0, repeat: $1, alias: $4 } )
 
 	[expression_symbol_match]
 		| T_WORD => ( { rule: $0 } )
 		| T_STRING => ( { literal: $0, insensitive: false } )
 		| "\\i" _ T_STRING => ( { literal: $2, insensitive: true } )
-		| "<" _ T_WORD:token _ ">" => ( { token: $token} )
-		| "<" _ T_STRING:token _ ">" => ( { token: $token} )
+		| "<" _ T_WORD@token _ ">" => ( { token: $token} )
+		| "<" _ T_STRING@token _ ">" => ( { token: $token} )
 		| T_REGEX => ( $0 )
 		| "(" _ expression_list _ ")" => ( { subexpression: $2 } )
 

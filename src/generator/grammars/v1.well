@@ -151,17 +151,17 @@ grammar {
 		| section T_WS section_list => ( [$0].concat($2) )
 
 	[section]
-		| K_CONFIG _ L_COLON _ L_TEMPLATEL _ kv_list:list _ L_TEMPLATER => ( { config: Object.assign(...$list) } )
-		| K_IMPORT _ L_STAR _ K_FROM __ T_WORD:import _ L_SCOLON => ( { import: $import } )
-		| K_IMPORT _ L_STAR _ K_FROM __ T_STRING:import _ L_SCOLON => ( { import: $import, path: true } )
-		| K_IMPORT _ L_STAR _ "as" _ T_WORD:alias _ K_FROM __ T_WORD:import _ L_SCOLON => ( { import: $import, alias: $alias} )
-		| K_IMPORT _ L_STAR _ "as" _ T_WORD:alias _ K_FROM __ T_STRING:import _ L_SCOLON => ( { import: $import, path: true, alias: $alias} )
-		| K_LEXER _ L_COLON _ L_TEMPLATEL _ lexer:lexer _ L_TEMPLATER => ( { lexer: Object.assign(...$lexer) } )
-		| K_GRAMMAR _ L_COLON _ L_TEMPLATEL _ grammar:grammar _ L_TEMPLATER => ( { grammar: $grammar } )
-		| K_BODY _ L_COLON _ T_JS:js => ( { lifecycle: "new", js: $js } )
-		| K_BODY _ L_COLON _ T_STRING:js => ( { lifecycle: "new", js: $js, path: true } )
-		| K_HEAD _ L_COLON _ T_JS:js => ( { lifecycle:"import", "js": $js } )
-		| K_HEAD _ L_COLON _ T_STRING:js => ( { lifecycle:"import", "js": $js, path: true } )
+		| K_CONFIG _ L_COLON _ L_TEMPLATEL _ kv_list@list _ L_TEMPLATER => ( { config: Object.assign(...$list) } )
+		| K_IMPORT _ L_STAR _ K_FROM __ T_WORD@import _ L_SCOLON => ( { import: $import } )
+		| K_IMPORT _ L_STAR _ K_FROM __ T_STRING@import _ L_SCOLON => ( { import: $import, path: true } )
+		| K_IMPORT _ L_STAR _ "as" _ T_WORD@alias _ K_FROM __ T_WORD@import _ L_SCOLON => ( { import: $import, alias: $alias} )
+		| K_IMPORT _ L_STAR _ "as" _ T_WORD@alias _ K_FROM __ T_STRING@import _ L_SCOLON => ( { import: $import, path: true, alias: $alias} )
+		| K_LEXER _ L_COLON _ L_TEMPLATEL _ lexer@lexer _ L_TEMPLATER => ( { lexer: Object.assign(...$lexer) } )
+		| K_GRAMMAR _ L_COLON _ L_TEMPLATEL _ grammar@grammar _ L_TEMPLATER => ( { grammar: $grammar } )
+		| K_BODY _ L_COLON _ T_JS@js => ( { lifecycle: "new", js: $js } )
+		| K_BODY _ L_COLON _ T_STRING@js => ( { lifecycle: "new", js: $js, path: true } )
+		| K_HEAD _ L_COLON _ T_JS@js => ( { lifecycle:"import", "js": $js } )
+		| K_HEAD _ L_COLON _ T_STRING@js => ( { lifecycle:"import", "js": $js, path: true } )
 
 	[lexer]
 		| kv_list _ state_list => ( $0.concat({ states: $2 }) )
@@ -209,8 +209,8 @@ grammar {
 		| K_WHEN _ L_COLON _ T_REGEX => ( { when: $4 } )
 		| K_OPEN _ L_COLON _ T_STRING => ( { open: $4 } )
 		| K_CLOSE _ L_COLON _ T_STRING => ( { close: $4 } )
-		| K_BEFORE _ L_COLON _ T_STRING => ( { when: $4, before:true } )
-		| K_BEFORE _ L_COLON _ T_REGEX => ( { when: $4, before:true } )
+		| K_BEFORE _ L_COLON _ T_STRING => ( { when: $4, before: true } )
+		| K_BEFORE _ L_COLON _ T_REGEX => ( { when: $4, before: true } )
 		| K_POP => ( { pop: 1 } )
 		| K_POP _ L_COLON _ T_INTEGER => ( { pop: parseInt($4) } )
 		| K_POP _ L_COLON _ K_ALL => ( { pop: "all" } )
@@ -233,8 +233,8 @@ grammar {
 
 	[grammar_rule]
 		| T_WORD _ L_ARROW _ expression_list => ( { name: $0, expressions: $4 } )
-		| T_WORD __ L_COLON _ T_JS:js _ L_ARROW _ expression_list:expressions => ( { name: $0, expressions: $expressions, postprocess: $js } )
-		| T_WORD __ L_COLON _ T_GRAMMAR_TEMPLATE:template _ L_ARROW _ expression_list:expressions => ( { name: $0, expressions: $expressions, postprocess: $template } )
+		| T_WORD __ L_COLON _ T_JS@js _ L_ARROW _ expression_list@expressions => ( { name: $0, expressions: $expressions, postprocess: $js } )
+		| T_WORD __ L_COLON _ T_GRAMMAR_TEMPLATE@template _ L_ARROW _ expression_list@expressions => ( { name: $0, expressions: $expressions, postprocess: $template } )
 
 	[expression_list]
 		| expression
@@ -242,8 +242,8 @@ grammar {
 
 	[expression]
 		| expression_symbol_list => ( { symbols: $0 } )
-		| expression_symbol_list __ L_COLON _ T_JS:js => ( { symbols: $0, postprocess: $js } )
-		| expression_symbol_list __ L_COLON _ T_GRAMMAR_TEMPLATE:template => ( { symbols: $0, postprocess: $template } )
+		| expression_symbol_list __ L_COLON _ T_JS@js => ( { symbols: $0, postprocess: $js } )
+		| expression_symbol_list __ L_COLON _ T_GRAMMAR_TEMPLATE@template => ( { symbols: $0, postprocess: $template } )
 
 	[expression_symbol_list]
 		| expression_symbol
