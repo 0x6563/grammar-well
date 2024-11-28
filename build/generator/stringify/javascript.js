@@ -25,7 +25,7 @@ export class JavaScriptGenerator {
     }
     artifacts(depth = 0) {
         let output = {};
-        const artifacts = this.options.artifacts;
+        const artifacts = this.options.artifacts || { grammar: true, lexer: true };
         if (artifacts && artifacts.lr) {
             const table = new LRParseTableBuilder(this);
             output.lr = CommonGenerator.JSON({
@@ -33,11 +33,11 @@ export class JavaScriptGenerator {
                 table: table.stringify(depth + 2)
             }, depth + 1);
         }
-        if ('lexer' in this.state && (!artifacts || artifacts.lexer)) {
+        if ('lexer' in this.state && artifacts.lexer) {
             const l = new LexerArtifact(this.state.lexer);
             output.lexer = l.output(depth + 1);
         }
-        if (!artifacts || artifacts.grammar) {
+        if (artifacts.grammar) {
             const basic = new BasicGrammarTable(this);
             output.grammar = basic.stringify(depth + 1);
         }

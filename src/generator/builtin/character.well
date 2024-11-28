@@ -1,0 +1,7 @@
+lexer {
+	start: "character"
+
+	[character]
+		- when \r "."
+
+}
