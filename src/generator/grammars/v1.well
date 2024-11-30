@@ -3,9 +3,9 @@ lexer {
 
 	[start]
 		- import string, js, ws, comment, l_scolon, l_star
-		- when \r "lexer(?![a-zA-Z\d_])" tag "T_WORD" highlight "type" goto lexer
-		- when \r "grammar(?![a-zA-Z\d_])" tag "T_WORD" highlight "type" goto grammar
-		- when \r "config(?![a-zA-Z\d_])" tag "T_WORD" highlight "type" goto config
+		- when r:{lexer(?![a-zA-Z\d_])} tag "T_WORD" highlight "type" goto lexer
+		- when r:{grammar(?![a-zA-Z\d_])} tag "T_WORD" highlight "type" goto grammar
+		- when r:{config(?![a-zA-Z\d_])} tag "T_WORD" highlight "type" goto config
 		- import kv
 
 	[config]
@@ -63,33 +63,33 @@ lexer {
 		- import string, ws, word, l_colon, integer
 
 	[jsignore]
-		- when \r "\"(?:[^\"\\\r\n]|\\.)*\"" tag "T_JSBODY"
-		- when \r "'(?:[^'\\\r\n]|\\.)*'" tag "T_JSBODY"
-		- when \r "`(?:[^`\\]|\\.)*`" tag "T_JSBODY"
-		- when \r "/(?:[^/\\\r\n]|\\.)+/[gmiyu]*" tag "T_JSBODY"
-		- when \r "//[^\n]*" tag "T_JSBODY"
-		- when \r "/\*.*\*/" tag "T_JSBODY"
+		- when r:{"(?:[^"\\\r\n]|\\.)*"} tag "T_JSBODY"
+		- when r:{'(?:[^'\\\r\n]|\\.)*'} tag "T_JSBODY"
+		- when r:{`(?:[^`\\]|\\.)*`} tag "T_JSBODY"
+		- when r:{/(?:[^/\\\r\n]|\\.)+/[gmiyu]*} tag "T_JSBODY"
+		- when r:{//[^\n]*} tag "T_JSBODY"
+		- when r:{/\*.*\*/} tag "T_JSBODY"
 
 	[string]
-		- when \r "\"(?:[^\"\\\r\n]|\\.)*\"" tag "T_STRING" highlight "string"
+		- when r:{"(?:[^"\\\r\n]|\\.)*"} tag "T_STRING" highlight "string"
 
 	[string2]
-		- when \r "'(?:[^'\\\r\n]|\\.)*'" tag "T_STRING" highlight "string"
+		- when r:{'(?:[^'\\\r\n]|\\.)*'} tag "T_STRING" highlight "string"
 
 	[string3]
-		- when \r "`(?:[^`\\]|\\.)*`" tag "T_STRING" highlight "string"
+		- when r:{`(?:[^`\\]|\\.)*`} tag "T_STRING" highlight "string"
 
 	[regex]
-		- when \r "\/(?:[^\/\\\r\n]|\\.)+\/" tag "T_REGEX" highlight "regexp"
+		- when r:{\/(?:[^\/\\\r\n]|\\.)+\/} tag "T_REGEX" highlight "regexp"
 
 	[integer]
-		- when \r "\d+" tag "T_INTEGER" highlight "number"
+		- when r:{\d+} tag "T_INTEGER" highlight "number"
 
 	[word]
-		- when \r "[a-zA-Z_][a-zA-Z_\d]*" tag "T_WORD"
+		- when r:{[a-zA-Z_][a-zA-Z_\d]*} tag "T_WORD"
 
 	[ws]
-		- when \r "\s+" tag "T_WS"
+		- when r:{\s+} tag "T_WS"
 
 	[l_colon]
 		- when ":" tag "L_COLON" highlight "keyword"
@@ -134,10 +134,10 @@ lexer {
 		- when "-" tag "L_DASH"
 
 	[comment]
-		- when \r "//[^\n]*" tag "T_COMMENT" highlight "comment"
+		- when r:{//[^\n]*} tag "T_COMMENT" highlight "comment"
 
 	[commentmulti]
-		- when \r "/\*.*\*/" tag "T_COMMENT" highlight "comment"
+		- when r:{/\*.*\*/} tag "T_COMMENT" highlight "comment"
 
 }
 
@@ -408,7 +408,7 @@ grammar {
 		| <T_WORD> => ( $0.value )
 
 	[T_REGEX]
-		| <T_REGEX> \r "[gmiuy]"* => ( { regex: $0.value.slice(1,-1), flags: $1.map(v=>v.value).join('').trim() } )
+		| <T_REGEX> r:{[gmiuy]}* => ( { regex: $0.value.slice(1,-1), flags: $1.map(v=>v.value).join('').trim() } )
 
 	[T_COMMENT]
 		| <T_COMMENT>

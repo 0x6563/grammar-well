@@ -1,7 +1,7 @@
 lexer {
 
 	[whitespace]
-		- when \r '\s+' tag "whitespace"
+		- when r:{\s+} tag "whitespace"
 
 }
 

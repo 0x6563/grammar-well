@@ -2,7 +2,8 @@ import { readdirSync, readFileSync, writeFileSync } from "fs";
 import { resolve } from "path";
 import { Format, Generate } from "../src/index.js";
 const BaseDir = './src/generator/builtin/';
-(async () => {
+// (async () => {
+    console.log('Prebuild Start');
     await TranspileTypescript('../grammars/v1.well');
     await TranspileTypescript('../grammars/v2.well');
     const files = readdirSync(BaseDir);
@@ -27,7 +28,8 @@ const BaseDir = './src/generator/builtin/';
     write(`./registry.json`, JSON.stringify(registry));
     write('../grammars/v2.well', Format(read('../grammars/v2.well')));
     write('../grammars/v1.well', Format(read('../grammars/v1.well')));
-})();
+    console.log('Prebuild End');
+// })();
 
 async function Transpile(path) {
     const source = read(path);
@@ -44,6 +46,7 @@ async function Transpile(path) {
     write(path.replace(/\.well$/, '.js'), js);
 }
 async function TranspileTypescript(path) {
+    console.log('Transpiling ' + path);
     const source = read(path);
     const js = await Generate(source, {
         output: {

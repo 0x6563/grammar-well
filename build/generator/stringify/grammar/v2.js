@@ -69,12 +69,8 @@ export class V2GrammarString {
             return (exp.insensitive ? '\\i ' : '') + JSON.stringify(exp.literal);
         }
         if ('regex' in exp) {
-            let { quote, regex, flags } = exp;
-            if (!quote) {
-                regex = regex.replace(/"/g, '\\"');
-                quote = "\"";
-            }
-            return `\\r${flags || ''} ${quote}${regex}${quote}`;
+            let { regex, flags } = exp;
+            return `r${flags || ''}:{${regex}}`;
         }
         if ('token' in exp) {
             return `<${exp.token}>`;

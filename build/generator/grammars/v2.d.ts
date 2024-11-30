@@ -115,14 +115,9 @@ declare class grammar {
                     }) => {
                         regex: any;
                         flags: any;
-                        quote: any;
                     };
                     symbols: (string | {
-                        literal: string;
-                        token?: undefined;
-                    } | {
                         token: string;
-                        literal?: undefined;
                     })[];
                 }[];
                 T_REGEX$RPT0Nx1: ({
@@ -134,7 +129,9 @@ declare class grammar {
                     postprocess: ({ data }: {
                         data: any;
                     }) => any;
-                    symbols: (string | RegExp)[];
+                    symbols: (string | {
+                        token: string;
+                    })[];
                 })[];
                 T_SECTWORD: {
                     name: string;
@@ -777,6 +774,12 @@ declare class grammar {
                         goto?: undefined;
                         pop?: undefined;
                     } | {
+                        goto: string;
+                        highlight: string;
+                        tag: string[];
+                        when: RegExp;
+                        pop?: undefined;
+                    } | {
                         when: string;
                         highlight?: undefined;
                         tag?: undefined;
@@ -1035,8 +1038,8 @@ declare class grammar {
                     } | {
                         goto: string;
                         highlight: string;
-                        when: string;
-                        tag?: undefined;
+                        tag: string[];
+                        when: RegExp;
                         pop?: undefined;
                     } | {
                         when: string;
@@ -1107,8 +1110,8 @@ declare class grammar {
                     } | {
                         goto: string;
                         highlight: string;
-                        when: string;
-                        tag?: undefined;
+                        tag: string[];
+                        when: RegExp;
                         pop?: undefined;
                     } | {
                         when: string;
@@ -1236,26 +1239,27 @@ declare class grammar {
                     rules: {
                         goto: string;
                         highlight: string;
-                        when: string;
+                        tag: string[];
+                        when: RegExp;
                     }[];
                 };
                 regex$span: {
                     regex: RegExp;
                     rules: ({
+                        highlight: string;
+                        tag: string[];
+                        when: RegExp;
+                        pop?: undefined;
+                    } | {
                         tag: string[];
                         when: RegExp;
                         highlight?: undefined;
                         pop?: undefined;
                     } | {
                         highlight: string;
-                        when: RegExp;
-                        tag?: undefined;
-                        pop?: undefined;
-                    } | {
-                        highlight: string;
                         pop: number;
                         tag: string[];
-                        when: RegExp;
+                        when: string;
                     })[];
                 };
                 regex$start: {
@@ -1263,7 +1267,8 @@ declare class grammar {
                     rules: {
                         goto: string;
                         highlight: string;
-                        when: string;
+                        tag: string[];
+                        when: RegExp;
                     }[];
                 };
                 regex$stop: {
@@ -1272,7 +1277,7 @@ declare class grammar {
                         highlight: string;
                         pop: number;
                         tag: string[];
-                        when: RegExp;
+                        when: string;
                     }[];
                 };
                 section_word: {

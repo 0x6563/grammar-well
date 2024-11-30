@@ -10,19 +10,19 @@ lexer {
 		- when "'" tag "squote" highlight "string" goto singleQuoteStringEnd
 
 	[doubleQuoteStringEnd]
-		- when \r "\\[\\\/bnrft]" tag "escaped" highlight "constant"
-		- when \r "\\\"" tag "quoteEscape"
-		- when \r "\\u[A-Fa-f\d]{4}" tag "escaped" highlight "constant"
-		- when \r "\\." tag "badEscape"
-		- when \r "[^\"\\]+" tag "string" highlight "string"
+		- when r:{\\[\\/bnrft]} tag "escaped" highlight "constant"
+		- when r:{\\"} tag "quoteEscape"
+		- when r:{\\u[A-Fa-f\d]{4}} tag "escaped" highlight "constant"
+		- when r:{\\.} tag "badEscape"
+		- when r:{[^"\\]+} tag "string" highlight "string"
 		- when "\"" tag "dquote" highlight "string" pop
 
 	[singleQuoteStringEnd]
-		- when \r "\\[\\\/bnrft]" tag "escaped"
-		- when \r "\\'" tag "quoteEscape"
-		- when \r "\\u[A-Fa-f\d]{4}" tag "escaped"
-		- when \r "\\." tag "badEscape"
-		- when \r "[^'\\]+" tag "string" highlight "string"
+		- when r:{\\[\\/bnrft]} tag "escaped"
+		- when r:{\\'} tag "quoteEscape"
+		- when r:{\\u[A-Fa-f\d]{4}} tag "escaped"
+		- when r:{\\.} tag "badEscape"
+		- when r:{[^'\\]+} tag "string" highlight "string"
 		- when "'" tag "squote" highlight "string" pop
 
 }
