@@ -11,6 +11,7 @@ export async function Generate(source, config = {}) {
     await builder.import(source);
     return builder.output(config.output);
 }
+export const NAME_DELIMITER = '.';
 export class Generator {
     config;
     context;
@@ -101,7 +102,7 @@ export class Generator {
     }
     importLexerState(name, state) {
         if ('span' in state) {
-            this.state.addLexerState(this.aliasPrefix + name, { rules: [{ import: [`${name}$start`] }] });
+            this.state.addLexerState(this.aliasPrefix + name, { rules: [{ import: [`${name}${NAME_DELIMITER}start`] }] });
             const states = this.buildLexerSpanStates(name, state);
             this.importLexerStates(states);
         }
@@ -117,11 +118,11 @@ export class Generator {
             for (const rule of state.rules) {
                 if ('span' in rule) {
                     let i = 1;
-                    while (`${this.aliasPrefix}${name}$${i}` in this.state.lexer.states)
+                    while (`${this.aliasPrefix}${name}${NAME_DELIMITER}${i}` in this.state.lexer.states)
                         ++i;
-                    const states = this.buildLexerSpanStates(`${name}$${i}`, rule);
+                    const states = this.buildLexerSpanStates(`${name}${NAME_DELIMITER}${i}`, rule);
                     this.importLexerStates(states);
-                    rules.push({ import: `${name}$${i}$start` });
+                    rules.push({ import: `${name}.${i}${NAME_DELIMITER}start` });
                     continue;
                 }
                 else {
@@ -188,7 +189,7 @@ export class Generator {
                 }
             }
         if (stopRules.length && spanRules.length)
-            spanRules.push({ import: [`${name}$stop`] });
+            spanRules.push({ import: [`${name}${NAME_DELIMITER}stop`] });
         const target = spanRules.length ? 'span' : 'stop';
         for (const r of start?.state?.rules) {
             if ('when' in r) {
@@ -203,26 +204,26 @@ export class Generator {
                     close: r.close,
                     embed: r.embed,
                     unembed: r.unembed,
-                    [transition]: r.stay ? undefined : `${name}$${target}`
+                    [transition]: r.stay ? undefined : `${name}${NAME_DELIMITER}${target}`
                 });
             }
             if ('import' in r) {
                 startRules.push({
                     import: r.import,
-                    [transition]: r.stay ? undefined : `${name}$${target}`
+                    [transition]: r.stay ? undefined : `${name}${NAME_DELIMITER}${target}`
                 });
             }
         }
         return [
             {
-                name: `${name}$start`,
+                name: `${name}${NAME_DELIMITER}start`,
                 state: {
                     default: start.state.default,
                     rules: startRules
                 }
             },
             {
-                name: `${name}$span`,
+                name: `${name}${NAME_DELIMITER}span`,
                 state: {
                     default: span?.state?.default,
                     unmatched: span?.state?.unmatched,
@@ -230,7 +231,7 @@ export class Generator {
                 }
             },
             {
-                name: `${name}$stop`,
+                name: `${name}${NAME_DELIMITER}stop`,
                 state: {
                     default: stop?.state?.default,
                     rules: stopRules
@@ -319,7 +320,7 @@ export class Generator {
         }
     }
     buildCharacterRules(name, symbol) {
-        const id = this.state.grammarUUID(name + "$STR");
+        const id = this.state.grammarUUID(name + NAME_DELIMITER + "STR");
         this.buildRules(id, [
             {
                 symbols: symbol.literal
@@ -335,7 +336,7 @@ export class Generator {
         return { rule: id };
     }
     buildSubExpressionRules(name, symbol) {
-        const id = this.state.grammarUUID(name + "$SUB");
+        const id = this.state.grammarUUID(name + NAME_DELIMITER + "SUB");
         this.buildRules(id, symbol.subexpression);
         return { rule: id };
     }
@@ -344,18 +345,18 @@ export class Generator {
         const expr1 = { symbols: [] };
         const expr2 = { symbols: [] };
         if (symbol.repeat == '+') {
-            id = this.state.grammarUUID(name + "$RPT1N");
+            id = this.state.grammarUUID(name + NAME_DELIMITER + "RPT1N");
             expr1.symbols = [symbol.expression];
             expr2.symbols = [{ rule: id }, symbol.expression];
             expr2.postprocess = { builtin: "concat" };
         }
         else if (symbol.repeat == '*') {
-            id = this.state.grammarUUID(name + "$RPT0N");
+            id = this.state.grammarUUID(name + NAME_DELIMITER + "RPT0N");
             expr2.symbols = [{ rule: id }, symbol.expression];
             expr2.postprocess = { builtin: "concat" };
         }
         else if (symbol.repeat == '?') {
-            id = this.state.grammarUUID(name + "$RPT01");
+            id = this.state.grammarUUID(name + NAME_DELIMITER + "RPT01");
             expr1.symbols = [symbol.expression];
             expr1.postprocess = { builtin: "first" };
             expr2.postprocess = { builtin: "null" };

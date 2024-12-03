@@ -229,7 +229,7 @@ declare class grammar {
                         token: string;
                     })[];
                 }[];
-                T_GRAMMAR_TEMPLATE$RPT0Nx1: ({
+                "T_GRAMMAR_TEMPLATE.RPT0Nx1": ({
                     name: string;
                     symbols: any[];
                     postprocess?: undefined;
@@ -262,7 +262,7 @@ declare class grammar {
                         token: string;
                     })[];
                 }[];
-                T_JS$RPT0Nx1: ({
+                "T_JS.RPT0Nx1": ({
                     name: string;
                     symbols: any[];
                     postprocess?: undefined;
@@ -287,7 +287,7 @@ declare class grammar {
                         token: string;
                     })[];
                 }[];
-                T_REGEX$RPT0Nx1: ({
+                "T_REGEX.RPT0Nx1": ({
                     name: string;
                     symbols: any[];
                     postprocess?: undefined;
@@ -332,7 +332,7 @@ declare class grammar {
                     }) => any;
                     symbols: string[];
                 }[];
-                _$RPT0Nx1: ({
+                "_.RPT0Nx1": ({
                     name: string;
                     symbols: any[];
                     postprocess?: undefined;
@@ -343,7 +343,7 @@ declare class grammar {
                     }) => any;
                     symbols: string[];
                 })[];
-                _$RPT0Nx1$SUBx1: {
+                "_.RPT0Nx1.SUBx1": {
                     name: string;
                     symbols: string[];
                 }[];
@@ -354,7 +354,7 @@ declare class grammar {
                     }) => any;
                     symbols: string[];
                 }[];
-                __$RPT1Nx1: ({
+                "__.RPT1Nx1": ({
                     name: string;
                     symbols: string[];
                     postprocess?: undefined;
@@ -365,11 +365,11 @@ declare class grammar {
                     }) => any;
                     symbols: string[];
                 })[];
-                __$RPT1Nx1$SUBx1: {
+                "__.RPT1Nx1.SUBx1": {
                     name: string;
                     symbols: string[];
                 }[];
-                __$RPT1Nx1$SUBx2: {
+                "__.RPT1Nx1.SUBx2": {
                     name: string;
                     symbols: string[];
                 }[];
@@ -425,7 +425,7 @@ declare class grammar {
                     }) => any;
                     symbols: string[];
                 }[];
-                expression_symbol_match$RPT01x1: {
+                "expression_symbol_match.RPT01x1": {
                     name: string;
                     postprocess: ({ data }: {
                         data: any;
@@ -469,7 +469,7 @@ declare class grammar {
                     };
                     symbols: string[];
                 }[];
-                kv$SUBx1: {
+                "kv.SUBx1": {
                     name: string;
                     symbols: string[];
                 }[];

@@ -23,7 +23,7 @@ declare class grammar {
                         literal: string;
                     })[];
                 })[];
-                POSTPROCESSOR$RPT0Nx1: ({
+                "POSTPROCESSOR.RPT0Nx1": ({
                     name: string;
                     symbols: any[];
                     postprocess?: undefined;
@@ -36,7 +36,7 @@ declare class grammar {
                         token: string;
                     })[];
                 })[];
-                POSTPROCESSOR$RPT0Nx2: ({
+                "POSTPROCESSOR.RPT0Nx2": ({
                     name: string;
                     symbols: any[];
                     postprocess?: undefined;
@@ -49,7 +49,7 @@ declare class grammar {
                         token: string;
                     })[];
                 })[];
-                POSTPROCESSOR$RPT0Nx3: ({
+                "POSTPROCESSOR.RPT0Nx3": ({
                     name: string;
                     symbols: any[];
                     postprocess?: undefined;
@@ -62,7 +62,7 @@ declare class grammar {
                         token: string;
                     })[];
                 })[];
-                POSTPROCESSOR$RPT0Nx4: ({
+                "POSTPROCESSOR.RPT0Nx4": ({
                     name: string;
                     symbols: any[];
                     postprocess?: undefined;
@@ -95,7 +95,7 @@ declare class grammar {
                         literal: string;
                     })[];
                 }[];
-                T_JS$RPT0Nx1: ({
+                "T_JS.RPT0Nx1": ({
                     name: string;
                     symbols: any[];
                     postprocess?: undefined;
@@ -120,7 +120,7 @@ declare class grammar {
                         token: string;
                     })[];
                 }[];
-                T_REGEX$RPT0Nx1: ({
+                "T_REGEX.RPT0Nx1": ({
                     name: string;
                     symbols: any[];
                     postprocess?: undefined;
@@ -167,7 +167,7 @@ declare class grammar {
                     }) => any;
                     symbols: string[];
                 }[];
-                _$RPT0Nx1: ({
+                "_.RPT0Nx1": ({
                     name: string;
                     symbols: any[];
                     postprocess?: undefined;
@@ -178,7 +178,7 @@ declare class grammar {
                     }) => any;
                     symbols: string[];
                 })[];
-                _$RPT0Nx1$SUBx1: {
+                "_.RPT0Nx1.SUBx1": {
                     name: string;
                     symbols: {
                         token: string;
@@ -191,7 +191,7 @@ declare class grammar {
                     }) => any;
                     symbols: string[];
                 }[];
-                __$RPT1Nx1: ({
+                "__.RPT1Nx1": ({
                     name: string;
                     symbols: string[];
                     postprocess?: undefined;
@@ -202,13 +202,13 @@ declare class grammar {
                     }) => any;
                     symbols: string[];
                 })[];
-                __$RPT1Nx1$SUBx1: {
+                "__.RPT1Nx1.SUBx1": {
                     name: string;
                     symbols: {
                         token: string;
                     }[];
                 }[];
-                __$RPT1Nx1$SUBx2: {
+                "__.RPT1Nx1.SUBx2": {
                     name: string;
                     symbols: {
                         token: string;
@@ -343,7 +343,7 @@ declare class grammar {
                         literal: string;
                     })[];
                 }[];
-                kv$SUBx1: {
+                "kv.SUBx1": {
                     name: string;
                     symbols: string[];
                 }[];
@@ -687,7 +687,7 @@ declare class grammar {
                         tag?: undefined;
                     })[];
                 };
-                config$span: {
+                "config.span": {
                     regex: RegExp;
                     rules: ({
                         highlight: string;
@@ -716,7 +716,7 @@ declare class grammar {
                         tag?: undefined;
                     })[];
                 };
-                config$start: {
+                "config.start": {
                     regex: RegExp;
                     rules: ({
                         tag: string[];
@@ -728,7 +728,7 @@ declare class grammar {
                         tag?: undefined;
                     })[];
                 };
-                config$stop: {
+                "config.stop": {
                     regex: RegExp;
                     rules: {
                         pop: number;
@@ -747,7 +747,7 @@ declare class grammar {
                         tag?: undefined;
                     })[];
                 };
-                grammar$span: {
+                "grammar.span": {
                     regex: RegExp;
                     rules: ({
                         highlight: string;
@@ -793,7 +793,7 @@ declare class grammar {
                         goto?: undefined;
                     })[];
                 };
-                grammar$start: {
+                "grammar.start": {
                     regex: RegExp;
                     rules: ({
                         tag: string[];
@@ -805,7 +805,7 @@ declare class grammar {
                         tag?: undefined;
                     })[];
                 };
-                grammar$stop: {
+                "grammar.stop": {
                     regex: RegExp;
                     rules: {
                         pop: number;
@@ -1021,7 +1021,7 @@ declare class grammar {
                         tag?: undefined;
                     })[];
                 };
-                lexer$span: {
+                "lexer.span": {
                     regex: RegExp;
                     rules: ({
                         tag: string[];
@@ -1067,7 +1067,7 @@ declare class grammar {
                         goto?: undefined;
                     })[];
                 };
-                lexer$start: {
+                "lexer.start": {
                     regex: RegExp;
                     rules: ({
                         tag: string[];
@@ -1079,7 +1079,7 @@ declare class grammar {
                         tag?: undefined;
                     })[];
                 };
-                lexer$stop: {
+                "lexer.stop": {
                     regex: RegExp;
                     rules: {
                         pop: number;
@@ -1093,7 +1093,7 @@ declare class grammar {
                         when: string;
                     }[];
                 };
-                lexer_span$span: {
+                "lexer_span.span": {
                     regex: RegExp;
                     rules: ({
                         tag: string[];
@@ -1133,14 +1133,14 @@ declare class grammar {
                         goto?: undefined;
                     })[];
                 };
-                lexer_span$start: {
+                "lexer_span.start": {
                     regex: RegExp;
                     rules: {
                         goto: string;
                         when: string;
                     }[];
                 };
-                lexer_span$stop: {
+                "lexer_span.stop": {
                     regex: RegExp;
                     rules: {
                         pop: number;
@@ -1156,7 +1156,7 @@ declare class grammar {
                         when: RegExp;
                     }[];
                 };
-                lifecycle$span: {
+                "lifecycle.span": {
                     regex: RegExp;
                     rules: ({
                         tag: string[];
@@ -1188,7 +1188,7 @@ declare class grammar {
                         set?: undefined;
                     })[];
                 };
-                lifecycle$start: {
+                "lifecycle.start": {
                     regex: RegExp;
                     rules: {
                         goto: string;
@@ -1197,7 +1197,7 @@ declare class grammar {
                         when: RegExp;
                     }[];
                 };
-                lifecycle$stop: {
+                "lifecycle.stop": {
                     regex: RegExp;
                     rules: {
                         before: boolean;
@@ -1243,7 +1243,7 @@ declare class grammar {
                         when: RegExp;
                     }[];
                 };
-                regex$span: {
+                "regex.span": {
                     regex: RegExp;
                     rules: ({
                         highlight: string;
@@ -1265,7 +1265,7 @@ declare class grammar {
                         goto?: undefined;
                     })[];
                 };
-                regex$start: {
+                "regex.start": {
                     regex: RegExp;
                     rules: {
                         goto: string;
@@ -1274,7 +1274,7 @@ declare class grammar {
                         when: RegExp;
                     }[];
                 };
-                regex$stop: {
+                "regex.stop": {
                     regex: RegExp;
                     rules: {
                         highlight: string;
@@ -1292,7 +1292,7 @@ declare class grammar {
                         when: string;
                     }[];
                 };
-                regex_charclass$span: {
+                "regex_charclass.span": {
                     regex: RegExp;
                     rules: ({
                         highlight: string;
@@ -1311,7 +1311,7 @@ declare class grammar {
                         when: string;
                     })[];
                 };
-                regex_charclass$start: {
+                "regex_charclass.start": {
                     regex: RegExp;
                     rules: {
                         goto: string;
@@ -1320,7 +1320,7 @@ declare class grammar {
                         when: string;
                     }[];
                 };
-                regex_charclass$stop: {
+                "regex_charclass.stop": {
                     regex: RegExp;
                     rules: {
                         highlight: string;

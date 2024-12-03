@@ -5,7 +5,7 @@
 
 
 class grammar {
-    artifacts =  {
+    artifacts = {
         grammar: {
             rules: {
                 K_ALL: [
@@ -117,28 +117,28 @@ class grammar {
                     { name: "T_COMMENT", symbols: [ { token: "T_COMMENT" } ] }
                 ],
                 T_GRAMMAR_TEMPLATE: [
-                    { name: "T_GRAMMAR_TEMPLATE", postprocess: ({data}) => { return ({ template: '(' + data[2].map(v=>v.value).join('').trim() + ')' }); }, symbols: [ { token: "L_TEMPLATEL" }, "_", "T_GRAMMAR_TEMPLATE$RPT0Nx1", "_", { token: "L_TEMPLATER" } ] }
+                    { name: "T_GRAMMAR_TEMPLATE", postprocess: ({data}) => { return ({ template: '(' + data[2].map(v=>v.value).join('').trim() + ')' }); }, symbols: [ { token: "L_TEMPLATEL" }, "_", "T_GRAMMAR_TEMPLATE.RPT0Nx1", "_", { token: "L_TEMPLATER" } ] }
                 ],
-                T_GRAMMAR_TEMPLATE$RPT0Nx1: [
-                    { name: "T_GRAMMAR_TEMPLATE$RPT0Nx1", symbols: [ ] },
-                    { name: "T_GRAMMAR_TEMPLATE$RPT0Nx1", postprocess: ({data}) => data[0].concat([data[1]]), symbols: [ "T_GRAMMAR_TEMPLATE$RPT0Nx1", { token: "T_JSBODY" } ] }
+                "T_GRAMMAR_TEMPLATE.RPT0Nx1": [
+                    { name: "T_GRAMMAR_TEMPLATE.RPT0Nx1", symbols: [ ] },
+                    { name: "T_GRAMMAR_TEMPLATE.RPT0Nx1", postprocess: ({data}) => data[0].concat([data[1]]), symbols: [ "T_GRAMMAR_TEMPLATE.RPT0Nx1", { token: "T_JSBODY" } ] }
                 ],
                 T_INTEGER: [
                     { name: "T_INTEGER", postprocess: ({data}) => { return (data[0].value); }, symbols: [ { token: "T_INTEGER" } ] }
                 ],
                 T_JS: [
-                    { name: "T_JS", postprocess: ({data}) => { return ({ js: data[1].map(v=>v.value).join('') }); }, symbols: [ { token: "L_JSL" }, "T_JS$RPT0Nx1", { token: "L_JSR" } ] }
+                    { name: "T_JS", postprocess: ({data}) => { return ({ js: data[1].map(v=>v.value).join('') }); }, symbols: [ { token: "L_JSL" }, "T_JS.RPT0Nx1", { token: "L_JSR" } ] }
                 ],
-                T_JS$RPT0Nx1: [
-                    { name: "T_JS$RPT0Nx1", symbols: [ ] },
-                    { name: "T_JS$RPT0Nx1", postprocess: ({data}) => data[0].concat([data[1]]), symbols: [ "T_JS$RPT0Nx1", { token: "T_JSBODY" } ] }
+                "T_JS.RPT0Nx1": [
+                    { name: "T_JS.RPT0Nx1", symbols: [ ] },
+                    { name: "T_JS.RPT0Nx1", postprocess: ({data}) => data[0].concat([data[1]]), symbols: [ "T_JS.RPT0Nx1", { token: "T_JSBODY" } ] }
                 ],
                 T_REGEX: [
-                    { name: "T_REGEX", postprocess: ({data}) => { return ({ regex: data[0].value.slice(1,-1), flags: data[1].map(v=>v.value).join('').trim() }); }, symbols: [ { token: "T_REGEX" }, "T_REGEX$RPT0Nx1" ] }
+                    { name: "T_REGEX", postprocess: ({data}) => { return ({ regex: data[0].value.slice(1,-1), flags: data[1].map(v=>v.value).join('').trim() }); }, symbols: [ { token: "T_REGEX" }, "T_REGEX.RPT0Nx1" ] }
                 ],
-                T_REGEX$RPT0Nx1: [
-                    { name: "T_REGEX$RPT0Nx1", symbols: [ ] },
-                    { name: "T_REGEX$RPT0Nx1", postprocess: ({data}) => data[0].concat([data[1]]), symbols: [ "T_REGEX$RPT0Nx1", /[gmiuy]/ ] }
+                "T_REGEX.RPT0Nx1": [
+                    { name: "T_REGEX.RPT0Nx1", symbols: [ ] },
+                    { name: "T_REGEX.RPT0Nx1", postprocess: ({data}) => data[0].concat([data[1]]), symbols: [ "T_REGEX.RPT0Nx1", /[gmiuy]/ ] }
                 ],
                 T_STRING: [
                     { name: "T_STRING", postprocess: ({data}) => { return (JSON.parse(data[0].value)); }, symbols: [ { token: "T_STRING" } ] }
@@ -150,30 +150,30 @@ class grammar {
                     { name: "T_WS", postprocess: ({data}) => { return (null); }, symbols: [ { token: "T_WS" } ] }
                 ],
                 _: [
-                    { name: "_", postprocess: ({data}) => { return (null); }, symbols: [ "_$RPT0Nx1" ] }
+                    { name: "_", postprocess: ({data}) => { return (null); }, symbols: [ "_.RPT0Nx1" ] }
                 ],
-                _$RPT0Nx1: [
-                    { name: "_$RPT0Nx1", symbols: [ ] },
-                    { name: "_$RPT0Nx1", postprocess: ({data}) => data[0].concat([data[1]]), symbols: [ "_$RPT0Nx1", "_$RPT0Nx1$SUBx1" ] }
+                "_.RPT0Nx1": [
+                    { name: "_.RPT0Nx1", symbols: [ ] },
+                    { name: "_.RPT0Nx1", postprocess: ({data}) => data[0].concat([data[1]]), symbols: [ "_.RPT0Nx1", "_.RPT0Nx1.SUBx1" ] }
                 ],
-                _$RPT0Nx1$SUBx1: [
-                    { name: "_$RPT0Nx1$SUBx1", symbols: [ "T_WS" ] },
-                    { name: "_$RPT0Nx1$SUBx1", symbols: [ "T_COMMENT" ] }
+                "_.RPT0Nx1.SUBx1": [
+                    { name: "_.RPT0Nx1.SUBx1", symbols: [ "T_WS" ] },
+                    { name: "_.RPT0Nx1.SUBx1", symbols: [ "T_COMMENT" ] }
                 ],
                 __: [
-                    { name: "__", postprocess: ({data}) => { return (null); }, symbols: [ "__$RPT1Nx1" ] }
+                    { name: "__", postprocess: ({data}) => { return (null); }, symbols: [ "__.RPT1Nx1" ] }
                 ],
-                __$RPT1Nx1: [
-                    { name: "__$RPT1Nx1", symbols: [ "__$RPT1Nx1$SUBx1" ] },
-                    { name: "__$RPT1Nx1", postprocess: ({data}) => data[0].concat([data[1]]), symbols: [ "__$RPT1Nx1", "__$RPT1Nx1$SUBx2" ] }
+                "__.RPT1Nx1": [
+                    { name: "__.RPT1Nx1", symbols: [ "__.RPT1Nx1.SUBx1" ] },
+                    { name: "__.RPT1Nx1", postprocess: ({data}) => data[0].concat([data[1]]), symbols: [ "__.RPT1Nx1", "__.RPT1Nx1.SUBx2" ] }
                 ],
-                __$RPT1Nx1$SUBx1: [
-                    { name: "__$RPT1Nx1$SUBx1", symbols: [ "T_WS" ] },
-                    { name: "__$RPT1Nx1$SUBx1", symbols: [ "T_COMMENT" ] }
+                "__.RPT1Nx1.SUBx1": [
+                    { name: "__.RPT1Nx1.SUBx1", symbols: [ "T_WS" ] },
+                    { name: "__.RPT1Nx1.SUBx1", symbols: [ "T_COMMENT" ] }
                 ],
-                __$RPT1Nx1$SUBx2: [
-                    { name: "__$RPT1Nx1$SUBx2", symbols: [ "T_WS" ] },
-                    { name: "__$RPT1Nx1$SUBx2", symbols: [ "T_COMMENT" ] }
+                "__.RPT1Nx1.SUBx2": [
+                    { name: "__.RPT1Nx1.SUBx2", symbols: [ "T_WS" ] },
+                    { name: "__.RPT1Nx1.SUBx2", symbols: [ "T_COMMENT" ] }
                 ],
                 expression: [
                     { name: "expression", postprocess: ({data}) => { return ({ symbols: data[0] }); }, symbols: [ "expression_symbol_list" ] },
@@ -201,16 +201,16 @@ class grammar {
                 ],
                 expression_symbol_match: [
                     { name: "expression_symbol_match", postprocess: ({data}) => { return ({ rule: data[0] }); }, symbols: [ "T_WORD" ] },
-                    { name: "expression_symbol_match", postprocess: ({data}) => { return ({ literal: data[0], insensitive: !!data[1] }); }, symbols: [ "T_STRING", "expression_symbol_match$RPT01x1" ] },
+                    { name: "expression_symbol_match", postprocess: ({data}) => { return ({ literal: data[0], insensitive: !!data[1] }); }, symbols: [ "T_STRING", "expression_symbol_match.RPT01x1" ] },
                     { name: "expression_symbol_match", postprocess: ({data}) => { return ({ token: data[1]}); }, symbols: [ "L_DSIGN", "T_WORD" ] },
                     { name: "expression_symbol_match", postprocess: ({data}) => { return ({ token: data[1]}); }, symbols: [ "L_DSIGN", "T_STRING" ] },
                     { name: "expression_symbol_match", postprocess: ({data}) => { return (data[0]); }, symbols: [ "T_REGEX" ] },
                     { name: "expression_symbol_match", postprocess: ({data}) => { return ({ subexpression: data[2] }); }, symbols: [ "L_PARENL", "_", "expression_list", "_", "L_PARENR" ] },
                     { name: "expression_symbol_match", postprocess: ({data}) => { return (data[0]); }, symbols: [ "T_JS" ] }
                 ],
-                expression_symbol_match$RPT01x1: [
-                    { name: "expression_symbol_match$RPT01x1", postprocess: ({data}) => data[0], symbols: [ { literal: "i" } ] },
-                    { name: "expression_symbol_match$RPT01x1", postprocess: () => null, symbols: [ ] }
+                "expression_symbol_match.RPT01x1": [
+                    { name: "expression_symbol_match.RPT01x1", postprocess: ({data}) => data[0], symbols: [ { literal: "i" } ] },
+                    { name: "expression_symbol_match.RPT01x1", postprocess: () => null, symbols: [ ] }
                 ],
                 grammar: [
                     { name: "grammar", postprocess: ({data}) => { return ({ config: Object.assign(...data[0]), rules: data[2] }); }, symbols: [ "kv_list", "_", "grammar_rule_list" ] },
@@ -226,14 +226,14 @@ class grammar {
                     { name: "grammar_rule_list", postprocess: ({data}) => { return ([data[0]].concat(data[2])); }, symbols: [ "grammar_rule", "_", "grammar_rule_list" ] }
                 ],
                 kv: [
-                    { name: "kv", postprocess: ({data}) => { return ({ [data[0]]: data[4][0] }); }, symbols: [ "T_WORD", "_", "L_COLON", "_", "kv$SUBx1" ] }
+                    { name: "kv", postprocess: ({data}) => { return ({ [data[0]]: data[4][0] }); }, symbols: [ "T_WORD", "_", "L_COLON", "_", "kv.SUBx1" ] }
                 ],
-                kv$SUBx1: [
-                    { name: "kv$SUBx1", symbols: [ "T_WORD" ] },
-                    { name: "kv$SUBx1", symbols: [ "T_STRING" ] },
-                    { name: "kv$SUBx1", symbols: [ "T_INTEGER" ] },
-                    { name: "kv$SUBx1", symbols: [ "T_JS" ] },
-                    { name: "kv$SUBx1", symbols: [ "T_GRAMMAR_TEMPLATE" ] }
+                "kv.SUBx1": [
+                    { name: "kv.SUBx1", symbols: [ "T_WORD" ] },
+                    { name: "kv.SUBx1", symbols: [ "T_STRING" ] },
+                    { name: "kv.SUBx1", symbols: [ "T_INTEGER" ] },
+                    { name: "kv.SUBx1", symbols: [ "T_JS" ] },
+                    { name: "kv.SUBx1", symbols: [ "T_GRAMMAR_TEMPLATE" ] }
                 ],
                 kv_list: [
                     { name: "kv_list", postprocess: ({data}) => { return (data); }, symbols: [ "kv" ] },

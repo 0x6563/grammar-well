@@ -8,6 +8,10 @@ export declare class CommonGenerator {
     static JSON(obj: string[] | {
         [key: string]: string | (string[]);
     }, indent?: number): string;
+    static JSONArray(obj: string[], indent?: number): string;
+    static JSONObject(obj: {
+        [key: string]: string | (string[]);
+    }, indent?: number): string;
     static IsVal(value: any): boolean;
     static SerializeSymbol(s: GeneratorGrammarSymbol): string;
     static SerializeSymbolNonTerminal(s: ASTGrammarSymbolNonTerminal): string;

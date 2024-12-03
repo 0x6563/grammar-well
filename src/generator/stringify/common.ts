@@ -16,16 +16,20 @@ export class CommonGenerator {
     }
 
     static JSON(obj: string[] | { [key: string]: string | (string[]) }, indent = 0) {
-        if (Array.isArray(obj)) {
-            let r = `[`;
-            for (let i = 0; i < obj.length; i++) {
-                const value = obj[i];
-                r += `${CommonGenerator.SmartIndent(indent)}${value}${(CommonGenerator.IsVal(obj[i + 1]) ? ',' : '')}`;
-            }
-            r += `${CommonGenerator.SmartIndent(indent, 0)}]`;
-            return r;
-        }
+        return Array.isArray(obj) ? CommonGenerator.JSONArray(obj, indent) : CommonGenerator.JSONObject(obj, indent);
+    }
 
+    static JSONArray(obj: string[], indent = 0) {
+        let r = `[`;
+        for (let i = 0; i < obj.length; i++) {
+            const value = obj[i];
+            r += `${CommonGenerator.SmartIndent(indent)}${value}${(CommonGenerator.IsVal(obj[i + 1]) ? ',' : '')}`;
+        }
+        r += `${CommonGenerator.SmartIndent(indent, 0)}]`;
+        return r;
+    }
+
+    static JSONObject(obj: { [key: string]: string | (string[]) }, indent = 0) {
         let r = `{`;
         let seperator = '';
         const prefix = CommonGenerator.SmartIndent(indent);
@@ -33,7 +37,7 @@ export class CommonGenerator {
         for (const k of keys) {
             const v = obj[k];
             if (CommonGenerator.IsVal(v)) {
-                const key = /[a-z_][a-z\d_$]*/i.test(k) ? k : JSON.stringify(k);
+                const key = /^[a-z_][a-z\d_$]*$/i.test(k) ? k : JSON.stringify(k);
                 const value = Array.isArray(v) ? CommonGenerator.JSON(v, indent + 1 || -1) : v;
                 r += `${seperator}${prefix}${key}: ${value}`;
                 seperator = ','

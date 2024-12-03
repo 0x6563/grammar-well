@@ -62,7 +62,7 @@ export class TextFormatter {
                 return short ? symbol.toString() : `character matching ${symbol.toString()}`;
             }
             else if ("token" in symbol) {
-                return short ? `$${symbol.token}` : `${symbol.token} token`;
+                return short ? `<${symbol.token}>` : `${symbol.token} token`;
             }
             else if (error) {
                 return 'Unknown symbol type: ' + JSON.stringify(symbol);

@@ -5,47 +5,47 @@
 
 
 class grammar {
-    artifacts =  {
+    artifacts = {
         grammar: {
             rules: {
                 POSTPROCESSOR: [
-                    { name: "POSTPROCESSOR", postprocess: ({data}) => { return ({ template: data[2].value + data[3].map(v=>v.value).join('').trim() + data[4].value}); }, symbols: [ { literal: "=>" }, "_", { literal: "(" }, "POSTPROCESSOR$RPT0Nx1", { literal: ")" } ] },
-                    { name: "POSTPROCESSOR", postprocess: ({data}) => { return ({ template: data[2].value + data[3].map(v=>v.value).join('').trim() + data[4].value}); }, symbols: [ { literal: "=>" }, "_", { literal: "{" }, "POSTPROCESSOR$RPT0Nx2", { literal: "}" } ] },
-                    { name: "POSTPROCESSOR", postprocess: ({data}) => { return ({ template: data[2].value + data[3].map(v=>v.value).join('').trim() + data[4].value}); }, symbols: [ { literal: "=>" }, "_", { literal: "[" }, "POSTPROCESSOR$RPT0Nx3", { literal: "]" } ] },
-                    { name: "POSTPROCESSOR", postprocess: ({data}) => { return ({ js: data[3].map(v=>v.value).join('').trim() }); }, symbols: [ { literal: "=>" }, "_", { literal: "${" }, "POSTPROCESSOR$RPT0Nx4", { literal: "}" } ] }
+                    { name: "POSTPROCESSOR", postprocess: ({data}) => { return ({ template: data[2].value + data[3].map(v=>v.value).join('').trim() + data[4].value}); }, symbols: [ { literal: "=>" }, "_", { literal: "(" }, "POSTPROCESSOR.RPT0Nx1", { literal: ")" } ] },
+                    { name: "POSTPROCESSOR", postprocess: ({data}) => { return ({ template: data[2].value + data[3].map(v=>v.value).join('').trim() + data[4].value}); }, symbols: [ { literal: "=>" }, "_", { literal: "{" }, "POSTPROCESSOR.RPT0Nx2", { literal: "}" } ] },
+                    { name: "POSTPROCESSOR", postprocess: ({data}) => { return ({ template: data[2].value + data[3].map(v=>v.value).join('').trim() + data[4].value}); }, symbols: [ { literal: "=>" }, "_", { literal: "[" }, "POSTPROCESSOR.RPT0Nx3", { literal: "]" } ] },
+                    { name: "POSTPROCESSOR", postprocess: ({data}) => { return ({ js: data[3].map(v=>v.value).join('').trim() }); }, symbols: [ { literal: "=>" }, "_", { literal: "${" }, "POSTPROCESSOR.RPT0Nx4", { literal: "}" } ] }
                 ],
-                POSTPROCESSOR$RPT0Nx1: [
-                    { name: "POSTPROCESSOR$RPT0Nx1", symbols: [ ] },
-                    { name: "POSTPROCESSOR$RPT0Nx1", postprocess: ({data}) => data[0].concat([data[1]]), symbols: [ "POSTPROCESSOR$RPT0Nx1", { token: "T_JSBODY" } ] }
+                "POSTPROCESSOR.RPT0Nx1": [
+                    { name: "POSTPROCESSOR.RPT0Nx1", symbols: [ ] },
+                    { name: "POSTPROCESSOR.RPT0Nx1", postprocess: ({data}) => data[0].concat([data[1]]), symbols: [ "POSTPROCESSOR.RPT0Nx1", { token: "T_JSBODY" } ] }
                 ],
-                POSTPROCESSOR$RPT0Nx2: [
-                    { name: "POSTPROCESSOR$RPT0Nx2", symbols: [ ] },
-                    { name: "POSTPROCESSOR$RPT0Nx2", postprocess: ({data}) => data[0].concat([data[1]]), symbols: [ "POSTPROCESSOR$RPT0Nx2", { token: "T_JSBODY" } ] }
+                "POSTPROCESSOR.RPT0Nx2": [
+                    { name: "POSTPROCESSOR.RPT0Nx2", symbols: [ ] },
+                    { name: "POSTPROCESSOR.RPT0Nx2", postprocess: ({data}) => data[0].concat([data[1]]), symbols: [ "POSTPROCESSOR.RPT0Nx2", { token: "T_JSBODY" } ] }
                 ],
-                POSTPROCESSOR$RPT0Nx3: [
-                    { name: "POSTPROCESSOR$RPT0Nx3", symbols: [ ] },
-                    { name: "POSTPROCESSOR$RPT0Nx3", postprocess: ({data}) => data[0].concat([data[1]]), symbols: [ "POSTPROCESSOR$RPT0Nx3", { token: "T_JSBODY" } ] }
+                "POSTPROCESSOR.RPT0Nx3": [
+                    { name: "POSTPROCESSOR.RPT0Nx3", symbols: [ ] },
+                    { name: "POSTPROCESSOR.RPT0Nx3", postprocess: ({data}) => data[0].concat([data[1]]), symbols: [ "POSTPROCESSOR.RPT0Nx3", { token: "T_JSBODY" } ] }
                 ],
-                POSTPROCESSOR$RPT0Nx4: [
-                    { name: "POSTPROCESSOR$RPT0Nx4", symbols: [ ] },
-                    { name: "POSTPROCESSOR$RPT0Nx4", postprocess: ({data}) => data[0].concat([data[1]]), symbols: [ "POSTPROCESSOR$RPT0Nx4", { token: "T_JSBODY" } ] }
+                "POSTPROCESSOR.RPT0Nx4": [
+                    { name: "POSTPROCESSOR.RPT0Nx4", symbols: [ ] },
+                    { name: "POSTPROCESSOR.RPT0Nx4", postprocess: ({data}) => data[0].concat([data[1]]), symbols: [ "POSTPROCESSOR.RPT0Nx4", { token: "T_JSBODY" } ] }
                 ],
                 T_INTEGER: [
                     { name: "T_INTEGER", postprocess: ({data}) => { return (data[0].value); }, symbols: [ { token: "T_INTEGER" } ] }
                 ],
                 T_JS: [
-                    { name: "T_JS", postprocess: ({data}) => { return ({ js: data[1].map(v=>v.value).join('') }); }, symbols: [ { literal: "{" }, "T_JS$RPT0Nx1", { literal: "}" } ] }
+                    { name: "T_JS", postprocess: ({data}) => { return ({ js: data[1].map(v=>v.value).join('') }); }, symbols: [ { literal: "{" }, "T_JS.RPT0Nx1", { literal: "}" } ] }
                 ],
-                T_JS$RPT0Nx1: [
-                    { name: "T_JS$RPT0Nx1", symbols: [ ] },
-                    { name: "T_JS$RPT0Nx1", postprocess: ({data}) => data[0].concat([data[1]]), symbols: [ "T_JS$RPT0Nx1", { token: "T_JSBODY" } ] }
+                "T_JS.RPT0Nx1": [
+                    { name: "T_JS.RPT0Nx1", symbols: [ ] },
+                    { name: "T_JS.RPT0Nx1", postprocess: ({data}) => data[0].concat([data[1]]), symbols: [ "T_JS.RPT0Nx1", { token: "T_JSBODY" } ] }
                 ],
                 T_REGEX: [
-                    { name: "T_REGEX", postprocess: ({data}) => { return ({ regex: data[1].map(v=>v.value).join(''), flags: data[0].value.slice(1,-3) }); }, symbols: [ { token: "REGEX_DEFSTART" }, "T_REGEX$RPT0Nx1", { token: "REGEX_DEFEND" } ] }
+                    { name: "T_REGEX", postprocess: ({data}) => { return ({ regex: data[1].map(v=>v.value).join(''), flags: data[0].value.slice(1,-3) }); }, symbols: [ { token: "REGEX_DEFSTART" }, "T_REGEX.RPT0Nx1", { token: "REGEX_DEFEND" } ] }
                 ],
-                T_REGEX$RPT0Nx1: [
-                    { name: "T_REGEX$RPT0Nx1", symbols: [ ] },
-                    { name: "T_REGEX$RPT0Nx1", postprocess: ({data}) => data[0].concat([data[1]]), symbols: [ "T_REGEX$RPT0Nx1", { token: "T_REGEX" } ] }
+                "T_REGEX.RPT0Nx1": [
+                    { name: "T_REGEX.RPT0Nx1", symbols: [ ] },
+                    { name: "T_REGEX.RPT0Nx1", postprocess: ({data}) => data[0].concat([data[1]]), symbols: [ "T_REGEX.RPT0Nx1", { token: "T_REGEX" } ] }
                 ],
                 T_SECTWORD: [
                     { name: "T_SECTWORD", postprocess: ({data}) => { return (data[0].value.substring(1, data[0].value.length-1).trim()); }, symbols: [ { token: "T_SECTWORD" } ] }
@@ -57,30 +57,30 @@ class grammar {
                     { name: "T_WORD", postprocess: ({data}) => { return (data[0].value); }, symbols: [ { token: "T_WORD" } ] }
                 ],
                 _: [
-                    { name: "_", postprocess: ({data}) => { return (null); }, symbols: [ "_$RPT0Nx1" ] }
+                    { name: "_", postprocess: ({data}) => { return (null); }, symbols: [ "_.RPT0Nx1" ] }
                 ],
-                _$RPT0Nx1: [
-                    { name: "_$RPT0Nx1", symbols: [ ] },
-                    { name: "_$RPT0Nx1", postprocess: ({data}) => data[0].concat([data[1]]), symbols: [ "_$RPT0Nx1", "_$RPT0Nx1$SUBx1" ] }
+                "_.RPT0Nx1": [
+                    { name: "_.RPT0Nx1", symbols: [ ] },
+                    { name: "_.RPT0Nx1", postprocess: ({data}) => data[0].concat([data[1]]), symbols: [ "_.RPT0Nx1", "_.RPT0Nx1.SUBx1" ] }
                 ],
-                _$RPT0Nx1$SUBx1: [
-                    { name: "_$RPT0Nx1$SUBx1", symbols: [ { token: "T_WS" } ] },
-                    { name: "_$RPT0Nx1$SUBx1", symbols: [ { token: "T_COMMENT" } ] }
+                "_.RPT0Nx1.SUBx1": [
+                    { name: "_.RPT0Nx1.SUBx1", symbols: [ { token: "T_WS" } ] },
+                    { name: "_.RPT0Nx1.SUBx1", symbols: [ { token: "T_COMMENT" } ] }
                 ],
                 __: [
-                    { name: "__", postprocess: ({data}) => { return (null); }, symbols: [ "__$RPT1Nx1" ] }
+                    { name: "__", postprocess: ({data}) => { return (null); }, symbols: [ "__.RPT1Nx1" ] }
                 ],
-                __$RPT1Nx1: [
-                    { name: "__$RPT1Nx1", symbols: [ "__$RPT1Nx1$SUBx1" ] },
-                    { name: "__$RPT1Nx1", postprocess: ({data}) => data[0].concat([data[1]]), symbols: [ "__$RPT1Nx1", "__$RPT1Nx1$SUBx2" ] }
+                "__.RPT1Nx1": [
+                    { name: "__.RPT1Nx1", symbols: [ "__.RPT1Nx1.SUBx1" ] },
+                    { name: "__.RPT1Nx1", postprocess: ({data}) => data[0].concat([data[1]]), symbols: [ "__.RPT1Nx1", "__.RPT1Nx1.SUBx2" ] }
                 ],
-                __$RPT1Nx1$SUBx1: [
-                    { name: "__$RPT1Nx1$SUBx1", symbols: [ { token: "T_WS" } ] },
-                    { name: "__$RPT1Nx1$SUBx1", symbols: [ { token: "T_COMMENT" } ] }
+                "__.RPT1Nx1.SUBx1": [
+                    { name: "__.RPT1Nx1.SUBx1", symbols: [ { token: "T_WS" } ] },
+                    { name: "__.RPT1Nx1.SUBx1", symbols: [ { token: "T_COMMENT" } ] }
                 ],
-                __$RPT1Nx1$SUBx2: [
-                    { name: "__$RPT1Nx1$SUBx2", symbols: [ { token: "T_WS" } ] },
-                    { name: "__$RPT1Nx1$SUBx2", symbols: [ { token: "T_COMMENT" } ] }
+                "__.RPT1Nx1.SUBx2": [
+                    { name: "__.RPT1Nx1.SUBx2", symbols: [ { token: "T_WS" } ] },
+                    { name: "__.RPT1Nx1.SUBx2", symbols: [ { token: "T_COMMENT" } ] }
                 ],
                 expression: [
                     { name: "expression", postprocess: ({data}) => { return ({ symbols: data[0] }); }, symbols: [ "expression_symbol_list" ] },
@@ -131,13 +131,13 @@ class grammar {
                     { name: "grammar_rule_name", postprocess: ({data}) => { return (data[0]); }, symbols: [ "T_SECTWORD" ] }
                 ],
                 kv: [
-                    { name: "kv", postprocess: ({data}) => { return ({ [data[0]]: data[4][0] }); }, symbols: [ "T_WORD", "_", { literal: ":" }, "_", "kv$SUBx1" ] }
+                    { name: "kv", postprocess: ({data}) => { return ({ [data[0]]: data[4][0] }); }, symbols: [ "T_WORD", "_", { literal: ":" }, "_", "kv.SUBx1" ] }
                 ],
-                kv$SUBx1: [
-                    { name: "kv$SUBx1", symbols: [ "T_WORD" ] },
-                    { name: "kv$SUBx1", symbols: [ "T_STRING" ] },
-                    { name: "kv$SUBx1", symbols: [ "T_INTEGER" ] },
-                    { name: "kv$SUBx1", symbols: [ "T_JS" ] }
+                "kv.SUBx1": [
+                    { name: "kv.SUBx1", symbols: [ "T_WORD" ] },
+                    { name: "kv.SUBx1", symbols: [ "T_STRING" ] },
+                    { name: "kv.SUBx1", symbols: [ "T_INTEGER" ] },
+                    { name: "kv.SUBx1", symbols: [ "T_JS" ] }
                 ],
                 kv_list: [
                     { name: "kv_list", postprocess: ({data}) => { return (data); }, symbols: [ "kv" ] },
@@ -244,10 +244,10 @@ class grammar {
                     regex: /(?:(?:(\s+))|(?:((?:\{))))/ym,
                     rules: [
                         { tag: ["T_WS"], when: /\s+/ },
-                        { set: "config$span", when: "{" }
+                        { set: "config.span", when: "{" }
                     ]
                 },
-                config$span: {
+                "config.span": {
                     regex: /(?:(?:(\/\/[^\n]*))|(?:("(?:\\.|[^"\\\r\n])*"))|(?:(\s+))|(?:([a-zA-Z_][a-zA-Z_\d]*))|(?:((?::)))|(?:(\d+))|(?:((?:;)))|(?:((?:\}))))/ym,
                     rules: [
                         { highlight: "comment", tag: ["T_COMMENT"], when: /\/\/[^\n]*/ },
@@ -260,14 +260,14 @@ class grammar {
                         { pop: 1, when: "}" }
                     ]
                 },
-                config$start: {
+                "config.start": {
                     regex: /(?:(?:(\s+))|(?:((?:\{))))/ym,
                     rules: [
                         { tag: ["T_WS"], when: /\s+/ },
-                        { set: "config$span", when: "{" }
+                        { set: "config.span", when: "{" }
                     ]
                 },
-                config$stop: {
+                "config.stop": {
                     regex: /(?:(?:((?:\}))))/ym,
                     rules: [
                         { pop: 1, when: "}" }
@@ -277,10 +277,10 @@ class grammar {
                     regex: /(?:(?:(\s+))|(?:((?:\{))))/ym,
                     rules: [
                         { tag: ["T_WS"], when: /\s+/ },
-                        { set: "grammar$span", when: "{" }
+                        { set: "grammar.span", when: "{" }
                     ]
                 },
-                grammar$span: {
+                "grammar.span": {
                     regex: /(?:(?:(\/\/[^\n]*))|(?:(\[\s*[a-zA-Z_][a-zA-Z_\d]*\s*\]))|(?:((?:=>)))|(?:(\s+))|(?:((?:i:)))|(?:(r[gmiuy]*:\{))|(?:((?:\?)))|(?:((?:\+)))|(?:((?:\*)))|(?:("(?:\\.|[^"\\\r\n])*"))|(?:([a-zA-Z_][a-zA-Z_\d]*))|(?:((?::)))|(?:(\d+))|(?:((?:;)))|(?:((?:@)))|(?:((?:,)))|(?:((?:\|)))|(?:((?:\()))|(?:((?:\))))|(?:((?:<)))|(?:((?:>)))|(?:((?:\->)))|(?:((?:\$)))|(?:((?:\-)))|(?:((?:\}))))/ym,
                     rules: [
                         { highlight: "comment", tag: ["T_COMMENT"], when: /\/\/[^\n]*/ },
@@ -288,7 +288,7 @@ class grammar {
                         { goto: "js_template_inner", highlight: "annotation", when: "=>" },
                         { tag: ["T_WS"], when: /\s+/ },
                         { highlight: "constant", when: "i:" },
-                        { goto: "regex$span", highlight: "annotation", tag: ["REGEX_DEFSTART"], when: /r[gmiuy]*:\{/ },
+                        { goto: "regex.span", highlight: "annotation", tag: ["REGEX_DEFSTART"], when: /r[gmiuy]*:\{/ },
                         { when: "?" },
                         { when: "+" },
                         { when: "*" },
@@ -310,14 +310,14 @@ class grammar {
                         { pop: 1, when: "}" }
                     ]
                 },
-                grammar$start: {
+                "grammar.start": {
                     regex: /(?:(?:(\s+))|(?:((?:\{))))/ym,
                     rules: [
                         { tag: ["T_WS"], when: /\s+/ },
-                        { set: "grammar$span", when: "{" }
+                        { set: "grammar.span", when: "{" }
                     ]
                 },
-                grammar$stop: {
+                "grammar.stop": {
                     regex: /(?:(?:((?:\}))))/ym,
                     rules: [
                         { pop: 1, when: "}" }
@@ -492,16 +492,16 @@ class grammar {
                     regex: /(?:(?:(\s+))|(?:((?:\{))))/ym,
                     rules: [
                         { tag: ["T_WS"], when: /\s+/ },
-                        { set: "lexer$span", when: "{" }
+                        { set: "lexer.span", when: "{" }
                     ]
                 },
-                lexer$span: {
+                "lexer.span": {
                     regex: /(?:(?:(\s+))|(?:(\/\/[^\n]*))|(?:(\[\s*[a-zA-Z_][a-zA-Z_\d]*\s*\]))|(?:(r[gmiuy]*:\{))|(?:((?:,)))|(?:((?:\->)))|(?:((?:\-)))|(?:("(?:\\.|[^"\\\r\n])*"))|(?:([a-zA-Z_][a-zA-Z_\d]*))|(?:((?::)))|(?:(\d+))|(?:((?:;)))|(?:((?:\{)))|(?:((?:\}))))/ym,
                     rules: [
                         { tag: ["T_WS"], when: /\s+/ },
                         { highlight: "comment", tag: ["T_COMMENT"], when: /\/\/[^\n]*/ },
                         { highlight: "type.identifier", tag: ["T_SECTWORD"], when: /\[\s*[a-zA-Z_][a-zA-Z_\d]*\s*\]/ },
-                        { goto: "regex$span", highlight: "annotation", tag: ["REGEX_DEFSTART"], when: /r[gmiuy]*:\{/ },
+                        { goto: "regex.span", highlight: "annotation", tag: ["REGEX_DEFSTART"], when: /r[gmiuy]*:\{/ },
                         { when: "," },
                         { highlight: "keyword", when: "->" },
                         { when: "-" },
@@ -510,18 +510,18 @@ class grammar {
                         { highlight: "keyword", when: ":" },
                         { highlight: "number", tag: ["T_INTEGER"], when: /\d+/ },
                         { when: ";" },
-                        { goto: "lexer_span$span", when: "{" },
+                        { goto: "lexer_span.span", when: "{" },
                         { pop: 1, when: "}" }
                     ]
                 },
-                lexer$start: {
+                "lexer.start": {
                     regex: /(?:(?:(\s+))|(?:((?:\{))))/ym,
                     rules: [
                         { tag: ["T_WS"], when: /\s+/ },
-                        { set: "lexer$span", when: "{" }
+                        { set: "lexer.span", when: "{" }
                     ]
                 },
-                lexer$stop: {
+                "lexer.stop": {
                     regex: /(?:(?:((?:\}))))/ym,
                     rules: [
                         { pop: 1, when: "}" }
@@ -530,16 +530,16 @@ class grammar {
                 lexer_span: {
                     regex: /(?:(?:((?:\{))))/ym,
                     rules: [
-                        { goto: "lexer_span$span", when: "{" }
+                        { goto: "lexer_span.span", when: "{" }
                     ]
                 },
-                lexer_span$span: {
+                "lexer_span.span": {
                     regex: /(?:(?:(\s+))|(?:(\/\/[^\n]*))|(?:(\[\s*[a-zA-Z_][a-zA-Z_\d]*\s*\]))|(?:(r[gmiuy]*:\{))|(?:((?:,)))|(?:((?:\->)))|(?:((?:\-)))|(?:("(?:\\.|[^"\\\r\n])*"))|(?:([a-zA-Z_][a-zA-Z_\d]*))|(?:((?::)))|(?:(\d+))|(?:((?:;)))|(?:((?:\}))))/ym,
                     rules: [
                         { tag: ["T_WS"], when: /\s+/ },
                         { highlight: "comment", tag: ["T_COMMENT"], when: /\/\/[^\n]*/ },
                         { highlight: "type.identifier", tag: ["T_SECTWORD"], when: /\[\s*[a-zA-Z_][a-zA-Z_\d]*\s*\]/ },
-                        { goto: "regex$span", highlight: "annotation", tag: ["REGEX_DEFSTART"], when: /r[gmiuy]*:\{/ },
+                        { goto: "regex.span", highlight: "annotation", tag: ["REGEX_DEFSTART"], when: /r[gmiuy]*:\{/ },
                         { when: "," },
                         { highlight: "keyword", when: "->" },
                         { when: "-" },
@@ -551,13 +551,13 @@ class grammar {
                         { pop: 1, when: "}" }
                     ]
                 },
-                lexer_span$start: {
+                "lexer_span.start": {
                     regex: /(?:(?:((?:\{))))/ym,
                     rules: [
-                        { goto: "lexer_span$span", when: "{" }
+                        { goto: "lexer_span.span", when: "{" }
                     ]
                 },
-                lexer_span$stop: {
+                "lexer_span.stop": {
                     regex: /(?:(?:((?:\}))))/ym,
                     rules: [
                         { pop: 1, when: "}" }
@@ -566,10 +566,10 @@ class grammar {
                 lifecycle: {
                     regex: /(?:(?:(on(?![a-zA-Z\d_]))))/ym,
                     rules: [
-                        { goto: "lifecycle$span", highlight: "tag", tag: ["T_WORD"], when: /on(?![a-zA-Z\d_])/ }
+                        { goto: "lifecycle.span", highlight: "tag", tag: ["T_WORD"], when: /on(?![a-zA-Z\d_])/ }
                     ]
                 },
-                lifecycle$span: {
+                "lifecycle.span": {
                     regex: /(?:(?:(\s+))|(?:((?:\{)))|(?:((?::)))|(?:([a-zA-Z_][a-zA-Z_\d]*))|(?:([\'"`])))/ym,
                     rules: [
                         { tag: ["T_WS"], when: /\s+/ },
@@ -579,13 +579,13 @@ class grammar {
                         { before: true, pop: 1, when: /[\'"`]/ }
                     ]
                 },
-                lifecycle$start: {
+                "lifecycle.start": {
                     regex: /(?:(?:(on(?![a-zA-Z\d_]))))/ym,
                     rules: [
-                        { goto: "lifecycle$span", highlight: "tag", tag: ["T_WORD"], when: /on(?![a-zA-Z\d_])/ }
+                        { goto: "lifecycle.span", highlight: "tag", tag: ["T_WORD"], when: /on(?![a-zA-Z\d_])/ }
                     ]
                 },
-                lifecycle$stop: {
+                "lifecycle.stop": {
                     regex: /(?:(?:([\'"`])))/ym,
                     rules: [
                         { before: true, pop: 1, when: /[\'"`]/ }
@@ -598,7 +598,7 @@ class grammar {
                         { tag: ["T_WS"], when: /\s+/ },
                         { highlight: "comment", tag: ["T_COMMENT"], when: /\/\/[^\n]*/ },
                         { when: "*" },
-                        { goto: "lifecycle$span", highlight: "tag", tag: ["T_WORD"], when: /on(?![a-zA-Z\d_])/ },
+                        { goto: "lifecycle.span", highlight: "tag", tag: ["T_WORD"], when: /on(?![a-zA-Z\d_])/ },
                         { goto: "lexer", highlight: "tag", tag: ["T_WORD"], when: /lexer(?![a-zA-Z\d_])/ },
                         { goto: "grammar", highlight: "tag", tag: ["T_WORD"], when: /grammar(?![a-zA-Z\d_])/ },
                         { goto: "config", highlight: "tag", tag: ["T_WORD"], when: /config(?![a-zA-Z\d_])/ },
@@ -611,15 +611,15 @@ class grammar {
                 regex: {
                     regex: /(?:(?:(r[gmiuy]*:\{)))/ym,
                     rules: [
-                        { goto: "regex$span", highlight: "annotation", tag: ["REGEX_DEFSTART"], when: /r[gmiuy]*:\{/ }
+                        { goto: "regex.span", highlight: "annotation", tag: ["REGEX_DEFSTART"], when: /r[gmiuy]*:\{/ }
                     ]
                 },
-                regex$span: {
+                "regex.span": {
                     regex: /(?:(?:(\\.))|(?:((?:\[\^)))|(?:((?:\[)))|(?:(\{[\d\s,]+\}))|(?:([?!:^$+*.|]))|(?:([()]))|(?:([^\}]+?))|(?:((?:\}))))/ym,
                     rules: [
                         { highlight: "string.escape", tag: ["T_REGEX"], when: /\\./ },
-                        { goto: "regex_charclass$span", highlight: "regexp", tag: ["T_REGEX"], when: "[^" },
-                        { goto: "regex_charclass$span", highlight: "regexp", tag: ["T_REGEX"], when: "[" },
+                        { goto: "regex_charclass.span", highlight: "regexp", tag: ["T_REGEX"], when: "[^" },
+                        { goto: "regex_charclass.span", highlight: "regexp", tag: ["T_REGEX"], when: "[" },
                         { highlight: "number", tag: ["T_REGEX"], when: /\{[\d\s,]+\}/ },
                         { highlight: "keyword", tag: ["T_REGEX"], when: /[?!:^$+*.|]/ },
                         { highlight: "delimiter", tag: ["T_REGEX"], when: /[()]/ },
@@ -627,13 +627,13 @@ class grammar {
                         { highlight: "annotation", pop: 1, tag: ["REGEX_DEFEND"], when: "}" }
                     ]
                 },
-                regex$start: {
+                "regex.start": {
                     regex: /(?:(?:(r[gmiuy]*:\{)))/ym,
                     rules: [
-                        { goto: "regex$span", highlight: "annotation", tag: ["REGEX_DEFSTART"], when: /r[gmiuy]*:\{/ }
+                        { goto: "regex.span", highlight: "annotation", tag: ["REGEX_DEFSTART"], when: /r[gmiuy]*:\{/ }
                     ]
                 },
-                regex$stop: {
+                "regex.stop": {
                     regex: /(?:(?:((?:\}))))/ym,
                     rules: [
                         { highlight: "annotation", pop: 1, tag: ["REGEX_DEFEND"], when: "}" }
@@ -642,11 +642,11 @@ class grammar {
                 regex_charclass: {
                     regex: /(?:(?:((?:\[\^)))|(?:((?:\[))))/ym,
                     rules: [
-                        { goto: "regex_charclass$span", highlight: "regexp", tag: ["T_REGEX"], when: "[^" },
-                        { goto: "regex_charclass$span", highlight: "regexp", tag: ["T_REGEX"], when: "[" }
+                        { goto: "regex_charclass.span", highlight: "regexp", tag: ["T_REGEX"], when: "[^" },
+                        { goto: "regex_charclass.span", highlight: "regexp", tag: ["T_REGEX"], when: "[" }
                     ]
                 },
-                regex_charclass$span: {
+                "regex_charclass.span": {
                     regex: /(?:(?:(\\.))|(?:((?:\-)))|(?:([^\]]+?))|(?:((?:\]))))/ym,
                     rules: [
                         { highlight: "string.escape", tag: ["T_REGEX"], when: /\\./ },
@@ -655,14 +655,14 @@ class grammar {
                         { highlight: "regexp", pop: 1, tag: ["T_REGEX"], when: "]" }
                     ]
                 },
-                regex_charclass$start: {
+                "regex_charclass.start": {
                     regex: /(?:(?:((?:\[\^)))|(?:((?:\[))))/ym,
                     rules: [
-                        { goto: "regex_charclass$span", highlight: "regexp", tag: ["T_REGEX"], when: "[^" },
-                        { goto: "regex_charclass$span", highlight: "regexp", tag: ["T_REGEX"], when: "[" }
+                        { goto: "regex_charclass.span", highlight: "regexp", tag: ["T_REGEX"], when: "[^" },
+                        { goto: "regex_charclass.span", highlight: "regexp", tag: ["T_REGEX"], when: "[" }
                     ]
                 },
-                regex_charclass$stop: {
+                "regex_charclass.stop": {
                     regex: /(?:(?:((?:\]))))/ym,
                     rules: [
                         { highlight: "regexp", pop: 1, tag: ["T_REGEX"], when: "]" }

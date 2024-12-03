@@ -23,7 +23,7 @@ function Generate(generator: JavaScriptGenerator) {
 ${generator.lifecycle('import')}
 
 class ${exportName} {
-    artifacts =  ${generator.artifacts(1)}
+    artifacts = ${generator.artifacts(1)}
     constructor(){${generator.lifecycle('new')}}
 }`;
 }

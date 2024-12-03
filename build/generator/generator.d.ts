@@ -3,6 +3,7 @@ import { GeneratorState } from "./state.js";
 export declare function Generate(source: string, config?: GenerateOptions): Promise<ReturnType<Generator['output']>>;
 export declare function Generate(directive: ASTDirectives, config?: GenerateOptions): Promise<ReturnType<Generator['output']>>;
 export declare function Generate(directives: ASTDirectives[], config?: GenerateOptions): Promise<ReturnType<Generator['output']>>;
+export declare const NAME_DELIMITER = ".";
 export declare class Generator {
     private config;
     private context;
