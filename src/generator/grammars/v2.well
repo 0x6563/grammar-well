@@ -127,16 +127,34 @@ lexer {
 	[regex] span {
 
 		[start]
-			- when r:{r[gmiuy]*:\{} tag "REGEX_DEFSTART" highlight "constant"
+			- when r:{r[gmiuy]*:\{} tag "REGEX_DEFSTART" highlight "annotation"
 
 		[span]
-			- when r:{(?:\\.|[^\}\[\{])+} tag "T_REGEX" highlight "regex"
-			- when r:{\[(?:\\.|[^\]])*\]} tag "T_REGEX"
-			- when r:{\{[\d\s,]+\}} tag "T_REGEX"
-			- when r:{(?:\\.|[^\}])+} tag "T_REGEX" highlight "regex"
+			- when r:{\\.} tag "T_REGEX" highlight "string.escape"
+			- import regex_charclass
+			- when r:{\{[\d\s,]+\}} tag "T_REGEX" highlight "number"
+			- when r:{[?!:^$+*.|]} tag "T_REGEX" highlight "keyword"
+			- when r:{[()]} tag "T_REGEX" highlight "delimiter"
+			- when r:{[^\}]+?} tag "T_REGEX" highlight "string"
 
 		[stop]
-			- when "}" tag "REGEX_DEFEND" highlight "constant"
+			- when "}" tag "REGEX_DEFEND" highlight "annotation"
+
+	}
+
+	[regex_charclass] span {
+
+		[start]
+			- when "[^" tag "T_REGEX" highlight "regexp"
+			- when "[" tag "T_REGEX" highlight "regexp"
+
+		[span]
+			- when r:{\\.} tag "T_REGEX" highlight "string.escape"
+			- when "-" tag "T_REGEX" highlight "keyword"
+			- when r:{[^\]]+?} tag "T_REGEX" highlight "regexp"
+
+		[stop]
+			- when "]" tag "T_REGEX" highlight "regexp"
 
 	}
 

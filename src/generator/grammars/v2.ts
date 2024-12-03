@@ -288,7 +288,7 @@ class grammar {
                         { goto: "js_template_inner", highlight: "annotation", when: "=>" },
                         { tag: ["T_WS"], when: /\s+/ },
                         { highlight: "constant", when: "i:" },
-                        { goto: "regex$span", highlight: "constant", tag: ["REGEX_DEFSTART"], when: /r[gmiuy]*:\{/ },
+                        { goto: "regex$span", highlight: "annotation", tag: ["REGEX_DEFSTART"], when: /r[gmiuy]*:\{/ },
                         { when: "?" },
                         { when: "+" },
                         { when: "*" },
@@ -501,7 +501,7 @@ class grammar {
                         { tag: ["T_WS"], when: /\s+/ },
                         { highlight: "comment", tag: ["T_COMMENT"], when: /\/\/[^\n]*/ },
                         { highlight: "type.identifier", tag: ["T_SECTWORD"], when: /\[\s*[a-zA-Z_][a-zA-Z_\d]*\s*\]/ },
-                        { goto: "regex$span", highlight: "constant", tag: ["REGEX_DEFSTART"], when: /r[gmiuy]*:\{/ },
+                        { goto: "regex$span", highlight: "annotation", tag: ["REGEX_DEFSTART"], when: /r[gmiuy]*:\{/ },
                         { when: "," },
                         { highlight: "keyword", when: "->" },
                         { when: "-" },
@@ -539,7 +539,7 @@ class grammar {
                         { tag: ["T_WS"], when: /\s+/ },
                         { highlight: "comment", tag: ["T_COMMENT"], when: /\/\/[^\n]*/ },
                         { highlight: "type.identifier", tag: ["T_SECTWORD"], when: /\[\s*[a-zA-Z_][a-zA-Z_\d]*\s*\]/ },
-                        { goto: "regex$span", highlight: "constant", tag: ["REGEX_DEFSTART"], when: /r[gmiuy]*:\{/ },
+                        { goto: "regex$span", highlight: "annotation", tag: ["REGEX_DEFSTART"], when: /r[gmiuy]*:\{/ },
                         { when: "," },
                         { highlight: "keyword", when: "->" },
                         { when: "-" },
@@ -611,29 +611,61 @@ class grammar {
                 regex: {
                     regex: /(?:(?:(r[gmiuy]*:\{)))/ym,
                     rules: [
-                        { goto: "regex$span", highlight: "constant", tag: ["REGEX_DEFSTART"], when: /r[gmiuy]*:\{/ }
+                        { goto: "regex$span", highlight: "annotation", tag: ["REGEX_DEFSTART"], when: /r[gmiuy]*:\{/ }
                     ]
                 },
                 regex$span: {
-                    regex: /(?:(?:((?:\\.|[^\}\[\{])+))|(?:(\[(?:\\.|[^\]])*\]))|(?:(\{[\d\s,]+\}))|(?:((?:\\.|[^\}])+))|(?:((?:\}))))/ym,
+                    regex: /(?:(?:(\\.))|(?:((?:\[\^)))|(?:((?:\[)))|(?:(\{[\d\s,]+\}))|(?:([?!:^$+*.|]))|(?:([()]))|(?:([^\}]+?))|(?:((?:\}))))/ym,
                     rules: [
-                        { highlight: "regex", tag: ["T_REGEX"], when: /(?:\\.|[^\}\[\{])+/ },
-                        { tag: ["T_REGEX"], when: /\[(?:\\.|[^\]])*\]/ },
-                        { tag: ["T_REGEX"], when: /\{[\d\s,]+\}/ },
-                        { highlight: "regex", tag: ["T_REGEX"], when: /(?:\\.|[^\}])+/ },
-                        { highlight: "constant", pop: 1, tag: ["REGEX_DEFEND"], when: "}" }
+                        { highlight: "string.escape", tag: ["T_REGEX"], when: /\\./ },
+                        { goto: "regex_charclass$span", highlight: "regexp", tag: ["T_REGEX"], when: "[^" },
+                        { goto: "regex_charclass$span", highlight: "regexp", tag: ["T_REGEX"], when: "[" },
+                        { highlight: "number", tag: ["T_REGEX"], when: /\{[\d\s,]+\}/ },
+                        { highlight: "keyword", tag: ["T_REGEX"], when: /[?!:^$+*.|]/ },
+                        { highlight: "delimiter", tag: ["T_REGEX"], when: /[()]/ },
+                        { highlight: "string", tag: ["T_REGEX"], when: /[^\}]+?/ },
+                        { highlight: "annotation", pop: 1, tag: ["REGEX_DEFEND"], when: "}" }
                     ]
                 },
                 regex$start: {
                     regex: /(?:(?:(r[gmiuy]*:\{)))/ym,
                     rules: [
-                        { goto: "regex$span", highlight: "constant", tag: ["REGEX_DEFSTART"], when: /r[gmiuy]*:\{/ }
+                        { goto: "regex$span", highlight: "annotation", tag: ["REGEX_DEFSTART"], when: /r[gmiuy]*:\{/ }
                     ]
                 },
                 regex$stop: {
                     regex: /(?:(?:((?:\}))))/ym,
                     rules: [
-                        { highlight: "constant", pop: 1, tag: ["REGEX_DEFEND"], when: "}" }
+                        { highlight: "annotation", pop: 1, tag: ["REGEX_DEFEND"], when: "}" }
+                    ]
+                },
+                regex_charclass: {
+                    regex: /(?:(?:((?:\[\^)))|(?:((?:\[))))/ym,
+                    rules: [
+                        { goto: "regex_charclass$span", highlight: "regexp", tag: ["T_REGEX"], when: "[^" },
+                        { goto: "regex_charclass$span", highlight: "regexp", tag: ["T_REGEX"], when: "[" }
+                    ]
+                },
+                regex_charclass$span: {
+                    regex: /(?:(?:(\\.))|(?:((?:\-)))|(?:([^\]]+?))|(?:((?:\]))))/ym,
+                    rules: [
+                        { highlight: "string.escape", tag: ["T_REGEX"], when: /\\./ },
+                        { highlight: "keyword", tag: ["T_REGEX"], when: "-" },
+                        { highlight: "regexp", tag: ["T_REGEX"], when: /[^\]]+?/ },
+                        { highlight: "regexp", pop: 1, tag: ["T_REGEX"], when: "]" }
+                    ]
+                },
+                regex_charclass$start: {
+                    regex: /(?:(?:((?:\[\^)))|(?:((?:\[))))/ym,
+                    rules: [
+                        { goto: "regex_charclass$span", highlight: "regexp", tag: ["T_REGEX"], when: "[^" },
+                        { goto: "regex_charclass$span", highlight: "regexp", tag: ["T_REGEX"], when: "[" }
+                    ]
+                },
+                regex_charclass$stop: {
+                    regex: /(?:(?:((?:\]))))/ym,
+                    rules: [
+                        { highlight: "regexp", pop: 1, tag: ["T_REGEX"], when: "]" }
                     ]
                 },
                 section_word: {

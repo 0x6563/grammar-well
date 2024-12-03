@@ -1249,17 +1249,20 @@ declare class grammar {
                         highlight: string;
                         tag: string[];
                         when: RegExp;
+                        goto?: undefined;
                         pop?: undefined;
                     } | {
+                        goto: string;
+                        highlight: string;
                         tag: string[];
-                        when: RegExp;
-                        highlight?: undefined;
+                        when: string;
                         pop?: undefined;
                     } | {
                         highlight: string;
                         pop: number;
                         tag: string[];
                         when: string;
+                        goto?: undefined;
                     })[];
                 };
                 regex$start: {
@@ -1272,6 +1275,52 @@ declare class grammar {
                     }[];
                 };
                 regex$stop: {
+                    regex: RegExp;
+                    rules: {
+                        highlight: string;
+                        pop: number;
+                        tag: string[];
+                        when: string;
+                    }[];
+                };
+                regex_charclass: {
+                    regex: RegExp;
+                    rules: {
+                        goto: string;
+                        highlight: string;
+                        tag: string[];
+                        when: string;
+                    }[];
+                };
+                regex_charclass$span: {
+                    regex: RegExp;
+                    rules: ({
+                        highlight: string;
+                        tag: string[];
+                        when: RegExp;
+                        pop?: undefined;
+                    } | {
+                        highlight: string;
+                        tag: string[];
+                        when: string;
+                        pop?: undefined;
+                    } | {
+                        highlight: string;
+                        pop: number;
+                        tag: string[];
+                        when: string;
+                    })[];
+                };
+                regex_charclass$start: {
+                    regex: RegExp;
+                    rules: {
+                        goto: string;
+                        highlight: string;
+                        tag: string[];
+                        when: string;
+                    }[];
+                };
+                regex_charclass$stop: {
                     regex: RegExp;
                     rules: {
                         highlight: string;
