@@ -189,7 +189,7 @@ grammar {
 		| "right" __ "arrow" => ( "right arrow" )
 		| "left" __ "arrow" => ( "left arrow" )
 		| "any" => ( $0 )
-		| \r "[a-z0-9]" => ( $0 )
+		| r:{[a-z0-9]} => ( $0 )
 		| "_" => ( "" )
 
 	[m_list]
@@ -455,10 +455,10 @@ grammar {
 		| "..." => ${  ({data}) => ["ellips"]  }
 
 	[_]
-		| \r '[ ]'* => ${  ({data}) => null  }
+		| r:{[ ]}* => ${  ({data}) => null  }
 
 	[__]
-		| \r '[ ]'+ => ${  ({data}) => null  }
+		| r:{[ ]}+ => ${  ({data}) => null  }
 
 	[string]
 		| "'hello'" => ${  ({data}) => 'hello'  }
@@ -467,14 +467,14 @@ grammar {
 		| digits => ${  ({data}) => parseInt(data[0])  }
 
 	[number]
-		| digits \r '[.]' digits => ${  ({data}) => parseFloat(data[0] + '.' + data[2])  }
+		| digits r:{[.]} digits => ${  ({data}) => parseFloat(data[0] + '.' + data[2])  }
 
 	[digits]
-		| \r '[0-9]'+ => ${  ({data}) =>  data[0].map(v=>v.value).join('')  }
+		| r:{[0-9]}+ => ${  ({data}) =>  data[0].map(v=>v.value).join('')  }
 
 	[color]
-		| \r '[#]' \r '[0-9a-z]' \r '[0-9a-z]' \r '[0-9a-z]' \r '[0-9a-z]' \r '[0-9a-z]' \r '[0-9a-z]'
-		| \r '[#]' \r '[0-9a-z]' \r '[0-9a-z]' \r '[0-9a-z]'
+		| r:{[#]} r:{[0-9a-z]} r:{[0-9a-z]} r:{[0-9a-z]} r:{[0-9a-z]} r:{[0-9a-z]} r:{[0-9a-z]}
+		| r:{[#]} r:{[0-9a-z]} r:{[0-9a-z]} r:{[0-9a-z]}
 
 	[VariableName]
 		| "foo" => ( "foo" )

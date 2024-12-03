@@ -23,7 +23,7 @@ grammar {
 		| quoted_field quoted_field_char => ( $0.concat($1) )
 
 	[quoted_field_char]
-		| \r '[^"]' => ( $0 )
+		| r:{[^"]} => ( $0 )
 		| "\"" "\"" => ( "\"" )
 
 	[unquoted_field]
@@ -31,7 +31,7 @@ grammar {
 		| unquoted_field char => ( $0.concat($1) )
 
 	[char]
-		| \r '[^\\n\\r",]' => ( $0 )
+		| r:{[^\\n\\r",]} => ( $0 )
 
 	[newline]
 		| "\r" "\n" => ( [] )

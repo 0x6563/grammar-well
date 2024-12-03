@@ -2,7 +2,7 @@ lexer {
 	start: "start"
 
 	[start]
-		- when \r '[A-Za-z\d]' tag "char"
+		- when r:{[A-Za-z\d]} tag "char"
 
 }
 

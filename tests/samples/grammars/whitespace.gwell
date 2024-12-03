@@ -5,7 +5,7 @@ lexer {
 
 	[root]
 		- import whitespace
-		- when \r "."
+		- when r:{.}
 
 }
 
@@ -24,6 +24,6 @@ grammar {
 		| "(" _ d _ ")" => ( [ $0.value, $1, $2, $3, $4.value ] )
 
 	[letter]
-		| \r "[a-z]" => ( [ $0.value ] )
+		| r:{[a-z]} => ( [ $0.value ] )
 
 }

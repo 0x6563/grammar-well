@@ -2,11 +2,11 @@ lexer {
 	start: "root"
 	[root]
 		- when "(" tag "open" goto inner
-		- when \r "[a-z]" tag "letter"
+		- when r:{[a-z]} tag "letter"
 		- when ")" tag "close"
 
 	[inner]
-		- when \r "[a-z]" tag "letter"
+		- when r:{[a-z]} tag "letter"
 		- before ")" pop
 
 }
