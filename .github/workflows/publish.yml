@@ -23,12 +23,12 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
       - name: Install
         run: npm install
+      - name: Build
+        run: npm run build
       - name: Test
         run : npm run test
       - name: Version
         run: npm version ${{ inputs.version }} --no-git-tag-version
-      - name: Build
-        run: npm run build
       - name: Publish
         run: npm publish
         env:
