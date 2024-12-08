@@ -1,7 +1,7 @@
-import { Lexer, TQRestorePoint, LexerToken } from '../typings';
+import { RuntimeLexer, RuntimeLexerToken, TQRestorePoint } from '../typings/index.js';
 
 export class TokenBuffer {
-    private history: LexerToken[] = [];
+    private history: RuntimeLexerToken[] = [];
     private queued: string = '';
 
     private $historyIndex = -1;
@@ -15,7 +15,7 @@ export class TokenBuffer {
         return { historyIndex: this.$historyIndex, offset: this.offset };
     }
 
-    constructor(private lexer: Lexer) { }
+    constructor(public lexer: RuntimeLexer) { }
 
     reset(buffer: string) {
         this.lexer.feed(buffer);

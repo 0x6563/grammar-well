@@ -1,9 +1,9 @@
-import { GrammarRule, GrammarRuleSymbol, LanguageDefinition } from "../../../typings"
-import { ParserUtility } from "../../parser"
+import { RuntimeGrammarProductionRule, RuntimeGrammarRuleSymbol, RuntimeParserClass } from "../../../typings/index.js";
+import { ParserUtility } from "../../../utility/parsing.js";
 
 export class ClosureBuilder {
     constructor(
-        private grammar: LanguageDefinition['grammar'],
+        private grammar: RuntimeParserClass['artifacts']['grammar'],
     ) { }
 
     get(rule: string) {
@@ -12,7 +12,7 @@ export class ClosureBuilder {
         return closure.items;
     }
 
-    private addClosure(closure: RuleClosure, symbol: GrammarRuleSymbol) {
+    private addClosure(closure: RuleClosure, symbol: RuntimeGrammarRuleSymbol) {
         if (!ParserUtility.SymbolIsTerminal(symbol)) {
             const key = symbol as string;
             if (!(closure.visited.has(key))) {
@@ -30,8 +30,8 @@ export class ClosureBuilder {
 
 interface RuleClosure {
     items: {
-        rule: GrammarRule,
+        rule: RuntimeGrammarProductionRule,
         dot: number,
     }[]
-    visited: Set<GrammarRuleSymbol>;
+    visited: Set<RuntimeGrammarRuleSymbol>;
 }

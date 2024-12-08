@@ -1,5 +1,5 @@
-import { Lexer } from "../typings";
-export declare class CharacterLexer implements Lexer {
+import { RuntimeLexer } from "../typings/index.js";
+export declare class CharacterLexer implements RuntimeLexer {
     private buffer;
     private $indexOffset;
     private $index;

@@ -102,7 +102,7 @@ JSON:
     inputSource: json1.json
     resultJSON: json1.json
 
-  - title: JSON 
+  - title: JSON 2
     grammarSource: grammars/json.gwell
     inputSource: json2.json
     resultJSON: json2.json

@@ -1,27 +1,26 @@
 {
     "compilerOptions": {
-        "resolveJsonModule": true,
-        "module": "commonjs",
+        "module": "ESNext",
+        "moduleResolution": "Bundler",
         "noImplicitAny": false,
         "removeComments": true,
         "allowJs": true,
         "preserveConstEnums": true,
         "outDir": "./build",
         "sourceMap": true,
-        "target": "ES2022",
+        "target": "ESNext",
         "experimentalDecorators": true,
         "downlevelIteration": true,
         "declaration": true,
         "lib": [
-            "ES2022"
+            "ESNext"
         ],
         "types": [
-            "node",
-            "mocha"
+            "node"
         ]
     },
     "include": [
-        "src/**/*",
+        "src/**/*"
     ],
     "exclude": [
         "node_modules",

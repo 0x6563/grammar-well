@@ -1,13 +1,14 @@
-import { TokenBuffer } from "../../lexers/token-buffer";
-import { GrammarRule, GrammarRuleSymbol, LanguageDefinition, LexerToken } from "../../typings";
-import { Matrix } from "../../utility/general";
-import { ParserUtility } from "../parser";
+import { RuntimeGrammarProductionRule, RuntimeGrammarRuleSymbol, RuntimeParserClass, RuntimeLexerToken } from "../../typings/index.js";
+import { TokenBuffer } from "../../lexers/token-buffer.js";
+import { Matrix } from "../../utility/general.js";
+import { ParserUtility } from "../../utility/parsing.js";
 
-export function CYK(language: LanguageDefinition & { tokens: TokenBuffer }, _options = {}) {
-    const { grammar, tokens } = language;
+export function CYK(language: RuntimeParserClass & { tokens: TokenBuffer }, _options = {}) {
+    const { grammar } = language.artifacts;
+    const { tokens } = language;
 
-    const terminals: GrammarRule[] = [];
-    const nonTerminals: GrammarRule[] = [];
+    const terminals: RuntimeGrammarProductionRule[] = [];
+    const nonTerminals: RuntimeGrammarProductionRule[] = [];
 
     for (const name in grammar.rules) {
         for (const rule of grammar.rules[name]) {
@@ -21,7 +22,7 @@ export function CYK(language: LanguageDefinition & { tokens: TokenBuffer }, _opt
     }
 
     let currentTokenIndex = -1;
-    const chart = new Matrix(0, 0, () => new Map<GrammarRuleSymbol, Terminal | NonTerminal>());
+    const chart = new Matrix(0, 0, () => new Map<RuntimeGrammarRuleSymbol, Terminal | NonTerminal>());
     for (const token of tokens) {
         currentTokenIndex++;
         chart.resize(currentTokenIndex + 2, currentTokenIndex + 2);
@@ -63,12 +64,12 @@ function GetValue(ref: Terminal | NonTerminal) {
 }
 
 export interface NonTerminal {
-    rule: GrammarRule;
+    rule: RuntimeGrammarProductionRule;
     left: NonTerminal | Terminal;
     right: NonTerminal | Terminal;
 }
 
 export interface Terminal {
-    rule: GrammarRule;
-    token: LexerToken;
+    rule: RuntimeGrammarProductionRule;
+    token: RuntimeLexerToken;
 }

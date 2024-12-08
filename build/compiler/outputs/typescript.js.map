@@ -1,1 +1,0 @@
-{"version":3,"file":"typescript.js","sourceRoot":"","sources":["../../../src/compiler/outputs/typescript.ts"],"names":[],"mappings":";;;AAEA,SAAgB,gBAAgB,CAAC,SAAoB,EAAE,UAAkB;IACrE,OAAO,uDAAuD,SAAS,CAAC,KAAK,CAAC,OAAO;;;;EAIvF,SAAS,CAAC,aAAa,EAAE;;WAEhB,UAAU;MACf,SAAS,CAAC,aAAa,EAAE;aAClB,SAAS,CAAC,iBAAiB,CAAC,CAAC,CAAC;;;iBAG1B,UAAU;;CAE1B,CAAC;AACF,CAAC;AAfD,4CAeC"}

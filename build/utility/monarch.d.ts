@@ -1,5 +1,5 @@
-import { LexerConfig } from "../typings";
-export declare function CreateMonarchTokenizer(lexer: LexerConfig): {
+import { RuntimeLexerConfig } from "../typings/index.js";
+export declare function CreateMonarchTokenizer(lexer: RuntimeLexerConfig): {
     start: string;
     tokenizer: any;
 };

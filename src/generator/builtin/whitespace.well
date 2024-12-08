@@ -1,0 +1,16 @@
+lexer {
+
+	[whitespace]
+		- when r:{\s+} tag "whitespace"
+
+}
+
+grammar {
+
+	[_]
+		| <whitespace>? => ( null )
+
+	[__]
+		| <whitespace>+ => ( null )
+
+}

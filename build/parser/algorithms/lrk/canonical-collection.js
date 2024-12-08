@@ -1,25 +1,22 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.CanonicalCollection = void 0;
-const parser_1 = require("../../parser");
-const bimap_1 = require("./bimap");
-const closure_1 = require("./closure");
-class CanonicalCollection {
+import { ParserUtility } from "../../../utility/parsing.js";
+import { BiMap } from "./bimap.js";
+import { ClosureBuilder } from "./closure.js";
+export class CanonicalCollection {
     grammar;
     states = new Map();
-    rules = new bimap_1.BiMap();
-    terminals = new bimap_1.BiMap();
+    rules = new BiMap();
+    terminals = new BiMap();
     closure;
     constructor(grammar) {
         this.grammar = grammar;
         const augmented = {
             name: Symbol(),
-            symbols: [grammar.start]
+            symbols: [this.grammar.start]
         };
-        grammar['rules'][augmented.name] = [augmented];
-        this.closure = new closure_1.ClosureBuilder(grammar);
+        this.grammar['rules'][augmented.name] = [augmented];
+        this.closure = new ClosureBuilder(this.grammar);
         this.rules.id(augmented);
-        this.addState(grammar['rules'][augmented.name][0], 0);
+        this.addState(this.grammar['rules'][augmented.name][0], 0);
         this.linkStates('0.0');
     }
     addState(rule, dot) {
@@ -51,7 +48,7 @@ class CanonicalCollection {
             for (const { rule, dot } of state.items) {
                 const symbol = rule.symbols[dot];
                 const itemStateId = this.getStateId(rule, dot + 1);
-                if (parser_1.ParserUtility.SymbolIsTerminal(symbol) && typeof symbol != 'symbol') {
+                if (ParserUtility.SymbolIsTerminal(symbol) && typeof symbol != 'symbol') {
                     state.actions.set(symbol, itemStateId);
                 }
                 else {
@@ -69,5 +66,4 @@ class CanonicalCollection {
         return this.rules.id(rule) + '.' + dot;
     }
 }
-exports.CanonicalCollection = CanonicalCollection;
 //# sourceMappingURL=canonical-collection.js.map

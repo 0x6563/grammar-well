@@ -1,16 +1,16 @@
-import { LanguageDefinition, GrammarRuleSymbol, Dictionary, GrammarRule } from "../typings";
+import { Dictionary, RuntimeGrammarProductionRule, RuntimeGrammarRuleSymbol, RuntimeParserClass } from "../typings/index.js";
 
-
-export function LintGrammarSymbols(language: LanguageDefinition): GrammarRuleSymbol[] {
+export function LintGrammarSymbols(grammar: RuntimeParserClass['artifacts']['grammar']): RuntimeGrammarRuleSymbol[] {
     const unused = new Set<string>();
-    const { rules, start } = language.grammar;
+    const { rules, start } = grammar;
     for (const rule in rules) {
         unused.add(rule);
     }
     TraverseRule(start, rules, unused);
     return Array.from(unused);
 }
-function TraverseRule(name: string, rules: Dictionary<GrammarRule[]>, unvisited: Set<string>) {
+
+function TraverseRule(name: string, rules: Dictionary<RuntimeGrammarProductionRule[]>, unvisited: Set<string>) {
     if (!unvisited.has(name)) {
         return;
     }

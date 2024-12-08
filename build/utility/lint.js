@@ -1,16 +1,12 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.LintGrammarSymbols = void 0;
-function LintGrammarSymbols(language) {
+export function LintGrammarSymbols(grammar) {
     const unused = new Set();
-    const { rules, start } = language.grammar;
+    const { rules, start } = grammar;
     for (const rule in rules) {
         unused.add(rule);
     }
     TraverseRule(start, rules, unused);
     return Array.from(unused);
 }
-exports.LintGrammarSymbols = LintGrammarSymbols;
 function TraverseRule(name, rules, unvisited) {
     if (!unvisited.has(name)) {
         return;

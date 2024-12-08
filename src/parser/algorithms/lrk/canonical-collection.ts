@@ -1,30 +1,30 @@
-import { GrammarRule, GrammarRuleSymbol, LanguageDefinition } from "../../../typings";
-import { ParserUtility } from "../../parser";
-import { BiMap } from "./bimap";
-import { ClosureBuilder } from "./closure";
-import { State } from "./state";
+import { RuntimeGrammarProductionRule, RuntimeGrammarRuleSymbol, RuntimeParserClass } from "../../../typings/index.js";
+import { ParserUtility } from "../../../utility/parsing.js";
+import { BiMap } from "./bimap.js";
+import { ClosureBuilder } from "./closure.js";
+import { State } from "./state.js";
 
 export class CanonicalCollection {
     states: Map<string, State> = new Map();
-    rules: BiMap<GrammarRule> = new BiMap();
-    terminals: BiMap<GrammarRuleSymbol> = new BiMap();
+    rules: BiMap<RuntimeGrammarProductionRule> = new BiMap();
+    terminals: BiMap<RuntimeGrammarRuleSymbol> = new BiMap();
 
     private closure: ClosureBuilder;
     constructor(
-        public grammar: LanguageDefinition['grammar']
+        public grammar:  RuntimeParserClass['artifacts']['grammar']
     ) {
         const augmented = {
             name: Symbol() as unknown as string,
-            symbols: [grammar.start]
+            symbols: [this.grammar.start]
         }
-        grammar['rules'][augmented.name] = [augmented];
-        this.closure = new ClosureBuilder(grammar);
+        this.grammar['rules'][augmented.name] = [augmented];
+        this.closure = new ClosureBuilder(this.grammar);
         this.rules.id(augmented);
-        this.addState(grammar['rules'][augmented.name][0], 0);
+        this.addState(this.grammar['rules'][augmented.name][0], 0);
         this.linkStates('0.0');
     }
 
-    private addState(rule: GrammarRule, dot: number) {
+    private addState(rule: RuntimeGrammarProductionRule, dot: number) {
         const id = this.getStateId(rule, dot);
         if (this.states.has(id))
             return;
@@ -73,7 +73,7 @@ export class CanonicalCollection {
         }
     }
 
-    private getStateId(rule: GrammarRule, dot: number) {
+    private getStateId(rule: RuntimeGrammarProductionRule, dot: number) {
         return this.rules.id(rule) + '.' + dot;
     }
 }

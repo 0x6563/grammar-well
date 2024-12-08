@@ -1,22 +1,22 @@
-import { Lexer, TQRestorePoint, LexerToken } from '../typings';
+import { RuntimeLexer, RuntimeLexerToken, TQRestorePoint } from '../typings/index.js';
 export declare class TokenBuffer {
-    private lexer;
+    lexer: RuntimeLexer;
     private history;
     private queued;
     private $historyIndex;
     get offset(): number;
     get line(): number;
     get column(): number;
-    get active(): LexerToken;
+    get active(): RuntimeLexerToken;
     get state(): TQRestorePoint;
-    constructor(lexer: Lexer);
+    constructor(lexer: RuntimeLexer);
     reset(buffer: string): void;
     restore(state: TQRestorePoint): void;
     feed(buffer: string, flush?: boolean): void;
     flush(): void;
-    previous(): LexerToken;
-    next(): LexerToken;
-    peek(offset: number): LexerToken;
+    previous(): RuntimeLexerToken;
+    next(): RuntimeLexerToken;
+    peek(offset: number): RuntimeLexerToken;
     private lexerNext;
     [Symbol.iterator](): TokenIterator;
 }
@@ -24,7 +24,7 @@ declare class TokenIterator {
     private buffer;
     constructor(buffer: TokenBuffer);
     next(): {
-        value: LexerToken;
+        value: RuntimeLexerToken;
         done: boolean;
     };
     [Symbol.iterator](): this;

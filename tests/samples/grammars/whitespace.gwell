@@ -1,23 +1,29 @@
 import * from whitespace;
 
-lexer: {{
-   start: "root"
-   root ->
-        - import: whitespace
-        - when: /./
-}}
+lexer {
+	start: "root"
 
-grammar: {{
-   start: "d"
+	[root]
+		- import whitespace
+		- when r:{.}
 
-   d -> a : {{ data }}
+}
 
-   a -> b _ "&"  : {{ data }}
-      | b : {{ data }}
+grammar {
+	start: "d"
 
-   b -> letter : {{ data }}
-      | "(" _ d _ ")" : {{ [ $0.value, $1, $2, $3, $4.value ] }}
+	[d]
+		| a => ( data )
 
-   letter -> /[a-z]/ : {{ [ $0.value ] }}
-}}
+	[a]
+		| b _ "&" => ( data )
+		| b => ( data )
 
+	[b]
+		| letter => ( data )
+		| "(" _ d _ ")" => ( [ $0.value, $1, $2, $3, $4.value ] )
+
+	[letter]
+		| r:{[a-z]} => ( [ $0.value ] )
+
+}

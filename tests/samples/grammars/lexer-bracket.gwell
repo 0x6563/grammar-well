@@ -1,9 +1,14 @@
-lexer: {{
-    start ->
-        - when: "{" open: "bracket" highlight: "bracket"
-        - when: "}" close: "bracket" highlight: "bracket"
-}}
+lexer {
+	start: "start"
+	[start]
+		- when "{" open "bracket" highlight "bracket"
+		- when "}" close "bracket" highlight "bracket"
 
-grammar: {{
-    start -> "{" "}"
-}}
+}
+
+grammar {
+
+	[start]
+		| "{" "}"
+
+}

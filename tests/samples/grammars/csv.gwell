@@ -1,29 +1,41 @@
-grammar: {{
+grammar {
 
-    file              -> header newline rows             {{ { header: $0, rows: $2 } }}
+	[file]
+		| header newline rows => ( { header: $0, rows: $2 } )
 
-    header            -> row                             {{ $0 }}
+	[header]
+		| row => ( $0 )
 
-    rows              -> row
-                    | rows newline row                {{ $0.concat([$2]) }}
+	[rows]
+		| row
+		| rows newline row => ( $0.concat([$2]) )
 
-    row               -> field
-                    | row "," field                   {{ $0.concat([$2]) }}
+	[row]
+		| field
+		| row "," field => ( $0.concat([$2]) )
 
-    field             -> unquoted_field                  {{ $0 }}
-                    | "\"" quoted_field "\""          {{ $1 }}
+	[field]
+		| unquoted_field => ( $0 )
+		| "\"" quoted_field "\"" => ( $1 )
 
-    quoted_field      -> null                            {{ "" }}
-                    | quoted_field quoted_field_char  {{ $0.concat($1) }}
+	[quoted_field]
+		| null => ( "" )
+		| quoted_field quoted_field_char => ( $0.concat($1) )
 
-    quoted_field_char -> [^"]                            {{ $0 }}
-                    | "\"" "\""                       {{ "\"" }}
+	[quoted_field_char]
+		| r:{[^"]} => ( $0 )
+		| "\"" "\"" => ( "\"" )
 
-    unquoted_field    -> null                            {{ "" }}
-                    | unquoted_field char             {{ $0.concat($1) }}
+	[unquoted_field]
+		| null => ( "" )
+		| unquoted_field char => ( $0.concat($1) )
 
-    char              -> /[^\\n\\r",]/                       {{ $0 }}
+	[char]
+		| r:{[^\\n\\r",]} => ( $0 )
 
-    newline           -> "\r" "\n"                       {{ [] }}
-                    | "\r" | "\n"                     {{ [] }}
-}}
+	[newline]
+		| "\r" "\n" => ( [] )
+		| "\r"
+		| "\n" => ( [] )
+
+}

@@ -1,15 +1,15 @@
-import { Dictionary, GrammarRule, LanguageDefinition } from "../../typings";
-import { TokenBuffer } from "../../lexers/token-buffer";
-import { TextFormatter } from "../../utility/text-format";
-import { ParserUtility } from "../parser";
+import { Dictionary, RuntimeGrammarProductionRule, RuntimeParserClass } from "../../typings/index.js";
+import { TokenBuffer } from "../../lexers/token-buffer.js";
+import { TextFormatter } from "../../utility/text-format.js";
+import { ParserUtility } from "../../utility/parsing.js";
 
 export interface EarleyParserOptions {
     keepHistory?: boolean;
 }
 
-export function Earley(language: LanguageDefinition & { tokens: TokenBuffer }, options: EarleyParserOptions = {}) {
+export function Earley(language: RuntimeParserClass & { tokens: TokenBuffer }, options: EarleyParserOptions = {}) {
     const { tokens } = language;
-    const { rules, start } = language.grammar;
+    const { rules, start } = language.artifacts.grammar;
     const column = new Column(rules, 0);
     const table: Column[] = [column];
     column.wants[start] = [];
@@ -70,7 +70,7 @@ class Column {
     completed: Dictionary<State[]> = Object.create(null);  // states that are nullable
 
     constructor(
-        private rules: Dictionary<GrammarRule[]>,
+        private rules: Dictionary<RuntimeGrammarProductionRule[]>,
         public index: number
     ) { }
 
@@ -127,8 +127,8 @@ class Column {
         }
     }
 
-    expects(): GrammarRule[] {
-        const result: GrammarRule[] = [];
+    expects(): RuntimeGrammarProductionRule[] {
+        const result: RuntimeGrammarProductionRule[] = [];
         for (const state of this.states) {
             if (state.rule.symbols[state.dot] && typeof state.rule.symbols[state.dot] !== 'string') {
                 result.push({ ...state.rule, index: state.dot } as any)
@@ -149,7 +149,7 @@ class State {
     left: State;
     right: State | StateToken;
     constructor(
-        public rule: GrammarRule,
+        public rule: RuntimeGrammarProductionRule,
         public dot: number,
         public reference: number,
         public wantedBy: State[]

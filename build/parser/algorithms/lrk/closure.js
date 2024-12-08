@@ -1,8 +1,5 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.ClosureBuilder = void 0;
-const parser_1 = require("../../parser");
-class ClosureBuilder {
+import { ParserUtility } from "../../../utility/parsing.js";
+export class ClosureBuilder {
     grammar;
     constructor(grammar) {
         this.grammar = grammar;
@@ -13,7 +10,7 @@ class ClosureBuilder {
         return closure.items;
     }
     addClosure(closure, symbol) {
-        if (!parser_1.ParserUtility.SymbolIsTerminal(symbol)) {
+        if (!ParserUtility.SymbolIsTerminal(symbol)) {
             const key = symbol;
             if (!(closure.visited.has(key))) {
                 closure.visited.add(key);
@@ -26,5 +23,4 @@ class ClosureBuilder {
         }
     }
 }
-exports.ClosureBuilder = ClosureBuilder;
 //# sourceMappingURL=closure.js.map

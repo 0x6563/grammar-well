@@ -1,4 +1,4 @@
-import { Dictionary, GeneratorGrammarSymbol } from "../typings";
+import { Dictionary, GeneratorGrammarSymbol } from "../typings/index.js";
 export declare class Collection<T> {
     categorized: Dictionary<Dictionary<number>>;
     uncategorized: Map<T, number>;

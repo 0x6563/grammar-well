@@ -1,16 +1,32 @@
-lexer: {{
-    root ->
-        - when: "(" tag: "open" goto: inner
-        - when: /[a-z]/ tag: "letter"
-        - when: ")" tag: "close"
-    inner -> 
-        - when: /[a-z]/ tag: "letter"
-        - before: ")" pop
-}}
-grammar: {{
-    S -> A | B
-    A -> $letter+
-    B -> $open A $close
-    B -> $open $close
-    B -> $open B $close
-}}
+lexer {
+	start: "root"
+	[root]
+		- when "(" tag "open" goto inner
+		- when r:{[a-z]} tag "letter"
+		- when ")" tag "close"
+
+	[inner]
+		- when r:{[a-z]} tag "letter"
+		- before ")" pop
+
+}
+
+grammar {
+
+	[S]
+		| A
+		| B
+
+	[A]
+		| <letter>+
+
+	[B]
+		| <open> A <close>
+
+	[B]
+		| <open> <close>
+
+	[B]
+		| <open> B <close>
+
+}

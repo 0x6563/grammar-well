@@ -1,6 +1,6 @@
-import { TokenBuffer } from "../../../lexers/token-buffer";
-import { LanguageDefinition } from "../../../typings";
-export declare function LRK(language: LanguageDefinition & {
+import { RuntimeParserClass } from "../../../typings/index.js";
+import { TokenBuffer } from "../../../lexers/token-buffer.js";
+export declare function LRK(language: RuntimeParserClass & {
     tokens: TokenBuffer;
 }, options?: {}): {
     results: any[];

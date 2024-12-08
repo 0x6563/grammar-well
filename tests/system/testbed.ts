@@ -1,15 +1,15 @@
-import { expect } from "chai";
 import { readFileSync } from 'fs';
+import assert from "node:assert";
 import { join } from 'path';
-import { Compile, Parse, Parser } from '../../src';
+import { Generate, Parse } from '../../src';
 
 export function Expected(actual: any, expected: any, message?: string) {
     if (expected instanceof RegExp) {
-        expect(actual).matches(expected, message);
+        return assert.match(actual, expected, message);
     } else if (typeof expected == 'object') {
-        expect(actual).deep.equals(expected, message);
+        return assert.deepEqual(actual, expected, message);
     } else {
-        expect(actual).equals(expected, message);
+        return assert.equal(actual, expected, message);
     }
 }
 
@@ -41,23 +41,21 @@ export function GetValue(test, prefix) {
 }
 
 export function GetFile(path: string) {
-    return readFileSync(join(__dirname, path), 'utf8')
-}
-
-export async function Build(grammar): Promise<any> {
-    const compiled = await Compile(grammar, { exportName: 'grammar' }) as string;
-    return Evalr(compiled);
-}
-
-export async function BuildTest(grammar, input, options) {
-    return Parse((await Build(grammar))(), input, options).results[0];
+    return readFileSync(join(import.meta.dirname, path), 'utf8')
 }
 
 
-export async function GrammarWellRunner(source) {
-    const compiled = await Compile(source, { exportName: 'grammar' });
-    const parser = new Parser(Evalr(compiled)(), { algorithm: 'earley' });
-    return (input) => parser.run(input);
+export async function RunTest(source: string, input: string, options: any) {
+    return Parse(await Build(source), input, options);
+}
+
+export async function GrammarWellRunner(source: string) {
+    const compiled = Evalr(await Generate(source, { output: { name: 'grammar', format: 'commonjs' } }));
+    return (input) => Parse(new compiled(), input, { algorithm: 'earley' }, 'full');
+}
+
+async function Build(source: string): Promise<any> {
+    return new (Evalr(await Generate(source, { output: { name: 'grammar', format: 'commonjs' } })) as () => void);
 }
 
 function Evalr(source): any {

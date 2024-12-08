@@ -1,51 +1,36 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.ParserUtility = exports.Parser = exports.Parse = void 0;
-const character_lexer_1 = require("../lexers/character-lexer");
-const stateful_lexer_1 = require("../lexers/stateful-lexer");
-const token_buffer_1 = require("../lexers/token-buffer");
-const cyk_1 = require("./algorithms/cyk");
-const earley_1 = require("./algorithms/earley");
-const algorithm_1 = require("./algorithms/lrk/algorithm");
+import { CharacterLexer } from "../lexers/character-lexer.js";
+import { StatefulLexer } from "../lexers/stateful-lexer.js";
+import { TokenBuffer } from "../lexers/token-buffer.js";
+import { CYK } from "./algorithms/cyk.js";
+import { Earley } from "./algorithms/earley.js";
+import { LRK } from "./algorithms/lrk/algorithm.js";
 const ParserRegistry = {
-    earley: earley_1.Earley,
-    cyk: cyk_1.CYK,
-    lr0: algorithm_1.LRK
+    earley: Earley,
+    cyk: CYK,
+    lr0: LRK
 };
-function Parse(language, input, options) {
-    const i = new Parser(language, options);
-    return i.run(input);
+export function Parse(language, input, options = {
+    algorithm: 'earley',
+    parserOptions: {}
+}, results = 'first') {
+    const tokenizer = GetTokenizer(language);
+    tokenizer.feed(input);
+    const algorithm = typeof options.algorithm == 'function' ? options.algorithm : ParserRegistry[options.algorithm];
+    const result = algorithm({ ...language, tokens: tokenizer, utility: ParserUtility }, options.parserOptions);
+    return results == 'full' ? result : result.results[0];
 }
-exports.Parse = Parse;
-class Parser {
-    language;
-    options;
-    constructor(language, options = { algorithm: 'earley', parserOptions: {} }) {
-        this.language = language;
-        this.options = options;
+function GetTokenizer({ lexer }) {
+    if (!lexer) {
+        return new TokenBuffer(new CharacterLexer());
     }
-    run(input) {
-        const tokenQueue = this.getTokenQueue();
-        tokenQueue.feed(input);
-        if (typeof this.options.algorithm == 'function')
-            return this.options.algorithm({ ...this.language, tokens: tokenQueue, utility: ParserUtility }, this.options.parserOptions);
-        return ParserRegistry[this.options.algorithm]({ ...this.language, tokens: tokenQueue, utility: ParserUtility }, this.options.parserOptions);
+    else if ("feed" in lexer && typeof lexer.feed == 'function') {
+        return new TokenBuffer(lexer);
     }
-    getTokenQueue() {
-        const { lexer } = this.language;
-        if (!lexer) {
-            return new token_buffer_1.TokenBuffer(new character_lexer_1.CharacterLexer());
-        }
-        else if ("feed" in lexer && typeof lexer.feed == 'function') {
-            return new token_buffer_1.TokenBuffer(lexer);
-        }
-        else if ('states' in lexer) {
-            return new token_buffer_1.TokenBuffer(new stateful_lexer_1.StatefulLexer(lexer));
-        }
+    else if ('states' in lexer) {
+        return new TokenBuffer(new StatefulLexer(lexer));
     }
 }
-exports.Parser = Parser;
-class ParserUtility {
+export class ParserUtility {
     static SymbolMatchesToken(symbol, token) {
         if (typeof symbol === 'string')
             throw 'Attempted to match token against non-terminal';
@@ -70,5 +55,4 @@ class ParserUtility {
         return data;
     }
 }
-exports.ParserUtility = ParserUtility;
 //# sourceMappingURL=parser.js.map

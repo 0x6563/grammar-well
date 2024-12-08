@@ -1,27 +1,30 @@
+import test, { describe } from "node:test";
 import { parse } from 'yaml';
-import { AsyncRun, BuildTest, Expected, GetFile, GetValue } from './testbed';
+import { AsyncRun, RunTest, Expected, GetFile, GetValue } from './testbed';
+
 
 describe('Predefined Samples', () => {
     const groups = parse(GetFile('./predefined-samples.yml'));
+
     for (const group in groups) {
         const tests = groups[group];
         describe(group, () => {
-            for (const test of tests) {
-                it(test.title, async () => {
+            for (const t of tests) {
+                test(t.title, async () => {
                     const options: any = {};
-                    const grammar = GetValue(test, 'grammar');
-                    const input = GetValue(test, 'input');
-                    const result = GetValue(test, 'result');
-                    const error = GetValue(test, 'error');
-                    options.algorithm = GetValue(test, 'algorithm') || 'earley';
-                    const execution = await AsyncRun(() => BuildTest(grammar, input, options));
+                    const grammar = GetValue(t, 'grammar');
+                    const input = GetValue(t, 'input');
+                    const result = GetValue(t, 'result');
+                    const error = GetValue(t, 'error');
+                    options.algorithm = GetValue(t, 'algorithm') || 'earley';
+                    const execution = await AsyncRun(() => RunTest(grammar, input, options));
                     try {
-                        if (typeof test.throw == 'boolean') {
-                            if (execution.success == test.throw) {
+                        if (typeof t.throw == 'boolean') {
+                            if (execution.success == t.throw) {
                                 // console.log(execution.error);
                                 // console.log(input)
                             }
-                            Expected(execution.success, !test.throw, `Expected to ${test.throw ? '' : 'not '}throw.`);
+                            Expected(execution.success, !t.throw, `Expected to ${t.throw ? '' : 'not '}throw.`);
                         } else if (error) {
                             Expected(execution.error, error);
                             Expected(execution.success, false, 'Expected to throw error.');

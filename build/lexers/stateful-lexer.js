@@ -1,7 +1,4 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.ResolveStates = exports.StatefulLexer = void 0;
-class StatefulLexer {
+export class StatefulLexer {
     start;
     states = Object.create(null);
     buffer;
@@ -16,14 +13,7 @@ class StatefulLexer {
     regexp;
     tags = new Map();
     constructor({ states, start }) {
-        ResolveStates(states, start);
-        for (const key in states) {
-            this.states[key] = {
-                regexp: CompileRegExp(states[key]),
-                rules: states[key].rules,
-                unmatched: states[key].unmatched ? { type: states[key].unmatched } : null
-            };
-        }
+        this.states = states;
         this.start = start;
         this.buffer = '';
         this.stack = [];
@@ -47,16 +37,31 @@ class StatefulLexer {
             prefetched: this.prefetched,
         };
     }
-    next() {
-        const next = this.matchNext();
+    next(skipped = false) {
+        const next = this.matchNext(skipped);
         if (!next) {
             return;
         }
         const { rule, text, index } = next;
         if (!rule) {
-            throw new Error(`No matching rule for ${text}`);
+            throw new Error(`No matching rule for ${text.split(/\n|\r\n/).slice(0, 3).join('\n')}`);
         }
-        const token = this.createToken(rule, text, index);
+        const token = {
+            type: rule.type,
+            highlight: rule.highlight,
+            open: rule.open,
+            close: rule.close,
+            tag: this.getTags(rule.tag),
+            value: text,
+            text: text,
+            offset: index,
+            line: this.line,
+            lines: 0,
+            column: this.column,
+            state: this.current
+        };
+        this.adjustPosition(text);
+        token.lines = this.line - token.line;
         this.adjustStack(rule);
         return token;
     }
@@ -67,7 +72,7 @@ class StatefulLexer {
         this.current = current;
         this.rules = info.rules;
         this.unmatched = info.unmatched;
-        this.regexp = info.regexp;
+        this.regexp = info.regex;
     }
     pop() {
         this.set(this.stack.pop());
@@ -76,7 +81,7 @@ class StatefulLexer {
         this.stack.push(this.current);
         this.set(state);
     }
-    matchNext() {
+    matchNext(skipped = false) {
         if (this.index === this.buffer.length) {
             return;
         }
@@ -106,36 +111,15 @@ class StatefulLexer {
             text = match[0];
             if (rule.before) {
                 this.adjustStack(rule);
+                return this.matchNext(skipped);
+            }
+            else if (rule.skip && !skipped) {
+                this.adjustPosition(text);
+                this.adjustStack(rule);
                 return this.matchNext();
             }
         }
         return { index, rule, text };
-    }
-    createToken(rule, text, offset) {
-        const token = {
-            type: rule.type,
-            highlight: rule.highlight,
-            open: rule.open,
-            close: rule.close,
-            tag: this.getTags(rule.tag),
-            value: text,
-            text: text,
-            offset: offset,
-            line: this.line,
-            lines: 0,
-            column: this.column,
-            state: this.current
-        };
-        for (let i = 0; i < text.length; i++) {
-            this.column++;
-            if (text[i] == '\n') {
-                token.lines++;
-                this.column = 1;
-            }
-        }
-        this.index += text.length;
-        this.line += token.lines;
-        return token;
     }
     getTags(tags) {
         if (!tags)
@@ -143,6 +127,16 @@ class StatefulLexer {
         if (!this.tags.has(tags))
             this.tags.set(tags, new Set(tags));
         return this.tags.get(tags);
+    }
+    adjustPosition(text) {
+        this.index += text.length;
+        for (let i = 0; i < text.length; i++) {
+            this.column++;
+            if (text[i] == '\n') {
+                this.line++;
+                this.column = 1;
+            }
+        }
     }
     adjustStack(rule) {
         if (rule.pop) {
@@ -171,148 +165,6 @@ class StatefulLexer {
             }
         }
         throw new Error('Cannot find token type for matched text');
-    }
-}
-exports.StatefulLexer = StatefulLexer;
-class RegexLib {
-    static IsRegex(o) {
-        return o instanceof RegExp;
-    }
-    static Escape(s) {
-        return s.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
-    }
-    static HasGroups(s) {
-        return (new RegExp('|' + s)).exec('').length > 1;
-    }
-    static Capture(source) {
-        return '(' + source + ')';
-    }
-    static Join(regexps) {
-        if (!regexps.length)
-            return '(?!)';
-        const source = regexps.map((s) => `(?:${s})`).join('|');
-        return `(?:${source})`;
-    }
-    static Source(search) {
-        if (typeof search === 'string') {
-            return `(?:${RegexLib.Escape(search)})`;
-        }
-        if (RegexLib.IsRegex(search)) {
-            return search.source;
-        }
-        throw new Error('Not a pattern: ' + search);
-    }
-}
-function CompileRegExp(state) {
-    const rules = [];
-    const subexpressions = [];
-    let isUnicode = null;
-    let isCI = null;
-    for (const options of state.rules) {
-        if (RegexLib.IsRegex(options.when)) {
-            const when = options.when;
-            if (isUnicode === null) {
-                isUnicode = when.unicode;
-            }
-            else if (isUnicode !== when.unicode && !state.unmatched) {
-                throw new Error(`Inconsistent Regex Flag /u in state: ${state.name}`);
-            }
-            if (isCI === null) {
-                isCI = when.ignoreCase;
-            }
-            else if (isCI !== when.ignoreCase) {
-                throw new Error(`Inconsistent Regex Flag /i in state: ${state.name}`);
-            }
-        }
-        else {
-            if (isCI == null) {
-                isCI = false;
-            }
-            else if (isCI != false) {
-                throw new Error(`Inconsistent Regex Flag /i in state: ${state.name}`);
-            }
-        }
-        rules.push(options);
-        const pat = RegexLib.Source(options.when);
-        const regexp = new RegExp(pat);
-        if (regexp.test("")) {
-            throw new Error("RegExp matches empty string: " + regexp);
-        }
-        if (RegexLib.HasGroups(pat)) {
-            throw new Error("RegExp has capture groups: " + regexp + "\nUse (?: … ) instead");
-        }
-        subexpressions.push(RegexLib.Capture(pat));
-    }
-    let flags = !state.unmatched ? 'ym' : 'gm';
-    if (isUnicode === true)
-        flags += "u";
-    if (isCI === true)
-        flags += "i";
-    return new RegExp(RegexLib.Join(subexpressions), flags);
-}
-function ResolveStates(states, start) {
-    const resolved = new Set();
-    const resolving = new Set();
-    const chain = new Set();
-    ResolveRuleImports(start, states, resolved, resolving, chain);
-    for (const key in states) {
-        if (!resolved.has(key)) {
-            delete states[key];
-        }
-    }
-    return states;
-}
-exports.ResolveStates = ResolveStates;
-function ResolveRuleImports(name, states, resolved, resolving, chain) {
-    if (chain.has(name))
-        throw new Error(`Can not resolve circular import of ${name}`);
-    if (!states[name])
-        throw new Error(`Can not import unknown state ${name}`);
-    if (resolved.has(name) || resolving.has(name))
-        return;
-    const state = states[name];
-    const rules = new UniqueRules();
-    chain.add(name);
-    resolving.add(name);
-    for (let i = 0; i < state.rules.length; i++) {
-        const rule = state.rules[i];
-        if ("import" in rule) {
-            for (const ref of rule.import) {
-                ResolveRuleImports(ref, states, resolved, resolving, chain);
-                rules.push(...states[ref].rules);
-            }
-        }
-        else {
-            rules.push(rule);
-            if ("set" in rule && !resolving.has(rule.set)) {
-                ResolveRuleImports(rule.set, states, resolved, resolving, new Set());
-            }
-            if ("goto" in rule && !resolving.has(rule.goto)) {
-                ResolveRuleImports(rule.goto, states, resolved, resolving, new Set());
-            }
-        }
-    }
-    state.rules = rules.rules;
-    chain.delete(name);
-    resolved.add(name);
-}
-class UniqueRules {
-    regexps = new Set();
-    strings = new Set();
-    rules = [];
-    push(...rules) {
-        for (const rule of rules) {
-            if (RegexLib.IsRegex(rule.when)) {
-                if (!this.regexps.has(rule.when.source)) {
-                    this.rules.push(rule);
-                }
-            }
-            else {
-                if (!this.strings.has(rule.when)) {
-                    this.rules.push(rule);
-                }
-            }
-        }
     }
 }
 //# sourceMappingURL=stateful-lexer.js.map

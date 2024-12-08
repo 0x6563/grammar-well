@@ -1,2 +1,2 @@
-import { LanguageDefinition, GrammarRuleSymbol } from "../typings";
-export declare function LintGrammarSymbols(language: LanguageDefinition): GrammarRuleSymbol[];
+import { RuntimeGrammarRuleSymbol, RuntimeParserClass } from "../typings/index.js";
+export declare function LintGrammarSymbols(grammar: RuntimeParserClass['artifacts']['grammar']): RuntimeGrammarRuleSymbol[];

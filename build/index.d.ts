@@ -1,6 +1,7 @@
-export * from './compiler/compiler';
-export * from './compiler/import-resolver';
-export * from './parser/parser';
-export * from './typings';
-export { StatefulLexer } from './lexers/stateful-lexer';
-export * from './utility/monarch';
+export * from './generator/generator.js';
+export * from './generator/import-resolvers/auto.js';
+export { StatefulLexer } from './lexers/stateful-lexer.js';
+export * from './parser/parse.js';
+export * from './utility/parsing.js';
+export * from './typings/index.js';
+export * from './utility/index.js';

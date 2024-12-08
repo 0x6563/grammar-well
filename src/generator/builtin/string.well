@@ -1,0 +1,54 @@
+lexer {
+
+	[string]
+		- import singleQuoteString, doubleQuoteString
+
+	[doubleQuoteString]
+		- when "\"" tag "dquote" highlight "string" goto doubleQuoteStringEnd
+
+	[singleQuoteString]
+		- when "'" tag "squote" highlight "string" goto singleQuoteStringEnd
+
+	[doubleQuoteStringEnd]
+		- when r:{\\[\\/bnrft]} tag "escaped" highlight "constant"
+		- when r:{\\"} tag "quoteEscape"
+		- when r:{\\u[A-Fa-f\d]{4}} tag "escaped" highlight "constant"
+		- when r:{\\.} tag "badEscape"
+		- when r:{[^"\\]+} tag "string" highlight "string"
+		- when "\"" tag "dquote" highlight "string" pop
+
+	[singleQuoteStringEnd]
+		- when r:{\\[\\/bnrft]} tag "escaped"
+		- when r:{\\'} tag "quoteEscape"
+		- when r:{\\u[A-Fa-f\d]{4}} tag "escaped"
+		- when r:{\\.} tag "badEscape"
+		- when r:{[^'\\]+} tag "string" highlight "string"
+		- when "'" tag "squote" highlight "string" pop
+
+}
+
+grammar {
+
+	[string] => ( $0 )
+		| singleQuoteString
+		| doubleQuoteString
+
+	[doubleQuoteString]
+		| <dquote> stringInner <dquote> => ( $1 )
+		| <dquote> <dquote> => ( '' )
+
+	[singleQuoteString]
+		| <squote> stringInner <squote> => ( $1 )
+		| <squote> <squote> => ( '' )
+
+	[stringInner]
+		| stringEscape => ( $0 )
+		| <string> => ( $0.value )
+		| stringInner stringEscape => ( $0 + $1 )
+		| stringInner <string> => ( $0 + $1.value )
+
+	[stringEscape]
+		| <escaped> => ( JSON.parse('"' + $0.value + '"') )
+		| <quoteEscape> => ( $0.value[1] )
+
+}

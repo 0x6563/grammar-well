@@ -1,173 +1,183 @@
-lexer: {{
-    root ->
-        - import: keywords
-        - when: /\d+/ tag: "digits" highlight: "number"
-        - when: /"(?:\\["bfnrt\/\\]|\\u[a-fA-F0-9]{4}|[^"\\])*"/ tag: "string"
-        - when: /[_a-zA-Z][_a-zA-Z\d]*/ tag: "word"
-        - when: "==" tag: "l_eqeq" highlight: "keyword"
-        - when: ">=" tag: "l_gteq" highlight: "keyword"
-        - when: "<=" tag: "l_lteq" highlight: "keyword" 
-        - when: "=" tag: "l_eq" 
-        - when: ">" tag: "l_gt" highlight: "keyword"
-        - when: "<" tag: "l_lt" highlight: "keyword"
-        - when: "+" tag: "l_add" highlight: "keyword"
-        - when: "-" tag: "l_sub" highlight: "keyword"
-        - when: "/" tag: "l_div" highlight: "keyword"
-        - when: "%" tag: "l_mod" highlight: "keyword"
-        - when: "*" tag: "l_mul" highlight: "keyword"
-        - when: "^" tag: "l_exp" highlight: "keyword"
-        - when: ";" tag: "l_col" highlight: "keyword"
-        - when: "!" tag: "l_exc" highlight: "keyword"
-        - when: "." tag: "l_dot"
-        - when: "," tag: "l_comma" highlight: "delimiter"
-        - when: "$" tag: "l_m" highlight: "keyword"
-        - when: "(" tag: "l_lparen" highlight: "delimiter"
-        - when: ")" tag: "l_rparen" highlight: "delimiter"
-        - when: "{" tag: "l_lcurly" highlight: "delimiter"
-        - when: "}" tag: "l_rcurly" highlight: "delimiter"
-        - when: "[" tag: "l_lbrack" highlight: "delimiter"
-        - when: "]" tag: "l_rbrack" highlight: "delimiter"
-        - when: /\s+/ tag: "ws"
+lexer {
 
-    keywords ->
-        - when: /var(?![a-zA-Z])/ tag: "keyword" highlight: "keyword"
-        - when: /function(?![a-zA-Z])/ tag: "keyword" highlight: "keyword"
-        - when: /true(?![a-zA-Z])/ tag: "keyword" highlight: "keyword"
-        - when: /false(?![a-zA-Z])/ tag: "keyword" highlight: "keyword"
-        - when: /null(?![a-zA-Z])/ tag: "keyword" highlight: "keyword"
-        - when: /and(?![a-zA-Z])/ tag: "keyword" highlight: "keyword"
-        - when: /or(?![a-zA-Z])/ tag: "keyword" highlight: "keyword"
-        - when: /on(?![a-zA-Z])/ tag: "keyword" highlight: "keyword"
-        - when: /if(?![a-zA-Z])/ tag: "keyword" highlight: "keyword"
-        - when: /in(?![a-zA-Z])/ tag: "keyword" highlight: "keyword"
-        - when: /each(?![a-zA-Z])/ tag: "keyword" highlight: "keyword"
-        - when: /else(?![a-zA-Z])/ tag: "keyword" highlight: "keyword"
-        - when: /while(?![a-zA-Z])/ tag: "keyword" highlight: "keyword"
+	[root]
+		- import keywords
+		- when r:{\d+} tag "digits" highlight "number"
+		- when r:{"(?:\\["bfnrt\/\\]|\\u[a-fA-F0-9]{4}|[^"\\])*"} tag "string"
+		- when r:{[_a-zA-Z][_a-zA-Z\d]*} tag "word"
+		- when "==" tag "l_eqeq" highlight "keyword"
+		- when ">=" tag "l_gteq" highlight "keyword"
+		- when "<=" tag "l_lteq" highlight "keyword"
+		- when "=" tag "l_eq"
+		- when ">" tag "l_gt" highlight "keyword"
+		- when "<" tag "l_lt" highlight "keyword"
+		- when "+" tag "l_add" highlight "keyword"
+		- when "-" tag "l_sub" highlight "keyword"
+		- when "/" tag "l_div" highlight "keyword"
+		- when "%" tag "l_mod" highlight "keyword"
+		- when "*" tag "l_mul" highlight "keyword"
+		- when "^" tag "l_exp" highlight "keyword"
+		- when ";" tag "l_col" highlight "keyword"
+		- when "!" tag "l_exc" highlight "keyword"
+		- when "." tag "l_dot"
+		- when "," tag "l_comma" highlight "delimiter"
+		- when "$" tag "l_m" highlight "keyword"
+		- when "(" tag "l_lparen" highlight "delimiter"
+		- when ")" tag "l_rparen" highlight "delimiter"
+		- when "{" tag "l_lcurly" highlight "delimiter"
+		- when "}" tag "l_rcurly" highlight "delimiter"
+		- when "[" tag "l_lbrack" highlight "delimiter"
+		- when "]" tag "l_rbrack" highlight "delimiter"
+		- when r:{\s+} tag "ws"
 
-}}
+	[keywords]
+		- when r:{var(?![a-zA-Z])} tag "keyword" highlight "keyword"
+		- when r:{function(?![a-zA-Z])} tag "keyword" highlight "keyword"
+		- when r:{true(?![a-zA-Z])} tag "keyword" highlight "keyword"
+		- when r:{false(?![a-zA-Z])} tag "keyword" highlight "keyword"
+		- when r:{null(?![a-zA-Z])} tag "keyword" highlight "keyword"
+		- when r:{and(?![a-zA-Z])} tag "keyword" highlight "keyword"
+		- when r:{or(?![a-zA-Z])} tag "keyword" highlight "keyword"
+		- when r:{on(?![a-zA-Z])} tag "keyword" highlight "keyword"
+		- when r:{if(?![a-zA-Z])} tag "keyword" highlight "keyword"
+		- when r:{in(?![a-zA-Z])} tag "keyword" highlight "keyword"
+		- when r:{each(?![a-zA-Z])} tag "keyword" highlight "keyword"
+		- when r:{else(?![a-zA-Z])} tag "keyword" highlight "keyword"
+		- when r:{while(?![a-zA-Z])} tag "keyword" highlight "keyword"
 
-grammar: {{
+}
 
-    //	postprocessorOverride: ${ _ =>_ }
-    Chunk -> _ Statements _  : {{ { statements: $1 } }}
+grammar {
 
-    Statements -> Statement : {{ [$0] }}
-        | Statements _ Statement : {{ $0.concat($2) }}
+	[Chunk]
+		| _ Statements _ => ( { statements: $1 } )
 
-    Statement ->
-        Declare : {{ $0 }}
-        | Assignment : {{ $0 }}
-        | IfBlock : {{ { type: "if", block: $0 } }}
-        | IfBlock _ "else" _ Block : {{  { type: "if", block: $0.concat([{ condition: null, block: $4 }])} }}
-        | EachBlock : {{ { type: 'loop', loop: $0 } }}
-        | WhileBlock : {{ { type: 'loop', loop: $0 } }}
-        | LoopBlock : {{ { type: 'loop', loop: $0 } }}
-        | FunctionBlock
+	[Statements]
+		| Statement => ( [$0] )
+		| Statements _ Statement => ( $0.concat($2) )
 
-    Declare ->
-        "var" __ Word _ "=" _ Exp _ ";" : {{ { type: 'declare', typeof: $0.value, target: $2, value: $6 } }}
+	[Statement]
+		| Declare => ( $0 )
+		| Assignment => ( $0 )
+		| IfBlock => ( { type: "if", block: $0 } )
+		| IfBlock _ "else" _ Block => ( { type: "if", block: $0.concat([{ condition: null, block: $4 }])} )
+		| EachBlock => ( { type: 'loop', loop: $0 } )
+		| WhileBlock => ( { type: 'loop', loop: $0 } )
+		| LoopBlock => ( { type: 'loop', loop: $0 } )
+		| FunctionBlock
 
-    Assignment ->
-        Reference _ "=" _ Exp _ ";" : {{ { type: 'assign', target: $0,  value: $4 } }}
-        | Reference _ "+" "=" _ Exp _ ";" : {{ { type: 'assign', adjust: $2.value, target: $0,  value: $4 } }}
-        | Reference _ "-" "=" _ Exp _ ";" : {{ { type: 'assign', adjust: $2.value, target: $0,  value: $4 } }}
-        | Reference _ "/" "=" _ Exp _ ";" : {{ { type: 'assign', adjust: $2.value, target: $0,  value: $4 } }}
-        | Reference _ "*" "=" _ Exp _ ";" : {{ { type: 'assign', adjust: $2.value, target: $0,  value: $4 } }}
-        | Reference _ "%" "=" _ Exp _ ";" : {{ { type: 'assign', adjust: $2.value, target: $0,  value: $4 } }}
+	[Declare]
+		| "var" __ Word _ "=" _ Exp _ ";" => ( { type: 'declare', typeof: $0.value, target: $2, value: $6 } )
 
-    IfBlock ->
-        "if" _ Exp _ Block : {{ [{ condition: $2, block: $4 }] }}
-        | IfBlock _ "else" _ IfBlock : {{ $0.concat($4) }}
+	[Assignment]
+		| Reference _ "=" _ Exp _ ";" => ( { type: 'assign', target: $0,  value: $4 } )
+		| Reference _ "+" "=" _ Exp _ ";" => ( { type: 'assign', adjust: $2.value, target: $0,  value: $4 } )
+		| Reference _ "-" "=" _ Exp _ ";" => ( { type: 'assign', adjust: $2.value, target: $0,  value: $4 } )
+		| Reference _ "/" "=" _ Exp _ ";" => ( { type: 'assign', adjust: $2.value, target: $0,  value: $4 } )
+		| Reference _ "*" "=" _ Exp _ ";" => ( { type: 'assign', adjust: $2.value, target: $0,  value: $4 } )
+		| Reference _ "%" "=" _ Exp _ ";" => ( { type: 'assign', adjust: $2.value, target: $0,  value: $4 } )
 
-    EachBlock ->
-        "each" __ Word:key __ "in" _ Reference:ref _ Block:block : {{ { type: 'each', key: $key, reference: $ref, block: $block } }}
-        |  "each" __ Word:key _ "," _ Word:value __ "in" _ Reference:ref _ Block:block : {{ { type: 'each', key: $key, value:$value, reference: $ref, block: $block } }}
+	[IfBlock]
+		| "if" _ Exp _ Block => ( [{ condition: $2, block: $4 }] )
+		| IfBlock _ "else" _ IfBlock => ( $0.concat($4) )
 
-    WhileBlock ->
-        "while" _ Exp:condition _ Block:block : {{ { type: 'while', condition: $condition, block: $block } }}
+	[EachBlock]
+		| "each" __ Word:key __ "in" _ Reference:ref _ Block:block => ( { type: 'each', key: $key, reference: $ref, block: $block } )
+		| "each" __ Word:key _ "," _ Word:value __ "in" _ Reference:ref _ Block:block => ( { type: 'each', key: $key, value:$value, reference: $ref, block: $block } )
 
-    LoopBlock ->
-        "loop" _ "(" _ Declare:start  _ Exp:condition _ ";" _ Assignment:end _ ")" _ Block:block : {{ { type: 'loop', start: $start, end: $end, condition: $condition, block: $block } }}
+	[WhileBlock]
+		| "while" _ Exp:condition _ Block:block => ( { type: 'while', condition: $condition, block: $block } )
 
-    FunctionBlock -> 
-        "function" _ Word _ "(" _ ExpList _ ")" _ Block
-        | "function" _ Word _ "(" _ ")" _ Block
+	[LoopBlock]
+		| "loop" _ "(" _ Declare:start _ Exp:condition _ ";" _ Assignment:end _ ")" _ Block:block => ( { type: 'loop', start: $start, end: $end, condition: $condition, block: $block } )
 
-    Block -> "{" _ Statements _ "}" : {{ $2 }}
-        | "{" _ "}" : {{ [] }}
+	[FunctionBlock]
+		| "function" _ Word _ "(" _ ExpList _ ")" _ Block
+		| "function" _ Word _ "(" _ ")" _ Block
 
-    ExpList -> Exp : {{ [ $0 ] }}
-        | ExpList _ "," _ Exp : {{ $0.concat($4) }}
+	[Block]
+		| "{" _ Statements _ "}" => ( $2 )
+		| "{" _ "}" => ( [] )
 
-    Exp ->
-        ExpOr : {{ $0 }}
+	[ExpList]
+		| Exp => ( [ $0 ] )
+		| ExpList _ "," _ Exp => ( $0.concat($4) )
 
-    ExpOr : {{ { type: 'logical', operator: $2.value, left: $0, right: $4 } }} ->
-        ExpOr __ "or" __ ExpAnd
-        | ExpAnd : {{ $0 }}
+	[Exp]
+		| ExpOr => ( $0 )
 
-    ExpAnd : {{ { type: 'logical', operator: $2.value, left: $0, right: $4 } }} ->
-         ExpAnd __ "and" __ ExpComparison
-        | ExpComparison : {{ $0 }}
+	[ExpOr] => ( { type: 'logical', operator: $2.value, left: $0, right: $4 } )
+		| ExpOr __ "or" __ ExpAnd
+		| ExpAnd => ( $0 )
 
-    ExpComparison : {{ { type: 'compare', operator: $2.value, left: $0, right: $4 } }} ->
-        ExpComparison _ "<"  _ ExpConcatenation
-        | ExpComparison _ ">"  _ ExpConcatenation
-        | ExpComparison _ "<=" _ ExpConcatenation
-        | ExpComparison _ ">=" _ ExpConcatenation
-        | ExpComparison _ "!=" _ ExpConcatenation
-        | ExpComparison _ "==" _ ExpConcatenation
-        | ExpConcatenation : {{ $0 }}
+	[ExpAnd] => ( { type: 'logical', operator: $2.value, left: $0, right: $4 } )
+		| ExpAnd __ "and" __ ExpComparison
+		| ExpComparison => ( $0 )
 
-    ExpConcatenation ->
-        ExpSum _ ".." _ ExpConcatenation
-        | ExpSum : {{ $0 }}
+	[ExpComparison] => ( { type: 'compare', operator: $2.value, left: $0, right: $4 } )
+		| ExpComparison _ "<" _ ExpConcatenation
+		| ExpComparison _ ">" _ ExpConcatenation
+		| ExpComparison _ "<=" _ ExpConcatenation
+		| ExpComparison _ ">=" _ ExpConcatenation
+		| ExpComparison _ "!=" _ ExpConcatenation
+		| ExpComparison _ "==" _ ExpConcatenation
+		| ExpConcatenation => ( $0 )
 
-    ExpSum : {{ { type: 'math', operator: $2.value, left: $0, right: $4 } }} ->
-        ExpSum _ "+" _ ExpProduct
-        | ExpSum _ "-" _ ExpProduct
-        | ExpProduct : {{ $0 }}
+	[ExpConcatenation]
+		| ExpSum _ ".." _ ExpConcatenation
+		| ExpSum => ( $0 )
 
-    ExpProduct : {{ { type: 'math', operator: $2.value, left: $0, right: $4 } }} ->
-        ExpProduct _ "*" _ ExpUnary
-        | ExpProduct _ "/" _ ExpUnary
-        | ExpProduct _ "%" _ ExpUnary
-        | ExpUnary : {{ $0 }}
+	[ExpSum] => ( { type: 'math', operator: $2.value, left: $0, right: $4 } )
+		| ExpSum _ "+" _ ExpProduct
+		| ExpSum _ "-" _ ExpProduct
+		| ExpProduct => ( $0 )
 
-    ExpUnary ->
-        "not" __ ExpPow
-        | "-" _ ExpPow
-        | ExpPow : {{ $0 }}
+	[ExpProduct] => ( { type: 'math', operator: $2.value, left: $0, right: $4 } )
+		| ExpProduct _ "*" _ ExpUnary
+		| ExpProduct _ "/" _ ExpUnary
+		| ExpProduct _ "%" _ ExpUnary
+		| ExpUnary => ( $0 )
 
-    ExpPow ->
-        Atom _ "^" _ ExpPow : {{ { type: 'compare', operator: $2.value, left: $0, right: $4 } }}
-        | Atom : {{ $0 }}
+	[ExpUnary]
+		| "not" __ ExpPow
+		| "-" _ ExpPow
+		| ExpPow => ( $0 )
 
-    Atom ->
-        Number : {{ $0 }}
-        | String : {{ $0 }}
-        | "null" : {{ $0.value }}
-        | "false" : {{ $0.value }}
-        | "true" : {{ $0.value }}
-        | Reference : {{ $0 }}
-        | "(" _ Exp _ ")" : {{ { type: 'group', expression: $2 } }}
+	[ExpPow]
+		| Atom _ "^" _ ExpPow => ( { type: 'compare', operator: $2.value, left: $0, right: $4 } )
+		| Atom => ( $0 )
 
-    Reference ->
-        Path   : {{  { type: 'reference', path: $0 } }}
+	[Atom]
+		| Number => ( $0 )
+		| String => ( $0 )
+		| "null" => ( $0.value )
+		| "false" => ( $0.value )
+		| "true" => ( $0.value )
+		| Reference => ( $0 )
+		| "(" _ Exp _ ")" => ( { type: 'group', expression: $2 } )
 
-    Path ->
-        $word : {{ [$0.value] }}
-        | Path _ "." _ $word : {{ $0.concat($4.value) }}
-        | Path _ "[" _ Exp _ "]" : {{ $0.concat($4) }}
+	[Reference]
+		| Path => ( { type: 'reference', path: $0 } )
 
-    Word -> $word : {{ $0.value }}
+	[Path]
+		| $word => ( [$0.value] )
+		| Path _ "." _ $word => ( $0.concat($4.value) )
+		| Path _ "[" _ Exp _ "]" => ( $0.concat($4) )
 
-    Number ->
-        $digits "." $digits : {{ { type:'number', value: $0.value  + "." + $2.value } }}
-        | $digits : {{ { type:'number', value: $0.value } }}
+	[Word]
+		| $word => ( $0.value )
 
-    String -> $string : {{ { type: 'string', value: $0.value } }}
+	[Number]
+		| $digits "." $digits => ( { type:'number', value: $0.value  + "." + $2.value } )
+		| $digits => ( { type:'number', value: $0.value } )
 
-    _ -> $ws? : {{ null }}
-    __ -> $ws : {{ null }}
-}}
+	[String]
+		| $string => ( { type: 'string', value: $0.value } )
+
+	[_]
+		| $ws? => ( null )
+
+	[__]
+		| $ws => ( null )
+
+}
