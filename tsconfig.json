@@ -6,6 +6,7 @@
         "removeComments": true,
         "allowJs": true,
         "preserveConstEnums": true,
+        "rootDir": "./src",
         "outDir": "./build",
         "sourceMap": true,
         "target": "ESNext",

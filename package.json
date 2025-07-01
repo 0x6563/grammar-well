@@ -7,7 +7,6 @@
     "prebuild": "tsc --build --clean && tsx scripts/prebuild.ts",
     "grammar": "tsc --build --clean && tsx scripts/grammar.ts",
     "build": "tsc --build",
-    "builde": "tsc --build",
     "benchmark": "node tests/performance/benchmark.js",
     "test": "node --test --import tsx --test-reporter ./tests/reporter.mjs  tests/**/*.spec.ts",
     "profile": "node tests/performance/profile.js"

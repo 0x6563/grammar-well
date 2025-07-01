@@ -8,7 +8,7 @@ const BaseDir = './src/generator/builtin/';
 
 async function Transpile(path) {
     const source = read(path);
-    const js = await Generate(source, { overrides: {}, output: { name: 'grammar', format: 'esmodule' } });
+    const js = await Generate(source, { output: { name: 'grammar', format: 'esmodule' } });
     write(path.replace(/\.well$/, '.js'), js);
 }
 

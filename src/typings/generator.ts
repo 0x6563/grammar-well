@@ -7,10 +7,8 @@ import { ImportResolver, ImportResolverConstructor } from "./index.js";
 export type GenerateOptions = GeneratorOptions & { output?: GeneratorOutputOptions };
 
 export interface GeneratorOptions {
-    version?: string;
     basedir?: string;
     resolver?: ImportResolverConstructor | ImportResolver;
-    overrides?: Dictionary<string>;
 }
 
 export interface GeneratorOutputOptions {
@@ -19,7 +17,6 @@ export interface GeneratorOutputOptions {
         grammar?: boolean;
         [key: string]: boolean;
     }
-    parser?: boolean;
     format?: GeneratorExportFormat;
     noscript?: boolean;
     name?: string;

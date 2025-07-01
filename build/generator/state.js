@@ -1,9 +1,10 @@
+import { version } from "../version.json";
 export class GeneratorState {
     grammar;
     lexer;
     lifecycle = {};
     config = {};
-    version = 'unknown';
+    version = version;
     merge(state) {
         if (state.grammar) {
             this.initializeGrammar();
