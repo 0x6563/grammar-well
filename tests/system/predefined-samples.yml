@@ -14,6 +14,11 @@ General:
     input: "{}"
     throw: false
 
+  - title: Imports
+    grammarSource: grammars/json-main.gwell
+    input: "{\"abc\": 123,\n\"hello\": \"world\",\n\"boolean\": true\n}"
+    throw: false
+
 Parentheses:
   - title: Parentheses Pass 1
     grammarSource: grammars/parentheses.gwell

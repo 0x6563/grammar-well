@@ -343,7 +343,7 @@ export class Generator {
             if (!symbol.literal.length) {
                 return null;
             }
-            if (symbol.literal.length === 1 || this.state.lexer) {
+            if (symbol.literal.length === 1 || this.state.lexer || this.context.state.lexer) {
                 return symbol;
             }
             return this.buildCharacterRules(name, symbol);

@@ -1,0 +1,38 @@
+grammar {
+
+	[json]
+		| _ (object | array) _
+
+	[object]
+		| "{" _ "}"
+		| "{" _ pair (_ "," _ pair)* _ "}"
+
+	[array]
+		| "[" _ "]"
+		| "[" _ value (_ "," _ value)* _ "]"
+
+	[value]
+		| object
+		| array
+		| number
+		| string
+		| "true"
+		| "false"
+		| "null"
+
+	[number]
+		| <number>
+
+	[string]
+		| <string>
+
+	[pair]
+		| key@k _ ":" _ value@v
+
+	[key]
+		| string
+
+	[_]
+		| <space>?
+
+}

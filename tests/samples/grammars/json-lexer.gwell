@@ -1,0 +1,17 @@
+lexer {
+	start: "json"
+
+	[json]
+		- when r:{\s+} tag "space"
+		- when r:{-?(?:[0-9]|[1-9][0-9]+)(?:\.[0-9]+)?(?:[eE][-+]?[0-9]+)?\b} tag "number" highlight "number"
+		- when r:{"(?:\\["bfnrt\/\\]|\\u[a-fA-F0-9]{4}|[^"\\])*"} tag "string" highlight "string"
+		- when "{" tag "{"
+		- when "}" tag "}"
+		- when "[" tag "["
+		- when "]" tag "]"
+		- when "," tag ","
+		- when ":" tag ":"
+		- when "true" tag "true" highlight "keyword"
+		- when "false" tag "false" highlight "keyword"
+		- when "null" tag "null" highlight "keyword"
+}

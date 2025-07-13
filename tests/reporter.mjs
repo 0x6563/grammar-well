@@ -49,33 +49,33 @@ class TestReporter {
         },
         'test:pass': (event) => {
             this.running.pop();
-            if (event.data.details?.type) {
+            if (event.data.details?.type == 'suite') {
                 this.suiteHeader = true;
                 // return this.print(`${FgGreen}passed${Reset} ${this.running.join(' > ')} ${event.data.name}`);
             } else {
-                let l = '';
+                let line = '';
                 if (this.suiteHeader) {
-                    l += this.print(`${FgYellow}Suite${Reset} ${this.running.join(' > ')}`);
+                    line += this.print(`${FgYellow}Suite${Reset} ${this.running.join(' > ')}`);
                     this.suiteHeader = false;
                 }
-                l += this.print(`${FgGreen}✓${Reset} ${event.data.name}`, true);
-                return l;
+                line += this.print(`${FgGreen}✓${Reset} ${event.data.name}`, true);
+                return line;
             }
         },
         'test:fail': (event) => {
             this.running.pop();
-            if (event.data.details?.type) {
+            if (event.data.details?.type == 'suite') {
                 this.suiteHeader = true;
                 // return this.print(`${FgRed}failed${Reset} ${this.running.join(' > ')} ${event.data.name}`, false);
             } else {
-                let l = '';
+                let line = '';
                 if (this.suiteHeader) {
-                    l += this.print(`${FgYellow}Suite${Reset} ${this.running.join(' > ')}`);
+                    line += this.print(`${FgYellow}Suite${Reset} ${this.running.join(' > ')}`);
                     this.suiteHeader = false;
                 }
-                l += this.print(`${FgRed}𐄂${Reset} ${BgRed}${FgWhite}${event.data.name}${Reset}`, true);
-                l += this.print(`${FgWhite}${event.data.details.error.cause}${Reset}\n`, 4);
-                return l;
+                line += this.print(`${FgRed}𐄂${Reset} ${BgRed}${FgWhite}${event.data.name}${Reset}`, true);
+                line += this.print(`${FgWhite}${event.data.details.error.cause}${Reset}\n`, 4);
+                return line;
             }
         },
         'test:plan': (event) => {
@@ -89,15 +89,13 @@ class TestReporter {
         },
         'test:stdout': (event) => {
             return this.print(event.data.message);
-
-            // return this.print(event.data.message);
         },
         'test:coverage': (event) => {
             const { totalLineCount } = event.data.summary.totals;
             return `total line count: ${totalLineCount}\n`;
         },
         'done': () => {
-            console.log('\n' + this.logs.join('\n'))
+            console.log('\n' + this.logs.join('\n'));
         }
     }
     print(content, indent = false, temporary = false) {
