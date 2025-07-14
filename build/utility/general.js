@@ -119,8 +119,18 @@ export function Flatten(obj) {
             return collection.encode(src);
         }
         collection.encode(src);
-        if (Array.isArray(src)) {
+        if (src instanceof Set) {
+            collection.redirect(src, [...src].map(v => Traverse(v)));
+        }
+        else if (Array.isArray(src)) {
             collection.redirect(src, src.map(v => Traverse(v)));
+        }
+        else if (src instanceof Map) {
+            const o = {};
+            for (const [k, v] of src.entries()) {
+                o[k] = Traverse(v);
+            }
+            collection.redirect(src, o);
         }
         else if (typeof src === 'object') {
             const o = {};
