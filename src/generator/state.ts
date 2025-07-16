@@ -1,5 +1,5 @@
 import { GeneratorGrammarProductionRule, GeneratorLexerConfig, GeneratorLexerState, GeneratorStateGrammar } from "../typings/index.js";
-import { version } from "../version.json" with { type: "json" };
+import version from "../version.json" with { type: "json" };
 export class GeneratorState {
     grammar?: GeneratorStateGrammar;
     lexer?: GeneratorLexerConfig;
@@ -9,7 +9,7 @@ export class GeneratorState {
     } = {}
 
     config = {};
-    version: string = version;
+    version: string = version.version;
 
     merge(state: GeneratorState) {
         if (state.grammar) {

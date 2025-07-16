@@ -1,8 +1,8 @@
 import { readFileSync } from 'fs';
 import assert from "node:assert";
 import { join } from 'path';
-import { Generate, Parse } from '../../src';
-import { DictionaryResolver } from '../../src/generator/import-resolvers/dictionary';
+import { Generate, Parse } from '../../build';
+import { DictionaryResolver } from '../../build/generator/import-resolvers/dictionary';
 import { readdirSync } from 'node:fs';
 import { resolve } from 'node:path';
 const grammarDir = './tests/samples/grammars';
