@@ -2,7 +2,9 @@ lexer {
 	start: "main"
 
 	[main]
-		- import string, ws, comment, l_star, lifecycle
+		- import string, ws, comment
+		- when "*"
+		- import lifecycle
 		- when r:{lexer(?![a-zA-Z\d_])} tag "T_WORD" highlight "tag" goto lexer
 		- when r:{grammar(?![a-zA-Z\d_])} tag "T_WORD" highlight "tag" goto grammar
 		- when r:{config(?![a-zA-Z\d_])} tag "T_WORD" highlight "tag" goto config
@@ -14,7 +16,9 @@ lexer {
 			- when r:{on(?![a-zA-Z\d_])} tag "T_WORD" highlight "tag"
 
 		[span]
-			- import js_body, l_colon, word
+			- import js_body
+			- when ":" highlight "keyword"
+			- import word
 
 		[stop]
 			- before r:{[\'"`]}
@@ -44,7 +48,11 @@ lexer {
 			- when "{"
 
 		[span]
-			- import comment, section_word, js_template, ws, insensitive, regex, l_qmark, l_plus, l_star, kv, l_colon, l_at, l_comma, l_pipe, l_parenl, l_parenr, l_abracketl, l_abracketr, l_arrow, l_dsign, l_dash
+			- import comment, section_word, js_template, ws, insensitive, regex
+			- when r:{[?+*]} highlight "keyword"
+			- import kv
+			- when r:{[|@]} highlight "keyword"
+			- when r:{[,()<>$-]}
 
 		[stop]
 			- when "}"
@@ -59,7 +67,9 @@ lexer {
 			- when "{"
 
 		[span]
-			- import ws, comment, section_word, regex, l_comma, l_arrow, l_dash, kv, l_colon, lexer_span
+			- import ws, comment, section_word, regex
+			- when r:{[-,]}
+			- import kv, lexer_span
 
 		[stop]
 			- when "}"
@@ -72,7 +82,10 @@ lexer {
 			- when "{"
 
 		[span]
-			- import ws, comment, section_word, regex, l_comma, l_arrow, l_dash, kv
+			- import ws, comment, section_word, regex
+			- when ","
+			- when "-"
+			- import kv
 
 		[stop]
 			- when "}"
@@ -105,7 +118,10 @@ lexer {
 		- when "[" highlight "annotation" set js_literal
 
 	[kv]
-		- import string, ws, word, l_colon, integer, l_scolon
+		- import string, ws, word
+		- when ":" highlight "keyword"
+		- when r:{\d+} tag "T_INTEGER" highlight "number"
+		- when ";"
 
 	[jsignore]
 		- when r:{"(?:\\.|[^"\\\r\n])*"} tag "T_JSBODY"
@@ -161,9 +177,6 @@ lexer {
 	[insensitive]
 		- when "i:" highlight "constant"
 
-	[integer]
-		- when r:{\d+} tag "T_INTEGER" highlight "number"
-
 	[word]
 		- when r:{[a-zA-Z_][a-zA-Z_\d]*} tag "T_WORD"
 
@@ -172,63 +185,6 @@ lexer {
 
 	[ws]
 		- when r:{\s+} tag "T_WS"
-
-	[l_at]
-		- when "@" highlight "keyword"
-
-	[l_colon]
-		- when ":" highlight "keyword"
-
-	[l_scolon]
-		- when ";"
-
-	[l_qmark]
-		- when "?"
-
-	[l_plus]
-		- when "+"
-
-	[l_star]
-		- when "*"
-
-	[l_comma]
-		- when ","
-
-	[l_pipe]
-		- when "|" highlight "keyword"
-
-	[l_parenl]
-		- when "("
-
-	[l_parenr]
-		- when ")"
-
-	[l_cbracketl]
-		- when "{"
-
-	[l_cbracketr]
-		- when "}"
-
-	[l_abracketl]
-		- when "<"
-
-	[l_abracketr]
-		- when ">"
-
-	[l_squarel]
-		- when "[" highlight "variable"
-
-	[l_squarer]
-		- when "]" highlight "variable"
-
-	[l_arrow]
-		- when "->" highlight "keyword"
-
-	[l_dsign]
-		- when "$"
-
-	[l_dash]
-		- when "-"
 
 	[comment]
 		- when r:{//[^\n]*} tag "T_COMMENT" highlight "comment"

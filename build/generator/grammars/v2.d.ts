@@ -780,7 +780,19 @@ declare class grammar {
                         when: RegExp;
                         pop?: undefined;
                     } | {
+                        highlight: string;
+                        when: RegExp;
+                        tag?: undefined;
+                        goto?: undefined;
+                        pop?: undefined;
+                    } | {
                         when: string;
+                        highlight?: undefined;
+                        tag?: undefined;
+                        goto?: undefined;
+                        pop?: undefined;
+                    } | {
+                        when: RegExp;
                         highlight?: undefined;
                         tag?: undefined;
                         goto?: undefined;
@@ -817,14 +829,6 @@ declare class grammar {
                     rules: {
                         highlight: string;
                         when: string;
-                    }[];
-                };
-                integer: {
-                    regex: RegExp;
-                    rules: {
-                        highlight: string;
-                        tag: string[];
-                        when: RegExp;
                     }[];
                 };
                 js_body: {
@@ -915,100 +919,6 @@ declare class grammar {
                         tag?: undefined;
                     })[];
                 };
-                l_abracketl: {
-                    regex: RegExp;
-                    rules: {
-                        when: string;
-                    }[];
-                };
-                l_abracketr: {
-                    regex: RegExp;
-                    rules: {
-                        when: string;
-                    }[];
-                };
-                l_arrow: {
-                    regex: RegExp;
-                    rules: {
-                        highlight: string;
-                        when: string;
-                    }[];
-                };
-                l_at: {
-                    regex: RegExp;
-                    rules: {
-                        highlight: string;
-                        when: string;
-                    }[];
-                };
-                l_colon: {
-                    regex: RegExp;
-                    rules: {
-                        highlight: string;
-                        when: string;
-                    }[];
-                };
-                l_comma: {
-                    regex: RegExp;
-                    rules: {
-                        when: string;
-                    }[];
-                };
-                l_dash: {
-                    regex: RegExp;
-                    rules: {
-                        when: string;
-                    }[];
-                };
-                l_dsign: {
-                    regex: RegExp;
-                    rules: {
-                        when: string;
-                    }[];
-                };
-                l_parenl: {
-                    regex: RegExp;
-                    rules: {
-                        when: string;
-                    }[];
-                };
-                l_parenr: {
-                    regex: RegExp;
-                    rules: {
-                        when: string;
-                    }[];
-                };
-                l_pipe: {
-                    regex: RegExp;
-                    rules: {
-                        highlight: string;
-                        when: string;
-                    }[];
-                };
-                l_plus: {
-                    regex: RegExp;
-                    rules: {
-                        when: string;
-                    }[];
-                };
-                l_qmark: {
-                    regex: RegExp;
-                    rules: {
-                        when: string;
-                    }[];
-                };
-                l_scolon: {
-                    regex: RegExp;
-                    rules: {
-                        when: string;
-                    }[];
-                };
-                l_star: {
-                    regex: RegExp;
-                    rules: {
-                        when: string;
-                    }[];
-                };
                 lexer: {
                     regex: RegExp;
                     rules: ({
@@ -1042,7 +952,7 @@ declare class grammar {
                         when: RegExp;
                         pop?: undefined;
                     } | {
-                        when: string;
+                        when: RegExp;
                         tag?: undefined;
                         highlight?: undefined;
                         goto?: undefined;
@@ -1051,6 +961,12 @@ declare class grammar {
                         highlight: string;
                         when: string;
                         tag?: undefined;
+                        goto?: undefined;
+                        pop?: undefined;
+                    } | {
+                        when: string;
+                        tag?: undefined;
+                        highlight?: undefined;
                         goto?: undefined;
                         pop?: undefined;
                     } | {

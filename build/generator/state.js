@@ -1,4 +1,4 @@
-import { version } from "../version.json";
+import { version } from "../version.json" with { type: "json" };
 export class GeneratorState {
     grammar;
     lexer;
