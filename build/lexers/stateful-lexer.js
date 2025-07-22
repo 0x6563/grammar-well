@@ -58,7 +58,8 @@ export class StatefulLexer {
             line: this.line,
             lines: 0,
             column: this.column,
-            state: this.current
+            state: this.current,
+            custom: {},
         };
         this.adjustPosition(text);
         token.lines = this.line - token.line;

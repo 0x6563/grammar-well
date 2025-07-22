@@ -20,8 +20,8 @@ export class JavaScriptGenerator {
     }
     lifecycle(lifecycle) {
         if (this.options.noscript)
-            return '';
-        return this.state.lifecycle[lifecycle] || '';
+            return [];
+        return this.state.lifecycle[lifecycle] || [];
     }
     artifacts(depth = 0) {
         let output = {};
@@ -41,7 +41,28 @@ export class JavaScriptGenerator {
             const basic = new BasicGrammarTable(this);
             output.grammar = basic.stringify(depth + 1);
         }
+        const onToken = this.lifecycle('token');
+        if (onToken.length) {
+            output.tokenProcessor = `() => {`;
+            output.tokenProcessor += `${CommonGenerator.SmartIndent(depth + 1)}return (token) => {`;
+            output.tokenProcessor += `${CommonGenerator.SmartIndent(depth + 2)}const processors = [`;
+            output.tokenProcessor += `${CommonGenerator.SmartIndent(depth + 3)}${onToken.map(v => `({ token, state }) => ${v}`).join(',' + CommonGenerator.SmartIndent(depth + 3))}`;
+            output.tokenProcessor += `${CommonGenerator.SmartIndent(depth + 2)}];`;
+            output.tokenProcessor += `${CommonGenerator.SmartIndent(depth + 2)}for (const processor of processors) {`;
+            output.tokenProcessor += `${CommonGenerator.SmartIndent(depth + 3)}token = processor({ token, state: this.state })`;
+            output.tokenProcessor += `${CommonGenerator.SmartIndent(depth + 2)}}`;
+            output.tokenProcessor += `${CommonGenerator.SmartIndent(depth + 2)}return token;`;
+            output.tokenProcessor += `${CommonGenerator.SmartIndent(depth + 1)}}`;
+            output.tokenProcessor += `${CommonGenerator.SmartIndent(depth)}}`;
+        }
         return CommonGenerator.JSON(output, depth);
+    }
+    f(token) {
+        const processors = [({ token, state }) => token];
+        for (const processor of processors) {
+            token = processor({ token, state: this.state });
+        }
+        return token;
     }
     postProcess(postprocess, alias) {
         postprocess = this.state.grammar.config.postprocessorOverride || postprocess || this.state.grammar.config.postprocessorDefault;

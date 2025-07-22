@@ -80,7 +80,10 @@ export class Generator {
         }
     }
     async processLifecycleDirective(directive) {
-        this.state.addLifecycle(directive.lifecycle, directive.js.js);
+        if ('js' in directive.js)
+            this.state.addLifecycle(directive.lifecycle, directive.js.js);
+        else if ('template' in directive.js)
+            this.state.addLifecycle(directive.lifecycle, directive.js.template);
     }
     processConfigDirective(directive) {
         Object.assign(this.state.config, directive.config);

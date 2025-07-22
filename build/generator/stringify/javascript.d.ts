@@ -7,6 +7,7 @@ export declare class JavaScriptGenerator {
     name(): string;
     lifecycle(lifecycle: string): any;
     artifacts(depth?: number): string;
+    f(token: any): any;
     postProcess(postprocess: GeneratorGrammarProductionRule['postprocess'], alias: Dictionary<number>): any;
     grammarRule(rule: GeneratorGrammarProductionRule): string;
     private templatePostProcess;

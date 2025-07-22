@@ -12,6 +12,7 @@ export interface RuntimeParserClass {
             k: number;
             table: Dictionary<LRState>;
         };
+        tokenProcessor: () => ((token: RuntimeLexerToken) => RuntimeLexerToken) | undefined;
     };
     new (): any;
 }
@@ -50,6 +51,9 @@ export interface RuntimeLexerToken {
     offset: number;
     line: number;
     column: number;
+    custom?: {
+        [key: string]: any;
+    };
 }
 export interface RuntimeLexerStateMatchRule {
     when: string | RegExp;

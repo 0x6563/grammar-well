@@ -58,8 +58,11 @@ export class GeneratorState {
         }
     }
     addLifecycle(lifecycle, literal) {
-        this.lifecycle[lifecycle] = this.lifecycle[lifecycle] || '';
-        this.lifecycle[lifecycle] += literal;
+        this.lifecycle[lifecycle] = this.lifecycle[lifecycle] || [];
+        if (typeof literal == 'string')
+            this.lifecycle[lifecycle].push(literal);
+        if (Array.isArray(literal))
+            this.lifecycle[lifecycle].push(...literal);
     }
     export() {
         return {

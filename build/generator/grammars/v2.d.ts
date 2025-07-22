@@ -1,4 +1,5 @@
 declare class grammar {
+    state: {};
     artifacts: {
         grammar: {
             rules: {
@@ -1075,6 +1076,13 @@ declare class grammar {
                 "lifecycle.span": {
                     regex: RegExp;
                     rules: ({
+                        highlight: string;
+                        set: string;
+                        when: string;
+                        tag?: undefined;
+                        before?: undefined;
+                        pop?: undefined;
+                    } | {
                         tag: string[];
                         when: RegExp;
                         highlight?: undefined;
@@ -1091,17 +1099,17 @@ declare class grammar {
                     } | {
                         highlight: string;
                         when: string;
-                        tag?: undefined;
                         set?: undefined;
+                        tag?: undefined;
                         before?: undefined;
                         pop?: undefined;
                     } | {
                         before: boolean;
                         pop: number;
                         when: RegExp;
-                        tag?: undefined;
                         highlight?: undefined;
                         set?: undefined;
+                        tag?: undefined;
                     })[];
                 };
                 "lifecycle.start": {

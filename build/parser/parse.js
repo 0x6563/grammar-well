@@ -20,15 +20,16 @@ export function Parse(language, input, options = {
     const result = algorithm({ ...language, tokens: tokenizer, utility: ParserUtility }, options.parserOptions);
     return results == 'full' ? result : result.results[0];
 }
-function GetTokenizer({ lexer }) {
-    if (!lexer) {
-        return new TokenBuffer(new CharacterLexer());
+function GetTokenizer(artifacts) {
+    const tokenProcessor = artifacts?.tokenProcessor ? artifacts.tokenProcessor() : null;
+    if (!artifacts.lexer) {
+        return new TokenBuffer(new CharacterLexer(), tokenProcessor);
     }
-    else if ("feed" in lexer && typeof lexer.feed == 'function') {
-        return new TokenBuffer(lexer);
+    else if ("feed" in artifacts.lexer && typeof artifacts.lexer.feed == 'function') {
+        return new TokenBuffer(artifacts.lexer, tokenProcessor);
     }
-    else if ('states' in lexer) {
-        return new TokenBuffer(new StatefulLexer(lexer));
+    else if ('states' in artifacts.lexer) {
+        return new TokenBuffer(new StatefulLexer(artifacts.lexer), tokenProcessor);
     }
 }
 //# sourceMappingURL=parse.js.map

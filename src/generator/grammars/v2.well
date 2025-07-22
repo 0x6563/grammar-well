@@ -16,6 +16,7 @@ lexer {
 			- when r:{on(?![a-zA-Z\d_])} tag "T_WORD" highlight "tag"
 
 		[span]
+			- when "=>" highlight "annotation" set js_template_inner
 			- import js_body
 			- when ":" highlight "keyword"
 			- import word
@@ -212,6 +213,7 @@ grammar {
 		| "lexer" _ "{" _ lexer@lexer _ "}" => ( { lexer: Object.assign(...$lexer) } )
 		| "grammar" _ "{" _ grammar@grammar _ "}" => ( { grammar: $grammar } )
 		| r:{on} ":" T_WORD@lifecycle _ T_JS@js => ( { lifecycle: $lifecycle, js: $js } )
+		| r:{on} ":" T_WORD@lifecycle _ POSTPROCESSOR@js => ( { lifecycle: $lifecycle, js: $js } )
 		| r:{on} ":" T_WORD@lifecycle _ T_STRING@js => ( { lifecycle: $lifecycle, js: $js, path: true } )
 
 	[lexer]

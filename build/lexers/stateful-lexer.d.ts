@@ -35,6 +35,7 @@ export declare class StatefulLexer implements RuntimeLexer {
         lines: number;
         column: number;
         state: string;
+        custom: {};
     };
     private set;
     private pop;

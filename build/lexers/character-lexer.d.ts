@@ -14,6 +14,7 @@ export declare class CharacterLexer implements RuntimeLexer {
         offset: number;
         line: number;
         column: number;
+        custom: {};
     };
     feed(buffer: string | any[], state?: ReturnType<CharacterLexer['state']>): void;
     state(): {

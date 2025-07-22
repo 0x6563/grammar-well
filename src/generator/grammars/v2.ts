@@ -5,6 +5,7 @@
 
 
 class grammar {
+    state = {};
     artifacts = {
         grammar: {
             rules: {
@@ -159,6 +160,7 @@ class grammar {
                     { name: "section", postprocess: ({data}) => { return ({ lexer: Object.assign(...data[4]) }); }, symbols: [ { literal: "lexer" }, "_", { literal: "{" }, "_", "lexer", "_", { literal: "}" } ] },
                     { name: "section", postprocess: ({data}) => { return ({ grammar: data[4] }); }, symbols: [ { literal: "grammar" }, "_", { literal: "{" }, "_", "grammar", "_", { literal: "}" } ] },
                     { name: "section", postprocess: ({data}) => { return ({ lifecycle: data[2], js: data[4] }); }, symbols: [ /on/, { literal: ":" }, "T_WORD", "_", "T_JS" ] },
+                    { name: "section", postprocess: ({data}) => { return ({ lifecycle: data[2], js: data[4] }); }, symbols: [ /on/, { literal: ":" }, "T_WORD", "_", "POSTPROCESSOR" ] },
                     { name: "section", postprocess: ({data}) => { return ({ lifecycle: data[2], js: data[4], path: true }); }, symbols: [ /on/, { literal: ":" }, "T_WORD", "_", "T_STRING" ] }
                 ],
                 section_list: [
@@ -461,8 +463,9 @@ class grammar {
                     ]
                 },
                 "lifecycle.span": {
-                    regex: /(?:(?:(\s+))|(?:((?:\{)))|(?:((?::)))|(?:([a-zA-Z_][a-zA-Z_\d]*))|(?:([\'"`])))/ym,
+                    regex: /(?:(?:((?:=>)))|(?:(\s+))|(?:((?:\{)))|(?:((?::)))|(?:([a-zA-Z_][a-zA-Z_\d]*))|(?:([\'"`])))/ym,
                     rules: [
+                        { highlight: "annotation", set: "js_template_inner", when: "=>" },
                         { tag: ["T_WS"], when: /\s+/ },
                         { highlight: "annotation", set: "js_literal", tag: ["T_JSBODY"], when: "{" },
                         { highlight: "keyword", when: ":" },

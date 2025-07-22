@@ -15,7 +15,7 @@ export class TokenBuffer {
         return { historyIndex: this.$historyIndex, offset: this.offset };
     }
 
-    constructor(public lexer: RuntimeLexer) { }
+    constructor(public lexer: RuntimeLexer, private tokenProcessor?: (token: RuntimeLexerToken) => RuntimeLexerToken) { }
 
     reset(buffer: string) {
         this.lexer.feed(buffer);
@@ -77,8 +77,11 @@ export class TokenBuffer {
             this.queued = '';
             token = this.lexer.next();
         }
-        if (token)
+        if (token) {
+            if (this.tokenProcessor)
+                token = this.tokenProcessor(token);
             this.history.push(token);
+        }
         return token;
     }
 

@@ -4,11 +4,12 @@ export function TypescriptFormat(generator) {
 // https://github.com/0x6563/grammar-well
 // @ts-nocheck
 
-${generator.lifecycle('import')}
+${generator.lifecycle('import').join('')}
 
 class ${exportName} {
+    state = {};
     artifacts = ${generator.artifacts(1)}
-    constructor(){${generator.lifecycle('new')}}
+    constructor(){${generator.lifecycle('new').join('')}}
 }
 
 export default ${exportName};`;

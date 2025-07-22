@@ -4,8 +4,9 @@ export class GeneratorState {
     grammar?: GeneratorStateGrammar;
     lexer?: GeneratorLexerConfig;
     lifecycle: {
-        import?: string;
-        new?: string;
+        import?: string[];
+        new?: string[];
+        token?: string[];
     } = {}
 
     config = {};
@@ -72,9 +73,14 @@ export class GeneratorState {
         }
     }
 
-    addLifecycle(lifecycle: string, literal: string) {
-        this.lifecycle[lifecycle] = this.lifecycle[lifecycle] || '';
-        this.lifecycle[lifecycle] += literal;
+    addLifecycle(lifecycle: string, literal: string | string[]) {
+        this.lifecycle[lifecycle] = this.lifecycle[lifecycle] || [];
+
+        if (typeof literal == 'string')
+            this.lifecycle[lifecycle].push(literal);
+
+        if (Array.isArray(literal))
+            this.lifecycle[lifecycle].push(...literal);
     }
 
     export() {

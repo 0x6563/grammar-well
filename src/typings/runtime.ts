@@ -1,5 +1,5 @@
 import { LRState } from "./index.js";
-import { ASTGrammarSymbolLiteral, ASTGrammarSymbolToken, ASTLexerStateMatchRule, ASTLexerStateNonMatchRule } from "./ast.js";
+import { ASTGrammarSymbolLiteral, ASTGrammarSymbolToken, ASTLexerStateNonMatchRule } from "./ast.js";
 import { Dictionary } from "./common.js";
 
 export interface RuntimeParserClass {
@@ -13,6 +13,7 @@ export interface RuntimeParserClass {
             k: number;
             table: Dictionary<LRState>;
         }
+        tokenProcessor: () => ((token: RuntimeLexerToken) => RuntimeLexerToken) | undefined
     }
     new();
 }
@@ -60,6 +61,7 @@ export interface RuntimeLexerToken {
     offset: number;
     line: number;
     column: number;
+    custom?: { [key: string]: any }
 }
 
 

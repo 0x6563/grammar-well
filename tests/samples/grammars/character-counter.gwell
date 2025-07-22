@@ -1,0 +1,18 @@
+
+on:new => {
+	this.state.i = 0;
+}
+
+on:token => {
+	token.custom.i = ++state.i;
+	return token;
+}
+
+grammar {
+
+	[S]
+		| character+ => ($0)
+
+	[character]
+		| r:{.} => ($0.custom.i)
+}

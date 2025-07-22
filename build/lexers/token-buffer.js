@@ -1,5 +1,6 @@
 export class TokenBuffer {
     lexer;
+    tokenProcessor;
     history = [];
     queued = '';
     $historyIndex = -1;
@@ -10,8 +11,9 @@ export class TokenBuffer {
     get state() {
         return { historyIndex: this.$historyIndex, offset: this.offset };
     }
-    constructor(lexer) {
+    constructor(lexer, tokenProcessor) {
         this.lexer = lexer;
+        this.tokenProcessor = tokenProcessor;
     }
     reset(buffer) {
         this.lexer.feed(buffer);
@@ -64,8 +66,11 @@ export class TokenBuffer {
             this.queued = '';
             token = this.lexer.next();
         }
-        if (token)
+        if (token) {
+            if (this.tokenProcessor)
+                token = this.tokenProcessor(token);
             this.history.push(token);
+        }
         return token;
     }
     [Symbol.iterator]() {

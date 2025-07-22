@@ -92,7 +92,10 @@ export class Generator {
     }
 
     private async processLifecycleDirective(directive: ASTJavascriptLifecycleLiteral) {
-        this.state.addLifecycle(directive.lifecycle, directive.js.js);
+        if ('js' in directive.js)
+            this.state.addLifecycle(directive.lifecycle, directive.js.js);
+        else if ('template' in directive.js)
+            this.state.addLifecycle(directive.lifecycle, directive.js.template);
     }
 
     private processConfigDirective(directive: ASTConfig) {

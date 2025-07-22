@@ -1,4 +1,5 @@
 class grammar {
+    state = {};
     artifacts = {
         grammar: {
             rules: {

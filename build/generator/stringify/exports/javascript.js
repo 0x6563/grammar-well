@@ -16,11 +16,12 @@ function Generate(generator) {
     return `// Generated automatically by Grammar-Well, version ${generator.state.version} 
 // https://github.com/0x6563/grammar-well
 
-${generator.lifecycle('import')}
+${generator.lifecycle('import').join('')}
 
 class ${exportName} {
+    state = {};
     artifacts = ${generator.artifacts(1)}
-    constructor(){${generator.lifecycle('new')}}
+    constructor(){${generator.lifecycle('new').join('')}}
 }`;
 }
 //# sourceMappingURL=javascript.js.map

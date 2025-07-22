@@ -18,6 +18,11 @@ General:
     grammarSource: grammars/json-main.gwell
     input: "{\"abc\": 123,\n\"hello\": \"world\",\n\"boolean\": true\n}"
     throw: false
+  
+  - title: Token PostProcessor
+    grammarSource: grammars/character-counter.gwell
+    input: 'abc'
+    result: [1,2,3]
 
 Parentheses:
   - title: Parentheses Pass 1

@@ -9,6 +9,9 @@ export declare class V2GrammarString {
     formatSymbols(exp: GeneratorGrammarSymbol[]): any;
     formatSymbol(exp: ASTGrammarSymbol | GeneratorGrammarSymbol | string): any;
     formatPostProcess(postProcess: ASTGrammarProduction['postprocess']): string;
+    formatTemplate(postProcess: {
+        template: string;
+    }): string;
     appendLexerDirective(directive: ASTLexer): void;
     formatLexerState(name: string, state: ASTLexerState, depth?: number): string;
     formatLexerStateRule(rule: ASTLexerStateMatchRule | ASTLexerStateNonMatchRule | ASTLexerStateImportRule): string;
@@ -16,5 +19,6 @@ export declare class V2GrammarString {
         [key: string]: any;
     }, depth?: number): string;
     appendSection(label: string, body: string): void;
+    appendSource(source: any): void;
     indent(depth: number, content: string): string;
 }

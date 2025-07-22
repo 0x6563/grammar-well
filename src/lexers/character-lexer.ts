@@ -28,7 +28,8 @@ export class CharacterLexer implements RuntimeLexer {
                 value,
                 offset: this.index,
                 line: this.line,
-                column: this.column
+                column: this.column,
+                custom: {}
             };
         }
     }

@@ -1,6 +1,7 @@
 import { RuntimeLexer, RuntimeLexerToken, TQRestorePoint } from '../typings/index.js';
 export declare class TokenBuffer {
     lexer: RuntimeLexer;
+    private tokenProcessor?;
     private history;
     private queued;
     private $historyIndex;
@@ -9,7 +10,7 @@ export declare class TokenBuffer {
     get column(): number;
     get active(): RuntimeLexerToken;
     get state(): TQRestorePoint;
-    constructor(lexer: RuntimeLexer);
+    constructor(lexer: RuntimeLexer, tokenProcessor?: (token: RuntimeLexerToken) => RuntimeLexerToken);
     reset(buffer: string): void;
     restore(state: TQRestorePoint): void;
     feed(buffer: string, flush?: boolean): void;

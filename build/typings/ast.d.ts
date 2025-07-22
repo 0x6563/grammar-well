@@ -3,7 +3,7 @@ export type AST = ASTDirectives[];
 export type ASTJavascriptLifecycleLiteral = {
     lifecycle: string;
     path?: boolean;
-    js: ASTJavaScriptLiteral;
+    js: ASTJavaScriptLiteral | ASTJavaScriptTemplate;
 };
 export type ASTJavaScriptLiteral = {
     js: string;

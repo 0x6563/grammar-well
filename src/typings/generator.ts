@@ -41,7 +41,7 @@ export interface GeneratorStateGrammar {
 };
 
 export interface GeneratorLexerConfig {
-    start?: string
+    start?: string;
     states: Dictionary<GeneratorLexerState>;
 }
 

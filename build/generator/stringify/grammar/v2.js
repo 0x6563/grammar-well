@@ -4,7 +4,10 @@ export class V2GrammarString {
         directives = Array.isArray(directives) ? directives : [directives];
         for (const directive of directives) {
             if ("lifecycle" in directive) {
-                this.appendSection("on:" + directive.lifecycle, directive.js.js.trim());
+                if ('js' in directive.js)
+                    this.appendSection("on:" + directive.lifecycle, directive.js.js.trim());
+                else if ('template' in directive.js)
+                    this.appendSource("on:" + directive.lifecycle + this.formatTemplate(directive.js));
             }
             else if ("import" in directive) {
                 this.appendImportDirective(directive);
@@ -84,10 +87,13 @@ export class V2GrammarString {
             return `=> \${ ${postProcess.js} }`;
         }
         if ('template' in postProcess) {
-            const prefix = postProcess.template.slice(0, 1);
-            const suffix = postProcess.template.slice(-1);
-            return `=> ${prefix} ${postProcess.template.slice(1, -1).trim()} ${suffix}`;
+            return this.formatTemplate(postProcess);
         }
+    }
+    formatTemplate(postProcess) {
+        const prefix = postProcess.template.slice(0, 1);
+        const suffix = postProcess.template.slice(-1);
+        return `=> ${prefix} ${postProcess.template.slice(1, -1).trim()} ${suffix}`;
     }
     appendLexerDirective(directive) {
         let body = '';
@@ -199,10 +205,13 @@ export class V2GrammarString {
         return body;
     }
     appendSection(label, body) {
+        this.appendSource(`${label} {\n${body}\n}\n`);
+    }
+    appendSource(source) {
         if (this.source) {
             this.source += '\n';
         }
-        this.source += `${label} {\n${body}\n}\n`;
+        this.source += source;
     }
     indent(depth = 0, content) {
         return `\t`.repeat(depth) + content;
