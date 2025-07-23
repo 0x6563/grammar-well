@@ -1,4 +1,4 @@
-// Generated automatically by Grammar-Well, version 2.0.5 
+// Generated automatically by Grammar-Well, version 2.0.6 
 // https://github.com/0x6563/grammar-well
 // @ts-nocheck
 
