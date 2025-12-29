@@ -1,0 +1,15 @@
+lexer { 
+
+	[start]
+		- when r:{[a-zA-Z]} tag "TOKEN"  
+}
+
+grammar {
+
+	[start]
+		| list => ( ($0.match = '1') && $0)
+		| list => ( ($0.match = '2') && $0)
+ 
+    [list]
+        | <TOKEN> <TOKEN> => { items: [$0.value, $1.value] }
+}

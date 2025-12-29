@@ -5,7 +5,6 @@ import { AsyncRun, RunTest, Expected, GetFile, GetValue } from './testbed';
 
 describe('Predefined Samples', () => {
     const groups = parse(GetFile('./predefined-samples.yml'));
-
     for (const group in groups) {
         const tests = groups[group];
         describe(group, () => {
@@ -15,9 +14,11 @@ describe('Predefined Samples', () => {
                     const grammar = GetValue(t, 'grammar');
                     const input = GetValue(t, 'input');
                     const result = GetValue(t, 'result');
+                    const results = GetValue(t, 'results');
                     const error = GetValue(t, 'error');
                     options.algorithm = GetValue(t, 'algorithm') || 'earley';
-                    const execution = await AsyncRun(() => RunTest(grammar, input, options));
+                    const resultType = !result && results ? 'full' : 'first';
+                    const execution = await AsyncRun(() => RunTest(grammar, input, options, resultType));
                     try {
                         if (typeof t.throw == 'boolean') {
                             if (execution.success == t.throw) {
@@ -29,10 +30,15 @@ describe('Predefined Samples', () => {
                             Expected(execution.error, error);
                             Expected(execution.success, false, 'Expected to throw error.');
                         } else {
-                            Expected(execution.result, result);
+                            if (resultType == 'full') {
+                                Expected(execution.result.results, results);
+                            } else {
+                                Expected(execution.result, result);
+                            }
                             Expected(execution.success, true, 'Expected to not throw error.');
                         }
                     } catch (error) {
+                        console.log(error)
                         if (execution.error) {
                             console.error(execution.error);
                         }

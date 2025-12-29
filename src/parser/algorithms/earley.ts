@@ -1,4 +1,4 @@
-import { Dictionary, RuntimeGrammarProductionRule, RuntimeParserClass } from "../../typings/index.js";
+import { Dictionary, RuntimeGrammarProductionRule, RuntimeLexerToken, RuntimeParserClass } from "../../typings/index.js";
 import { TokenBuffer } from "../../lexers/token-buffer.js";
 import { TextFormatter } from "../../utility/text-format.js";
 import { ParserUtility } from "../../utility/parsing.js";
@@ -58,9 +58,22 @@ export function Earley(language: RuntimeParserClass & { tokens: TokenBuffer }, o
             results.push(data);
         }
     }
+    const clone = results.length > 1;
+    for (let i = 0; i < results.length; i++) {
+        results[i] = PostProcess(results[i], clone);
+    }
     return { results, info: { table } };
 }
 
+function PostProcess(ast: PreAST | RuntimeLexerToken, clone?: boolean) {
+    if (!Array.isArray(ast))
+        return clone ? { ...ast } : ast;
+    const data = [];
+    for (let i = 0; i < ast[1].length; i++) {
+        data[i] = PostProcess(ast[1][i], clone);
+    }
+    return ParserUtility.PostProcess(ast[0], data, ast[2]);
+}
 
 class Column {
     data: any;
@@ -170,7 +183,7 @@ class State {
 
 
     finish() {
-        this.data = ParserUtility.PostProcess(this.rule, this.data, { reference: this.reference, dot: this.dot });
+        this.data = [this.rule, this.data, { reference: this.reference, dot: this.dot }];
     }
 
     protected build() {
@@ -191,3 +204,5 @@ interface StateToken {
     isToken: boolean,
     reference: number
 }
+
+type PreAST = [RuntimeGrammarProductionRule, (RuntimeLexerToken | PreAST)[], { reference: number, dot: number }];
