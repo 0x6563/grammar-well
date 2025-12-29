@@ -1,4 +1,11 @@
 General:
+  - title: Shared Node Mutation Safety
+    grammarSource: grammars/shared-node.gwell
+    input: "ab"
+    results: [
+      { items: ["a", "b"], match: "2" },
+      { items: ["a", "b"], match: "1" }
+    ]
   - title: Nullable Whitespace Bug
     grammarSource: grammars/whitespace.gwell
     input: "(x)"

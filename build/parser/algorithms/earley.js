@@ -42,7 +42,20 @@ export function Earley(language, options = {}) {
             results.push(data);
         }
     }
+    const clone = results.length > 1;
+    for (let i = 0; i < results.length; i++) {
+        results[i] = PostProcess(results[i], clone);
+    }
     return { results, info: { table } };
+}
+function PostProcess(ast, clone) {
+    if (!Array.isArray(ast))
+        return clone ? { ...ast } : ast;
+    const data = [];
+    for (let i = 0; i < ast[1].length; i++) {
+        data[i] = PostProcess(ast[1][i], clone);
+    }
+    return ParserUtility.PostProcess(ast[0], data, ast[2]);
 }
 class Column {
     rules;
@@ -141,7 +154,7 @@ class State {
         return state;
     }
     finish() {
-        this.data = ParserUtility.PostProcess(this.rule, this.data, { reference: this.reference, dot: this.dot });
+        this.data = [this.rule, this.data, { reference: this.reference, dot: this.dot }];
     }
     build() {
         const children = [];
