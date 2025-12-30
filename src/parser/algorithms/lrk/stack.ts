@@ -1,5 +1,5 @@
-import { RuntimeGrammarProductionRule, RuntimeGrammarRuleSymbol } from "../../../typings/index.js";
-import { State } from "./state.js";
+import type { RuntimeGrammarProductionRule, RuntimeGrammarRuleSymbol } from "../../../typings/index.ts";
+import type { State } from "./state.ts";
 
 export class LRStack {
 

@@ -1,10 +1,10 @@
-import { RuntimeLexer, RuntimeLexerToken, TQRestorePoint } from '../typings/index.js';
+import type { RuntimeLexer, RuntimeLexerToken, TQRestorePoint } from '../typings/index.ts';
 export declare class TokenBuffer {
-    lexer: RuntimeLexer;
-    private tokenProcessor?;
     private history;
     private queued;
     private $historyIndex;
+    lexer: RuntimeLexer;
+    private tokenProcessor?;
     get offset(): number;
     get line(): number;
     get column(): number;

@@ -1,15 +1,16 @@
-import { ASTGrammarSymbolNonTerminal, Dictionary, GeneratorGrammarProductionRule, GeneratorGrammarSymbol } from "../../typings/index.js";
-import { Collection, GeneratorSymbolCollection } from "../../utility/general.js";
-import { CommonGenerator } from "../stringify/common.js";
-import { JavaScriptGenerator } from "../stringify/javascript.js";
+import type { ASTGrammarSymbolNonTerminal, Dictionary, GeneratorGrammarProductionRule, GeneratorGrammarSymbol } from "../../typings/index.ts";
+import { Collection, GeneratorSymbolCollection } from "../../utility/general.ts";
+import { CommonGenerator } from "../stringify/common.ts";
+import { JavaScriptGenerator } from "../stringify/javascript.ts";
 
 
 export class LRParseTableBuilder {
     rules: Collection<GeneratorGrammarProductionRule> = new Collection();
     table: Dictionary<StateBuilder> = Object.create(null)
     symbols: GeneratorSymbolCollection = new GeneratorSymbolCollection();
-
-    constructor(public generator: JavaScriptGenerator) {
+    public generator: JavaScriptGenerator;
+    constructor(generator: JavaScriptGenerator) {
+        this.generator = generator;
         const augmented = { name: Symbol() as unknown as string, symbols: [{ rule: generator.state.grammar.start }] }
         generator.state.grammar.rules[augmented.name] = [augmented];
         this.addState([{ rule: augmented, dot: 0 }]);
@@ -73,8 +74,10 @@ class StateBuilder {
     actions: Map<GeneratorGrammarSymbol, string> = new Map();
     goto: Map<GeneratorGrammarSymbol, string> = new Map();
     reduce?: GeneratorGrammarProductionRule;
+    private collection: LRParseTableBuilder;
+    constructor(collection: LRParseTableBuilder, items: StateItem[]) {
+        this.collection = collection;
 
-    constructor(private collection: LRParseTableBuilder, items: StateItem[]) {
         const visited = new Set<GeneratorGrammarSymbol>();
         for (const item of items) {
             this.closure(item.rule, item.dot, visited);

@@ -1,6 +1,6 @@
 import test, { describe } from "node:test";
 import { parse } from 'yaml';
-import { AsyncRun, RunTest, Expected, GetFile, GetValue } from './testbed';
+import { AsyncRun, RunTest, Expected, GetFile, GetValue } from './testbed.ts';
 
 
 describe('Predefined Samples', () => {

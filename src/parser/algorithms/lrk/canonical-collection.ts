@@ -1,18 +1,20 @@
-import { RuntimeGrammarProductionRule, RuntimeGrammarRuleSymbol, RuntimeParserClass } from "../../../typings/index.js";
-import { ParserUtility } from "../../../utility/parsing.js";
-import { BiMap } from "./bimap.js";
-import { ClosureBuilder } from "./closure.js";
-import { State } from "./state.js";
+import type { RuntimeGrammarProductionRule, RuntimeGrammarRuleSymbol, RuntimeParserClass } from "../../../typings/index.ts";
+import { ParserUtility } from "../../../utility/parsing.ts";
+import { BiMap } from "./bimap.ts";
+import { ClosureBuilder } from "./closure.ts";
+import type { State } from "./state.ts";
 
 export class CanonicalCollection {
     states: Map<string, State> = new Map();
     rules: BiMap<RuntimeGrammarProductionRule> = new BiMap();
     terminals: BiMap<RuntimeGrammarRuleSymbol> = new BiMap();
+    public grammar: RuntimeParserClass['artifacts']['grammar'];
 
     private closure: ClosureBuilder;
     constructor(
-        public grammar:  RuntimeParserClass['artifacts']['grammar']
+        grammar: RuntimeParserClass['artifacts']['grammar']
     ) {
+        this.grammar = grammar;
         const augmented = {
             name: Symbol() as unknown as string,
             symbols: [this.grammar.start]

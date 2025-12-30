@@ -1,10 +1,10 @@
 import { Collection, GeneratorSymbolCollection } from "../../utility/general.js";
 import { CommonGenerator } from "../stringify/common.js";
 export class LRParseTableBuilder {
-    generator;
     rules = new Collection();
     table = Object.create(null);
     symbols = new GeneratorSymbolCollection();
+    generator;
     constructor(generator) {
         this.generator = generator;
         const augmented = { name: Symbol(), symbols: [{ rule: generator.state.grammar.start }] };
@@ -51,7 +51,6 @@ export class LRParseTableBuilder {
     }
 }
 class StateBuilder {
-    collection;
     isFinal = false;
     outputs = {
         goto: {},
@@ -61,6 +60,7 @@ class StateBuilder {
     actions = new Map();
     goto = new Map();
     reduce;
+    collection;
     constructor(collection, items) {
         this.collection = collection;
         const visited = new Set();

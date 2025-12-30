@@ -1,4 +1,4 @@
-import { GeneratorGrammarProductionRule, GeneratorLexerConfig, GeneratorLexerState, GeneratorStateGrammar } from "../typings/index.js";
+import type { GeneratorGrammarProductionRule, GeneratorLexerConfig, GeneratorLexerState, GeneratorStateGrammar } from "../typings/index.ts";
 import version from "../version.json" with { type: "json" };
 export class GeneratorState {
     grammar?: GeneratorStateGrammar;

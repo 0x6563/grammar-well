@@ -1,4 +1,4 @@
-import { Dictionary, RuntimeGrammarProductionRule, RuntimeGrammarRuleSymbol, RuntimeParserClass } from "../typings/index.js";
+import type { Dictionary, RuntimeGrammarProductionRule, RuntimeGrammarRuleSymbol, RuntimeParserClass } from "../typings/index.ts";
 
 export function LintGrammarSymbols(grammar: RuntimeParserClass['artifacts']['grammar']): RuntimeGrammarRuleSymbol[] {
     const unused = new Set<string>();

@@ -2,10 +2,10 @@ import { ParserUtility } from "../../../utility/parsing.js";
 import { BiMap } from "./bimap.js";
 import { ClosureBuilder } from "./closure.js";
 export class CanonicalCollection {
-    grammar;
     states = new Map();
     rules = new BiMap();
     terminals = new BiMap();
+    grammar;
     closure;
     constructor(grammar) {
         this.grammar = grammar;

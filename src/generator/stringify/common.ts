@@ -1,8 +1,11 @@
-import { ASTGrammarSymbolLiteral, ASTGrammarSymbolNonTerminal, ASTGrammarSymbolRegex, ASTGrammarSymbolToken, GeneratorGrammarSymbol } from "../../typings/index.js";
-import { GeneratorState } from "../state.js";
+import type { ASTGrammarSymbolLiteral, ASTGrammarSymbolNonTerminal, ASTGrammarSymbolRegex, ASTGrammarSymbolToken, GeneratorGrammarSymbol } from "../../typings/index.ts";
+import { GeneratorState } from "../state.ts";
 
 export class CommonGenerator {
-    constructor(public state: GeneratorState) { }
+    public state: GeneratorState;
+    constructor(state: GeneratorState) {
+        this.state = state;
+    }
 
     static NewLine(indent: number) {
         return '\n' + ' '.repeat(indent * 4);

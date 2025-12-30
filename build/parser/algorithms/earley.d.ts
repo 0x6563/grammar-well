@@ -1,7 +1,8 @@
-import { Dictionary, RuntimeGrammarProductionRule, RuntimeParserClass } from "../../typings/index.js";
-import { TokenBuffer } from "../../lexers/token-buffer.js";
+import type { Dictionary, RuntimeGrammarProductionRule, RuntimeParserClass } from "../../typings/index.ts";
+import { TokenBuffer } from "../../lexers/token-buffer.ts";
 export interface EarleyParserOptions {
     keepHistory?: boolean;
+    postProcessing?: 'eager' | 'lazy';
 }
 export declare function Earley(language: RuntimeParserClass & {
     tokens: TokenBuffer;
@@ -12,31 +13,32 @@ export declare function Earley(language: RuntimeParserClass & {
     };
 };
 declare class Column {
-    private rules;
-    index: number;
     data: any;
     states: State[];
     wants: Dictionary<State[]>;
     scannable: State[];
     completed: Dictionary<State[]>;
-    constructor(rules: Dictionary<RuntimeGrammarProductionRule[]>, index: number);
+    private rules;
+    index: number;
+    private StateClass;
+    constructor(rules: Dictionary<RuntimeGrammarProductionRule[]>, index: number, StateClass: Concrete<typeof State>);
     process(): void;
     predict(exp: string): void;
     expects(): RuntimeGrammarProductionRule[];
     private complete;
 }
-declare class State {
-    rule: RuntimeGrammarProductionRule;
-    dot: number;
-    reference: number;
-    wantedBy: State[];
+declare abstract class State {
     isComplete: boolean;
     data: any;
     left: State;
     right: State | StateToken;
+    rule: RuntimeGrammarProductionRule;
+    dot: number;
+    reference: number;
+    wantedBy: State[];
     constructor(rule: RuntimeGrammarProductionRule, dot: number, reference: number, wantedBy: State[]);
-    nextState(child: State | StateToken): State;
-    finish(): void;
+    nextState(child: State | StateToken): any;
+    abstract finish(): void;
     protected build(): any[];
 }
 interface StateToken {
@@ -45,4 +47,5 @@ interface StateToken {
     isToken: boolean;
     reference: number;
 }
+type Concrete<T extends abstract new (...args: any) => any> = new (...args: ConstructorParameters<T>) => InstanceType<T>;
 export {};

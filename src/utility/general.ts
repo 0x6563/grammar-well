@@ -1,4 +1,4 @@
-import { Dictionary, GeneratorGrammarSymbol } from "../typings/index.js";
+import type { Dictionary, GeneratorGrammarSymbol } from "../typings/index.ts";
 
 export class Collection<T> {
     categorized: Dictionary<Dictionary<number>> = {};
@@ -85,10 +85,11 @@ export class Matrix<T> {
     set x(x: number) { x != this.$x && this.resize(x, this.y); }
     get y() { return this.$y }
     set y(y: number) { y != this.$y && this.resize(this.x, y); }
-
+    private initial?: T | ((...args: any) => T);
     matrix: GetCallbackOrValue<T>[][] = [];
 
-    constructor(x: number, y: number, private initial?: T | ((...args: any) => T)) {
+    constructor(x: number, y: number, initial?: T | ((...args: any) => T)) {
+        this.initial = initial;
         this.resize(x, y);
     }
 

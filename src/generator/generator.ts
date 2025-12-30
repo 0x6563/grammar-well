@@ -1,14 +1,14 @@
-import { ASTConfig, ASTDirectives, ASTGrammar, ASTGrammarProduction, ASTGrammarProductionRule, ASTGrammarSymbol, ASTGrammarSymbolGroup, ASTGrammarSymbolLiteral, ASTGrammarSymbolRepeat, ASTImport, ASTLexer, ASTLexerConfig, ASTLexerState, ASTLexerStateImportRule, ASTLexerStateMatchRule, ASTLexerStateSpan, GeneratorContext, GeneratorGrammarProductionRule, GeneratorGrammarSymbol, GeneratorOptions, GeneratorExportFormat, ImportResolver, GeneratorOutputOptions, GenerateOptions, ASTJavascriptLifecycleLiteral } from "../typings/index.js";
+import type { ASTConfig, ASTDirectives, ASTGrammar, ASTGrammarProduction, ASTGrammarProductionRule, ASTGrammarSymbol, ASTGrammarSymbolGroup, ASTGrammarSymbolLiteral, ASTGrammarSymbolRepeat, ASTImport, ASTLexer, ASTLexerConfig, ASTLexerState, ASTLexerStateImportRule, ASTLexerStateMatchRule, ASTLexerStateSpan, GeneratorContext, GeneratorGrammarProductionRule, GeneratorGrammarSymbol, GeneratorOptions, GeneratorExportFormat, ImportResolver, GeneratorOutputOptions, GenerateOptions, ASTJavascriptLifecycleLiteral } from "../typings/index.ts";
 
-import { Parse } from "../parser/parse.js";
-import GrammarV1 from './grammars/v1.js';
-import GrammarV2 from './grammars/v2.js';
+import { Parse } from "../parser/parse.ts";
+import GrammarV1 from './grammars/v1.ts';
+import GrammarV2 from './grammars/v2.ts';
 
 import BuiltInRegistry from "./builtin/registry.json" with {type: 'json'};
-import { GeneratorState } from "./state.js";
-import { ExportsRegistry } from "./stringify/exports/registry.js";
-import { JavaScriptGenerator } from "./stringify/javascript.js";
-import { BrowserImportResolver } from "./import-resolvers/browser.js";
+import { GeneratorState } from "./state.ts";
+import { ExportsRegistry } from "./stringify/exports/registry.ts";
+import { JavaScriptGenerator } from "./stringify/javascript.ts";
+import { BrowserImportResolver } from "./import-resolvers/browser.ts";
 
 
 export async function Generate(source: string, config?: GenerateOptions): Promise<ReturnType<Generator['output']>>;
@@ -23,16 +23,22 @@ export async function Generate(source: string | ASTDirectives | (ASTDirectives[]
 export const NAME_DELIMITER = '.';
 export class Generator {
     private state = new GeneratorState();
+    private config: GeneratorOptions;
+    private context: GeneratorContext;
+    private aliasPrefix: string;
 
     constructor(
-        private config: GeneratorOptions = {},
-        private context: GeneratorContext = {
+        config: GeneratorOptions = {},
+        context: GeneratorContext = {
             imported: new Set(),
             resolver: undefined as ImportResolver,
             state: undefined as GeneratorState
         },
-        private aliasPrefix: string = ''
+        aliasPrefix: string = ''
     ) {
+        this.config = config;
+        this.context = context;
+        this.aliasPrefix = aliasPrefix;
 
         if (typeof config.resolver == 'function') {
             this.context.resolver = new config.resolver(config.basedir);

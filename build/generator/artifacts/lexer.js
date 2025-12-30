@@ -1,8 +1,8 @@
 import { CommonGenerator } from "../stringify/common.js";
 export class LexerArtifact {
-    lexer;
     resolved = new Set();
     resolving = new Set();
+    lexer;
     constructor(lexer) {
         this.lexer = lexer;
     }

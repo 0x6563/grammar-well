@@ -1,4 +1,4 @@
-import { JavaScriptGenerator } from "../stringify/javascript.js";
+import { JavaScriptGenerator } from "../stringify/javascript.ts";
 export declare class BasicGrammarTable {
     private generator;
     constructor(generator: JavaScriptGenerator);

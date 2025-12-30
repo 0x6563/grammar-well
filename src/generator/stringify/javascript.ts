@@ -1,9 +1,9 @@
-import { Dictionary, GeneratorOutputOptions, GeneratorGrammarProductionRule } from "../../typings/index.js";
-import { BasicGrammarTable } from "../artifacts/basic.js";
-import { LexerArtifact } from "../artifacts/lexer.js";
-import { LRParseTableBuilder } from "../artifacts/lr.js";
-import { GeneratorState } from "../state.js";
-import { CommonGenerator } from "./common.js";
+import type { Dictionary, GeneratorOutputOptions, GeneratorGrammarProductionRule } from "../../typings/index.ts";
+import { BasicGrammarTable } from "../artifacts/basic.ts";
+import { LexerArtifact } from "../artifacts/lexer.ts";
+import { LRParseTableBuilder } from "../artifacts/lr.ts";
+import { GeneratorState } from "../state.ts";
+import { CommonGenerator } from "./common.ts";
 
 const PostProcessors = {
     "join": "({data}) => data.join('')",
@@ -13,8 +13,12 @@ const PostProcessors = {
 };
 
 export class JavaScriptGenerator {
-
-    constructor(public state: GeneratorState, public options: GeneratorOutputOptions) { }
+    public state: GeneratorState;
+    public options: GeneratorOutputOptions;
+    constructor(state: GeneratorState, options: GeneratorOutputOptions) {
+        this.state = state;
+        this.options = options;
+    }
 
     name() {
         return this.options.name || 'GWLanguage';
