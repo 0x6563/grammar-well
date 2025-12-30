@@ -1,0 +1,28 @@
+- title: JSON
+  grammarSource: grammars/json-main.gwell
+  input: "{}"
+  parserIterations: 1000
+  compilerIterations: 1000
+  tests:
+    - title: Earley Eager
+      algorithm: earley
+      parserOptions: { postProcessing: 'eager' }
+      compilerOptions: {      }
+    - title: Earley Lazy
+      algorithm: earley
+      parserOptions: { postProcessing: 'lazy' }
+      compilerOptions: {      }
+- title: Grammar Well
+  grammarSource: grammars/v2.well
+  inputSource: grammars/v2.well
+  parserIterations: 1000
+  compilerIterations: 1000
+  tests:
+    - title: Earley Eager
+      algorithm: earley
+      parserOptions: { postProcessing: 'eager' }
+      compilerOptions: {      }
+    - title: Earley Lazy
+      algorithm: earley
+      parserOptions: { postProcessing: 'lazy' }
+      compilerOptions: {      }

@@ -1,10 +1,13 @@
 import test, { describe } from "node:test";
-import { parse } from 'yaml';
-import { AsyncRun, RunTest, Expected, GetFile, GetValue } from './testbed.ts';
+import assert from "node:assert";
+import { Compile, ParseInput } from "../utilities/language.ts";
+import { Eval } from "../utilities/eval.ts";
+import { GetValue, ReadConfigFile } from "../utilities/config.ts";
+import { type RuntimeParserClass } from "../../build/index.js";
 
 
 describe('Predefined Samples', () => {
-    const groups = parse(GetFile('./predefined-samples.yml'));
+    const groups = ReadConfigFile(import.meta.dirname, './system.config.yml');
     for (const group in groups) {
         const tests = groups[group];
         describe(group, () => {
@@ -48,4 +51,35 @@ describe('Predefined Samples', () => {
             }
         })
     }
-}) 
+})
+
+
+async function AsyncRun(method: () => Promise<any>) {
+    let error;
+    let result;
+    let success = false;
+    try {
+        result = await method();
+        success = true;
+    } catch (err) {
+        error = err;
+    }
+    return { error, result, success };
+}
+
+async function RunTest(source: string, input: string, options: any, results: 'first' | 'full' = 'first') {
+    const c = await Compile(source);
+    const parser: RuntimeParserClass = Eval(c);
+    return ParseInput(new parser(), input, options, results);
+}
+
+
+function Expected(actual: any, expected: any, message?: string) {
+    if (expected instanceof RegExp) {
+        return assert.match(actual, expected, message);
+    } else if (typeof expected == 'object') {
+        return assert.deepEqual(actual, expected, message);
+    } else {
+        return assert.equal(actual, expected, message);
+    }
+}
