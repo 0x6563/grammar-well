@@ -7,9 +7,9 @@
     "prebuild": "tsc --build --clean && node scripts/prebuild.ts",
     "grammar": "tsc --build --clean && node scripts/grammar.ts",
     "build": "tsc --build",
-    "benchmark": "node tests/performance/benchmark.js",
-    "test": "node --test --test-reporter ./tests/reporter.mjs  tests/**/*.spec.ts",
-    "profile": "node tests/performance/profile.js"
+    "benchmark": "node tests/performance/benchmark.ts",
+    "test": "node --test --test-reporter ./tests/utilities/reporter.ts tests/**/*.spec.ts",
+    "profile": "node tests/performance/profile.ts"
   },
   "exports": {
     ".": "./build/index.js",

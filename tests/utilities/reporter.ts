@@ -29,25 +29,29 @@ const BgGray = "\x1b[100m";
 
 class TestReporter {
     suiteHeader = true;
-    last = {};
+    last: {
+        length?: number,
+        line?: string,
+        temporary?: boolean
+    } = {};
     logs = [];
     queue = [];
-    running = [];
+    running: string[] = [];
     events = {
-        'test:enqueue': (event) => {
+        'test:enqueue': (event: any) => {
             return '';
         },
-        'test:dequeue': (event) => {
+        'test:dequeue': (event: any) => {
             this.running.push(event.data.name);
             // return this.print(`${event.data.name} dequeued`, false, false)
         },
-        'test:watch:drained': (event) => {
+        'test:watch:drained': (event: any) => {
             return 'test watch queue drained';
         },
-        'test:start': (event) => {
+        'test:start': (event: any) => {
             // return this.print(`${event.data.name} started`, true, false);
         },
-        'test:pass': (event) => {
+        'test:pass': (event: any) => {
             this.running.pop();
             if (event.data.details?.type == 'suite') {
                 this.suiteHeader = true;
@@ -58,11 +62,11 @@ class TestReporter {
                     line += this.print(`${FgYellow}Suite${Reset} ${this.running.join(' > ')}`);
                     this.suiteHeader = false;
                 }
-                line += this.print(`${FgGreen}✓${Reset} ${event.data.name}`, true);
+                line += this.print(`${FgGreen}✓${Reset} ${event.data.name}`, 1);
                 return line;
             }
         },
-        'test:fail': (event) => {
+        'test:fail': (event: any) => {
             this.running.pop();
             if (event.data.details?.type == 'suite') {
                 this.suiteHeader = true;
@@ -73,24 +77,24 @@ class TestReporter {
                     line += this.print(`${FgYellow}Suite${Reset} ${this.running.join(' > ')}`);
                     this.suiteHeader = false;
                 }
-                line += this.print(`${FgRed}𐄂${Reset} ${BgRed}${FgWhite}${event.data.name}${Reset}`, true);
+                line += this.print(`${FgRed}𐄂${Reset} ${BgRed}${FgWhite}${event.data.name}${Reset}`, 1);
                 line += this.print(`${FgWhite}${event.data.details.error.cause}${Reset}\n`, 4);
                 return line;
             }
         },
-        'test:plan': (event) => {
+        'test:plan': (event: any) => {
             // return this.print(`Tests(${event.data.count}): ${event.data.file}:${event.data.line}:${event.data.column}`, false);
         },
-        'test:diagnostic': (event) => {
+        'test:diagnostic': (event: any) => {
             // return this.print(`Diagnostic: ${event.data.message}`, false);
         },
-        'test:stderr': (event) => {
+        'test:stderr': (event: any) => {
             return this.print(`${FgRed}${event.data.message}${Reset}`);
         },
-        'test:stdout': (event) => {
+        'test:stdout': (event: any) => {
             return this.print(event.data.message);
         },
-        'test:coverage': (event) => {
+        'test:coverage': (event: any) => {
             const { totalLineCount } = event.data.summary.totals;
             return `total line count: ${totalLineCount}\n`;
         },
@@ -98,11 +102,11 @@ class TestReporter {
             console.log('\n' + this.logs.join('\n'));
         }
     }
-    print(content, indent = false, temporary = false) {
+    print(content: string, indent: number | false = false, temporary: boolean = false) {
         const space = ' ';
         const empty = '';
-        const leading = indent ? space.repeat(indent + 1) : empty;
-        const prefix = this.last.temporary ? `\r${space.repeat(this.last.length)}\r` : empty;
+        const leading = indent !== false ? space.repeat(indent + 1) : empty;
+        const prefix = this.last.temporary ? `\r${space.repeat(this.last.length as number)}\r` : empty;
         const line = leading + content.replace(/\n/gm, '\n' + leading) + (temporary ? empty : '\n');
         this.last = {
             temporary,
@@ -115,8 +119,8 @@ class TestReporter {
     transform() {
         return new Transform({
             writableObjectMode: true,
-            transform: (event, encoding, callback) => {
-                const result = this.events[event.type]?.(event) || '';
+            transform: (event: any, encoding: string, callback) => {
+                const result = this.events[event.type as keyof TestReporter['events']]?.(event) || '';
                 if (result && typeof result == 'object') {
                     callback(result, '');
                 } else {
