@@ -1,4 +1,4 @@
-import { ASTConfig, ASTDirectives, ASTGrammar, ASTGrammarProduction, ASTGrammarSymbol, ASTImport, ASTLexer, ASTLexerState, ASTLexerStateImportRule, ASTLexerStateMatchRule, ASTLexerStateNonMatchRule, GeneratorGrammarSymbol } from "../../../typings/index.js";
+import type { ASTConfig, ASTDirectives, ASTGrammar, ASTGrammarProduction, ASTGrammarSymbol, ASTImport, ASTLexer, ASTLexerState, ASTLexerStateImportRule, ASTLexerStateMatchRule, ASTLexerStateNonMatchRule, GeneratorGrammarSymbol } from "../../../typings/index.ts";
 export declare class V2GrammarString {
     source: string;
     append(directives: ASTDirectives | (ASTDirectives[])): void;

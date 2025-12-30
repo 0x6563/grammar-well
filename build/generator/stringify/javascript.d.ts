@@ -1,5 +1,5 @@
-import { Dictionary, GeneratorOutputOptions, GeneratorGrammarProductionRule } from "../../typings/index.js";
-import { GeneratorState } from "../state.js";
+import type { Dictionary, GeneratorOutputOptions, GeneratorGrammarProductionRule } from "../../typings/index.ts";
+import { GeneratorState } from "../state.ts";
 export declare class JavaScriptGenerator {
     state: GeneratorState;
     options: GeneratorOutputOptions;

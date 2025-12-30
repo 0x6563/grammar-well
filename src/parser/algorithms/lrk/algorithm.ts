@@ -1,8 +1,8 @@
-import { RuntimeParserClass } from "../../../typings/index.js";
-import { TokenBuffer } from "../../../lexers/token-buffer.js";
-import { ParserUtility } from "../../../utility/parsing.js";
-import { CanonicalCollection } from "./canonical-collection.js";
-import { LRStack } from "./stack.js";
+import type { RuntimeParserClass } from "../../../typings/index.ts";
+import { TokenBuffer } from "../../../lexers/token-buffer.ts";
+import { ParserUtility } from "../../../utility/parsing.ts";
+import { CanonicalCollection } from "./canonical-collection.ts";
+import { LRStack } from "./stack.ts";
 
 export function LRK(language: RuntimeParserClass & { tokens: TokenBuffer }, options = {}) {
     const { grammar } = language.artifacts;

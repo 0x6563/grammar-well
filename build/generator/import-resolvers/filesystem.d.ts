@@ -1,4 +1,4 @@
-import { ImportResolver } from "../../typings/index.js";
+import type { ImportResolver } from "../../typings/index.ts";
 export declare class FileSystemResolver implements ImportResolver {
     private baseDir;
     constructor(baseDir: string);

@@ -1,11 +1,11 @@
 import { readdirSync, readFileSync, writeFileSync } from "fs";
 import { resolve } from "path";
-import { Format, Generate } from "../src/index.js";
-import { version } from "../package.json";
+import { Format, Generate } from "../src/index.ts";
+import packageJSON from "../package.json" with {type: 'json'};
 
 const BaseDir = './src/';
 console.log('Prebuild Start');
-write('./version.json', JSON.stringify({ version }));
+write('./version.json', JSON.stringify({ version: packageJSON.version }));
 await TranspileTypescript('./generator/grammars/v1.well');
 await TranspileTypescript('./generator/grammars/v2.well');
 const BuiltInDir = './generator/builtin/';

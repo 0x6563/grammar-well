@@ -1,4 +1,4 @@
-import { RuntimeLexer, RuntimeLexerConfig } from "../typings/index.js";
+import type { RuntimeLexer, RuntimeLexerConfig } from "../typings/index.ts";
 export declare class StatefulLexer implements RuntimeLexer {
     private start;
     private states;

@@ -1,9 +1,9 @@
 export class TokenBuffer {
-    lexer;
-    tokenProcessor;
     history = [];
     queued = '';
     $historyIndex = -1;
+    lexer;
+    tokenProcessor;
     get offset() { return this.active?.offset || 0; }
     get line() { return this.active?.line || 0; }
     get column() { return this.active?.column || 0; }

@@ -1,2 +1,2 @@
-import { JavaScriptGenerator } from "../javascript.js";
+import { JavaScriptGenerator } from "../javascript.ts";
 export declare function JSONFormatter(generator: JavaScriptGenerator): string;

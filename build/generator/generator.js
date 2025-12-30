@@ -1,6 +1,6 @@
 import { Parse } from "../parser/parse.js";
-import GrammarV1 from './grammars/v1.js';
-import GrammarV2 from './grammars/v2.js';
+import GrammarV1 from "./grammars/v1.js";
+import GrammarV2 from "./grammars/v2.js";
 import BuiltInRegistry from "./builtin/registry.json" with { type: 'json' };
 import { GeneratorState } from "./state.js";
 import { ExportsRegistry } from "./stringify/exports/registry.js";
@@ -13,10 +13,10 @@ export async function Generate(source, config = {}) {
 }
 export const NAME_DELIMITER = '.';
 export class Generator {
+    state = new GeneratorState();
     config;
     context;
     aliasPrefix;
-    state = new GeneratorState();
     constructor(config = {}, context = {
         imported: new Set(),
         resolver: undefined,

@@ -1,4 +1,4 @@
-import { ParserAlgorithm, RuntimeParserClass } from "../typings/index.js";
+import type { ParserAlgorithm, RuntimeParserClass } from "../typings/index.ts";
 declare const ParserRegistry: {
     [key: string]: ParserAlgorithm;
 };

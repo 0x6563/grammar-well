@@ -67,13 +67,13 @@ export class GeneratorSymbolCollection extends Collection {
     }
 }
 export class Matrix {
-    initial;
     $x = 0;
     $y = 0;
     get x() { return this.$x; }
     set x(x) { x != this.$x && this.resize(x, this.y); }
     get y() { return this.$y; }
     set y(y) { y != this.$y && this.resize(this.x, y); }
+    initial;
     matrix = [];
     constructor(x, y, initial) {
         this.initial = initial;

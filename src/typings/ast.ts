@@ -1,4 +1,4 @@
-import { Dictionary } from "./common.js";
+import type { Dictionary } from "./common.ts";
 
 export type AST = ASTDirectives[];
 

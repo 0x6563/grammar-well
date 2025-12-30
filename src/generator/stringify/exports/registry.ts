@@ -1,8 +1,8 @@
 
-import { JavaScriptGenerator } from "../javascript.js";
-import { CJSOutput, ESMOutput } from "./javascript.js";
-import { JSONFormatter } from "./json.js";
-import { TypescriptFormat } from "./typescript.js";
+import { JavaScriptGenerator } from "../javascript.ts";
+import { CJSOutput, ESMOutput } from "./javascript.ts";
+import { JSONFormatter } from "./json.ts";
+import { TypescriptFormat } from "./typescript.ts";
 
 
 export const ExportsRegistry = {

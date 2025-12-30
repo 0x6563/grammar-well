@@ -1,8 +1,8 @@
-import { GeneratorLexerConfig } from "../../typings/index.js";
+import type { GeneratorLexerConfig } from "../../typings/index.ts";
 export declare class LexerArtifact {
-    private lexer;
     private resolved;
     private resolving;
+    private lexer;
     constructor(lexer: GeneratorLexerConfig);
     output(depth?: number): string;
     private lexerConfigStates;

@@ -1,5 +1,5 @@
-import { TokenBuffer } from "../lexers/token-buffer.js";
-import { RuntimeGrammarProductionRule, RuntimeGrammarRuleSymbol, RuntimeLexerToken } from "../typings/index.js";
+import { TokenBuffer } from "../lexers/token-buffer.ts";
+import type { RuntimeGrammarProductionRule, RuntimeGrammarRuleSymbol, RuntimeLexerToken } from "../typings/index.ts";
 export declare class TextFormatter {
     static UnexpectedToken(queue: TokenBuffer, expected: (RuntimeGrammarProductionRule & {
         index?: number;

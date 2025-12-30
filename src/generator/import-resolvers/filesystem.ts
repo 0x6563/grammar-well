@@ -1,6 +1,6 @@
 import { readFile } from 'fs/promises';
 import { dirname, resolve } from 'path';
-import { ImportResolver } from "../../typings/index.js";
+import type { ImportResolver } from "../../typings/index.ts";
 
 export class FileSystemResolver implements ImportResolver {
     private baseDir: string;

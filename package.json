@@ -4,11 +4,11 @@
   "version": "2.1.0",
   "description": "Cross-platform Parser written in TypeScript",
   "scripts": {
-    "prebuild": "tsc --build --clean && tsx scripts/prebuild.ts",
-    "grammar": "tsc --build --clean && tsx scripts/grammar.ts",
+    "prebuild": "tsc --build --clean && node scripts/prebuild.ts",
+    "grammar": "tsc --build --clean && node scripts/grammar.ts",
     "build": "tsc --build",
     "benchmark": "node tests/performance/benchmark.js",
-    "test": "node --test --import tsx --test-reporter ./tests/reporter.mjs  tests/**/*.spec.ts",
+    "test": "node --test --test-reporter ./tests/reporter.mjs  tests/**/*.spec.ts",
     "profile": "node tests/performance/profile.js"
   },
   "exports": {
@@ -32,12 +32,11 @@
   "bugs": {
     "url": "https://github.com/0x6563/grammar-well/issues"
   },
-  "homepage": "https://github.com/0x6563/grammar-well#readme",
+  "homepage": "https://grammar-well.xyz",
   "devDependencies": {
-    "@types/node": "^22.10.1",
-    "tsx": "^4.19.2",
-    "typescript": "^5.7.2",
-    "yaml": "^2.6.1"
+    "@types/node": "^25.0.3",
+    "typescript": "^5.9.3",
+    "yaml": "^2.8.2"
   },
   "keywords": [
     "parser",

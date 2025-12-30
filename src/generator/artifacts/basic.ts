@@ -1,9 +1,11 @@
-import { CommonGenerator } from "../stringify/common.js";
-import { JavaScriptGenerator } from "../stringify/javascript.js";
+import { CommonGenerator } from "../stringify/common.ts";
+import { JavaScriptGenerator } from "../stringify/javascript.ts";
 
 export class BasicGrammarTable {
-
-    constructor(private generator: JavaScriptGenerator) { }
+    private generator: JavaScriptGenerator
+    constructor(generator: JavaScriptGenerator) {
+        this.generator = generator;
+    }
 
     stringify(depth: number = 0) {
         if (!this.generator.state.grammar) {

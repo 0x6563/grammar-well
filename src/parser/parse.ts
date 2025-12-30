@@ -1,11 +1,11 @@
-import { ParserAlgorithm, RuntimeParserClass } from "../typings/index.js";
-import { CharacterLexer } from "../lexers/character-lexer.js";
-import { StatefulLexer } from "../lexers/stateful-lexer.js";
-import { TokenBuffer } from "../lexers/token-buffer.js";
-import { CYK } from "./algorithms/cyk.js";
-import { Earley } from "./algorithms/earley.js";
-import { LRK } from "./algorithms/lrk/algorithm.js";
-import { ParserUtility } from "../utility/parsing.js";
+import type { ParserAlgorithm, RuntimeParserClass } from "../typings/index.ts";
+import { CharacterLexer } from "../lexers/character-lexer.ts";
+import { StatefulLexer } from "../lexers/stateful-lexer.ts";
+import { TokenBuffer } from "../lexers/token-buffer.ts";
+import { CYK } from "./algorithms/cyk.ts";
+import { Earley } from "./algorithms/earley.ts";
+import { LRK } from "./algorithms/lrk/algorithm.ts";
+import { ParserUtility } from "../utility/parsing.ts";
 
 const ParserRegistry: { [key: string]: ParserAlgorithm } = {
     earley: Earley,

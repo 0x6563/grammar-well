@@ -3,7 +3,8 @@ import { ParserUtility } from "../../utility/parsing.js";
 export function Earley(language, options = {}) {
     const { tokens } = language;
     const { rules, start } = language.artifacts.grammar;
-    const column = new Column(rules, 0);
+    const StateClass = options.postProcessing === 'eager' ? EagerState : LazyState;
+    const column = new Column(rules, 0, StateClass);
     const table = [column];
     column.wants[start] = [];
     column.predict(start);
@@ -15,7 +16,7 @@ export function Earley(language, options = {}) {
             delete table[current - 1];
         }
         current++;
-        const nextColumn = new Column(rules, current);
+        const nextColumn = new Column(rules, current, StateClass);
         table.push(nextColumn);
         const literal = token.value;
         const data = token;
@@ -42,9 +43,11 @@ export function Earley(language, options = {}) {
             results.push(data);
         }
     }
-    const clone = results.length > 1;
-    for (let i = 0; i < results.length; i++) {
-        results[i] = PostProcess(results[i], clone);
+    if (StateClass == LazyState) {
+        const clone = results.length > 1;
+        for (let i = 0; i < results.length; i++) {
+            results[i] = PostProcess(results[i], clone);
+        }
     }
     return { results, info: { table } };
 }
@@ -58,16 +61,18 @@ function PostProcess(ast, clone) {
     return ParserUtility.PostProcess(ast[0], data, ast[2]);
 }
 class Column {
-    rules;
-    index;
     data;
     states = [];
     wants = Object.create(null);
     scannable = [];
     completed = Object.create(null);
-    constructor(rules, index) {
+    rules;
+    index;
+    StateClass;
+    constructor(rules, index, StateClass) {
         this.rules = rules;
         this.index = index;
+        this.StateClass = StateClass;
     }
     process() {
         let w = 0;
@@ -110,7 +115,7 @@ class Column {
         if (!this.rules[exp])
             return;
         for (const rule of this.rules[exp]) {
-            this.states.push(new State(rule, 0, this.index, this.wants[exp]));
+            this.states.push(new this.StateClass(rule, 0, this.index, this.wants[exp]));
         }
     }
     expects() {
@@ -128,14 +133,14 @@ class Column {
     }
 }
 class State {
-    rule;
-    dot;
-    reference;
-    wantedBy;
     isComplete;
     data = [];
     left;
     right;
+    rule;
+    dot;
+    reference;
+    wantedBy;
     constructor(rule, dot, reference, wantedBy) {
         this.rule = rule;
         this.dot = dot;
@@ -144,7 +149,7 @@ class State {
         this.isComplete = this.dot === rule.symbols.length;
     }
     nextState(child) {
-        const state = new State(this.rule, this.dot + 1, this.reference, this.wantedBy);
+        const state = new this.constructor(this.rule, this.dot + 1, this.reference, this.wantedBy);
         state.left = this;
         state.right = child;
         if (state.isComplete) {
@@ -152,9 +157,6 @@ class State {
             state.right = undefined;
         }
         return state;
-    }
-    finish() {
-        this.data = [this.rule, this.data, { reference: this.reference, dot: this.dot }];
     }
     build() {
         const children = [];
@@ -164,6 +166,16 @@ class State {
             node = node.left;
         } while (node.left);
         return children;
+    }
+}
+class EagerState extends State {
+    finish() {
+        this.data = ParserUtility.PostProcess(this.rule, this.data, { reference: this.reference, dot: this.dot });
+    }
+}
+class LazyState extends State {
+    finish() {
+        this.data = [this.rule, this.data, { reference: this.reference, dot: this.dot }];
     }
 }
 //# sourceMappingURL=earley.js.map

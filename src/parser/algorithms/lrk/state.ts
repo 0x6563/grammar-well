@@ -1,4 +1,4 @@
-import { RuntimeGrammarProductionRule, RuntimeGrammarRuleSymbol } from "../../../typings/index.js";
+import type { RuntimeGrammarProductionRule, RuntimeGrammarRuleSymbol } from "../../../typings/index.ts";
 
 export interface State {
     items: { rule: RuntimeGrammarProductionRule, dot: number }[];

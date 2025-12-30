@@ -1,11 +1,11 @@
-import { Dictionary, GeneratorGrammarProductionRule, GeneratorGrammarSymbol } from "../../typings/index.js";
-import { Collection, GeneratorSymbolCollection } from "../../utility/general.js";
-import { JavaScriptGenerator } from "../stringify/javascript.js";
+import type { Dictionary, GeneratorGrammarProductionRule, GeneratorGrammarSymbol } from "../../typings/index.ts";
+import { Collection, GeneratorSymbolCollection } from "../../utility/general.ts";
+import { JavaScriptGenerator } from "../stringify/javascript.ts";
 export declare class LRParseTableBuilder {
-    generator: JavaScriptGenerator;
     rules: Collection<GeneratorGrammarProductionRule>;
     table: Dictionary<StateBuilder>;
     symbols: GeneratorSymbolCollection;
+    generator: JavaScriptGenerator;
     constructor(generator: JavaScriptGenerator);
     addState(seed: StateItem[]): StateBuilder;
     encodeRule(rule: GeneratorGrammarProductionRule, dot: number): string;
@@ -15,7 +15,6 @@ export declare class LRParseTableBuilder {
     stringifyNext(next: Next, depth: number): string;
 }
 declare class StateBuilder {
-    private collection;
     isFinal: boolean;
     outputs: StateOut;
     queue: {
@@ -24,6 +23,7 @@ declare class StateBuilder {
     actions: Map<GeneratorGrammarSymbol, string>;
     goto: Map<GeneratorGrammarSymbol, string>;
     reduce?: GeneratorGrammarProductionRule;
+    private collection;
     constructor(collection: LRParseTableBuilder, items: StateItem[]);
     private closure;
     export(): State;

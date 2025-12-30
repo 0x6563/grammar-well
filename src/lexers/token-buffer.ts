@@ -1,10 +1,13 @@
-import { RuntimeLexer, RuntimeLexerToken, TQRestorePoint } from '../typings/index.js';
+import type { RuntimeLexer, RuntimeLexerToken, TQRestorePoint } from '../typings/index.ts';
 
 export class TokenBuffer {
     private history: RuntimeLexerToken[] = [];
     private queued: string = '';
 
     private $historyIndex = -1;
+
+    public lexer: RuntimeLexer;
+    private tokenProcessor?: (token: RuntimeLexerToken) => RuntimeLexerToken;
 
     get offset() { return this.active?.offset || 0 }
     get line() { return this.active?.line || 0 }
@@ -15,7 +18,13 @@ export class TokenBuffer {
         return { historyIndex: this.$historyIndex, offset: this.offset };
     }
 
-    constructor(public lexer: RuntimeLexer, private tokenProcessor?: (token: RuntimeLexerToken) => RuntimeLexerToken) { }
+    constructor(
+        lexer: RuntimeLexer,
+        tokenProcessor?: (token: RuntimeLexerToken) => RuntimeLexerToken
+    ) {
+        this.lexer = lexer;
+        this.tokenProcessor = tokenProcessor;
+    }
 
     reset(buffer: string) {
         this.lexer.feed(buffer);
@@ -92,7 +101,11 @@ export class TokenBuffer {
 }
 
 class TokenIterator {
-    constructor(private buffer: TokenBuffer) { }
+    private buffer: TokenBuffer;
+
+    constructor(buffer: TokenBuffer) {
+        this.buffer = buffer;
+    }
 
     next() {
         const token = this.buffer.next()

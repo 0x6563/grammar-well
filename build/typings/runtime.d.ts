@@ -1,6 +1,6 @@
-import { LRState } from "./index.js";
-import { ASTGrammarSymbolLiteral, ASTGrammarSymbolToken, ASTLexerStateNonMatchRule } from "./ast.js";
-import { Dictionary } from "./common.js";
+import type { LRState } from "./index.ts";
+import type { ASTGrammarSymbolLiteral, ASTGrammarSymbolToken, ASTLexerStateNonMatchRule } from "./ast.ts";
+import type { Dictionary } from "./common.ts";
 export interface RuntimeParserClass {
     artifacts: {
         lexer?: RuntimeLexer | RuntimeLexerConfig;

@@ -1,4 +1,4 @@
-import { Dictionary, GeneratorGrammarSymbol } from "../typings/index.js";
+import type { Dictionary, GeneratorGrammarSymbol } from "../typings/index.ts";
 export declare class Collection<T> {
     categorized: Dictionary<Dictionary<number>>;
     uncategorized: Map<T, number>;
@@ -29,13 +29,13 @@ export declare class GeneratorSymbolCollection extends Collection<GeneratorGramm
     };
 }
 export declare class Matrix<T> {
-    private initial?;
     private $x;
     private $y;
     get x(): number;
     set x(x: number);
     get y(): number;
     set y(y: number);
+    private initial?;
     matrix: GetCallbackOrValue<T>[][];
     constructor(x: number, y: number, initial?: T | ((...args: any) => T));
     get(x: number, y: number): T;

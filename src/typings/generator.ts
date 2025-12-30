@@ -1,7 +1,7 @@
-import { GeneratorState } from "../generator/state.js";
-import { ASTGrammarSymbolLiteral, ASTGrammarSymbolNonTerminal, ASTGrammarSymbolRegex, ASTGrammarSymbolToken, ASTJavaScriptBuiltin, ASTJavaScriptLiteral, ASTJavaScriptTemplate, ASTLexerStateImportRule, ASTLexerStateMatchRule, ASTLexerStateNonMatchRule } from "./ast.js";
-import { Dictionary } from "./common.js";
-import { ImportResolver, ImportResolverConstructor } from "./index.js";
+import { GeneratorState } from "../generator/state.ts";
+import type { ASTGrammarSymbolLiteral, ASTGrammarSymbolNonTerminal, ASTGrammarSymbolRegex, ASTGrammarSymbolToken, ASTJavaScriptBuiltin, ASTJavaScriptLiteral, ASTJavaScriptTemplate, ASTLexerStateImportRule, ASTLexerStateMatchRule, ASTLexerStateNonMatchRule } from "./ast.ts";
+import type { Dictionary } from "./common.ts";
+import type { ImportResolver, ImportResolverConstructor } from "./index.ts";
 
 
 export type GenerateOptions = GeneratorOptions & { output?: GeneratorOutputOptions };

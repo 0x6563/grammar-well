@@ -1,4 +1,4 @@
-import { ASTLexerStateNonMatchRule, RuntimeLexerConfig, RuntimeLexerStateMatchRule } from "../typings/index.js";
+import type { ASTLexerStateNonMatchRule, RuntimeLexerConfig, RuntimeLexerStateMatchRule } from "../typings/index.ts";
 
 export function CreateMonarchTokenizer(lexer: RuntimeLexerConfig) {
     const tokenizer: any = {}; // languages.IMonarchLanguage['tokenizer']

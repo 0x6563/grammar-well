@@ -1,4 +1,4 @@
-import { JavaScriptGenerator } from "../javascript.js";
+import { JavaScriptGenerator } from "../javascript.ts";
 
 export function TypescriptFormat(generator: JavaScriptGenerator) {
     const exportName = generator.name();

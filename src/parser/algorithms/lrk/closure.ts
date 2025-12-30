@@ -1,10 +1,13 @@
-import { RuntimeGrammarProductionRule, RuntimeGrammarRuleSymbol, RuntimeParserClass } from "../../../typings/index.js";
-import { ParserUtility } from "../../../utility/parsing.js";
+import type { RuntimeGrammarProductionRule, RuntimeGrammarRuleSymbol, RuntimeParserClass } from "../../../typings/index.ts";
+import { ParserUtility } from "../../../utility/parsing.ts";
 
 export class ClosureBuilder {
+    private grammar: RuntimeParserClass['artifacts']['grammar'];
     constructor(
-        private grammar: RuntimeParserClass['artifacts']['grammar'],
-    ) { }
+        grammar: RuntimeParserClass['artifacts']['grammar'],
+    ) {
+        this.grammar = grammar;
+    }
 
     get(rule: string) {
         const closure: RuleClosure = { items: [], visited: new Set() };

@@ -1,5 +1,7 @@
 {
     "compilerOptions": {
+        "allowImportingTsExtensions": true,
+        "rewriteRelativeImportExtensions": true,
         "module": "ESNext",
         "moduleResolution": "Bundler",
         "noImplicitAny": false,

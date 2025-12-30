@@ -1,4 +1,4 @@
-import { RuntimeLexer } from "../typings/index.js";
+import type { RuntimeLexer } from "../typings/index.ts";
 export declare class CharacterLexer implements RuntimeLexer {
     private buffer;
     private $indexOffset;

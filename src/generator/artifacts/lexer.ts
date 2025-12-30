@@ -1,11 +1,13 @@
-import { ASTGrammarSymbolRegex, ASTLexerStateImportRule, ASTLexerStateMatchRule, ASTLexerStateNonMatchRule, Dictionary, GeneratorLexerConfig, GeneratorLexerState } from "../../typings/index.js";
-import { CommonGenerator } from "../stringify/common.js";
+import type { ASTGrammarSymbolRegex, ASTLexerStateImportRule, ASTLexerStateMatchRule, ASTLexerStateNonMatchRule, Dictionary, GeneratorLexerConfig, GeneratorLexerState } from "../../typings/index.ts";
+import { CommonGenerator } from "../stringify/common.ts";
 
 export class LexerArtifact {
     private resolved = new Set<string>();
     private resolving = new Set<string>();
-
-    constructor(private lexer: GeneratorLexerConfig) { }
+    private lexer: GeneratorLexerConfig;
+    constructor(lexer: GeneratorLexerConfig) {
+        this.lexer = lexer;
+    }
 
     output(depth: number = 0) {
         if (!this.lexer)

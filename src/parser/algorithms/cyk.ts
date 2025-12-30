@@ -1,7 +1,7 @@
-import { RuntimeGrammarProductionRule, RuntimeGrammarRuleSymbol, RuntimeParserClass, RuntimeLexerToken } from "../../typings/index.js";
-import { TokenBuffer } from "../../lexers/token-buffer.js";
-import { Matrix } from "../../utility/general.js";
-import { ParserUtility } from "../../utility/parsing.js";
+import type { RuntimeGrammarProductionRule, RuntimeGrammarRuleSymbol, RuntimeParserClass, RuntimeLexerToken } from "../../typings/index.ts";
+import { TokenBuffer } from "../../lexers/token-buffer.ts";
+import { Matrix } from "../../utility/general.ts";
+import { ParserUtility } from "../../utility/parsing.ts";
 
 export function CYK(language: RuntimeParserClass & { tokens: TokenBuffer }, _options = {}) {
     const { grammar } = language.artifacts;

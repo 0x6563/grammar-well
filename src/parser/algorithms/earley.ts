@@ -1,16 +1,18 @@
-import { Dictionary, RuntimeGrammarProductionRule, RuntimeLexerToken, RuntimeParserClass } from "../../typings/index.js";
-import { TokenBuffer } from "../../lexers/token-buffer.js";
-import { TextFormatter } from "../../utility/text-format.js";
-import { ParserUtility } from "../../utility/parsing.js";
+import type { Dictionary, RuntimeGrammarProductionRule, RuntimeLexerToken, RuntimeParserClass } from "../../typings/index.ts";
+import { TokenBuffer } from "../../lexers/token-buffer.ts";
+import { TextFormatter } from "../../utility/text-format.ts";
+import { ParserUtility } from "../../utility/parsing.ts";
 
 export interface EarleyParserOptions {
     keepHistory?: boolean;
+    postProcessing?: 'eager' | 'lazy';
 }
 
 export function Earley(language: RuntimeParserClass & { tokens: TokenBuffer }, options: EarleyParserOptions = {}) {
     const { tokens } = language;
     const { rules, start } = language.artifacts.grammar;
-    const column = new Column(rules, 0);
+    const StateClass = options.postProcessing === 'eager' ? EagerState : LazyState;
+    const column = new Column(rules, 0, StateClass);
     const table: Column[] = [column];
     column.wants[start] = [];
     column.predict(start);
@@ -27,7 +29,7 @@ export function Earley(language: RuntimeParserClass & { tokens: TokenBuffer }, o
 
         current++;
 
-        const nextColumn = new Column(rules, current);
+        const nextColumn = new Column(rules, current, StateClass);
         table.push(nextColumn);
 
         const literal = token.value;
@@ -58,9 +60,12 @@ export function Earley(language: RuntimeParserClass & { tokens: TokenBuffer }, o
             results.push(data);
         }
     }
-    const clone = results.length > 1;
-    for (let i = 0; i < results.length; i++) {
-        results[i] = PostProcess(results[i], clone);
+
+    if (StateClass == LazyState) {
+        const clone = results.length > 1;
+        for (let i = 0; i < results.length; i++) {
+            results[i] = PostProcess(results[i], clone);
+        }
     }
     return { results, info: { table } };
 }
@@ -81,11 +86,19 @@ class Column {
     wants: Dictionary<State[]> = Object.create(null);// states indexed by the non-terminal they expect
     scannable: State[] = [];// list of states that expect a token
     completed: Dictionary<State[]> = Object.create(null);  // states that are nullable
+    private rules: Dictionary<RuntimeGrammarProductionRule[]>;
+    public index: number;
+    private StateClass: Concrete<typeof State>;
 
     constructor(
-        private rules: Dictionary<RuntimeGrammarProductionRule[]>,
-        public index: number
-    ) { }
+        rules: Dictionary<RuntimeGrammarProductionRule[]>,
+        index: number,
+        StateClass: Concrete<typeof State>
+    ) {
+        this.rules = rules;
+        this.index = index;
+        this.StateClass = StateClass;
+    }
 
 
     process() {
@@ -136,7 +149,7 @@ class Column {
             return;
 
         for (const rule of this.rules[exp]) {
-            this.states.push(new State(rule, 0, this.index, this.wants[exp]));
+            this.states.push(new this.StateClass(rule, 0, this.index, this.wants[exp]));
         }
     }
 
@@ -156,22 +169,30 @@ class Column {
     }
 }
 
-class State {
+abstract class State {
     isComplete: boolean;
     data: any = [];
     left: State;
     right: State | StateToken;
+    public rule: RuntimeGrammarProductionRule;
+    public dot: number;
+    public reference: number;
+    public wantedBy: State[];
     constructor(
-        public rule: RuntimeGrammarProductionRule,
-        public dot: number,
-        public reference: number,
-        public wantedBy: State[]
+        rule: RuntimeGrammarProductionRule,
+        dot: number,
+        reference: number,
+        wantedBy: State[]
     ) {
+        this.rule = rule;
+        this.dot = dot;
+        this.reference = reference;
+        this.wantedBy = wantedBy;
         this.isComplete = this.dot === rule.symbols.length;
     }
 
     nextState(child: State | StateToken) {
-        const state = new State(this.rule, this.dot + 1, this.reference, this.wantedBy);
+        const state = new (this.constructor as any)(this.rule, this.dot + 1, this.reference, this.wantedBy);
         state.left = this;
         state.right = child;
         if (state.isComplete) {
@@ -182,9 +203,7 @@ class State {
     }
 
 
-    finish() {
-        this.data = [this.rule, this.data, { reference: this.reference, dot: this.dot }];
-    }
+    abstract finish(): void;
 
     protected build() {
         const children = [];
@@ -198,6 +217,18 @@ class State {
     }
 }
 
+class EagerState extends State {
+    finish() {
+        this.data = ParserUtility.PostProcess(this.rule, this.data, { reference: this.reference, dot: this.dot });
+    }
+}
+
+class LazyState extends State {
+    finish() {
+        this.data = [this.rule, this.data, { reference: this.reference, dot: this.dot }];
+    }
+}
+
 interface StateToken {
     data: any,
     token: any,
@@ -206,3 +237,5 @@ interface StateToken {
 }
 
 type PreAST = [RuntimeGrammarProductionRule, (RuntimeLexerToken | PreAST)[], { reference: number, dot: number }];
+type Concrete<T extends abstract new (...args: any) => any> =
+    new (...args: ConstructorParameters<T>) => InstanceType<T>;

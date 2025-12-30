@@ -1,11 +1,11 @@
-import { TokenBuffer } from "../lexers/token-buffer.js";
-import { ParserUtility } from "../utility/parsing.js";
-import { ASTLexerStateNonMatchRule } from "./ast.js";
-import { RuntimeGrammarProductionRule, RuntimeGrammarRuleSymbol, RuntimeParserClass, RuntimeLexerStateMatchRule } from "./runtime.js";
-export * from './ast.js';
-export * from './common.js';
-export * from './generator.js';
-export * from './runtime.js';
+import type { TokenBuffer } from "../lexers/token-buffer.ts";
+import type { ParserUtility } from "../utility/parsing.ts";
+import type { ASTLexerStateNonMatchRule } from "./ast.ts";
+import type { RuntimeGrammarProductionRule, RuntimeGrammarRuleSymbol, RuntimeParserClass, RuntimeLexerStateMatchRule } from "./runtime.ts";
+export * from './ast.ts';
+export * from './common.ts';
+export * from './generator.ts';
+export * from './runtime.ts';
 
 export interface ImportResolver {
     path(path: string): string;
