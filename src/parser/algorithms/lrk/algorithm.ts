@@ -2,36 +2,51 @@ import type { RuntimeParserClass } from "../../../typings/index.ts";
 import { TokenBuffer } from "../../../lexers/token-buffer.ts";
 import { ParserUtility } from "../../../utility/parsing.ts";
 import { CanonicalCollection } from "./canonical-collection.ts";
-import { LRStack } from "./stack.ts";
+import { Stack } from "./stack.ts";
+import type { State } from "./typings.ts";
 
 export function LRK(language: RuntimeParserClass & { tokens: TokenBuffer }, options = {}) {
     const { grammar } = language.artifacts;
     const { tokens } = language;
-    const { states, rules: rules } = new CanonicalCollection(grammar);
-    const stack = new LRStack();
-    const s = states.get('0.0');
-    stack.append(s.rule.name);
-    stack.shift(s);
+    const { start } = new CanonicalCollection(grammar);
+    const stateStack = new Stack<State>();
+    const inputStack = new Stack<any>();
+    stateStack.push(start);
+
     let token;
 
-    while (token = tokens.next()) {
-        for (const [symbol, state] of stack.current.state.actions) {
-            if (ParserUtility.SymbolMatchesToken(symbol, token)) {
-                stack.append(symbol);
-                stack.shift(states.get(state));
-                stack.current.value = token;
-                break;
-            }
-        }
-        while (stack.current.state?.isFinal) {
-            const rule = rules.fetch(stack.current.state.reduce);
-            stack.reduce(rule);
-            stack.current.value = ParserUtility.PostProcess(rule, stack.current.children.map(v => v.value));
-            const s = stack.previous.state.goto.get(rule.name);
-            stack.shift(states.get(s));
+    tokenloop: while (token = tokens.next()) {
+        const match = stateStack.current.actions.find(a => ParserUtility.SymbolMatchesToken(a.symbol, token));
 
+        if (match) {
+            inputStack.push(token);
+            stateStack.push(match.state);
+        } else {
+            throw new Error("Syntax Error: Unexpected Token");
+        }
+
+        while (stateStack.current.reduce) {
+            const rule = stateStack.current.reduce;
+            const value = inputStack.pop(rule.symbols.length);
+            stateStack.pop(rule.symbols.length);
+            inputStack.push(ParserUtility.PostProcess(rule, value));
+            const nextState = stateStack.current.goto[rule.name];
+
+            if (!nextState)
+                break tokenloop;
+
+            stateStack.push(nextState);
         }
     }
 
-    return { results: [stack.current.value] }
+    if (stateStack.size > 1) {
+        throw new Error("Syntax Error: Unexpected End of Input");
+    }
+    const peek = tokens.next();
+    if (peek) {
+        console.log(peek)
+        throw new Error("Syntax Error: Expected End of Input");
+    }
+
+    return { results: [inputStack.current[0]] }
 }

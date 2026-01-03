@@ -1,35 +1,22 @@
-export class LRStack {
+export class Stack {
     stack = [];
-    get current() {
-        return this.stack[this.stack.length - 1];
+    get size() {
+        return this.stack.length;
     }
     get previous() {
         return this.stack[this.stack.length - 2];
     }
-    shift(state) {
-        this.current.state = state;
+    get current() {
+        return this.stack[this.stack.length - 1];
     }
-    reduce(rule) {
-        const n = LRStack.NewItem();
-        const l = rule.symbols.length;
-        n.children = this.stack.splice(l * -1, l);
-        n.children.forEach(v => delete v.state);
-        n.rule = rule;
-        n.symbol = rule.name;
-        this.stack.push(n);
+    set current(item) {
+        this.stack[this.stack.length - 1] = item;
     }
-    append(symbol) {
-        this.stack.push(LRStack.NewItem());
-        this.current.symbol = symbol;
+    push(...items) {
+        return this.stack.push(...items);
     }
-    static NewItem() {
-        return {
-            children: [],
-            state: null,
-            symbol: null,
-            rule: null,
-            value: null
-        };
+    pop(n = 1) {
+        return this.stack.splice(n * -1, n);
     }
 }
 //# sourceMappingURL=stack.js.map
