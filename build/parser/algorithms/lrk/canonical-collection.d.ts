@@ -1,14 +1,14 @@
-import type { RuntimeGrammarProductionRule, RuntimeGrammarRuleSymbol, RuntimeParserClass } from "../../../typings/index.ts";
+import type { RuntimeGrammarProductionRule, RuntimeParserClass } from "../../../typings/index.ts";
 import { BiMap } from "./bimap.ts";
-import type { State } from "./state.ts";
+import type { State } from "./typings.ts";
 export declare class CanonicalCollection {
-    states: Map<string, State>;
+    start: State;
     rules: BiMap<RuntimeGrammarProductionRule>;
-    terminals: BiMap<RuntimeGrammarRuleSymbol>;
     grammar: RuntimeParserClass['artifacts']['grammar'];
-    private closure;
+    private cache;
     constructor(grammar: RuntimeParserClass['artifacts']['grammar']);
-    private addState;
-    private linkStates;
-    private getStateId;
+    private generateState;
+    private canonicalStateId;
+    private canonicalLRItemId;
+    private canonicalSymbolId;
 }

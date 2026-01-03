@@ -135,4 +135,4 @@ LR:
     algorithm: lr0
     grammarSource: grammars/lr.gwell
     input: abab
-    result: [[[a, b], [a, b]]]
+    result: [[a, b], [a, b]]

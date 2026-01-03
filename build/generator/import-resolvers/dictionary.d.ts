@@ -1,4 +1,4 @@
-import { ImportResolver } from "../../typings";
+import { type ImportResolver } from "../../typings/index.ts";
 export declare class DictionaryResolver implements ImportResolver {
     private files;
     constructor(files: {
