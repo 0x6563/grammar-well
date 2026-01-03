@@ -1,7 +1,10 @@
-import { ImportResolver } from "../../typings";
+import { type ImportResolver } from "../../typings/index.ts";
 
 export class DictionaryResolver implements ImportResolver {
-    constructor(private files: { [key: string]: string }) { }
+    private files: { [key: string]: string }
+    constructor(files: { [key: string]: string }) {
+        this.files = files;
+    }
 
     path(path: string) {
         if (path in this.files)

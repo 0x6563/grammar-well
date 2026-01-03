@@ -1,69 +1,93 @@
 import { ParserUtility } from "../../../utility/parsing.js";
+import { TextFormatter } from "../../../utility/text-format.js";
 import { BiMap } from "./bimap.js";
-import { ClosureBuilder } from "./closure.js";
 export class CanonicalCollection {
-    states = new Map();
+    start;
     rules = new BiMap();
-    terminals = new BiMap();
     grammar;
-    closure;
+    cache = {};
     constructor(grammar) {
         this.grammar = grammar;
         const augmented = {
             name: Symbol(),
             symbols: [this.grammar.start]
         };
-        this.grammar['rules'][augmented.name] = [augmented];
-        this.closure = new ClosureBuilder(this.grammar);
+        this.grammar.rules[augmented.name] = [augmented];
         this.rules.id(augmented);
-        this.addState(this.grammar['rules'][augmented.name][0], 0);
-        this.linkStates('0.0');
+        this.start = this.generateState([{ rule: augmented, dot: 0 }]);
     }
-    addState(rule, dot) {
-        const id = this.getStateId(rule, dot);
-        if (this.states.has(id))
+    generateState(kernel) {
+        const id = this.canonicalStateId(kernel);
+        if (this.cache[id])
+            return this.cache[id];
+        this.cache[id] = { id };
+        if (kernel.length == 1 && kernel[0].rule.symbols.length == kernel[0].dot) {
+            this.cache[id].reduce = kernel[0].rule;
+            return this.cache[id];
+        }
+        const items = [...kernel];
+        const visited = new Set();
+        const refs = {};
+        const actions = {};
+        const goto = {};
+        for (let i = 0; i < items.length; i++) {
+            const { rule, dot } = items[i];
+            const id = this.canonicalLRItemId(items[i]);
+            if (dot == rule.symbols.length)
+                throw new Error('Reduce Conflict on state: ' + id + `\n${items.map(v => TextFormatter.GrammarRule(v.rule, v.dot)).join('\n')}`);
+            if (visited.has(id))
+                continue;
+            visited.add(id);
+            const symbol = rule.symbols[dot];
+            const name = this.canonicalSymbolId(symbol);
+            refs[name] = symbol;
+            if (symbol && !ParserUtility.SymbolIsTerminal(symbol)) {
+                const prods = this.grammar.rules[symbol] || [];
+                for (const rule of prods) {
+                    items.push({ rule, dot: 0 });
+                }
+                goto[name] = goto[name] || [];
+                goto[name].push({ rule, dot: dot + 1 });
+            }
+            else {
+                actions[name] = actions[name] || [];
+                actions[name].push({ rule, dot: dot + 1 });
+            }
+        }
+        this.cache[id].actions = [];
+        this.cache[id].goto = {};
+        for (const key in actions) {
+            this.cache[id].actions.push({ symbol: refs[key], state: this.generateState(actions[key]) });
+        }
+        for (const key in goto) {
+            this.cache[id].goto[refs[key]] = this.generateState(goto[key]);
+        }
+        return this.cache[id];
+    }
+    canonicalStateId(items) {
+        return items
+            .map(item => this.canonicalLRItemId(item))
+            .sort()
+            .join('|');
+    }
+    canonicalLRItemId(item) {
+        return `${this.rules.id(item.rule)}:${item.dot}`;
+    }
+    canonicalSymbolId(symbol) {
+        if (typeof symbol === 'symbol')
+            return `SY:START`;
+        if (typeof symbol === 'string')
+            return `NT:${symbol}`;
+        if (typeof symbol == 'function')
+            return `FN:${symbol.toString()}`;
+        if (!symbol)
             return;
-        const state = {
-            items: [],
-            isFinal: false,
-            actions: new Map(),
-            goto: new Map(),
-            reduce: null,
-            rule: rule
-        };
-        state.items.push({ rule, dot });
-        if (rule.symbols.length == dot)
-            state.isFinal = true;
-        this.states.set(id, state);
-        state.items.push(...this.closure.get(rule.symbols[dot]));
-        if (!state.isFinal)
-            for (const { rule, dot } of state.items) {
-                this.addState(rule, dot + 1);
-            }
-    }
-    linkStates(id, completed = new Set()) {
-        completed.add(id);
-        const state = this.states.get(id);
-        if (!state.isFinal) {
-            for (const { rule, dot } of state.items) {
-                const symbol = rule.symbols[dot];
-                const itemStateId = this.getStateId(rule, dot + 1);
-                if (ParserUtility.SymbolIsTerminal(symbol) && typeof symbol != 'symbol') {
-                    state.actions.set(symbol, itemStateId);
-                }
-                else {
-                    state.goto.set(symbol, itemStateId);
-                }
-                if (!completed.has(itemStateId))
-                    this.linkStates(itemStateId, completed);
-            }
-        }
-        else {
-            state.reduce = this.rules.id(state.rule);
-        }
-    }
-    getStateId(rule, dot) {
-        return this.rules.id(rule) + '.' + dot;
+        if (symbol instanceof RegExp)
+            return `RG:${symbol.source}`;
+        if ("token" in symbol)
+            return `TK:${symbol.token}`;
+        if ("literal" in symbol)
+            return `LT:${symbol.literal}`;
     }
 }
 //# sourceMappingURL=canonical-collection.js.map
