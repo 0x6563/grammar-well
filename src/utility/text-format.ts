@@ -74,10 +74,10 @@ export class TextFormatter {
         }
     }
 
-    static GrammarRule(rule: RuntimeGrammarProductionRule, withCursorAt?: number) {
-        let symbolSequence = rule.symbols.slice(0, withCursorAt).map(v => TextFormatter.GrammarRuleSymbol(v, true, true)).join(' ');
-        if (typeof withCursorAt !== "undefined") {
-            symbolSequence += " ● " + rule.symbols.slice(withCursorAt).map(v => TextFormatter.GrammarRuleSymbol(v, true, true)).join(' ');
+    static GrammarRule(rule: RuntimeGrammarProductionRule, dot?: number) {
+        let symbolSequence = rule.symbols.slice(0, dot).map(v => TextFormatter.GrammarRuleSymbol(v, true, true)).join(' ');
+        if (typeof dot !== "undefined") {
+            symbolSequence += " ● " + rule.symbols.slice(dot).map(v => TextFormatter.GrammarRuleSymbol(v, true, true)).join(' ');
         }
         return rule.name + " → " + symbolSequence;
     }

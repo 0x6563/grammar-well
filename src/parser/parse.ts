@@ -6,11 +6,13 @@ import { CYK } from "./algorithms/cyk.ts";
 import { Earley } from "./algorithms/earley.ts";
 import { LRK } from "./algorithms/lrk/algorithm.ts";
 import { ParserUtility } from "../utility/parsing.ts";
+import { NOOP } from "./algorithms/noop.ts";
 
 const ParserRegistry: { [key: string]: ParserAlgorithm } = {
     earley: Earley,
     cyk: CYK,
-    lr0: LRK
+    lr0: LRK,
+    noop: NOOP
 }
 
 export function Parse(

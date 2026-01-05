@@ -81,13 +81,13 @@ function PostProcess(ast: PreAST | RuntimeLexerToken, clone?: boolean) {
 }
 
 class Column {
-    data: any;
-    states: State[] = [];
-    wants: Dictionary<State[]> = Object.create(null);// states indexed by the non-terminal they expect
-    scannable: State[] = [];// list of states that expect a token
-    completed: Dictionary<State[]> = Object.create(null);  // states that are nullable
-    private rules: Dictionary<RuntimeGrammarProductionRule[]>;
+    public data: any;
+    public states: State[] = [];
+    public wants: Dictionary<State[]> = Object.create(null);
+    public scannable: State[] = [];
+    public completed: Dictionary<State[]> = Object.create(null);
     public index: number;
+    private rules: Dictionary<RuntimeGrammarProductionRule[]>;
     private StateClass: Concrete<typeof State>;
 
     constructor(
@@ -105,12 +105,11 @@ class Column {
         let w = 0;
         let state: State;
 
-        // eslint-disable-next-line no-cond-assign
-        while (state = this.states[w++]) { // nb. we push() during iteration
+        while (state = this.states[w++]) {
             if (state.isComplete) {
                 state.finish();
                 const { wantedBy } = state;
-                for (let i = wantedBy.length; i--;) { // this line is hot
+                for (let i = wantedBy.length; i--;) {
                     this.complete(wantedBy[i], state);
                 }
 
@@ -170,14 +169,15 @@ class Column {
 }
 
 abstract class State {
-    isComplete: boolean;
-    data: any = [];
-    left: State;
-    right: State | StateToken;
+    public isComplete: boolean;
+    public data: any = [];
+    public left: State;
+    public right: State | StateToken;
     public rule: RuntimeGrammarProductionRule;
     public dot: number;
     public reference: number;
     public wantedBy: State[];
+
     constructor(
         rule: RuntimeGrammarProductionRule,
         dot: number,
@@ -207,7 +207,6 @@ abstract class State {
 
     protected build() {
         const children = [];
-        // eslint-disable-next-line @typescript-eslint/no-this-alias
         let node: State = this;
         do {
             children[node.dot - 1] = node.right.data;
@@ -237,5 +236,4 @@ interface StateToken {
 }
 
 type PreAST = [RuntimeGrammarProductionRule, (RuntimeLexerToken | PreAST)[], { reference: number, dot: number }];
-type Concrete<T extends abstract new (...args: any) => any> =
-    new (...args: ConstructorParameters<T>) => InstanceType<T>;
+type Concrete<T extends abstract new (...args: any) => any> = new (...args: ConstructorParameters<T>) => InstanceType<T>;

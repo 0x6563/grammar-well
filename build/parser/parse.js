@@ -5,10 +5,12 @@ import { CYK } from "./algorithms/cyk.js";
 import { Earley } from "./algorithms/earley.js";
 import { LRK } from "./algorithms/lrk/algorithm.js";
 import { ParserUtility } from "../utility/parsing.js";
+import { NOOP } from "./algorithms/noop.js";
 const ParserRegistry = {
     earley: Earley,
     cyk: CYK,
-    lr0: LRK
+    lr0: LRK,
+    noop: NOOP
 };
 export function Parse(language, input, options = {
     algorithm: 'earley',

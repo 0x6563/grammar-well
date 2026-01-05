@@ -1,15 +1,17 @@
 {
   "name": "grammar-well",
   "type": "module",
-  "version": "2.2.0",
+  "version": "2.1.0",
   "description": "Cross-platform Parser written in TypeScript",
   "scripts": {
     "prebuild": "tsc --build --clean && node scripts/prebuild.ts",
     "grammar": "tsc --build --clean && node scripts/grammar.ts",
     "build": "tsc --build",
-    "benchmark": "node tests/performance/benchmark.ts",
+    "hardware": "node tests/utilities/hardware.ts",
+    "benchmark": "node --stack-size=65536 --max-old-space-size=28000 --expose-gc tests/performance/benchmark.ts",
     "test": "node --test --test-reporter ./tests/utilities/reporter.ts tests/**/*.spec.ts",
-    "profile": "node tests/performance/profile.ts"
+    "profile": "node tests/performance/profile.ts",
+    "lint": "tsc --noEmit"
   },
   "exports": {
     ".": "./build/index.js",
@@ -34,6 +36,7 @@
   },
   "homepage": "https://grammar-well.xyz",
   "devDependencies": {
+    "grammar-well": "^2.1.0",
     "@types/node": "^25.0.3",
     "typescript": "^5.9.3",
     "yaml": "^2.8.2"

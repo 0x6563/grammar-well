@@ -2,6 +2,7 @@ import type { RuntimeGrammarProductionRule, RuntimeGrammarRuleSymbol, RuntimeLex
 
 export class ParserUtility {
 
+
     static SymbolMatchesToken(symbol: RuntimeGrammarRuleSymbol, token: RuntimeLexerToken) {
         if (typeof symbol === 'string')
             throw 'Attempted to match token against non-terminal';

@@ -1,6 +1,7 @@
 import { readFileSync } from 'fs';
 import { readdirSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { PseudoRandomJSONGenerator } from './prjg.ts';
 const dir = resolve(import.meta.dirname, '../samples');
 const files = readdirSync(dir, { recursive: true, withFileTypes: true });
 const dictionary: { [key: string]: string } = {};
@@ -17,5 +18,9 @@ for (const file of files) {
         }
     }
 }
+dictionary['mem:\\\\1k.json'] = new PseudoRandomJSONGenerator(787253, 1000).generate();
+dictionary['mem:\\\\10k.json'] = new PseudoRandomJSONGenerator(893241, 10000).generate();
+dictionary['mem:\\\\50k.json'] = new PseudoRandomJSONGenerator(53897, 50000).generate();
+dictionary['mem:\\\\100k.json'] = new PseudoRandomJSONGenerator(812240, 100000).generate();
 export const Samples = dictionary;
 export const Grammars = filtered;

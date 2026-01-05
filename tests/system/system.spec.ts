@@ -1,9 +1,11 @@
 import test, { describe } from "node:test";
 import assert from "node:assert";
-import { Compile, ParseInput } from "../utilities/language.ts";
+import { Candidate } from "../utilities/language.ts";
 import { Eval } from "../utilities/eval.ts";
 import { GetValue, ReadConfigFile } from "../utilities/config.ts";
 import { type RuntimeParserClass } from "../../build/index.js";
+import { writeFileSync } from "node:fs";
+import { resolve } from "node:path";
 
 
 describe('Predefined Samples', () => {
@@ -22,6 +24,15 @@ describe('Predefined Samples', () => {
                     options.algorithm = GetValue(t, 'algorithm') || 'earley';
                     const resultType = !result && results ? 'full' : 'first';
                     const execution = await AsyncRun(() => RunTest(grammar, input, options, resultType));
+                    if (t.save) {
+                        writeFileSync(resolve(import.meta.dirname, '../dumps/' + t.save), JSON.stringify({
+                            grammar,
+                            input,
+                            result,
+                            results,
+                            execution
+                        }))
+                    }
                     try {
                         if (typeof t.throw == 'boolean') {
                             if (execution.success == t.throw) {
@@ -68,9 +79,9 @@ async function AsyncRun(method: () => Promise<any>) {
 }
 
 async function RunTest(source: string, input: string, options: any, results: 'first' | 'full' = 'first') {
-    const c = await Compile(source);
+    const c = await Candidate.Compile(source);
     const parser: RuntimeParserClass = Eval(c);
-    return ParseInput(new parser(), input, options, results);
+    return Candidate.Parse(new parser(), input, options, results);
 }
 
 

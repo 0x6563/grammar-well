@@ -2,15 +2,13 @@ General:
   - title: Shared Node Mutation Safety
     grammarSource: grammars/shared-node.gwell
     input: "ab"
-    results: [
-      { items: ["a", "b"], match: "2" },
-      { items: ["a", "b"], match: "1" }
-    ]
+    results: [{ items: ["a", "b"], match: "2" }, { items: ["a", "b"], match: "1" }]
+
   - title: Nullable Whitespace Bug
     grammarSource: grammars/whitespace.gwell
     input: "(x)"
     result: [[["(", null, [[[["x"]]]], null, ")"]]]
-    
+
   - title: Lexer Before
     grammarSource: grammars/lexer-before.gwell
     input: "(a)"
@@ -25,11 +23,11 @@ General:
     grammarSource: grammars/json-main.gwell
     input: "{\"abc\": 123,\n\"hello\": \"world\",\n\"boolean\": true\n}"
     throw: false
-  
+
   - title: Token PostProcessor
     grammarSource: grammars/character-counter.gwell
-    input: 'abc'
-    result: [1,2,3]
+    input: "abc"
+    result: [1, 2, 3]
 
 Parentheses:
   - title: Parentheses Pass 1
@@ -86,32 +84,7 @@ Tosh:
   - title: Tosh 1 Pass
     grammarSource: grammars/tosh.gwell
     input: "set foo to 2 * e^ of ( foo * -0.05 + 0.5) * (1 - e ^ of (foo * -0.05 + 0.5))"
-    result:
-      [
-        "setVar:to:",
-        "foo",
-        [
-          "*",
-          [
-            "*",
-            2,
-            [
-              "computeFunction:of:",
-              "e ^",
-              ["+", ["*", ["readVariable", "foo"], -0.05], 0.5],
-            ],
-          ],
-          [
-            "-",
-            1,
-            [
-              "computeFunction:of:",
-              "e ^",
-              ["+", ["*", ["readVariable", "foo"], -0.05], 0.5],
-            ],
-          ],
-        ],
-      ]
+    result: ["setVar:to:", "foo", ["*", ["*", 2, ["computeFunction:of:", "e ^", ["+", ["*", ["readVariable", "foo"], -0.05], 0.5]]], ["-", 1, ["computeFunction:of:", "e ^", ["+", ["*", ["readVariable", "foo"], -0.05], 0.5]]]]]
 
 JSON:
   - title: JSON 1
@@ -119,10 +92,16 @@ JSON:
     inputSource: json1.json
     resultJSON: json1.json
 
-  - title: JSON 2
-    grammarSource: grammars/json.gwell
-    inputSource: json2.json
-    resultJSON: json2.json
+  - title: JSON (No Epsilon)
+    grammarSource: grammars/json-no-epsilon.gwell
+    inputSource: mem:\\1k.json
+    resultJSON: mem:\\1k.json
+
+  - title: LR
+    algorithm: lr0
+    grammarSource: grammars/json-no-epsilon.gwell
+    inputSource: json1.json
+    resultJSON: json1.json
 
 CYK:
   - title: CYK
@@ -130,8 +109,20 @@ CYK:
     grammarSource: grammars/cyk.gwell
     input: ABC
     result: [A, [B, C]]
+
 LR:
-  - title: LR
+  - title: Earley
+    grammarSource: grammars/lr.gwell
+    input: abab
+    result: [[a, b], [a, b]]
+
+  - title: JSON
+    algorithm: lr0
+    grammarSource: grammars/json-no-epsilon.gwell
+    inputSource: mem:\\1k.json
+    resultJSON: mem:\\1k.json
+
+  - title: AB
     algorithm: lr0
     grammarSource: grammars/lr.gwell
     input: abab

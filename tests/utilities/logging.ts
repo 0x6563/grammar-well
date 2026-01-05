@@ -1,4 +1,4 @@
-export function ConsoleTable(rows: any[], columns: Column[]) {
+export function MarkdownTable(rows: any[], columns: Column[]) {
     const accessors = columns.map(v => typeof v.value == 'function' ? v.value : (row: any) => row[v.value as string]);
     const widths: number[] = columns.map(v => v.label.length);
     const values = [];
@@ -11,23 +11,19 @@ export function ConsoleTable(rows: any[], columns: Column[]) {
         }
         values.push(r);
     }
-    let headers = `| ${Row(columns.map(v => v.label), widths).join(' | ')} |`;
-    let divider = ''.padEnd(headers.length, '_');
-    let output = '\n';
-    output += headers + '\n';
-    output += divider + '\n';
+    let output = `| ${Row(columns.map(v => v.label), widths).join(' | ')} |\n`;
+    output += `| ${Row(widths.map(v => ''), widths,'-').join(' | ')} |` + '\n';
     for (const row of values) {
         output += `| ${Row(row, widths).join(' | ')} |` + '\n';
-        output += divider + '\n';
 
     }
     return output;
 }
 
-function Row(row: any[], widths: number[]) {
+function Row(row: any[], widths: number[], pad: string = ' ') {
     const cols = [];
     for (let i = 0; i < widths.length; i++) {
-        cols.push((row[i] || '').toString().padEnd(widths[i]));
+        cols.push((row[i] || '').toString().padEnd(widths[i], pad));
     }
     return cols;
 }

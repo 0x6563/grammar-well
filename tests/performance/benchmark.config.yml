@@ -1,28 +1,163 @@
-- title: JSON
-  grammarSource: grammars/json-main.gwell
-  input: "{}"
-  parserIterations: 1000
-  compilerIterations: 1000
+- title: JSON (1K Nodes)
+  grammarSource: grammars/json.gwell
+  inputSource: mem:\\1k.json
+  compilerIterations: 1
+  parserIterations: 100
   tests:
+    - title: Lexer Only
+      algorithm: noop
+      parserOptions: { }
+      compilerOptions: { }
     - title: Earley Eager
+      grammarSource: grammars/json.gwell
       algorithm: earley
       parserOptions: { postProcessing: 'eager' }
-      compilerOptions: {      }
+      compilerOptions: { }
     - title: Earley Lazy
+      grammarSource: grammars/json.gwell
       algorithm: earley
       parserOptions: { postProcessing: 'lazy' }
-      compilerOptions: {      }
+      compilerOptions: { } 
+    - title: Earley Eager (Zero Epsilon)
+      grammarSource: grammars/json-no-epsilon.gwell
+      algorithm: earley
+      parserOptions: { postProcessing: 'eager' }
+      compilerOptions: { }
+    - title: Earley Lazy (Zero Epsilon)
+      grammarSource: grammars/json-no-epsilon.gwell
+      algorithm: earley
+      parserOptions: { postProcessing: 'lazy' }
+      compilerOptions: { } 
+    - title: LR0 (Zero Epsilon)
+      grammarSource: grammars/json-no-epsilon.gwell
+      algorithm: lr0
+      parserOptions: { }
+      compilerOptions: { } 
+
+- title: JSON (10K Nodes)
+  grammarSource: grammars/json.gwell
+  inputSource: mem:\\10k.json
+  compilerIterations: 1
+  parserIterations: 100
+  tests:
+    - title: Lexer Only
+      algorithm: noop
+      parserOptions: { }
+      compilerOptions: { }
+    - title: Earley Eager
+      grammarSource: grammars/json.gwell
+      algorithm: earley
+      parserOptions: { postProcessing: 'eager' }
+      compilerOptions: { }
+    - title: Earley Lazy
+      grammarSource: grammars/json.gwell
+      algorithm: earley
+      parserOptions: { postProcessing: 'lazy' }
+      compilerOptions: { } 
+    - title: Earley Eager (Zero Epsilon)
+      grammarSource: grammars/json-no-epsilon.gwell
+      algorithm: earley
+      parserOptions: { postProcessing: 'eager' }
+      compilerOptions: { }
+    - title: Earley Lazy (Zero Epsilon)
+      grammarSource: grammars/json-no-epsilon.gwell
+      algorithm: earley
+      parserOptions: { postProcessing: 'lazy' }
+      compilerOptions: { } 
+    - title: LR0 (Zero Epsilon)
+      grammarSource: grammars/json-no-epsilon.gwell
+      algorithm: lr0
+      parserOptions: { }
+      compilerOptions: { } 
+
+- title: JSON (50K Nodes)
+  grammarSource: grammars/json.gwell
+  inputSource: mem:\\50k.json
+  compilerIterations: 1
+  parserIterations: 10
+  tests:
+    - title: Lexer Only
+      algorithm: noop
+      parserOptions: { }
+      compilerOptions: { }
+    - title: Earley Eager
+      grammarSource: grammars/json.gwell
+      algorithm: earley
+      parserOptions: { postProcessing: 'eager' }
+      compilerOptions: { }
+    - title: Earley Lazy
+      grammarSource: grammars/json.gwell
+      algorithm: earley
+      parserOptions: { postProcessing: 'lazy' }
+      compilerOptions: { } 
+    - title: Earley Eager (Zero Epsilon)
+      grammarSource: grammars/json-no-epsilon.gwell
+      algorithm: earley
+      parserOptions: { postProcessing: 'eager' }
+      compilerOptions: { }
+    - title: Earley Lazy (Zero Epsilon)
+      grammarSource: grammars/json-no-epsilon.gwell
+      algorithm: earley
+      parserOptions: { postProcessing: 'lazy' }
+      compilerOptions: { } 
+    - title: LR0 (Zero Epsilon)
+      grammarSource: grammars/json-no-epsilon.gwell
+      algorithm: lr0
+      parserOptions: { }
+      compilerOptions: { } 
+
+
+- title: JSON (100k Nodes)
+  grammarSource: grammars/json.gwell
+  inputSource: mem:\\100k.json
+  compilerIterations: 1
+  parserIterations: 10
+  tests:
+    - title: Lexer Only
+      algorithm: noop
+      parserOptions: { }
+      compilerOptions: { }
+    - title: Earley Eager (Zero Epsilon)
+      grammarSource: grammars/json-no-epsilon.gwell
+      algorithm: earley
+      parserOptions: { postProcessing: 'eager' }
+      compilerOptions: { }
+    - title: Earley Lazy (Zero Epsilon)
+      grammarSource: grammars/json-no-epsilon.gwell
+      algorithm: earley
+      parserOptions: { postProcessing: 'lazy' }
+      compilerOptions: { } 
+    - title: LR0 (Zero Epsilon)
+      grammarSource: grammars/json-no-epsilon.gwell
+      algorithm: lr0
+      parserOptions: { }
+      compilerOptions: { } 
+
 - title: Grammar Well
   grammarSource: grammars/v2.well
   inputSource: grammars/v2.well
+  compilerIterations: 1
   parserIterations: 1000
-  compilerIterations: 1000
   tests:
-    - title: Earley Eager
+    - title: Lexer Only
+      algorithm: noop
+      parserOptions: { }
+      compilerOptions: { }
+    - title: Earley Eager (Stable)
+      version: 'stable'
       algorithm: earley
       parserOptions: { postProcessing: 'eager' }
-      compilerOptions: {      }
-    - title: Earley Lazy
+      compilerOptions: { }
+    - title: Earley Lazy (Stable)
+      version: 'stable'
       algorithm: earley
       parserOptions: { postProcessing: 'lazy' }
-      compilerOptions: {      }
+      compilerOptions: { } 
+    - title: Earley Eager (Candidate)
+      algorithm: earley
+      parserOptions: { postProcessing: 'eager' }
+      compilerOptions: { }
+    - title: Earley Lazy (Candidate)
+      algorithm: earley
+      parserOptions: { postProcessing: 'lazy' }
+      compilerOptions: { } 
