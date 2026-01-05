@@ -1,0 +1,93 @@
+lexer {
+	start: "json"
+
+	[json]
+		- when r:{\s+} tag "space"
+		- when r:{-?(?:[0-9]|[1-9][0-9]+)(?:\.[0-9]+)?(?:[eE][-+]?[0-9]+)?\b} tag "number" highlight "number"
+		- when r:{"(?:\\["bfnrt\/\\]|\\u[a-fA-F0-9]{4}|[^"\\])*"} tag "string" highlight "string"
+		- when "{" tag "{"
+		- when "}" tag "}"
+		- when "[" tag "["
+		- when "]" tag "]"
+		- when "," tag ","
+		- when ":" tag ":"
+		- when "true" tag "true" highlight "keyword"
+		- when "false" tag "false" highlight "keyword"
+		- when "null" tag "null" highlight "keyword"
+}
+
+grammar {
+ 
+	[json]
+		| value => ( $0 )
+
+	[value]
+		| object => ( $0 )
+		| array => ( $0 )
+		| number => ( $0 )
+		| string => ( $0 )
+		| "true" => ( true )
+		| "false" => ( false )
+		| "null" => ( null )
+
+	[object]
+		| "{" "}" => ({})
+		| "{" _ "}" => ({})
+		| "{" kv_list "}" => ( Rollup($1) )
+		| "{" _ kv_list "}" => ( Rollup($2) )
+		| "{" kv_list _ "}" => ( Rollup($1) )
+		| "{" _ kv_list _ "}" => ( Rollup($2) )
+
+
+	[array]
+		| "[" "]" => ([])
+		| "[" _ "]" => ([])
+		| "[" value_list "]" => ( $1 )
+		| "[" _ value_list "]" => ( $2 )
+		| "[" value_list _ "]" => ( $1 )
+		| "[" _ value_list _ "]" => ( $2 )
+		
+	[number]
+		| <number> => ( parseFloat($0.value) )
+
+	[string]
+		| <string> => ( JSON.parse($0.value) )
+	
+	[kv]
+		| string@key ":" value@value => (  { [$key]: $value } )
+		| string@key _ ":" value@value => (  { [$key]: $value } )
+		| string@key ":" _ value@value => (  { [$key]: $value } )
+		| string@key _ ":" _ value@value => (  { [$key]: $value } )
+
+	[kv_list]
+		| kv
+		| kv_list@list "," kv@kv => ( $list.push($kv) && $0 )
+		| kv_list@list _ "," kv@kv => ( $list.push($kv) && $0 )
+		| kv_list@list "," _ kv@kv => ( $list.push($kv) && $0 )
+		| kv_list@list _ "," _ kv@kv => ( $list.push($kv) && $0 )
+
+	[value_list]
+		| value
+		| value_list@list "," value@value => ( $list.push($value) && $0 )
+		| value_list@list _ "," value@value => ( $list.push($value) && $0 )
+		| value_list@list "," _ value@value => ( $list.push($value) && $0 )
+		| value_list@list _ "," _ value@value => ( $list.push($value) && $0 )
+
+	[_]
+		| <space>
+
+}
+
+
+
+on:import {
+	function Rollup(list) {
+		const out = {};
+		for (let i = 0; i < list.length; i++) {
+			for (const key in list[i]) {
+				out[key] = list[i][key];
+			}
+		}
+		return out;
+	}
+}

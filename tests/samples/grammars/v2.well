@@ -1,0 +1,371 @@
+lexer {
+	start: "main"
+
+	[main]
+		- import string, ws, comment
+		- when "*"
+		- import lifecycle
+		- when r:{lexer(?![a-zA-Z\d_])} tag "T_WORD" highlight "tag" goto lexer
+		- when r:{grammar(?![a-zA-Z\d_])} tag "T_WORD" highlight "tag" goto grammar
+		- when r:{config(?![a-zA-Z\d_])} tag "T_WORD" highlight "tag" goto config
+		- import kv
+
+	[lifecycle] span {
+
+		[start]
+			- when r:{on(?![a-zA-Z\d_])} tag "T_WORD" highlight "tag"
+
+		[span]
+			- when "=>" highlight "annotation" set js_template_inner
+			- import js_body
+			- when ":" highlight "keyword"
+			- import word
+
+		[stop]
+			- before r:{[\'"`]}
+
+	}
+
+	[config] span {
+		transition: "set"
+
+		[start]
+			- when r:{\s+} tag "T_WS" stay
+			- when "{"
+
+		[span]
+			- import comment, kv
+
+		[stop]
+			- when "}"
+
+	}
+
+	[grammar] span {
+		transition: "set"
+
+		[start]
+			- when r:{\s+} tag "T_WS" stay
+			- when "{"
+
+		[span]
+			- import comment, section_word, js_template, ws, insensitive, regex
+			- when r:{[?+*]} highlight "keyword"
+			- import kv
+			- when r:{[|@]} highlight "keyword"
+			- when r:{[,()<>$-]}
+
+		[stop]
+			- when "}"
+
+	}
+
+	[lexer] span {
+		transition: "set"
+
+		[start]
+			- when r:{\s+} tag "T_WS" stay
+			- when "{"
+
+		[span]
+			- import ws, comment, section_word, regex
+			- when r:{[-,]}
+			- import kv, lexer_span
+
+		[stop]
+			- when "}"
+
+	}
+
+	[lexer_span] span {
+
+		[start]
+			- when "{"
+
+		[span]
+			- import ws, comment, section_word, regex
+			- when ","
+			- when "-"
+			- import kv
+
+		[stop]
+			- when "}"
+
+	}
+
+	[js_body]
+		- import ws
+		- when "{" tag "T_JSBODY" highlight "annotation" set js_literal
+
+	[js_literal]
+		default: tag "T_JSBODY";
+		unmatched: tag "T_JSBODY";
+		- import jsignore
+		- when "{" highlight "annotation" goto js_literal
+		- when "}" highlight "annotation" pop
+		- when "(" highlight "annotation" goto js_literal
+		- when ")" highlight "annotation" pop
+		- when "[" highlight "annotation" goto js_literal
+		- when "]" highlight "annotation" pop
+
+	[js_template]
+		- when "=>" highlight "annotation" goto js_template_inner
+
+	[js_template_inner]
+		- import ws
+		- when "${" highlight "annotation" set js_literal
+		- when "(" highlight "annotation" set js_literal
+		- when "{" highlight "annotation" set js_literal
+		- when "[" highlight "annotation" set js_literal
+
+	[kv]
+		- import string, ws, word
+		- when ":" highlight "keyword"
+		- when r:{\d+} tag "T_INTEGER" highlight "number"
+		- when ";"
+
+	[jsignore]
+		- when r:{"(?:\\.|[^"\\\r\n])*"} tag "T_JSBODY"
+		- when r:{'(?:\\.|[^'\\\r\n])*'} tag "T_JSBODY"
+		- when r:{`(?:\\.|[^`\\])*`} tag "T_JSBODY"
+		- when r:{/(?:\\.|[^/\\\r\n])+/[gmiyu]*} tag "T_JSBODY"
+		- when r:{//[^\n]*} tag "T_JSBODY"
+		- when r:{/\*.*\*/} tag "T_JSBODY"
+
+	[string]
+		- when r:{"(?:\\.|[^"\\\r\n])*"} tag "T_STRING" highlight "string"
+
+	[string2]
+		- when r:{'(?:\\.|[^'\\\r\n])*'} tag "T_STRING" highlight "string"
+
+	[string3]
+		- when r:{`(?:\\.|[^`\\])*`} tag "T_STRING" highlight "string"
+
+	[regex] span {
+
+		[start]
+			- when r:{r[gmiuy]*:\{} tag "REGEX_DEFSTART" highlight "annotation"
+
+		[span]
+			- when r:{\\.} tag "T_REGEX" highlight "string.escape"
+			- import regex_charclass
+			- when r:{\{[\d\s,]+\}} tag "T_REGEX" highlight "number"
+			- when r:{[?!:^$+*.|]} tag "T_REGEX" highlight "keyword"
+			- when r:{[()]} tag "T_REGEX" highlight "delimiter"
+			- when r:{[^\}]+?} tag "T_REGEX" highlight "string"
+
+		[stop]
+			- when "}" tag "REGEX_DEFEND" highlight "annotation"
+
+	}
+
+	[regex_charclass] span {
+
+		[start]
+			- when "[^" tag "T_REGEX" highlight "regexp"
+			- when "[" tag "T_REGEX" highlight "regexp"
+
+		[span]
+			- when r:{\\.} tag "T_REGEX" highlight "string.escape"
+			- when "-" tag "T_REGEX" highlight "keyword"
+			- when r:{[^\]]+?} tag "T_REGEX" highlight "regexp"
+
+		[stop]
+			- when "]" tag "T_REGEX" highlight "regexp"
+
+	}
+
+	[insensitive]
+		- when "i:" highlight "constant"
+
+	[word]
+		- when r:{[a-zA-Z_][a-zA-Z_\d]*} tag "T_WORD"
+
+	[section_word]
+		- when r:{\[\s*[a-zA-Z_][a-zA-Z_\d]*\s*\]} tag "T_SECTWORD" highlight "type.identifier"
+
+	[ws]
+		- when r:{\s+} tag "T_WS"
+
+	[comment]
+		- when r:{//[^\n]*} tag "T_COMMENT" highlight "comment"
+
+	[commentmulti]
+		- when r:{/\*.*\*/} tag "T_COMMENT" highlight "comment"
+
+}
+
+grammar {
+
+	[main]
+		| _ section_list _ => ( $1 )
+
+	[section_list]
+		| section => ( [$0] )
+		| section __ section_list => ( [$0].concat($2) )
+
+	[section]
+		| "config" _ "{" _ kv_list@list _ "}" => ( { config: Object.assign(...$list) } )
+		| "import" _ "*" _ "from" __ T_WORD@import _ ";" => ( { import: $import } )
+		| "import" _ "*" _ "from" __ T_STRING@import _ ";" => ( { import: $import, path: true } )
+		| "import" _ "*" _ "as" _ T_WORD@alias _ "from" __ T_WORD@import _ ";" => ( { import: $import, alias: $alias} )
+		| "import" _ "*" _ "as" _ T_WORD@alias _ "from" __ T_STRING@import _ ";" => ( { import: $import, path: true, alias: $alias} )
+		| "lexer" _ "{" _ lexer@lexer _ "}" => ( { lexer: Object.assign(...$lexer) } )
+		| "grammar" _ "{" _ grammar@grammar _ "}" => ( { grammar: $grammar } )
+		| r:{on} ":" T_WORD@lifecycle _ T_JS@js => ( { lifecycle: $lifecycle, js: $js } )
+		| r:{on} ":" T_WORD@lifecycle _ POSTPROCESSOR@js => ( { lifecycle: $lifecycle, js: $js } )
+		| r:{on} ":" T_WORD@lifecycle _ T_STRING@js => ( { lifecycle: $lifecycle, js: $js, path: true } )
+
+	[lexer]
+		| kv_list _ state_list => ( $0.concat({ states: $2 }) )
+		| state_list => ( [{ states: $0 }] )
+
+	[state_list]
+		| state => ( [$0] )
+		| state _ state_list => ( [$0].concat($2) )
+
+	[state]
+		| T_SECTWORD _ state_definition => ( { name: $0, state: $2 } )
+
+	[state_definition]
+		| state_config_list _ token_list => ( Object.assign($0, { rules: $2 }) )
+		| token_list => ( { rules: $0 } )
+		| "span" _ "{" _ kv_list@kv _ state_list@span _ "}" => ( { config: Object.assign(...$kv), span: $span} )
+		| "span" _ "{" _ state_list@span _ "}" => ( { span: $span} )
+
+	[state_config_list]
+		| state_config => ( $0 )
+		| state_config _ state_config_list => ( Object.assign($0, $2) )
+
+	[state_config]
+		| T_WORD _ ":" _ token_definition_list _ ";" => ( {[$0]: Object.assign(...$4) } )
+
+	[token_list]
+		| token => ( data )
+		| token _ token_list => ( [$0].concat($2) )
+
+	[token]
+		| "-" _ "import" _ word_list => ( { import: $4 } )
+		| "-" _ token_definition_list => ( Object.assign(...$2) )
+
+	[token_definition_list]
+		| token_definition => ( data )
+		| token_definition _ token_definition_list => ( [$0].concat($2) )
+
+	[token_definition]
+		| "open" _ T_STRING => ( { open: $2 } )
+		| "close" _ T_STRING => ( { close: $2 } )
+		| "tag" _ string_list => ( { tag: $2 } )
+		| "when" _ T_STRING => ( { when: $2 } )
+		| "when" _ T_REGEX => ( { when: $2 } )
+		| "before" _ T_STRING => ( { when: $2, before: true } )
+		| "before" _ T_REGEX => ( { when: $2, before: true } )
+		| "skip" _ T_STRING => ( { when: $2, skip: true } )
+		| "skip" _ T_REGEX => ( { when: $2, skip: true } )
+		| "stay" => ( { stay: true } )
+		| "pop" => ( { pop: 1 } )
+		| "pop" _ T_INTEGER => ( { pop: parseInt($2) } )
+		| "pop" _ "all" => ( { pop: "all" } )
+		| "highlight" _ T_STRING => ( { highlight: $2 } )
+		| "embed" _ T_STRING => ( { embed: $2 } )
+		| "unembed" => ( { unembed: true } )
+		| "inset" => ( { inset: 1 } )
+		| "inset" _ T_INTEGER => ( { inset: parseInt($2) } )
+		| "set" _ T_WORD => ( { set: $2 } )
+		| "goto" _ T_WORD => ( { goto: $2 } )
+		| "type" _ T_STRING => ( { type: $2 } )
+
+	[grammar]
+		| kv_list _ grammar_rule_list => ( { config: Object.assign(...$0), rules: $2 } )
+		| grammar_rule_list => ( { rules: $0 } )
+
+	[grammar_rule_list]
+		| grammar_rule => ( [$0] )
+		| grammar_rule _ grammar_rule_list => ( [$0].concat($2) )
+
+	[grammar_rule]
+		| grammar_rule_name _ expression_list => ( { name: $0, expressions: $2 } )
+		| grammar_rule_name __ POSTPROCESSOR@template _ expression_list@expressions => ( { name: $0, expressions: $expressions, postprocess: $template } )
+
+	[grammar_rule_name]
+		| T_SECTWORD => ( $0 )
+
+	[expression_list]
+		| expression => ( [$0] )
+		| "|" _ expression => ( [$2] )
+		| expression_list _ "|" _ expression => ( $0.concat([$4]) )
+
+	[expression]
+		| expression_symbol_list => ( { symbols: $0 } )
+		| expression_symbol_list _ POSTPROCESSOR@template => ( { symbols: $0, postprocess: $template } )
+
+	[expression_symbol_list]
+		| expression_symbol
+		| expression_symbol_list __ expression_symbol => ( $0.concat([$2]) )
+
+	[expression_symbol]
+		| expression_symbol_match => ( $0 )
+		| expression_symbol_match "@" T_WORD => ( { ...$0,  alias: $2 } )
+		| expression_symbol_match expression_repeater => ( { expression: $0, repeat: $1 } )
+		| expression_symbol_match expression_repeater "@" T_WORD => ( { expression: $0, repeat: $1, alias: $4 } )
+
+	[expression_symbol_match]
+		| T_WORD => ( { rule: $0 } )
+		| T_STRING => ( { literal: $0, insensitive: false } )
+		| "i:" T_STRING => ( { literal: $2, insensitive: true } )
+		| "<" _ T_WORD@token _ ">" => ( { token: $token} )
+		| "<" _ T_STRING@token _ ">" => ( { token: $token} )
+		| T_REGEX => ( $0 )
+		| "(" _ expression_list _ ")" => ( { subexpression: $2 } )
+
+	[expression_repeater] => ( $0.value )
+		| "?"
+		| "+"
+		| "*"
+
+	[kv_list]
+		| kv => ( data )
+		| kv _ kv_list => ( [$0].concat($2) )
+
+	[kv]
+		| T_WORD _ ":" _ (T_WORD | T_STRING | T_INTEGER | T_JS) => ( { [$0]: $4[0] } )
+
+	[string_list]
+		| T_STRING => ( [$0] )
+		| T_STRING _ "," _ string_list => ( [$0].concat($4) )
+
+	[word_list]
+		| T_WORD => ( [$0] )
+		| T_WORD _ "," _ word_list => ( [$0].concat($4) )
+
+	[_]
+		| (<T_WS> | <T_COMMENT>)* => ( null )
+
+	[__]
+		| (<T_WS> | <T_COMMENT>)+ => ( null )
+
+	[T_JS]
+		| "{" <T_JSBODY>* "}" => ( { js: $1.map(v=>v.value).join('') } )
+
+	[POSTPROCESSOR] => ( { template: $2.value + $3.map(v=>v.value).join('').trim() + $4.value} )
+		| "=>" _ "(" <T_JSBODY>* ")"
+		| "=>" _ "{" <T_JSBODY>* "}"
+		| "=>" _ "[" <T_JSBODY>* "]"
+		| "=>" _ "${" <T_JSBODY>* "}" => ( { js: $3.map(v=>v.value).join('').trim() } )
+
+	[T_STRING]
+		| <T_STRING> => ( JSON.parse($0.value) )
+
+	[T_WORD]
+		| <T_WORD> => ( $0.value )
+
+	[T_SECTWORD]
+		| <T_SECTWORD> => ( $0.value.substring(1, $0.value.length-1).trim() )
+
+	[T_REGEX]
+		| <REGEX_DEFSTART> <T_REGEX>* <REGEX_DEFEND> => ( { regex: $1.map(v=>v.value).join(''), flags: $0.value.slice(1,-3) } )
+
+	[T_INTEGER]
+		| <T_INTEGER> => ( $0.value )
+
+}

@@ -1,15 +1,6 @@
-out.js
 node_modules/
-docs/node_modules/
-.DS_Store
+dump/
 test/profile.log
 test/grammars/parens.js
-test/grammars/whitespace.js
-*.swp
-*.ps1
-*.cmd
-*.bat
+test/grammars/whitespace.js 
 npm-debug.log
-sandbox/
-.nyc_output
-coverage

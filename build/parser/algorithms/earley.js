@@ -66,8 +66,8 @@ class Column {
     wants = Object.create(null);
     scannable = [];
     completed = Object.create(null);
-    rules;
     index;
+    rules;
     StateClass;
     constructor(rules, index, StateClass) {
         this.rules = rules;

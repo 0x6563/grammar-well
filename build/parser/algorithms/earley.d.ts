@@ -18,8 +18,8 @@ declare class Column {
     wants: Dictionary<State[]>;
     scannable: State[];
     completed: Dictionary<State[]>;
-    private rules;
     index: number;
+    private rules;
     private StateClass;
     constructor(rules: Dictionary<RuntimeGrammarProductionRule[]>, index: number, StateClass: Concrete<typeof State>);
     process(): void;

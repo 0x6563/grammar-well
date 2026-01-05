@@ -7,5 +7,5 @@ export declare class TextFormatter {
     static LexerTokenShort(token: RuntimeLexerToken): string;
     static LexerTokenError(lexer: TokenBuffer): string;
     static GrammarRuleSymbol(symbol: RuntimeGrammarRuleSymbol, short?: boolean, error?: boolean): string;
-    static GrammarRule(rule: RuntimeGrammarProductionRule, withCursorAt?: number): string;
+    static GrammarRule(rule: RuntimeGrammarProductionRule, dot?: number): string;
 }
