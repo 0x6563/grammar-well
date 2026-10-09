@@ -1,0 +1,26 @@
+name: Test Suite
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+jobs:
+  test:
+    if: contains(fromJSON('["OWNER", "MEMBER", "COLLABORATOR"]'), github.event.pull_request.author_association)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          registry-url: 'https://registry.npmjs.org'
+      - name: Install
+        run: npm install
+      - name: Version
+        run: npm version ${{ inputs.version }} --no-git-tag-version
+      - name: Build
+        run: npm run build
+      - name: Test
+        run : npm run test
