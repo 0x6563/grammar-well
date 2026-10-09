@@ -29,6 +29,11 @@ General:
     input: "abc"
     result: [1, 2, 3]
 
+  - title: Template Aliases
+    grammarSource: grammars/alias.gwell
+    input: "ababa"
+    result: [[a, b, a, b], [b, a], [a, "x$a", "$$a"]]
+
 Parentheses:
   - title: Parentheses Pass 1
     grammarSource: grammars/parentheses.gwell

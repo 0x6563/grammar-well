@@ -112,7 +112,7 @@ export class JavaScriptGenerator {
 
     private templatePostProcess(templateBody: string, alias: { [key: string]: number }) {
         for (const key in alias) {
-            templateBody = templateBody.replace(new RegExp('(?:\\$)' + key + '(?![a-zA-Z\\d\\$_])'), `data[${alias[key]}]`);
+            templateBody = templateBody.replace(new RegExp('(?<![a-zA-Z\\d\\$_])\\$' + key + '(?![a-zA-Z\\d\\$_])', 'g'), `data[${alias[key]}]`);
         }
         return "({data}) => { return " + templateBody.replace(/\$(\d+)/g, "data[$1]") + "; }";
     }
