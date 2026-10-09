@@ -1,0 +1,15 @@
+grammar {
+
+	[S]
+		| Repeated@r Prefix@p Embedded@e => ( [$r, $p, $e] )
+
+	[Repeated]
+		| "a"@a "b"@b => ( [$a.value, $b.value, $a.value, $b.value] )
+
+	[Prefix]
+		| "a"@a "b"@ab => ( [$ab.value, $a.value] )
+
+	[Embedded]
+		| "a"@a => ( [$a.value, 'x$a', '$$a'] )
+
+}
