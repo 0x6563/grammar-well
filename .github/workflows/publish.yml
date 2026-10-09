@@ -32,8 +32,6 @@ jobs:
         run : npm run test
       - name: Publish
         run: npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: Commit
         run: |
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
