@@ -11,6 +11,9 @@ on:
           - patch
           - minor
           - major
+permissions:
+  contents: write
+  id-token: write
 jobs:
   build:
     runs-on: ubuntu-latest
