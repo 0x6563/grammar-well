@@ -102,6 +102,16 @@ JSON:
     inputSource: mem:\\1k.json
     resultJSON: mem:\\1k.json
 
+  - title: Builtin Empty Key
+    grammar: "import * from json;"
+    input: "{\"\": 1, \"a\": 2}"
+    result: { "": 1, a: 2 }
+
+  - title: Builtin Nested Empty Key
+    grammar: "import * from json;"
+    input: "[{\"x\": {\"\": null}}, {\"\": 0}]"
+    result: [{ x: { "": null } }, { "": 0 }]
+
   - title: LR
     algorithm: lr0
     grammarSource: grammars/json-no-epsilon.gwell
