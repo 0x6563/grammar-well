@@ -58,7 +58,7 @@ grammar {
 
 on:import {
 function extractPair(kv, output) {
-        if(kv[0]) { output[kv[0]] = kv[1]; }
+        output[kv[0]] = kv[1];
     }
 
     function extractObject({data}) {
